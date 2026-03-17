@@ -125,8 +125,8 @@
     /* DNQ rows */
     tr.dnq-row td { color:var(--text-muted); font-size:.82rem; height:2.6rem; opacity:.7; }
     tr.dnq-row td:first-child { font-family:var(--font-mono); font-size:.65rem; }
-    tr.college-row td { color:var(--text-muted) !important; font-style:italic; opacity:.75; }
-    .college-tag { cursor:help; border-bottom:1px dashed rgba(35,26,165,.4); }
+    tr.college-row td { color:var(--text) !important; font-style:normal !important; opacity:1 !important; }
+    .college-tag { cursor:help; border-bottom:1px dashed var(--text-muted); text-decoration:none; }
     /* college footnote */
     .college-footnote { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.1em; color:var(--text-muted); margin-top:10px; padding:8px 0 0; border-top:1px solid var(--border-soft); }
     .college-footnote span { color:var(--blue); margin-right:4px; }
@@ -238,27 +238,27 @@
       </div>
       <div class="player-select-grid">
         <a class="player-select-card" href="#clark-bio" data-player="clark">
-          <div class="psc-num">#05 · PG</div><div class="psc-avatar">CC</div>
+          <div class="psc-num">#5 · PG</div><div class="psc-avatar" style="background:linear-gradient(135deg,var(--blue),var(--navy));overflow:hidden;padding:0;"><img src="headshot_clark.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
           <div class="psc-name">Cooper Clark</div><div class="psc-pos">Point Guard</div>
           <span class="psc-arrow">View Profile →</span>
         </a>
         <a class="player-select-card" href="#hatch-bio" data-player="hatch">
-          <div class="psc-num">#10 · PF</div><div class="psc-avatar">PH</div>
+          <div class="psc-num">#10 · PF</div><div class="psc-avatar" style="background:linear-gradient(135deg,var(--blue),var(--navy));overflow:hidden;padding:0;"><img src="headshot_hatch.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
           <div class="psc-name">Paxon Hatch</div><div class="psc-pos">Power Forward</div>
           <span class="psc-arrow">View Profile →</span>
         </a>
         <a class="player-select-card" href="#stogsdill-bio" data-player="stogsdill">
-          <div class="psc-num">#34 · C</div><div class="psc-avatar">SS</div>
+          <div class="psc-num">#34 · C</div><div class="psc-avatar" style="background:linear-gradient(135deg,var(--blue),var(--navy));overflow:hidden;padding:0;"><img src="headshot_stogsdill.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
           <div class="psc-name">Sam Stogsdill</div><div class="psc-pos">Center</div>
           <span class="psc-arrow">View Profile →</span>
         </a>
         <a class="player-select-card" href="#stewart-bio" data-player="stewart">
-          <div class="psc-num">#02 · PG</div><div class="psc-avatar">JS</div>
+          <div class="psc-num">#2 · PG</div><div class="psc-avatar" style="background:linear-gradient(135deg,var(--blue),var(--navy));overflow:hidden;padding:0;"><img src="headshot_stewart.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
           <div class="psc-name">Jaykeb Stewart</div><div class="psc-pos">Point Guard</div>
           <span class="psc-arrow">View Profile →</span>
         </a>
         <a class="player-select-card" href="#vitel-bio" data-player="vitel">
-          <div class="psc-num">#08 · SG</div><div class="psc-avatar">IV</div>
+          <div class="psc-num">#1 · SG</div><div class="psc-avatar" style="background:linear-gradient(135deg,var(--blue),var(--navy));overflow:hidden;padding:0;"><img src="headshot_vitel.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
           <div class="psc-name">Isaac Vitel</div><div class="psc-pos">Shooting Guard</div>
           <span class="psc-arrow">View Profile →</span>
         </a>
@@ -375,18 +375,6 @@
               <div class="chart-card-body"><canvas id="chart-progression"></canvas></div>
             </div>
 
-            <!-- CHART 2: Radar with year dropdown -->
-            <div class="chart-card">
-              <div class="chart-card-header">
-                <div class="chart-card-dot"></div>
-                <span class="chart-card-title">Stat Distribution</span>
-                <div style="margin-left:auto;">
-                  <select class="chart-select" id="radar-year-select"></select>
-                </div>
-              </div>
-              <div class="chart-card-body"><canvas id="chart-radar"></canvas></div>
-            </div>
-
             <!-- CHART 3: Ratio comparison bars -->
             <div class="chart-card wide" id="compare-card">
               <div class="chart-card-header">
@@ -445,23 +433,32 @@
 
   var PLAYERS = {
     clark:     { name:'Cooper Clark',   initials:'CC', number:'#05', position:'Point Guard',    team:'TBD',
-      bio:[{key:'Height',val:'—'},{key:'Weight',val:'—'},{key:'Age',val:'—'},{key:'College',val:'—'},{key:'Draft Year',val:'—'},{key:'Draft Pick',val:'—'},{key:'Nationality',val:'—'}]
+      bio:[{key:'Height',val:'6\'1\"'},{key:'Weight',val:'155 lbs'},{key:'Age',val:'—'},{key:'College',val:'Arizona'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Thirteenth Pick'},{key:'Nickname',val:'Clutch Clark'}]
     },
     hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward',  team:'TBD',
-      bio:[{key:'Height',val:'—'},{key:'Weight',val:'—'},{key:'Age',val:'—'},{key:'College',val:'—'},{key:'Draft Year',val:'—'},{key:'Draft Pick',val:'—'},{key:'Nationality',val:'—'}]
+      bio:[{key:'Height',val:'6\'7\"'},{key:'Weight',val:'228 lbs'},{key:'Age',val:'—'},{key:'College',val:'UCLA'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Second Pick'},{key:'Nickname',val:'Pax'}]
     },
     stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',         team:'TBD',
-      bio:[{key:'Height',val:'—'},{key:'Weight',val:'—'},{key:'Age',val:'—'},{key:'College',val:'—'},{key:'Draft Year',val:'—'},{key:'Draft Pick',val:'—'},{key:'Nationality',val:'—'}]
+      bio:[{key:'Height',val:'6\'9\"'},{key:'Weight',val:'253 lbs'},{key:'Age',val:'—'},{key:'College',val:'Louisville'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Seventeenth Pick'},{key:'Nickname',val:'Uncle Sam'}]
     },
     stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#02', position:'Point Guard',    team:'TBD',
-      bio:[{key:'Height',val:'—'},{key:'Weight',val:'—'},{key:'Age',val:'—'},{key:'College',val:'—'},{key:'Draft Year',val:'—'},{key:'Draft Pick',val:'—'},{key:'Nationality',val:'—'}]
+      bio:[{key:'Height',val:'6\'5\"'},{key:'Weight',val:'200 lbs'},{key:'Age',val:'—'},{key:'College',val:'Florida State, Duke'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Eleventh Pick'},{key:'Nickname',val:'—'}]
     },
     vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#08', position:'Shooting Guard', team:'TBD',
-      bio:[{key:'Height',val:'—'},{key:'Weight',val:'—'},{key:'Age',val:'—'},{key:'College',val:'—'},{key:'Draft Year',val:'—'},{key:'Draft Pick',val:'—'},{key:'Nationality',val:'—'}]
+      bio:[{key:'Height',val:'6\'4\"'},{key:'Weight',val:'203 lbs'},{key:'Age',val:'—'},{key:'College',val:'Kansas'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Sixth Pick'},{key:'Nickname',val:'V8'}]
     }
   };
 
   var TABS = ['bio','traditional-splits','awards','contracts','career-high','shoes','jersey-locker'];
+
+  /* ── HEADSHOT IMAGES ── */
+  var PLAYER_HEADSHOTS = {
+    clark:     'headshot_clark.png',
+    hatch:     'headshot_hatch.png',
+    stogsdill: 'headshot_stogsdill.png',
+    stewart:   'headshot_stewart.png',
+    vitel:     'headshot_vitel.png'
+  };
   var activeCharts = {};
   var pgMode = 'regular';
   var currentKey = null;
@@ -531,7 +528,27 @@
     var p = PLAYERS[key];
     var latest = latestSeason(key);
     var team = latest ? latest.team : p.team;
-    document.getElementById('profile-initials').textContent = p.initials;
+    // Headshot
+    var hsEl = document.getElementById('profile-initials');
+    var imgSrc = PLAYER_HEADSHOTS[key];
+    if (imgSrc) {
+      hsEl.style.display = 'none';
+      var existing = document.getElementById('profile-headshot-img');
+      if (!existing) {
+        var img = document.createElement('img');
+        img.id = 'profile-headshot-img';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top center;position:absolute;inset:0;';
+        hsEl.parentNode.style.position = 'relative';
+        hsEl.parentNode.appendChild(img);
+        existing = img;
+      }
+      existing.src = imgSrc;
+      existing.style.display = 'block';
+    } else {
+      hsEl.style.display = 'flex';
+      var old = document.getElementById('profile-headshot-img');
+      if (old) old.style.display = 'none';
+    }
     document.getElementById('profile-name').textContent = p.name;
     document.getElementById('profile-team-line').textContent = p.number+' · '+p.position+' · '+team;
     var meta = document.getElementById('profile-meta');
@@ -569,6 +586,21 @@
       d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val'+(r.orange?' orange':'')+'">'+r.val+'</span>';
       bioEl.appendChild(d);
     });
+
+    // Auto-update Age from most recent pro season
+    (function(){
+      var latestRow = latestSeason(key);
+      if (!latestRow || !latestRow.age) return;
+      var rows = bioEl.querySelectorAll('.bio-row');
+      for (var i=0; i<rows.length; i++) {
+        var kEl = rows[i].querySelector('.bio-row-key');
+        if (kEl && kEl.textContent.trim() === 'Age') {
+          var vEl = rows[i].querySelector('.bio-row-val');
+          if (vEl) vEl.textContent = String(latestRow.age);
+          break;
+        }
+      }
+    })();
 
     // Career overview — computed from PLAYER_STATS
     var careerEl = document.getElementById('bio-career-rows');
@@ -773,16 +805,19 @@
 
   /* ── WEIGHTED AVG ROW ── */
   function weightedAvgRow(rows) {
-    var valid=rows.filter(isProRow);
-    if(!valid.length) return null;
+    var valid = (rows||[]).filter(isProRow);
+    if (!valid.length) return null;
     var g=0,wP=0,wR=0,wA=0,wS=0,wB=0,wT=0,wFG=0,wTP=0,wFT=0,tpW=0,wMPG=0;
     valid.forEach(function(r){
-      g+=r.gp; wP+=r.ppg*r.gp; wR+=r.rpg*r.gp; wA+=r.apg*r.gp;
-      wS+=r.spg*r.gp; wB+=r.bpg*r.gp; wT+=r.topg*r.gp; wMPG+=r.mpg*r.gp;
-      wFG+=parseFloat((r.fgp||'0').replace('%',''))*r.gp;
-      wFT+=parseFloat((r.ftp||'0').replace('%',''))*r.gp;
-      var tw=r.tpa>0?r.tpa*r.gp:r.gp; tpW+=tw; wTP+=parseFloat((r.tpp||'0').replace('%',''))*tw;
+      var gp = r.gp||0; if(gp<=0) return;
+      g+=gp; wP+=r.ppg*gp; wR+=r.rpg*gp; wA+=r.apg*gp;
+      wS+=r.spg*gp; wB+=r.bpg*gp; wT+=r.topg*gp; wMPG+=r.mpg*gp;
+      wFG+=parseFloat(String(r.fgp||'0').replace('%',''))*gp;
+      wFT+=parseFloat(String(r.ftp||'0').replace('%',''))*gp;
+      var tw=(r.tpa||0)>0?(r.tpa*gp):gp; tpW+=tw;
+      wTP+=parseFloat(String(r.tpp||'0').replace('%',''))*tw;
     });
+    if (!g) return null;
     return { ppg:wP/g, rpg:wR/g, apg:wA/g, spg:wS/g, bpg:wB/g, topg:wT/g, mpg:wMPG/g,
              fgp:wFG/g, tpp:tpW>0?wTP/tpW:0, ftp:wFT/g };
   }
@@ -880,10 +915,13 @@
   }
 
   function getRowForYear(key, yearVal) {
-    var data=(PLAYER_STATS[key]||{}).regular||[];
-    var valid=data.filter(isProRow);
-    if(yearVal==='career') return weightedAvgRow(valid);
-    return valid.find(function(r){ return r.season===yearVal; })||null;
+    var data = (PLAYER_STATS[key]||{}).regular||[];
+    var valid = data.filter(isProRow);
+    if (yearVal === 'career') return weightedAvgRow(valid);
+    // Try exact match first, then without hyphens
+    return valid.find(function(r){ return r.season === yearVal; })
+        || valid.find(function(r){ return String(r.season).replace('-','–') === yearVal; })
+        || null;
   }
 
   /* ══ CHART 3: RATIO BAR COMPARISON (SVG-based, no Chart.js) ══ */
@@ -928,17 +966,22 @@
       var label = COMPARE_LABELS[i];
 
       // Format display values
-      var dispA = (stat === 'fgp' || stat === 'tpp' || stat === 'ftp')
-        ? fmt1(vA) + '%'
-        : fmt1(vA);
-      var dispB = (stat === 'fgp' || stat === 'tpp' || stat === 'ftp')
-        ? fmt1(vB) + '%'
-        : fmt1(vB);
+      var isPct = (stat === 'fgp' || stat === 'tpp' || stat === 'ftp');
+      var dispA = isPct ? fmt1(vA) + '%' : fmt1(vA);
+      var dispB = isPct ? fmt1(vB) + '%' : fmt1(vB);
+
+      // Checkmark for stat winner (✓ on outer side)
+      var aWins = vA > vB;
+      var bWins = vB > vA;
+      // TOPG: lower is better
+      if (stat === 'topg') { aWins = vA < vB; bWins = vB < vA; }
+      var checkA = aWins ? '<span style="font-size:.7rem;color:' + ORANGE + ';margin-right:2px;opacity:.9;">✓</span>' : '<span style="width:12px;display:inline-block;"></span>';
+      var checkB = bWins ? '<span style="font-size:.7rem;color:' + BLUE + ';margin-left:2px;opacity:.9;">✓</span>' : '<span style="width:12px;display:inline-block;"></span>';
 
       rows += '<div style="display:flex;align-items:center;gap:0;margin-bottom:6px;">';
 
-      // Player A value (right-aligned, left side)
-      rows += '<div style="width:52px;text-align:right;font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + ORANGE + ';padding-right:8px;flex-shrink:0;">' + dispA + '</div>';
+      // Player A value + checkmark (right-aligned, left side)
+      rows += '<div style="width:64px;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:0;padding-right:8px;flex-shrink:0;">' + checkA + '<span style="font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + ORANGE + ';">' + dispA + '</span></div>';
 
       // Stacked bar
       rows += '<div style="flex:1;height:28px;display:flex;border-radius:3px;overflow:hidden;position:relative;">';
@@ -953,23 +996,23 @@
 
       rows += '</div>';
 
-      // Player B value (left-aligned, right side)
-      rows += '<div style="width:52px;text-align:left;font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + BLUE + ';padding-left:8px;flex-shrink:0;">' + dispB + '</div>';
+      // Player B value + checkmark (left-aligned, right side)
+      rows += '<div style="width:64px;text-align:left;display:flex;align-items:center;justify-content:flex-start;gap:0;padding-left:8px;flex-shrink:0;"><span style="font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + BLUE + ';">' + dispB + '</span>' + checkB + '</div>';
 
       // Stat label overlay centered
       rows += '</div>';
 
       // Stat label row below the bar
       rows += '<div style="display:flex;align-items:center;gap:0;margin-bottom:10px;">';
-      rows += '<div style="width:52px;"></div>';
+      rows += '<div style="width:64px;"></div>';
       rows += '<div style="flex:1;text-align:center;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:' + mutedColor + ';">' + label + '</div>';
-      rows += '<div style="width:52px;"></div>';
+      rows += '<div style="width:64px;"></div>';
       rows += '</div>';
     });
 
     // Legend
     var legend =
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 52px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 64px;">' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
           '<div style="width:14px;height:14px;border-radius:2px;background:' + ORANGE_FADE + ';flex-shrink:0;"></div>' +
           '<span style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:' + textColor + ';">' + nameA + '</span>' +
@@ -993,23 +1036,16 @@
   /* ── BUILD ALL CHARTS ── */
   function buildCharts(key) {
     var stat=document.getElementById('progression-stat-select').value||'ppg';
-    var radarYear=document.getElementById('radar-year-select').value||'career';
     buildProgressionChart(key, stat);
-    buildRadarChart(key, radarYear);
     buildCompareChart(key);
   }
 
   function initChartControls(key) {
-    populateRadarYears(key);
     populateCompareDropdowns(key);
 
     // Progression stat change
     var progSel=document.getElementById('progression-stat-select');
     progSel.onchange=function(){ buildProgressionChart(key, progSel.value); };
-
-    // Radar year change
-    var radarSel=document.getElementById('radar-year-select');
-    radarSel.onchange=function(){ buildRadarChart(key, radarSel.value); };
 
     // Compare player B change → repopulate B years → rebuild
     var selB=document.getElementById('compare-player-b');
