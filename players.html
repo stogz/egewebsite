@@ -387,19 +387,20 @@
               <div class="chart-card-body"><canvas id="chart-radar"></canvas></div>
             </div>
 
-            <!-- CHART 3: Player comparison double bar -->
+            <!-- CHART 3: Ratio comparison bars -->
             <div class="chart-card wide" id="compare-card">
               <div class="chart-card-header">
                 <div class="chart-card-dot"></div>
                 <span class="chart-card-title">Player Comparison</span>
                 <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
                   <select class="chart-select" id="compare-year-a"></select>
-                  <span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);padding:0 2px;">vs</span>
+                  <span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);padding:0 4px;">vs</span>
                   <select class="chart-select" id="compare-player-b"></select>
                   <select class="chart-select" id="compare-year-b"></select>
                 </div>
               </div>
-              <div class="chart-card-body" style="height:380px;"><canvas id="chart-compare"></canvas></div>
+              <!-- Custom ratio bar chart — no canvas needed -->
+              <div id="compare-ratio-chart" style="padding:20px 24px 16px;"></div>
             </div>
 
           </div>
@@ -847,9 +848,6 @@
   }
 
   /* ══ CHART 3: COMPARISON DOUBLE BAR ══ */
-  var COMPARE_STATS = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp'];
-  var COMPARE_LABELS = ['PPG','RPG','APG','SPG','BPG','TOPG','FG%','3P%','FT%'];
-
   function populateCompareDropdowns(activeKey) {
     // Year A (active player)
     var selA=document.getElementById('compare-year-a');
@@ -888,64 +886,108 @@
     return valid.find(function(r){ return r.season===yearVal; })||null;
   }
 
+  /* ══ CHART 3: RATIO BAR COMPARISON (SVG-based, no Chart.js) ══ */
+  var COMPARE_STATS  = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','mpg'];
+  var COMPARE_LABELS = ['PPG','RPG','APG','SPG','BPG','TOPG','FG%','3P%','FT%','MPG'];
+
   function buildCompareChart(activeKey) {
-    if(activeCharts['compare']){ activeCharts['compare'].destroy(); delete activeCharts['compare']; }
-    var yearA=document.getElementById('compare-year-a').value;
-    var bKey=document.getElementById('compare-player-b').value;
-    var yearB=document.getElementById('compare-year-b').value;
-    if(!bKey) return;
+    var yearA = document.getElementById('compare-year-a').value;
+    var bKey  = document.getElementById('compare-player-b').value;
+    var yearB = document.getElementById('compare-year-b').value;
+    var wrap  = document.getElementById('compare-ratio-chart');
+    if (!bKey || !wrap) return;
 
-    var rowA=getRowForYear(activeKey, yearA);
-    var rowB=getRowForYear(bKey, yearB);
-    var c=chartColors();
+    var rowA = getRowForYear(activeKey, yearA);
+    var rowB = getRowForYear(bKey, yearB);
 
-    var nameA=yearA==='career'
-      ? PLAYERS[activeKey].name+' (All-Time)'
-      : PLAYERS[activeKey].name+' '+fmtSeason(yearA);
-    var nameB=yearB==='career'
-      ? PLAYERS[bKey].name+' (All-Time)'
-      : PLAYERS[bKey].name+' '+fmtSeason(yearB);
+    var nameA = yearA === 'career'
+      ? PLAYERS[activeKey].name + ' · All-Time'
+      : PLAYERS[activeKey].name + ' · ' + fmtSeason(yearA);
+    var nameB = yearB === 'career'
+      ? PLAYERS[bKey].name + ' · All-Time'
+      : PLAYERS[bKey].name + ' · ' + fmtSeason(yearB);
 
-    var valsA=COMPARE_STATS.map(function(s){ return rowA?Math.round(parseFloat(fmt1(getStatVal(rowA,s)))*10)/10:0; });
-    var valsB=COMPARE_STATS.map(function(s){ return rowB?Math.round(parseFloat(fmt1(getStatVal(rowB,s)))*10)/10:0; });
+    var isLight = document.documentElement.classList.contains('light');
+    var textColor   = isLight ? '#2a2140' : '#d0d0d0';
+    var mutedColor  = isLight ? 'rgba(42,33,64,0.45)' : 'rgba(208,208,208,0.45)';
+    var borderColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
 
-    var ctx=document.getElementById('chart-compare').getContext('2d');
-    activeCharts['compare']=new Chart(ctx,{
-      type:'bar',
-      data:{
-        labels: COMPARE_LABELS,
-        datasets:[
-          { label: nameA, data: valsA,
-            backgroundColor:'rgba(231,87,25,0.75)', borderColor:c.orange, borderWidth:1, borderRadius:3 },
-          { label: nameB, data: valsB,
-            backgroundColor:'rgba(35,26,165,0.65)', borderColor:c.blue,   borderWidth:1, borderRadius:3 }
-        ]
-      },
-      options:{
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{
-          legend: legendOpts(c),
-          tooltip:{
-            callbacks:{
-              label: function(ctx){ return '  '+ctx.dataset.label+': '+ctx.parsed.x; }
-            }
-          }
-        },
-        scales:{
-          x:{
-            ticks:{ color:c.faint, font:{family:"'Share Tech Mono',monospace",size:9} },
-            grid:{ color:c.grid },
-            beginAtZero: true
-          },
-          y:{
-            ticks:{ color:c.text, font:{family:"'Share Tech Mono',monospace",size:10,weight:'600'} },
-            grid:{ color:c.grid }
-          }
-        }
-      }
+    var ORANGE = '#e75719';
+    var BLUE   = '#231aa5';
+    var ORANGE_FADE = 'rgba(231,87,25,0.80)';
+    var BLUE_FADE   = 'rgba(35,26,165,0.75)';
+
+    // Build rows
+    var rows = '';
+    COMPARE_STATS.forEach(function(stat, i) {
+      var vA = rowA ? getStatVal(rowA, stat) : 0;
+      var vB = rowB ? getStatVal(rowB, stat) : 0;
+      var total = vA + vB;
+      var pctA = total > 0 ? (vA / total * 100) : 50;
+      var pctB = total > 0 ? (vB / total * 100) : 50;
+      var label = COMPARE_LABELS[i];
+
+      // Format display values
+      var dispA = (stat === 'fgp' || stat === 'tpp' || stat === 'ftp')
+        ? fmt1(vA) + '%'
+        : fmt1(vA);
+      var dispB = (stat === 'fgp' || stat === 'tpp' || stat === 'ftp')
+        ? fmt1(vB) + '%'
+        : fmt1(vB);
+
+      rows += '<div style="display:flex;align-items:center;gap:0;margin-bottom:6px;">';
+
+      // Player A value (right-aligned, left side)
+      rows += '<div style="width:52px;text-align:right;font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + ORANGE + ';padding-right:8px;flex-shrink:0;">' + dispA + '</div>';
+
+      // Stacked bar
+      rows += '<div style="flex:1;height:28px;display:flex;border-radius:3px;overflow:hidden;position:relative;">';
+
+      // A bar (left, orange, grows right-to-left from center — we flip with direction)
+      rows += '<div style="width:' + pctA.toFixed(2) + '%;background:' + ORANGE_FADE + ';display:flex;align-items:center;justify-content:flex-end;transition:width .5s ease;">';
+      // stat label pinned at center
+      rows += '</div>';
+
+      // B bar (right, blue)
+      rows += '<div style="width:' + pctB.toFixed(2) + '%;background:' + BLUE_FADE + ';transition:width .5s ease;"></div>';
+
+      rows += '</div>';
+
+      // Player B value (left-aligned, right side)
+      rows += '<div style="width:52px;text-align:left;font-family:var(--font-display);font-weight:700;font-size:.95rem;color:' + BLUE + ';padding-left:8px;flex-shrink:0;">' + dispB + '</div>';
+
+      // Stat label overlay centered
+      rows += '</div>';
+
+      // Stat label row below the bar
+      rows += '<div style="display:flex;align-items:center;gap:0;margin-bottom:10px;">';
+      rows += '<div style="width:52px;"></div>';
+      rows += '<div style="flex:1;text-align:center;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:' + mutedColor + ';">' + label + '</div>';
+      rows += '<div style="width:52px;"></div>';
+      rows += '</div>';
     });
+
+    // Legend
+    var legend =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 52px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="width:14px;height:14px;border-radius:2px;background:' + ORANGE_FADE + ';flex-shrink:0;"></div>' +
+          '<span style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:' + textColor + ';">' + nameA + '</span>' +
+        '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:' + mutedColor + ';">ratio comparison</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:' + textColor + ';">' + nameB + '</span>' +
+          '<div style="width:14px;height:14px;border-radius:2px;background:' + BLUE_FADE + ';flex-shrink:0;"></div>' +
+        '</div>' +
+      '</div>';
+
+    // 50% center line marker
+    var centerLine =
+      '<div style="position:relative;margin-bottom:4px;">' +
+        '<div style="position:absolute;left:calc(52px + 50% - 1px);top:-' + (COMPARE_STATS.length * 46) + 'px;width:1px;height:' + (COMPARE_STATS.length * 46) + 'px;background:' + borderColor + ';pointer-events:none;"></div>' +
+      '</div>';
+
+    wrap.innerHTML = legend + '<div style="position:relative;">' + centerLine + rows + '</div>';
   }
 
   /* ── BUILD ALL CHARTS ── */
