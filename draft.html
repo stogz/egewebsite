@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="EGE_Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draft · EGE NBA Simulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    .placeholder-wrap {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 40px 80px;
+      text-align: center;
+    }
+    .placeholder-glow {
+      position: absolute;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(35,26,165,.2) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .placeholder-eyebrow {
+      font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .3em; color: var(--orange);
+      text-transform: uppercase; margin-bottom: 22px;
+      animation: fadeUp .8s ease both;
+    }
+    .placeholder-eyebrow::before { content: '// '; opacity: .5; }
+    .placeholder-title {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(4rem, 12vw, 10rem);
+      line-height: .9; text-transform: uppercase;
+      color: var(--heading); letter-spacing: -.01em;
+      animation: fadeUp .8s .15s ease both;
+      transition: color 0.35s;
+    }
+    .placeholder-title .ghost {
+      -webkit-text-stroke: 2px rgba(35,26,165,.7);
+      color: transparent;
+    }
+    .wip-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 36px; padding: 10px 24px;
+      border: 1px solid rgba(231,87,25,.3); border-radius: 3px;
+      background: rgba(231,87,25,.06);
+      font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--text-muted);
+      animation: fadeUp .8s .3s ease both;
+    }
+    .wip-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--orange);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    .placeholder-sub {
+      font-family: var(--font-body); font-size: 1.05rem;
+      font-weight: 300; letter-spacing: .06em;
+      color: var(--text-muted);
+      max-width: 420px; margin: 20px auto 0;
+      line-height: 1.7;
+      animation: fadeUp .8s .4s ease both;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 48px;
+      font-family: var(--font-mono); font-size: .75rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      text-decoration: none; padding: 13px 30px;
+      border: 1px solid rgba(231,87,25,.35); border-radius: 3px;
+      color: var(--orange); background: rgba(231,87,25,.06);
+      transition: all .2s;
+      animation: fadeUp .8s .5s ease both;
+    }
+    .back-btn:hover {
+      background: rgba(231,87,25,.12);
+      border-color: var(--orange);
+      transform: translateY(-2px);
+    }
+    .deco-lines { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .deco-line  { position: absolute; background: rgba(35,26,165,.12); }
+    .deco-line.h { height: 1px; left: 0; right: 0; }
+    .deco-line.v { width: 1px; top: 0; bottom: 0; }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="scanline"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="EGE_Logo.png" alt="EGE Logo" class="logo-img" />
+      <span>EGE <span class="accent">NBA</span> Simulation</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-num="01">Home</a></li>
+      <li><a href="players.html" data-num="02">Players</a></li>
+      <li><a href="teams.html" data-num="03">Teams</a></li>
+      <li><a href="history.html" data-num="04">History</a></li>
+      <li><a href="draft.html" data-num="05" class="active">Draft</a></li>
+      <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
+    </ul>
+  </nav>
+
+  <div class="placeholder-wrap">
+    <div class="placeholder-glow"></div>
+    <div class="deco-lines">
+      <div class="deco-line h" style="top:25%"></div>
+      <div class="deco-line h" style="top:75%"></div>
+      <div class="deco-line v" style="left:15%"></div>
+      <div class="deco-line v" style="right:15%"></div>
+    </div>
+    <p class="placeholder-eyebrow">draft · classes · prospects</p>
+    <h1 class="placeholder-title">
+      Draft<br>
+      <span class="ghost">Database</span>
+    </h1>
+    <div class="wip-badge">
+      <span class="wip-dot"></span>
+      Under Construction · Coming Soon
+    </div>
+    <p class="placeholder-sub">Pick-by-pick results, prospect evaluations, and full class breakdowns for every draft in the EGE simulation.</p>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+
+  <footer>
+    <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
+    <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
+  </footer>
+
+  <script src="shared.js"></script>
+</body>
+</html>
