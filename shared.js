@@ -5,6 +5,31 @@
 
 (function () {
 
+  /* ── MOBILE NAV ROW ── */
+  // Inject a full-width bottom row inside <nav> for mobile page links
+  (function() {
+    var nav = document.querySelector('nav');
+    if (!nav) return;
+    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    var pages = [
+      { href: 'index.html',   label: 'Home' },
+      { href: 'players.html', label: 'Players' },
+      { href: 'teams.html',   label: 'Teams' },
+      { href: 'history.html', label: 'History' },
+      { href: 'draft.html',   label: 'Draft' },
+    ];
+    var row = document.createElement('div');
+    row.className = 'nav-mobile-row';
+    pages.forEach(function(p) {
+      var a = document.createElement('a');
+      a.href = p.href;
+      a.textContent = p.label;
+      if (p.href === currentPage) a.classList.add('active');
+      row.appendChild(a);
+    });
+    nav.appendChild(row);
+  })();
+
   /* ── DARK / LIGHT MODE ── */
   const btn = document.getElementById('mode-toggle');
   const html = document.documentElement;

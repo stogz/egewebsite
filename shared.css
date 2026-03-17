@@ -323,3 +323,77 @@ section { position: relative; z-index: 2; }
   0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
   50%       { transform: translate(-50%,-50%) scale(1.12); opacity: .7; }
 }
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE — shared elements
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── NAV ── */
+  nav {
+    padding: 10px 18px;
+    height: auto;
+    flex-wrap: wrap;
+  }
+  .nav-logo {
+    font-size: 1rem;
+    gap: 8px;
+  }
+  .logo-img {
+    width: 30px; height: 30px;
+  }
+  .nav-logo > span { display: none; }
+
+  /* Hide page links from the inline list on mobile */
+  .nav-links li:not(:last-child) { display: none; }
+  .nav-links li:last-child { display: flex; }
+  #mode-toggle { width: 32px; height: 32px; font-size: .9rem; }
+
+  /* Mobile full-width nav row injected by JS */
+  .nav-mobile-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    padding: 8px 0 2px;
+    border-top: 1px solid rgba(231,87,25,.12);
+    margin-top: 6px;
+  }
+  .nav-mobile-row a {
+    font-family: var(--font-mono);
+    font-size: .6rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 5px 6px;
+    border-radius: 3px;
+    transition: color .2s, background .2s;
+  }
+  .nav-mobile-row a:hover,
+  .nav-mobile-row a.active {
+    color: var(--orange);
+    background: rgba(231,87,25,.07);
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .section-title { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+
+  /* ── FOOTER ── */
+  footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 20px;
+    text-align: center;
+  }
+  .footer-links {
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
