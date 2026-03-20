@@ -27,8 +27,8 @@
     .player-select-card:hover .psc-arrow { gap:12px; }
 
     /* ══ PROFILE VIEW ══ */
-    #player-profile { display:none; padding-top:56px; }
-    #player-profile.visible { display:block; }
+    #player-profile { display:none; padding-top:64px; }
+    #player-profile.visible { display:flex; flex-direction:column; }
 
     /* Banner */
     .player-banner { position:relative; z-index:2; background:var(--bg-card); border-bottom:1px solid rgba(231,87,25,.2); overflow:visible; transition:background .35s; height:315px; }
@@ -237,7 +237,41 @@
     #profile-headshot-img.animate-in { animation:headshotIn .6s ease both; }
 
     /* ══ MOBILE ══ */
+    /* ── MOBILE CONTRACTS ── */
     @media (max-width:768px) {
+      /* Ensure salary table scrolls horizontally */
+      .ct-card { overflow:hidden; }
+      .ct-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; display:block; }
+      .ct-table { min-width:460px; }
+      /* Contracts right column stacks below */
+      .contracts-layout { grid-template-columns:1fr; }
+      /* Signing/trade feed full width */
+      .signing-item { flex-wrap:wrap; }
+    }
+
+    /* ── MOBILE BIO JERSEYS ── */
+    @media (max-width:768px) {
+      #bio-jerseys-section { gap:12px; }
+      .jersey-wrap { flex-shrink:0; }
+    }
+
+    /* ── MOBILE COMPARE CHART ── */
+    @media (max-width:768px) {
+      .chart-card-header[style*="flex-wrap:nowrap"] { flex-wrap:wrap !important; overflow-x:auto; }
+      /* Compare dropdowns wrap on small screens */
+      #compare-year-a, #compare-year-b, #compare-player-b { min-width:90px !important; }
+    }
+
+    /* ── MOBILE BANNER NAME ── */
+    @media (max-width:768px) {
+      .player-banner-name { flex-wrap:wrap; overflow:hidden; }
+      #banner-team-logo-wrap img { height:.65em; }
+    }
+
+    /* ── MOBILE PLAYER CONTENT PADDING ── */
+    @media (max-width:768px) {
+      /* Nav is position:relative on mobile, so no offset needed */
+      #player-profile { padding-top:0; }
       .player-select { padding:80px 16px 50px; }
       .player-select-grid { gap:10px; }
       .player-banner { height:170px; }
@@ -251,7 +285,7 @@
       .player-banner-meta { justify-content:flex-start; gap:10px; }
       .banner-meta-value { font-size:1rem; }
       .banner-meta-label { font-size:.5rem; }
-      .player-subnav { padding:0 12px; top:56px; overflow-x:auto; }
+      .player-subnav { padding:0 12px; top:0; overflow-x:auto; }
       .subnav-tab { display:none; }
       .subnav-mobile-select {
         display:block;
@@ -299,7 +333,7 @@
     /* Salary table — styled exactly like splits-table */
     .ct-card { border:1px solid var(--border); border-radius:6px; overflow:hidden; background:var(--bg-card); transition:background .35s; margin-bottom:28px; }
     .ct-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
-    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; }
+    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; }
     .ct-scroll::-webkit-scrollbar { height:4px; }
     .ct-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
     .ct-table { border-collapse:collapse; width:100%; min-width:520px; font-family:var(--font-body); }
@@ -526,6 +560,23 @@
     @media (hover:none) {
       .player-select-card:hover { transform:none; }
       .player-select-card:active { border-color:rgba(231,87,25,.5); background:rgba(231,87,25,.04); }
+    }
+    /* ── STICKY FOOTER ── */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    #player-select-view {
+      flex: 1;
+    }
+    #player-profile.visible {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .player-content {
+      flex: 1;
     }
   </style>
 </head>
@@ -2556,9 +2607,13 @@
       setTimeout(function(){ buildCharts(key); }, 80);
     }
     if(push!==false) history.pushState(null,'','#'+key+'-'+tab);
-    // Scroll content area to top on tab switch
-    var content = document.querySelector('.player-content');
-    if (content) content.scrollTop = 0;
+    // Scroll to top of player profile on tab switch
+    var banner = document.querySelector('.player-banner');
+    if (banner) {
+      banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /* ── SHOW PROFILE ── */
@@ -2583,6 +2638,8 @@
     renderAwards(key);
     switchTab(tab, key, false);
     document.title=PLAYERS[key].name+' · EGE NBA Simulation';
+    // Scroll to very top of page when opening a player profile
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function showRoster() {
