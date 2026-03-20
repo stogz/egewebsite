@@ -106,7 +106,7 @@
     .splits-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
 
     /* Scroll wrapper */
-    .splits-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; }
+    .splits-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; touch-action:pan-x; }
     .splits-scroll::-webkit-scrollbar { height:4px; }
     .splits-scroll::-webkit-scrollbar-track { background:transparent; }
     .splits-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
@@ -237,23 +237,7 @@
     #profile-headshot-img.animate-in { animation:headshotIn .6s ease both; }
 
     /* ══ MOBILE ══ */
-    /* ── MOBILE CONTRACTS ── */
-    @media (max-width:768px) {
-      /* Salary table: card clips border-radius, scroll handles horizontal */
-      .ct-card { overflow:clip; max-width:100%; }
-      .ct-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; display:block; width:100%; }
-      .ct-table { min-width:460px; }
-      /* Contracts right column stacks below */
-      .contracts-layout { grid-template-columns:1fr; }
-      /* Trade/signing items fit within screen */
-      .signing-item { flex-wrap:wrap; max-width:100%; }
-      .trade-item { max-width:100%; overflow:hidden; }
-      .trade-teams { white-space:normal; word-break:break-word; }
-      .trade-assets { max-width:100%; }
-      /* Chart canvas container */
-      .ct-chart-scroll { max-width:100%; }
-      .ct-chart-inner { min-width:380px; }
-    }
+
 
     /* ── MOBILE BIO JERSEYS ── */
     @media (max-width:768px) {
@@ -337,9 +321,9 @@
     .contracts-layout { display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start; }
 
     /* Salary table — styled exactly like splits-table */
-    .ct-card { border:1px solid var(--border); border-radius:6px; overflow:hidden; background:var(--bg-card); transition:background .35s; margin-bottom:28px; }
+    .ct-card { border:1px solid var(--border); border-radius:6px; overflow:clip; background:var(--bg-card); transition:background .35s; margin-bottom:28px; }
     .ct-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
-    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; }
+    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x; }
     .ct-scroll::-webkit-scrollbar { height:4px; }
     .ct-scroll::-webkit-scrollbar-track { background:transparent; }
     .ct-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
@@ -392,7 +376,7 @@
     .signing-logo { width:38px; height:38px; border-radius:6px; background:rgba(35,26,165,.07); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border:1px solid var(--border-soft); }
     .signing-logo img { width:26px; height:26px; object-fit:contain; display:block; }
     .signing-body { flex:1; min-width:0; }
-    .signing-team { font-family:var(--font-display); font-weight:700; font-size:.95rem; color:var(--heading); letter-spacing:.02em; line-height:1.1; transition:color .35s; }
+    .signing-team { font-family:var(--font-display); font-weight:700; font-size:.95rem; color:var(--heading); letter-spacing:.02em; line-height:1.1; transition:color .35s; overflow-wrap:break-word; word-break:break-word; }
     .signing-date { font-family:var(--font-mono); font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:7px; margin-top:2px; }
     .signing-tags { display:flex; gap:5px; flex-wrap:wrap; }
     .signing-tag { font-family:var(--font-mono); font-size:.56rem; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:3px; background:rgba(35,26,165,.07); color:var(--text-muted); border:1px solid var(--border-soft); }
@@ -400,11 +384,12 @@
 
     /* Salary chart */
     .contracts-chart-body { padding:20px; height:210px; position:relative; }
-    .ct-chart-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; }
+    .ct-chart-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x; }
     .ct-chart-scroll::-webkit-scrollbar { height:4px; }
     .ct-chart-scroll::-webkit-scrollbar-track { background:transparent; }
     .ct-chart-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
     .ct-chart-inner { min-width:500px; height:210px; position:relative; padding:20px; }
+    @media (max-width:768px) { .ct-chart-inner { min-width:340px; } }
 
     /* Legend */
     .ct-legend { display:flex; gap:16px; flex-wrap:wrap; padding:10px 20px 14px; font-family:var(--font-mono); font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); border-top:1px solid var(--border-soft); }
@@ -436,8 +421,12 @@
     /* Mobile contracts */
     @media (max-width:768px) {
       .contracts-layout { grid-template-columns:1fr; gap:20px; }
-      .ct-table { min-width:460px; }
+      .ct-table { min-width:360px; }
+      .ct-chart-inner { min-width:320px; }
       .trade-grid { grid-template-columns:1fr; gap:10px; }
+      .trade-teams { white-space:normal; word-break:break-word; max-width:100%; }
+      .signing-item { flex-wrap:wrap; }
+      .signing-team { font-size:.85rem; }
     }
 
     /* ══ CAREER HIGH PANEL ══ */
@@ -450,6 +439,11 @@
     }
     .ch-layout { display:flex; flex-direction:column; gap:28px; }
     .ch-header { margin-bottom:4px; }
+    @media (max-width:768px) {
+      .ch-header { flex-direction:column !important; align-items:flex-start !important; gap:0 !important; margin-bottom:16px !important; }
+      .ch-header > div { margin-bottom:8px; }
+      .ch-header .splits-toggle { margin-left:0 !important; }
+    }
     .ch-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
     .ch-card {
       border:1px solid var(--border); border-radius:6px; background:var(--bg-card);
@@ -594,19 +588,22 @@
     }
     /* ── PREVENT HORIZONTAL PAGE OVERFLOW (mobile only) ── */
     @media (max-width: 768px) {
-      html, body {
-        overflow-x: hidden;
-        max-width: 100%;
-      }
+      /* Box-sizing on containers prevents padding from causing overflow */
       .player-content,
       .contracts-layout,
-      .ct-card,
-      .ct-scroll,
       .signing-item,
       .trade-item {
         max-width: 100%;
         box-sizing: border-box;
       }
+    }
+    /* ── MOBILE SCROLL FIX ── */
+    @media (max-width:768px) {
+      /* Allow scroll containers to show scrollbar outside card border on mobile */
+      .splits-card { overflow:visible; }
+      .splits-scroll { border-radius:0 0 6px 6px; overflow-x:auto; }
+      /* Prevent the card background from bleeding outside radius */
+      .splits-card-header { border-radius:6px 6px 0 0; }
     }
   </style>
 </head>
