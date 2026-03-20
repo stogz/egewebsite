@@ -3,6 +3,22 @@
    Edit this file to update all stats across the site.
 
    Structure per player:
+
+     jerseys  → array of jersey entries shown on the Bio tab
+                Each entry:
+                  team    : team name (used as section heading)
+                  name    : jersey label e.g. 'Home', 'Away', 'City Edition'
+                  number  : jersey number to display (overrides player default)
+                  bg      : jersey body hex color  e.g. '#552583'
+                  stroke  : sleeve/collar hex color e.g. '#fdb927'
+                  num     : number text hex color  e.g. '#fdb927'
+                  seasons : year range e.g. '2018–2024' — shown in tooltip on hover
+                  img     : URL to custom image (leave '' to use SVG with colors above)
+
+                Example:
+                  { team:'Indiana Pacers', name:'City Edition', number:'5',
+                    bg:'#041e42', stroke:'#fdbb30', num:'#fdbb30',
+                    seasons:'2027–Present', img:'' }
      regular  → array of per-game season rows
      playoffs → array of per-game playoff rows
      totals   → array of season totals rows
@@ -67,7 +83,125 @@ var PLAYER_STATS = {
       { season:'2029-30', age:31, team:'IND', pts:1256, reb:88,  ast:578, stl:69,  blk:0, tov:149, fgm:406, fga:878,  tpm:189, tpa:467, ftm:255, fta:268, min:2166, gs:72, gp:72, dd:19, td:0 },
       { season:'2030-31', age:32, team:'IND', pts:1425, reb:127, ast:625, stl:77,  blk:0, tov:162, fgm:474, fga:1036, tpm:228, tpa:580, ftm:249, fta:270, min:2380, gs:81, gp:81, dd:18, td:0 },
       { season:'2031-32', age:33, team:'IND', pts:1759, reb:156, ast:622, stl:85,  blk:0, tov:179, fgm:560, fga:1165, tpm:288, tpa:673, ftm:351, fta:367, min:2501, gs:82, gp:82, dd:16, td:0 },
-    ]
+    ],
+    contracts: {
+      signings: [
+        { date:'July 1, 2018',       team:'Los Angeles Clippers', years:4, total:'$15.67M',  aav:'$3.92M',  note:'Rookie Contract' },
+        { date:'February 22, 2021',  team:'Los Angeles Clippers', years:2, total:'$64.31M',  aav:'$32.15M', note:'Player Option Waived' },
+        { date:'June 30, 2024',      team:'Los Angeles Lakers',   years:3, total:'$111.08M', aav:'$37.03M', note:'' },
+        { date:'February 24, 2027',  team:'Los Angeles Lakers',   years:4, total:'$252.07M', aav:'$63.02M', note:'Player Option Waived' },
+        { date:'July 1, 2030',       team:'Indiana Pacers',       years:3, total:'$131.48M', aav:'$43.83M', note:'' },
+        { date:'June 6, 2032',       team:'Indiana Pacers',       years:4, total:'$168.76M', aav:'$42.19M', note:'' },
+      ],
+      trades: [
+        {
+          date:'July 3, 2026',
+          fromTeam:'Los Angeles Lakers',
+          toTeam:'Indiana Pacers',
+          sent:[
+            { type:'Player', text:'Cooper Clark' }
+          ],
+          received:[
+            { type:'Player', text:'Chris Cenac Jr.' },
+            { type:'Player', text:'Ace Bailey' },
+            { type:'Pick',   text:'2029 1st Round Pick' },
+            { type:'Pick',   text:'2030 1st Round Pick' },
+            { type:'Pick',   text:'2032 1st Round Pick' },
+            { type:'Pick',   text:'2033 1st Round Pick' }
+          ],
+          notes:''
+        }
+      ],
+      seasons: [
+        { season:'2018-19', team:'Los Angeles Clippers', salary:'$2.53M',  option:'' },
+        { season:'2019-20', team:'Los Angeles Clippers', salary:'$2.97M',  option:'' },
+        { season:'2020-21', team:'Los Angeles Clippers', salary:'$4.19M',  option:'' },
+        { season:'2021-22', team:'Los Angeles Clippers', salary:'$5.98M',  option:'' },
+        { season:'2022-23', team:'Los Angeles Clippers', salary:'$30.91M', option:'' },
+        { season:'2023-24', team:'Los Angeles Clippers', salary:'$33.39M', option:'' },
+        { season:'2024-25', team:'Los Angeles Lakers',   salary:'$32.56M', option:'' },
+        { season:'2025-26', team:'Los Angeles Lakers',   salary:'$37.86M', option:'' },
+        { season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.66M', option:'' },
+        { season:'2027-28', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
+        { season:'2028-29', team:'Los Angeles Lakers',   salary:'$60.42M', option:'' },
+        { season:'2029-30', team:'Indiana Pacers',       salary:'$65.26M', option:'' },
+        { season:'2030-31', team:'Indiana Pacers',       salary:'$40.89M', option:'' },
+        { season:'2031-32', team:'Indiana Pacers',       salary:'$43.77M', option:'' },
+        { season:'2032-33', team:'Indiana Pacers',       salary:'$46.82M', option:'' },
+        { season:'2033-34', team:'Indiana Pacers',       salary:'$34.76M', option:'' },
+        { season:'2034-35', team:'Indiana Pacers',       salary:'$39.82M', option:'' },
+        { season:'2035-36', team:'Indiana Pacers',       salary:'$44.64M', option:'' },
+        { season:'2036-37', team:'Indiana Pacers',       salary:'$49.54M', option:'' },
+      ]
+    },
+    awards: {
+      nba: [
+        { title:'NBA Champion',            years:[2026],                                    icon:'🏆' },
+        { title:'Most Improved Player',    years:[2020],                                    icon:'📈' },
+        { title:'All-NBA First Team',      years:[2023,2024,2026],                          icon:'🥇' },
+        { title:'All-NBA Second Team',     years:[2027],                                    icon:'🥈' },
+        { title:'All-NBA Third Team',      years:[2029],                                    icon:'🥉' },
+        { title:'NBA All-Star',            years:[2023,2024,2025,2026,2027,2028,2029],      icon:'⭐' },
+        { title:'All-Rookie Second Team',  years:[2019],                                    icon:'🌟' },
+      ],
+      college: [
+        { title:'SEC First Team',          years:[2018], icon:'🎓' },
+        { title:'SEC All-Freshman Team',   years:[2017], icon:'🎓' },
+      ],
+      misc: [
+        { title:'2028 LA Olympics Gold Medal', years:[2028], icon:'🥇' },
+      ]
+    },
+    careerHighs: [
+      { stat:'pts', value:56, label:'Points',             date:'Feb 11, 2029', opp:'Detroit Pistons' , type:'regular' },
+      { stat:'reb', value:9,  label:'Rebounds',           date:'Nov 26, 2024', opp:'New Orleans Pelicans' , type:'regular' },
+      { stat:'ast', value:26, label:'Assists',            date:'Feb 7, 2024',  opp:'Philadelphia 76ers' , type:'regular' },
+      { stat:'stl', value:7,  label:'Steals',             date:'Jan 3, 2027', opp:'Minnesota Timberwolves' , type:'regular' },
+      { stat:'blk', value:3,  label:'Blocks',             date:'Dec 14, 2021',  opp:'Atlanta Hawks' , type:'regular' },
+      { stat:'tpm', value:10, label:'3-Pointers Made',    date:'Feb 11, 2029', opp:'Detroit Pistons' , type:'regular' },
+    ],
+    playoffCareerHighs: [
+      { stat:'pts', value:52, label:'Points',          date:'Apr 17, 2029', opp:'Golden State Warriors', type:'playoffs' },
+      { stat:'reb', value:7,  label:'Rebounds',        date:'Apr 17, 2027', opp:'Houston Rockets',      type:'playoffs' },
+      { stat:'ast', value:21, label:'Assists',         date:'Apr 13, 2030', opp:'Toronto Raptors',      type:'playoffs' },
+      { stat:'stl', value:5,  label:'Steals',          date:'Apr 28, 2027', opp:'Phoenix Suns',         type:'playoffs' },
+      { stat:'blk', value:0,  label:'Blocks',          date:'Apr 28, 2025', opp:'Memphis Grizzlies',    type:'playoffs' },
+      { stat:'tpm', value:10, label:'3-Pointers Made', date:'May 6, 2026',  opp:'Sacramento Kings',     type:'playoffs' },
+    ],
+    shoes: {
+      brand: 'Adidas',
+      sigs: [
+        {
+          name: 'CSWAG I',
+          thumbnail: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/low-tide_orig.png',
+          colorways: [
+            { name: 'Low Tide',      img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/low-tide_orig.png' },
+            { name: 'Clean Cut',     img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/clean-cut_orig.png' },
+            { name: 'Golden Hour',   img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/golden-hour_orig.png' },
+            { name: 'Golden Dunes',  img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/golden-dunes_orig.png' },
+            { name: 'Throwbacks',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/throwbacks_orig.png' },
+            { name: 'Burnt Horizon', img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/burnt-horizon_orig.png' },
+          ]
+        },
+        {
+          name: 'CSWAG II',
+          thumbnail: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-the-fundamentals_orig.png',
+          colorways: [
+            { name: 'The Fundamentals', img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-the-fundamentals_orig.png' },
+            { name: 'Midnight Shade',   img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-midnight-shade_orig.png' },
+            { name: 'Flower Field',     img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-flower-field_orig.png' },
+            { name: 'Down to Earth',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-down-to-earth_orig.png' },
+          ]
+        }
+      ]
+    },
+    jerseys: [
+      { team:'Arizona Wildcats', name:'Home',  number:'5', bg:'#18305c', stroke:'#b11b2f', num:'#ffffff', seasons:'2018–2024', img:'' },
+      { team:'Los Angeles Clippers', name:'Home',  number:'5', bg:'#ff0000', stroke:'#0001ff', num:'#ffffff', seasons:'2018–2024', img:'' },
+      { team:'Los Angeles Lakers', name:'Away',  number:'5', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2018–2024', img:'' },
+      { team:'Team USA',   name:'Home',  number:'5', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2024–2027', img:'' },
+      { team:'Indiana Pacers',   name:'Away',  number:'5', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2024–2027', img:'' },
+    ],
   },
 
   /* ─────────────── PAXON HATCH ─────────────── */
@@ -121,7 +255,87 @@ var PLAYER_STATS = {
       { season:'2028-29', age:30, team:'LAL', pts:1149, reb:562,  ast:84,  stl:35,  blk:102, tov:76,  fgm:395,  fga:877,  tpm:173, tpa:455,  ftm:186, fta:242, min:1797, gs:66, gp:66, dd:21, td:0 },
       { season:'2029-30', age:31, team:'LAL', pts:1315, reb:495,  ast:122, stl:33,  blk:83,  tov:72,  fgm:458,  fga:926,  tpm:180, tpa:424,  ftm:219, fta:273, min:1802, gs:70, gp:70, dd:14, td:0 },
       { season:'2030-31', age:32, team:'LAL', pts:1020, reb:589,  ast:136, stl:39,  blk:113, tov:108, fgm:324,  fga:735,  tpm:147, tpa:360,  ftm:225, fta:293, min:2124, gs:79, gp:79, dd:13, td:0 },
-    ]
+    ],
+    contracts: {
+      signings: [
+        { date:'July 1, 2017',       team:'Los Angeles Lakers',   years:4, total:'$33.91M',  aav:'$8.48M',  note:'Rookie Contract' },
+        { date:'September 28, 2020', team:'Los Angeles Lakers',   years:5, total:'$162.13M', aav:'$32.43M', note:'' },
+        { date:'July 1, 2025',       team:'Los Angeles Lakers',   years:3, total:'$120.00M', aav:'$40.00M', note:'' },
+        { date:'June 30, 2029',      team:'Los Angeles Lakers',   years:3, total:'$181.28M', aav:'$60.43M', note:'Player Option Exercised' },
+      ],
+      seasons: [
+        { season:'2017-18', team:'Los Angeles Lakers',   salary:'$5.23M',  option:'' },
+        { season:'2018-19', team:'Los Angeles Lakers',   salary:'$6.21M',  option:'' },
+        { season:'2019-20', team:'Los Angeles Lakers',   salary:'$10.21M', option:'' },
+        { season:'2020-21', team:'Los Angeles Lakers',   salary:'$12.26M', option:'' },
+        { season:'2021-22', team:'Los Angeles Lakers',   salary:'$27.91M', option:'' },
+        { season:'2022-23', team:'Los Angeles Lakers',   salary:'$30.15M', option:'' },
+        { season:'2023-24', team:'Los Angeles Lakers',   salary:'$32.38M', option:'' },
+        { season:'2024-25', team:'Los Angeles Lakers',   salary:'$34.61M', option:'' },
+        { season:'2025-26', team:'Los Angeles Lakers',   salary:'$36.85M', option:'' },
+        { season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { season:'2027-28', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { season:'2028-29', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { season:'2029-30', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
+        { season:'2030-31', team:'Los Angeles Lakers',   salary:'$60.43M', option:'' },
+      ]
+    },
+    awards: {
+      nba: [
+        { title:'Hall of Fame',              years:[2033],                                          icon:'🏛️' },
+        { title:'NBA Champion',              years:[2022,2026],                                     icon:'🏆' },
+        { title:'Finals MVP',                years:[2022,2026],                                     icon:'🏆' },
+        { title:'All-NBA First Team',        years:[2021,2024,2025],                                icon:'🥇' },
+        { title:'All-NBA Second Team',       years:[2022],                                          icon:'🥈' },
+        { title:'All-NBA Third Team',        years:[2020,2023],                                     icon:'🥉' },
+        { title:'All-Defense First Team',    years:[2024,2025],                                     icon:'🛡️' },
+        { title:'All-Defense Second Team',   years:[2022,2023],                                     icon:'🛡️' },
+        { title:'NBA All-Star',              years:[2019,2020,2021,2022,2023,2024,2026],            icon:'⭐' },
+        { title:'All-Rookie First Team',     years:[2018],                                          icon:'🌟' },
+      ],
+      college: [
+        { title:'NCAA Champion',                         years:[2017], icon:'🏆' },
+        { title:'Karl Malone Player of the Year',        years:[2017], icon:'🎓' },
+        { title:'Big Ten Defensive Player of the Year',  years:[2017], icon:'🎓' },
+        { title:'Big Ten First Team',                    years:[2017], icon:'🎓' },
+        { title:'Big Ten All-Freshman Team',             years:[2017], icon:'🎓' },
+      ],
+      misc: []
+    },
+    careerHighs: [
+      { stat:'pts', value:60, label:'Points',             date:'Mar 10, 2023', opp:'New Orleans Pelicans' , type:'regular' },
+      { stat:'reb', value:27,  label:'Rebounds',           date:'Jan 22, 2025', opp:'Denver Nuggets' , type:'regular' },
+      { stat:'ast', value:8, label:'Assists',            date:'Feb 27, 2026',  opp:'Golden State Warriors' , type:'regular' },
+      { stat:'stl', value:4,  label:'Steals',             date:'Oct 30, 2027', opp:'Golden State Warriors' , type:'regular' },
+      { stat:'blk', value:8,  label:'Blocks',             date:'Jan 4, 2024',  opp:'Brooklyn Nets' , type:'regular' },
+      { stat:'tpm', value:10, label:'3-Pointers Made',    date:'Mar 10, 2023', opp:'New Orleans Pelicans' , type:'regular' },
+    ],
+    playoffCareerHighs: [
+      { stat:'pts', value:49, label:'Points',          date:'Apr 19, 2022', opp:'New Orleans Pelicans', type:'playoffs' },
+      { stat:'reb', value:23, label:'Rebounds',        date:'Apr 15, 2021', opp:'Golden State Warriors',type:'playoffs' },
+      { stat:'ast', value:9, label:'Assists',         date:'Apr 30, 2026', opp:'Sacramento Kings',     type:'playoffs' },
+      { stat:'stl', value:4,  label:'Steals',          date:'May 17, 2022', opp:'Utah Jazz',            type:'playoffs' },
+      { stat:'blk', value:6,  label:'Blocks',          date:'May 21, 2026', opp:'Denver Nuggets',       type:'playoffs' },
+      { stat:'tpm', value:10, label:'3-Pointers Made', date:'May 23, 2025', opp:'Dallas Mavericks',     type:'playoffs' },
+    ],
+    shoes: {
+      brand: 'Air Jordan',
+      sigs: [
+        {
+          name: 'PAX I',
+          thumbnail: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/moon-man_orig.png',
+          colorways: [
+            { name: 'Moon Man',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/moon-man_orig.png' },
+            { name: 'Green Giant', img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/green-giant_orig.png' },
+            { name: 'Legacy',      img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/legacy_orig.png' },
+          ]
+        }
+      ]
+    },
+    jerseys: [
+      { team:'UCLA', name:'Home',         number:'42', bg:'#0001ff', stroke:'#ffdf35', num:'#ffffff', seasons:'2017–Present', img:'' },
+      { team:'Los Angeles Lakers', name:'Away',         number:'10', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2017–Present', img:'' },
+    ],
   },
 
   /* ─────────────── SAM STOGSDILL ─────────────── */
@@ -156,7 +370,7 @@ var PLAYER_STATS = {
       { season:'2024-25', age:27, team:'WAS', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2025-26', age:28, team:'WAS', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2026-27', age:29, team:'WAS', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
-      { season:'2027-28', age:30, team:'HOU', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not play, injury.' },
+      { season:'2027-28', age:30, team:'HOU', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2028-29', age:31, team:'HOU', ppg:15.6, rpg:9.3,  apg:8.6, spg:0.8, bpg:1.0, topg:1.4, fgp:'56.2%', tpp:'46.2%', ftp:'74.4%', tpa:2.2, gs:12, gp:12, mpg:29.7, dnq:false },
       { season:'2029-30', age:32, team:'HOU', ppg:11.8, rpg:7.9,  apg:8.1, spg:0.9, bpg:0.9, topg:1.2, fgp:'46.1%', tpp:'33.3%', ftp:'76.2%', tpa:1.7, gs:12, gp:12, mpg:27.7, dnq:false },
       { season:'2030-31', age:33, team:'HOU', ppg:11.0, rpg:9.3,  apg:9.3, spg:0.5, bpg:1.3, topg:0.5, fgp:'43.6%', tpp:'37.5%', ftp:'77.8%', tpa:2.0, gs:4,  gp:4,  mpg:30.2, dnq:false },
@@ -177,7 +391,83 @@ var PLAYER_STATS = {
       { season:'2029-30', age:32, team:'HOU', pts:857,  reb:600, ast:560, stl:40,  blk:88,  tov:104, fgm:347, fga:734, tpm:58, tpa:157, ftm:105, fta:142, min:2000, gs:79, gp:79, dd:19, td:2 },
       { season:'2030-31', age:33, team:'HOU', pts:604,  reb:540, ast:509, stl:68,  blk:67,  tov:88,  fgm:245, fga:546, tpm:35, tpa:109, ftm:79,  fta:110, min:1883, gs:64, gp:71, dd:14, td:3 },
       { season:'2031-32', age:34, team:'HOU', pts:536,  reb:426, ast:407, stl:55,  blk:73,  tov:105, fgm:211, fga:449, tpm:28, tpa:105, ftm:86,  fta:103, min:1535, gs:53, gp:64, dd:5,  td:0 },
-    ]
+    ],
+    contracts: {
+      signings: [
+        { date:'July 1, 2018',      team:'Washington Wizards', years:4, total:'$13.13M',  aav:'$3.28M',  note:'Rookie Contract' },
+        { date:'June 30, 2022',     team:'Washington Wizards', years:3, total:'$40.31M',  aav:'$13.44M', note:'' },
+        { date:'June 30, 2025',     team:'Washington Wizards', years:5, total:'$173.19M', aav:'$34.63M', note:'' },
+        { date:'June 30, 2030',     team:'Houston Rockets',    years:5, total:'$222.21M', aav:'$44.44M', note:'' },
+      ],
+      trades: [
+        {
+          date:'July 3, 2026',
+          fromTeam:'Washington Wizards',
+          toTeam:'Houston Rockets',
+          sent:[
+            { type:'Player', text:'Sam Stogsdill' }
+          ],
+          received:[
+            { type:'Player', text:'Alex Costanza' }
+          ],
+          notes:''
+        }
+      ],
+      seasons: [
+        { season:'2018-19', team:'Washington Wizards', salary:'$2.06M',  option:'' },
+        { season:'2019-20', team:'Washington Wizards', salary:'$2.42M',  option:'' },
+        { season:'2020-21', team:'Washington Wizards', salary:'$3.41M',  option:'' },
+        { season:'2021-22', team:'Washington Wizards', salary:'$5.24M',  option:'' },
+        { season:'2022-23', team:'Washington Wizards', salary:'$12.44M', option:'' },
+        { season:'2023-24', team:'Washington Wizards', salary:'$13.44M', option:'' },
+        { season:'2024-25', team:'Washington Wizards', salary:'$14.43M', option:'' },
+        { season:'2025-26', team:'Washington Wizards', salary:'$31.25M', option:'' },
+        { season:'2026-27', team:'Washington Wizards', salary:'$32.81M', option:'' },
+        { season:'2027-28', team:'Houston Rockets',    salary:'$34.45M', option:'' },
+        { season:'2028-29', team:'Houston Rockets',    salary:'$36.17M', option:'' },
+        { season:'2029-30', team:'Houston Rockets',    salary:'$37.98M', option:'' },
+        { season:'2030-31', team:'Houston Rockets',    salary:'$38.31M', option:'' },
+        { season:'2031-32', team:'Houston Rockets',    salary:'$41.38M', option:'' },
+        { season:'2032-33', team:'Houston Rockets',    salary:'$44.44M', option:'' },
+        { season:'2033-34', team:'Houston Rockets',    salary:'$47.51M', option:'' },
+        { season:'2034-35', team:'Houston Rockets',    salary:'$50.57M', option:'' },
+      ]
+    },
+    awards: {
+      nba: [
+        { title:'All-NBA Third Team',    years:[2027], icon:'🥉' },
+        { title:'NBA All-Star',          years:[2028], icon:'⭐' },
+        { title:'All-Rookie First Team', years:[2019], icon:'🌟' },
+      ],
+      college: [
+        { title:'ACC Second Team', years:[2018], icon:'🎓' },
+      ],
+      misc: [
+        { title:'2028 LA Olympics Gold Medal', years:[2028], icon:'🥇' },
+      ]
+    },
+    careerHighs: [
+      { stat:'pts', value:39, label:'Points',             date:'Jan 21, 2027', opp:'Brooklyn Nets' , type:'regular' },
+      { stat:'reb', value:23,  label:'Rebounds',           date:'Jan 11, 2027', opp:'Boston Celtics' , type:'regular' },
+      { stat:'ast', value:19, label:'Assists',            date:'Jan 4, 2028',  opp:'Chicago Bulls' , type:'regular' },
+      { stat:'stl', value:8,  label:'Steals',             date:'Mar 27, 2024', opp:'New Orleans Pelicans' , type:'regular' },
+      { stat:'blk', value:8,  label:'Blocks',             date:'Dec 1, 2022',  opp:'Oklahoma City Thunder' , type:'regular' },
+      { stat:'tpm', value:3, label:'3-Pointers Made',    date:'Feb 10, 2032', opp:'New York Knicks' , type:'regular' },
+    ],
+    playoffCareerHighs: [
+      { stat:'pts', value:28, label:'Points',          date:'Apr 17, 2029', opp:'Dallas Mavericks',      type:'playoffs' },
+      { stat:'reb', value:21, label:'Rebounds',        date:'May 4, 2023',  opp:'Milwaukee Bucks',      type:'playoffs' },
+      { stat:'ast', value:15, label:'Assists',         date:'Apr 30, 2029', opp:'Los Angeles Clippers', type:'playoffs' },
+      { stat:'stl', value:4,  label:'Steals',          date:'Apr 23, 2022', opp:'Cleveland Cavaliers',  type:'playoffs' },
+      { stat:'blk', value:6,  label:'Blocks',          date:'Apr 23, 2032', opp:'Mexico City Flight',   type:'playoffs' },
+      { stat:'tpm', value:2,  label:'3-Pointers Made', date:'Apr 13, 2032', opp:'Mexico City Flight',   type:'playoffs' },
+    ],
+    jerseys: [
+      { team:'Louisville Cardinals', name:'Home',  number:'34', bg:'#ff0000', stroke:'#050505', num:'#ffffff', seasons:'2018–2027', img:'' },
+      { team:'Washington Wizards', name:'Away',  number:'34', bg:'#ff0000', stroke:'#000080', num:'#ffffff', seasons:'2018–2027', img:'' },
+      { team:'Team USA', name:'Away',  number:'13', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2018–2027', img:'' },
+      { team:'Houston Rockets',    name:'Away',  number:'33', bg:'#ff0000', stroke:'#FFFFFF', num:'#ffffff', seasons:'2027–Present', img:'' },
+    ],
   },
 
   /* ─────────────── JAYKEB STEWART ─────────────── */
@@ -215,7 +505,7 @@ var PLAYER_STATS = {
       { season:'2027-28', age:29, team:'CHI', ppg:25.0, rpg:5.7, apg:9.8, spg:1.7, bpg:1.0, topg:2.8, fgp:'50.9%', tpp:'31.2%', ftp:'100.0%',tpa:7.8, gs:6,  gp:6,  mpg:33.7, dnq:false },
       { season:'2028-29', age:30, team:'CHI', ppg:24.5, rpg:6.4, apg:7.8, spg:2.6, bpg:1.0, topg:2.8, fgp:'54.3%', tpp:'45.8%', ftp:'98.2%', tpa:7.6, gs:14, gp:14, mpg:33.9, dnq:false },
       { season:'2029-30', age:31, team:'CHI', ppg:24.9, rpg:5.5, apg:8.6, spg:1.3, bpg:1.0, topg:2.7, fgp:'50.4%', tpp:'42.5%', ftp:'94.9%', tpa:9.4, gs:19, gp:19, mpg:34.1, dnq:false },
-      { season:'2030-31', age:32, team:'CHI', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not play, injury.' },
+      { season:'2030-31', age:32, team:'CHI', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2031-32', age:33, team:'CHI', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
     ],
     totals: [
@@ -233,7 +523,96 @@ var PLAYER_STATS = {
       { season:'2029-30', age:31, team:'CHI', pts:1416, reb:393, ast:597, stl:103, blk:64,  tov:163, fgm:521, fga:1045, tpm:181, tpa:484, ftm:193, fta:213, min:1991, gs:65, gp:65, dd:34, td:3 },
       { season:'2030-31', age:32, team:'CHI', pts:1497, reb:446, ast:617, stl:157, blk:84,  tov:191, fgm:535, fga:1169, tpm:212, tpa:575, ftm:215, fta:226, min:2421, gs:82, gp:82, dd:21, td:1 },
       { season:'2031-32', age:33, team:'CHI', pts:652,  reb:192, ast:274, stl:53,  blk:48,  tov:79,  fgm:230, fga:485,  tpm:107, tpa:269, ftm:85,  fta:91,  min:1128, gs:39, gp:39, dd:4,  td:0 },
-    ]
+    ],
+    contracts: {
+      signings: [
+        { date:'July 1, 2018',      team:'Milwaukee Bucks',     years:4, total:'$16.91M',  aav:'$4.23M',  note:'Rookie Contract' },
+        { date:'July 2, 2022',      team:'Milwaukee Bucks',     years:5, total:'$176.51M', aav:'$35.30M', note:'' },
+        { date:'July 4, 2027',      team:'Chicago Bulls',       years:5, total:'$326.56M', aav:'$65.31M', note:'' },
+        { date:'June 30, 2032',     team:'Vancouver Grizzlies', years:2, total:'$32.65M',  aav:'$16.33M', note:'' },
+      ],
+      trades: [
+        {
+          date:'July 3, 2026',
+          fromTeam:'Milwaukee Bucks',
+          toTeam:'New York Knicks',
+          sent:[
+            { type:'Player', text:'Jaykeb Stewart' }
+          ],
+          received:[
+            { type:'Player', text:'DeAaron Fox' },
+            { type:'Player', text:'Wendell Carter Jr.' },
+            { type:'Pick',   text:'2029 1st Round Pick' },
+            { type:'Pick',   text:'2030 1st Round Pick' }
+          ],
+          notes:''
+        }
+      ],
+      seasons: [
+        { season:'2018-19', team:'Milwaukee Bucks',     salary:'$2.82M',  option:'' },
+        { season:'2019-20', team:'Milwaukee Bucks',     salary:'$3.29M',  option:'' },
+        { season:'2020-21', team:'Milwaukee Bucks',     salary:'$4.64M',  option:'' },
+        { season:'2021-22', team:'Milwaukee Bucks',     salary:'$6.16M',  option:'' },
+        { season:'2022-23', team:'Milwaukee Bucks',     salary:'$30.43M', option:'' },
+        { season:'2023-24', team:'Milwaukee Bucks',     salary:'$32.87M', option:'' },
+        { season:'2024-25', team:'Milwaukee Bucks',     salary:'$35.30M', option:'' },
+        { season:'2025-26', team:'Milwaukee Bucks',     salary:'$37.74M', option:'' },
+        { season:'2026-27', team:'New York Knicks',     salary:'$40.17M', option:'' },
+        { season:'2027-28', team:'Chicago Bulls',       salary:'$55.67M', option:'' },
+        { season:'2028-29', team:'Chicago Bulls',       salary:'$60.12M', option:'' },
+        { season:'2029-30', team:'Chicago Bulls',       salary:'$64.92M', option:'' },
+        { season:'2030-31', team:'Chicago Bulls',       salary:'$70.12M', option:'' },
+        { season:'2031-32', team:'Chicago Bulls',       salary:'$75.73M', option:'' },
+        { season:'2032-33', team:'Vancouver Grizzlies', salary:'$13.75M', option:'' },
+        { season:'2033-34', team:'Vancouver Grizzlies', salary:'$18.90M', option:'' },
+      ]
+    },
+    awards: {
+      nba: [
+        { title:'NBA Champion',              years:[2021,2023,2024,2025], icon:'🏆' },
+        { title:'NBA Most Valuable Player',  years:[2027],                icon:'🏆' },
+        { title:'All-NBA First Team',        years:[2027],                icon:'🥇' },
+        { title:'All-NBA Second Team',       years:[2028],                icon:'🥈' },
+        { title:'All-NBA Third Team',        years:[2024,2026,2029],      icon:'🥉' },
+        { title:'All-Defense First Team',    years:[2027],                icon:'🛡️' },
+        { title:'NBA All-Star',              years:[2026,2027,2028,2029], icon:'⭐' },
+        { title:'All-Rookie First Team',     years:[2019],                icon:'🌟' },
+      ],
+      college: [
+        { title:'NCAA Champion',         years:[2018], icon:'🏆' },
+        { title:'ACC First Team',        years:[2018], icon:'🎓' },
+        { title:'ACC Third Team',        years:[2017], icon:'🎓' },
+        { title:'ACC All-Freshman Team', years:[2017], icon:'🎓' },
+      ],
+      misc: [
+        { title:'2028 LA Olympics Gold Medal', years:[2028], icon:'🥇' },
+      ]
+    },
+    careerHighs: [
+      { stat:'pts', value:57, label:'Points',             date:'Mar 14, 2027', opp:'Houston Rockets' , type:'regular' },
+      { stat:'reb', value:18,  label:'Rebounds',           date:'Jan 22, 2025', opp:'Denver Nuggets' , type:'regular' },
+      { stat:'ast', value:19, label:'Assists',            date:'Feb 8, 2026',  opp:'Golden State Warriors' , type:'regular' },
+      { stat:'stl', value:7,  label:'Steals',             date:'Nov 19, 2024', opp:'Memphis Grizzlies' , type:'regular' },
+      { stat:'blk', value:6,  label:'Blocks',             date:'Dec 3, 2023',  opp:'Milwaukee Bucks' , type:'regular' },
+      { stat:'tpm', value:11, label:'3-Pointers Made',    date:'Mar 14, 2027', opp:'Houston Rockets' , type:'regular' },
+    ],
+    playoffCareerHighs: [
+      { stat:'pts', value:54, label:'Points',          date:'Apr 21, 2027', opp:'Miami Heat', type:'playoffs' },
+      { stat:'reb', value:13, label:'Rebounds',        date:'May 17, 2023', opp:'Boston Celtics',  type:'playoffs' },
+      { stat:'ast', value:19, label:'Assists',         date:'Apr 13, 2027', opp:'Miami Heat', type:'playoffs' },
+      { stat:'stl', value:6,  label:'Steals',          date:'Apr 15, 2027', opp:'Miami Heat', type:'playoffs' },
+      { stat:'blk', value:4,  label:'Blocks',          date:'Apr 15, 2027', opp:'Miami Heat', type:'playoffs' },
+      { stat:'tpm', value:11, label:'3-Pointers Made', date:'Apr 21, 2027', opp:'Miami Heat', type:'playoffs' },
+    ],
+    jerseys: [
+      { team:'Florida State Seminoles',     name:'Home',  number:'11', bg:'#800000', stroke:'#ffd700', num:'#ffffff', seasons:'2018–2026', img:'' },
+      { team:'Duke Blue Devils',     name:'Away',  number:'2', bg:'#4069e1', stroke:'#ffffff', num:'#ffffff', seasons:'2018–2026', img:'' },
+      { team:'Milwaukee Bucks',     name:'Home',  number:'11', bg:'#004010', stroke:'#e4cda1', num:'#ffffff', seasons:'2026–2027', img:'' },
+      { team:'New York Knicks',       name:'Home',  number:'2', bg:'#0001ff', stroke:'#ff4500', num:'#ffffff', seasons:'2027–2032', img:'' },
+      { team:'Team USA',       name:'Away',  number:'2', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2027–2032', img:'' },
+      { team:'Chicago Bulls',       name:'Away',  number:'2', bg:'#ff0000', stroke:'#110201', num:'#ffffff', seasons:'2027–2032', img:'' },
+      { team:'Vancouver Grizzlies', name:'Home',  number:'11', bg:'#1a1970', stroke:'#6ca5cc', num:'#ffffff', seasons:'2032–Present', img:'' },
+    ],
   },
 
   /* ─────────────── ISAAC VITEL ─────────────── */
@@ -263,7 +642,7 @@ var PLAYER_STATS = {
       { season:'2019-20', age:22, team:'ORL', ppg:19.6, rpg:4.5, apg:4.1, spg:1.5, bpg:0.3, topg:3.5, fgp:'45.6%', tpp:'31.3%', ftp:'81.8%', tpa:7.5, gs:15, gp:15, mpg:38.5, dnq:false },
       { season:'2020-21', age:23, team:'ORL', ppg:19.3, rpg:2.7, apg:4.3, spg:1.1, bpg:0.1, topg:1.7, fgp:'47.9%', tpp:'33.3%', ftp:'75.7%', tpa:6.4, gs:7,  gp:7,  mpg:32.9, dnq:false },
       { season:'2021-22', age:24, team:'ORL', ppg:21.9, rpg:5.6, apg:5.1, spg:2.2, bpg:0.3, topg:2.1, fgp:'46.3%', tpp:'41.9%', ftp:'82.7%', tpa:7.8, gs:12, gp:12, mpg:33.8, dnq:false },
-      { season:'2022-23', age:25, team:'ORL', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not play, injury.' },
+      { season:'2022-23', age:25, team:'ORL', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2023-24', age:26, team:'ORL', ppg:21.7, rpg:5.1, apg:4.3, spg:1.8, bpg:0.2, topg:3.3, fgp:'46.6%', tpp:'38.8%', ftp:'86.8%', tpa:7.3, gs:16, gp:16, mpg:35.4, dnq:false },
       { season:'2024-25', age:27, team:'ORL', ppg:19.0, rpg:3.9, apg:4.4, spg:1.3, bpg:0.1, topg:2.3, fgp:'57.8%', tpp:'50.0%', ftp:'95.0%', tpa:5.1, gs:7,  gp:7,  mpg:32.6, dnq:false },
       { season:'2025-26', age:28, team:'DEN', ppg:25.9, rpg:6.6, apg:3.7, spg:2.1, bpg:0.5, topg:2.7, fgp:'47.1%', tpp:'31.9%', ftp:'88.4%', tpa:6.6, gs:18, gp:18, mpg:35.7, dnq:false },
@@ -290,6 +669,96 @@ var PLAYER_STATS = {
       { season:'2029-30', age:32, team:'IND', pts:1222, reb:379, ast:266, stl:104, blk:28, tov:153, fgm:496, fga:966,  tpm:63,  tpa:223, ftm:167, fta:198, min:2159, gs:82, gp:82, dd:0, td:0 },
       { season:'2030-31', age:33, team:'IND', pts:958,  reb:275, ast:241, stl:94,  blk:13, tov:133, fgm:385, fga:788,  tpm:57,  tpa:210, ftm:131, fta:153, min:2014, gs:80, gp:81, dd:0, td:0 },
       { season:'2031-32', age:34, team:'IND', pts:1057, reb:314, ast:285, stl:102, blk:17, tov:161, fgm:395, fga:834,  tpm:51,  tpa:202, ftm:216, fta:236, min:2091, gs:15, gp:82, dd:1, td:0 },
+    ],
+    contracts: {
+      signings: [
+        { date:'June 30, 2017',      team:'Orlando Magic',   years:4, total:'$23.66M',  aav:'$5.92M',  note:'Rookie Contract' },
+        { date:'July 5, 2021',       team:'Orlando Magic',   years:5, total:'$163.01M', aav:'$32.60M', note:'' },
+        { date:'June 15, 2025',      team:'Denver Nuggets',  years:4, total:'$180.55M', aav:'$45.14M', note:'' },
+        { date:'July 4, 2029',       team:'Indiana Pacers',  years:2, total:'$12.78M',  aav:'$6.39M',  note:'Player Option Waived' },
+        { date:'July 1, 2030',       team:'Indiana Pacers',  years:3, total:'$37.93M',  aav:'$12.64M', note:'' },
+      ],
+      trades: [
+        {
+          date:'June 12, 2025',
+          fromTeam:'Orlando Magic',
+          toTeam:'Denver Nuggets',
+          sent:[
+            { type:'Player', text:'Isaac Vitel' }
+          ],
+          received:[
+            { type:'Player', text:'Markelle Fultz' },
+            { type:'Pick',   text:'2027 1st Round Pick' },
+            { type:'Pick',   text:'2028 1st Round Pick' }
+          ],
+          notes:''
+        },
+        {
+          date:'July 3, 2029',
+          fromTeam:'Denver Nuggets',
+          toTeam:'Utah Jazz',
+          sent:[
+            { type:'Player', text:'Isaac Vitel' },
+            { type:'Pick',   text:'2033 1st Round Pick' }
+          ],
+          received:[
+            { type:'Player', text:'Kobe Bufkin' }
+          ],
+          notes:''
+        }
+      ],
+      seasons: [
+        { season:'2017-18', team:'Orlando Magic',   salary:'$3.48M',  option:'' },
+        { season:'2018-19', team:'Orlando Magic',   salary:'$4.14M',  option:'' },
+        { season:'2019-20', team:'Orlando Magic',   salary:'$7.84M',  option:'' },
+        { season:'2020-21', team:'Orlando Magic',   salary:'$8.20M',  option:'' },
+        { season:'2021-22', team:'Orlando Magic',   salary:'$28.11M', option:'' },
+        { season:'2022-23', team:'Orlando Magic',   salary:'$30.35M', option:'' },
+        { season:'2023-24', team:'Orlando Magic',   salary:'$32.60M', option:'' },
+        { season:'2024-25', team:'Orlando Magic',   salary:'$34.85M', option:'' },
+        { season:'2025-26', team:'Denver Nuggets',  salary:'$37.10M', option:'' },
+        { season:'2026-27', team:'Denver Nuggets',  salary:'$40.07M', option:'' },
+        { season:'2027-28', team:'Denver Nuggets',  salary:'$43.27M', option:'' },
+        { season:'2028-29', team:'Denver Nuggets',  salary:'$46.74M', option:'' },
+        { season:'2029-30', team:'Utah Jazz',        salary:'$50.47M', option:'waived' },
+        { season:'2029-30', team:'Indiana Pacers',  salary:'$6.07M',  option:'' },
+        { season:'2030-31', team:'Indiana Pacers',  salary:'$14.74M', option:'' },
+        { season:'2031-32', team:'Indiana Pacers',  salary:'$12.98M', option:'' },
+        { season:'2032-33', team:'Indiana Pacers',  salary:'$10.21M', option:'player' },
+      ]
+    },
+    awards: {
+      nba: [
+        { title:'NBA All-Star', years:[2022], icon:'⭐' },
+      ],
+      college: [
+        { title:'Big 12 Freshman of the Year', years:[2017], icon:'🎓' },
+        { title:'Big 12 Second Team',          years:[2017], icon:'🎓' },
+      ],
+      misc: []
+    },
+    careerHighs: [
+      { stat:'pts', value:43, label:'Points',             date:'Dec 22, 2024', opp:'Miami Heat' , type:'regular' },
+      { stat:'reb', value:17,  label:'Rebounds',           date:'Jan 9, 2028', opp:'Sacramento Kings' , type:'regular' },
+      { stat:'ast', value:11, label:'Assists',            date:'Feb 8, 2026',  opp:'Brooklyn Nets' , type:'regular' },
+      { stat:'stl', value:8,  label:'Steals',             date:'Mar 27, 2027', opp:'Orlando Magic' , type:'regular' },
+      { stat:'blk', value:3,  label:'Blocks',             date:'Dec 22, 2024',  opp:'Miami Heat' , type:'regular' },
+      { stat:'tpm', value:7, label:'3-Pointers Made',    date:'Dec 22, 2024', opp:'Miami Heat' , type:'regular' },
+    ],
+    playoffCareerHighs: [
+      { stat:'pts', value:40, label:'Points',          date:'Apr 28, 2026', opp:'Dallas Mavericks',   type:'playoffs' },
+      { stat:'reb', value:12, label:'Rebounds',        date:'May 17, 2026', opp:'Los Angeles Lakers', type:'playoffs' },
+      { stat:'ast', value:12, label:'Assists',         date:'May 15, 2024', opp:'Milwaukee Bucks',    type:'playoffs' },
+      { stat:'stl', value:7,  label:'Steals',          date:'May 21, 2026', opp:'Los Angeles Lakers', type:'playoffs' },
+      { stat:'blk', value:2,  label:'Blocks',          date:'Apr 13, 2026', opp:'Houston Rockets',    type:'playoffs' },
+      { stat:'tpm', value:7,  label:'3-Pointers Made', date:'Apr 19, 2019', opp:'Philadelphia 76ers', type:'playoffs' },
+    ],
+    jerseys: [
+      { team:'Kansas Jayhawks',  name:'Home',  number:'8', bg:'#0001ff', stroke:'#db143e', num:'#ffffff', seasons:'2017–2025', img:'' },
+      { team:'Orlando Magic',  name:'Home',  number:'8', bg:'#0001ff', stroke:'#000000', num:'#ffffff', seasons:'2017–2025', img:'' },
+      { team:'Denver Nuggets', name:'Home',  number:'8', bg:'#0c2240', stroke:'#f9c646', num:'#ffffff', seasons:'2025–2029', img:'' },
+      { team:'Indiana Pacers', name:'Home',  number:'24', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2025–2029', img:'' },
+      { team:'Indiana Pacers', name:'Home',  number:'1', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2025–2029', img:'' },
     ]
   }
 

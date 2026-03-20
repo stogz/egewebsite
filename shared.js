@@ -5,8 +5,7 @@
 
 (function () {
 
-  /* ── MOBILE NAV ROW ── */
-  // Inject a full-width bottom row inside <nav> for mobile page links
+  /* ── MOBILE HAMBURGER NAV ── */
   (function() {
     var nav = document.querySelector('nav');
     if (!nav) return;
@@ -18,16 +17,67 @@
       { href: 'history.html', label: 'History' },
       { href: 'draft.html',   label: 'Draft' },
     ];
-    var row = document.createElement('div');
-    row.className = 'nav-mobile-row';
+
+    // Hamburger button — hidden on desktop via CSS, shown on mobile
+    var btn = document.createElement('button');
+    btn.id = 'nav-hamburger';
+    btn.setAttribute('aria-label', 'Toggle navigation');
+    btn.innerHTML = '<span></span><span></span><span></span>';
+    nav.appendChild(btn);
+
+    // Dropdown menu — always in DOM, shown/hidden via CSS class
+    var menu = document.createElement('div');
+    menu.id = 'nav-mobile-menu';
+
     pages.forEach(function(p) {
       var a = document.createElement('a');
       a.href = p.href;
       a.textContent = p.label;
       if (p.href === currentPage) a.classList.add('active');
-      row.appendChild(a);
+      menu.appendChild(a);
     });
-    nav.appendChild(row);
+
+    // Divider
+    var divEl = document.createElement('div');
+    divEl.className = 'nav-menu-divider';
+    menu.appendChild(divEl);
+
+    // Mode toggle row (only visible inside mobile menu)
+    var modeRow = document.createElement('button');
+    modeRow.id = 'nav-menu-mode-toggle';
+    modeRow.setAttribute('aria-label', 'Toggle light/dark mode');
+    modeRow.textContent = '☀  Light / Dark Mode';
+    modeRow.addEventListener('click', function() {
+      var mainToggle = document.getElementById('mode-toggle');
+      if (mainToggle) mainToggle.click();
+      var isLight = document.documentElement.classList.contains('light');
+      modeRow.textContent = isLight ? '☾  Light / Dark Mode' : '☀  Light / Dark Mode';
+    });
+    menu.appendChild(modeRow);
+    nav.appendChild(menu);
+
+    // Toggle open/close
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      btn.classList.toggle('open');
+      menu.classList.toggle('open');
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!nav.contains(e.target)) {
+        btn.classList.remove('open');
+        menu.classList.remove('open');
+      }
+    });
+
+    // Close when a link is tapped
+    menu.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        btn.classList.remove('open');
+        menu.classList.remove('open');
+      });
+    });
   })();
 
   /* ── DARK / LIGHT MODE ── */

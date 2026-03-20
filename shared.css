@@ -213,6 +213,11 @@ nav {
   transform: scale(1.1);
 }
 
+/* ── HAMBURGER + MOBILE MENU: hidden on desktop by default ── */
+#nav-hamburger { display: none; }
+#nav-mobile-menu { display: none; }
+#nav-menu-mode-toggle { display: none; }
+
 /* ── FOOTER ── */
 footer {
   position: relative;
@@ -331,9 +336,10 @@ section { position: relative; z-index: 2; }
 
   /* ── NAV ── */
   nav {
-    padding: 10px 18px;
-    height: auto;
-    flex-wrap: wrap;
+    padding: 0 18px;
+    height: 56px;
+    flex-wrap: nowrap;
+    position: relative;
   }
   .nav-logo {
     font-size: 1rem;
@@ -344,36 +350,104 @@ section { position: relative; z-index: 2; }
   }
   .nav-logo > span { display: none; }
 
-  /* Hide page links from the inline list on mobile */
-  .nav-links li:not(:last-child) { display: none; }
-  .nav-links li:last-child { display: flex; }
-  #mode-toggle { width: 32px; height: 32px; font-size: .9rem; }
+  /* Hide desktop nav links + mode toggle on mobile — hamburger takes over */
+  .nav-links { display: none; }
 
-  /* Mobile full-width nav row injected by JS */
-  .nav-mobile-row {
-    display: flex;
-    width: 100%;
-    justify-content: space-around;
-    padding: 8px 0 2px;
-    border-top: 1px solid rgba(231,87,25,.12);
-    margin-top: 6px;
+  /* Show hamburger on mobile */
+  #nav-hamburger { display: inline-flex; }
+
+  /* Hamburger button */
+  #nav-hamburger {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid rgba(231,87,25,.3);
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 8px;
+    flex-shrink: 0;
+    margin-left: 6px;
   }
-  .nav-mobile-row a {
+  #nav-hamburger span {
+    display: block;
+    height: 2px;
+    background: var(--orange);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s;
+  }
+  #nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  #nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  #nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile dropdown menu */
+  #nav-mobile-menu {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 0; right: 0;
+    background: var(--bg-nav);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(231,87,25,.18);
+    z-index: 200;
+    flex-direction: column;
+    padding: 8px 0 12px;
+  }
+  #nav-mobile-menu.open { display: flex; }
+  #nav-mobile-menu a {
     font-family: var(--font-mono);
-    font-size: .6rem;
-    letter-spacing: .08em;
+    font-size: .72rem;
+    letter-spacing: .12em;
     text-transform: uppercase;
     color: var(--text-muted);
     text-decoration: none;
-    padding: 5px 6px;
-    border-radius: 3px;
-    transition: color .2s, background .2s;
+    padding: 14px 24px;
+    border-left: 2px solid transparent;
+    transition: color .2s, border-color .2s, background .2s;
   }
-  .nav-mobile-row a:hover,
-  .nav-mobile-row a.active {
+  #nav-mobile-menu a:hover,
+  #nav-mobile-menu a.active {
     color: var(--orange);
-    background: rgba(231,87,25,.07);
+    border-left-color: var(--orange);
+    background: rgba(231,87,25,.05);
   }
+  #nav-mobile-menu .nav-menu-divider {
+    height: 1px;
+    background: rgba(231,87,25,.1);
+    margin: 6px 24px;
+  }
+
+  /* Mode toggle row inside mobile menu */
+  #nav-menu-mode-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  #nav-menu-mode-toggle:hover {
+    color: var(--orange);
+    border-left-color: var(--orange);
+    background: rgba(231,87,25,.05);
+  }
+
+  /* Show mobile dropdown when open */
+  #nav-mobile-menu.open { display: flex; }
+
+  /* Hide injected mobile row (legacy) */
+  .nav-mobile-row { display: none; }
 
   /* ── SECTION HEADERS ── */
   .section-header {
