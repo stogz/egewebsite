@@ -240,7 +240,7 @@
     /* ── MOBILE CONTRACTS ── */
     @media (max-width:768px) {
       /* Salary table: card clips border-radius, scroll handles horizontal */
-      .ct-card { overflow:hidden; max-width:100%; }
+      .ct-card { overflow:clip; max-width:100%; }
       .ct-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; display:block; width:100%; }
       .ct-table { min-width:460px; }
       /* Contracts right column stacks below */
@@ -251,7 +251,8 @@
       .trade-teams { white-space:normal; word-break:break-word; }
       .trade-assets { max-width:100%; }
       /* Chart canvas container */
-      .contracts-chart-body { max-width:100%; overflow:hidden; }
+      .ct-chart-scroll { max-width:100%; }
+      .ct-chart-inner { min-width:380px; }
     }
 
     /* ── MOBILE BIO JERSEYS ── */
@@ -340,6 +341,9 @@
     .ct-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; }
     .ct-scroll::-webkit-scrollbar { height:4px; }
+    .ct-scroll::-webkit-scrollbar-track { background:transparent; }
+    .ct-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
+    .ct-scroll::-webkit-scrollbar { height:4px; }
     .ct-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
     .ct-table { border-collapse:collapse; width:100%; min-width:520px; font-family:var(--font-body); }
     .ct-table thead tr { border-bottom:1px solid var(--border-soft); }
@@ -396,6 +400,11 @@
 
     /* Salary chart */
     .contracts-chart-body { padding:20px; height:210px; position:relative; }
+    .ct-chart-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; }
+    .ct-chart-scroll::-webkit-scrollbar { height:4px; }
+    .ct-chart-scroll::-webkit-scrollbar-track { background:transparent; }
+    .ct-chart-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
+    .ct-chart-inner { min-width:500px; height:210px; position:relative; padding:20px; }
 
     /* Legend */
     .ct-legend { display:flex; gap:16px; flex-wrap:wrap; padding:10px 20px 14px; font-family:var(--font-mono); font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); border-top:1px solid var(--border-soft); }
@@ -2122,7 +2131,7 @@
     var chartId = 'chart-salary-'+key;
     var salaryChart = '<div class="ct-card">'
       + '<div class="ct-card-header"><div class="chart-card-dot"></div><span class="chart-card-title">Salary Progression</span></div>'
-      + '<div class="contracts-chart-body"><canvas id="'+chartId+'"></canvas></div>'
+      + '<div class="ct-chart-scroll"><div class="ct-chart-inner"><canvas id="'+chartId+'"></canvas></div></div>'
       + '</div>';
 
     // ── Contract signings feed ──
