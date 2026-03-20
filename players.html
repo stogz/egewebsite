@@ -239,14 +239,19 @@
     /* ══ MOBILE ══ */
     /* ── MOBILE CONTRACTS ── */
     @media (max-width:768px) {
-      /* Ensure salary table scrolls horizontally */
-      .ct-card { overflow:hidden; }
-      .ct-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; display:block; }
+      /* Salary table: card clips border-radius, scroll handles horizontal */
+      .ct-card { overflow:hidden; max-width:100%; }
+      .ct-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; display:block; width:100%; }
       .ct-table { min-width:460px; }
       /* Contracts right column stacks below */
       .contracts-layout { grid-template-columns:1fr; }
-      /* Signing/trade feed full width */
-      .signing-item { flex-wrap:wrap; }
+      /* Trade/signing items fit within screen */
+      .signing-item { flex-wrap:wrap; max-width:100%; }
+      .trade-item { max-width:100%; overflow:hidden; }
+      .trade-teams { white-space:normal; word-break:break-word; }
+      .trade-assets { max-width:100%; }
+      /* Chart canvas container */
+      .contracts-chart-body { max-width:100%; overflow:hidden; }
     }
 
     /* ── MOBILE BIO JERSEYS ── */
@@ -577,6 +582,22 @@
     }
     .player-content {
       flex: 1;
+    }
+    /* ── PREVENT HORIZONTAL PAGE OVERFLOW (mobile only) ── */
+    @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden;
+        max-width: 100%;
+      }
+      .player-content,
+      .contracts-layout,
+      .ct-card,
+      .ct-scroll,
+      .signing-item,
+      .trade-item {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
     }
   </style>
 </head>
@@ -1064,10 +1085,13 @@
       ? '<span id="banner-team-logo-wrap" style="display:inline-flex;align-items:center;margin-left:18px;flex-shrink:0;"><img id="banner-team-logo" src="'+logoUrl+'" alt="'+team+'" style="height:.75em;width:auto;object-fit:contain;display:block;opacity:.85;transition:src .3s,opacity .3s;"></span>'
       : '';
     nameEl.innerHTML = '<span>'+p.name+'</span>' + logoHtml;
-    document.getElementById('profile-team-line').textContent = p.number+' · '+p.position+' · '+team;
+    // On mobile show abbreviated team name to save space
+    var isMobileView = window.innerWidth < 769;
+    var teamDisplay = isMobileView ? teamRaw : team;
+    document.getElementById('profile-team-line').textContent = p.number+' · '+p.position+' · '+teamDisplay;
     var meta = document.getElementById('profile-meta');
     meta.innerHTML='';
-    [{label:'Position',val:p.position},{label:'Number',val:p.number},{label:'Team',val:team}].forEach(function(m){
+    [{label:'Position',val:p.position},{label:'Number',val:p.number},{label:'Team',val:teamDisplay}].forEach(function(m){
       var d=document.createElement('div'); d.className='banner-meta-item';
       d.innerHTML='<span class="banner-meta-label">'+m.label+'</span><span class="banner-meta-value">'+m.val+'</span>';
       meta.appendChild(d);
@@ -2626,9 +2650,20 @@
     // Show/hide Shoes tab depending on whether player has shoe data
     var hasShoesData = !!(PLAYER_STATS[key] && PLAYER_STATS[key].shoes && (PLAYER_STATS[key].shoes.sigs||[]).length);
     var shoesTabBtn = document.querySelector('.subnav-tab[data-tab="shoes"]');
-    var shoesTabOpt = document.querySelector('#subnav-mobile-select option[value="shoes"]');
     if (shoesTabBtn) shoesTabBtn.style.display = hasShoesData ? '' : 'none';
-    if (shoesTabOpt) shoesTabOpt.style.display = hasShoesData ? '' : 'none';
+    // Remove/add the mobile <option> from the DOM (style.display doesn't work on iOS Safari)
+    var mSel = document.getElementById('subnav-mobile-select');
+    if (mSel) {
+      var existingOpt = mSel.querySelector('option[value="shoes"]');
+      if (hasShoesData && !existingOpt) {
+        var newOpt = document.createElement('option');
+        newOpt.value = 'shoes';
+        newOpt.textContent = 'Shoes';
+        mSel.appendChild(newOpt);
+      } else if (!hasShoesData && existingOpt) {
+        mSel.removeChild(existingOpt);
+      }
+    }
     if (!hasShoesData && tab === 'shoes') tab = 'bio';
 
     renderBanner(key);
