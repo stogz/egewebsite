@@ -7,91 +7,494 @@
   <title>Teams · EGE NBA Simulation</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    .placeholder-wrap {
+    /* ── PAGE LAYOUT ── */
+    body { display:flex; flex-direction:column; min-height:100vh; }
+
+    .teams-page {
       position: relative; z-index: 2;
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 120px 40px 80px;
-      text-align: center;
+      flex: 1;
+      padding: 80px 0 80px;
     }
-    .placeholder-glow {
+
+    .teams-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 60px;
+    }
+
+    /* ── CONTROLS BAR ── */
+    .teams-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+      animation: fadeSlideUp .5s .08s ease both;
+    }
+
+    /* Shared styled select */
+    .ege-select-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .ege-select {
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 11px 38px 11px 14px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .2s, background .35s, color .35s;
+      min-width: 180px;
+    }
+    .ege-select:hover  { border-color: rgba(231,87,25,.5); }
+    .ege-select:focus  { border-color: var(--orange); }
+    .ege-select option { background: var(--bg-card); color: var(--text); }
+    .ege-select-chev {
+      pointer-events: none;
       position: absolute;
-      width: 600px; height: 600px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(35,26,165,.2) 0%, transparent 70%);
-      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      right: 11px; top: 50%;
+      transform: translateY(-50%);
+      width: 14px; height: 14px;
+      color: var(--orange);
+    }
+
+    /* Year nav arrows */
+    .year-arrow-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .35s;
+    }
+    .year-arrow-btn:hover:not([disabled]) { border-color: var(--orange); color: var(--orange); }
+    .year-arrow-btn[disabled] { opacity: .35; cursor: not-allowed; }
+    .year-arrow-btn svg { width:16px; height:16px; }
+
+    /* Back / reset button */
+    .teams-back-btn {
+      display: none;
+      align-items: center; gap: 8px;
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 11px 18px;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .35s;
+      margin-left: auto;
+    }
+    .teams-back-btn.visible { display: flex; }
+    .teams-back-btn:hover { border-color: rgba(231,87,25,.5); color: var(--orange); }
+    .teams-back-btn svg { width:14px; height:14px; }
+
+    /* ── STANDINGS VIEW ── */
+    #teamsStandingsView { animation: fadeSlideUp .4s ease both; }
+
+    .standings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(16px, 3vw, 28px);
+      align-items: start;
+    }
+    .standings-conf-label {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .standings-conf-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .standings-conf-label { color: var(--orange); }
+
+    .standings-list {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(5px, .9vw, 7px);
+      position: relative;
+    }
+
+    /* Cut lines */
+    .standings-list a:nth-child(6)::after,
+    .standings-list a:nth-child(10)::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      bottom: calc(-1 * clamp(6px,1.2vw,9px) / 2);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(231,87,25,.3); }
+    .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(231,87,25,.25); }
+
+    .standings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(8px,1.6vw,14px);
+      padding: clamp(9px,1.4vw,13px) clamp(14px,2vw,18px);
+      min-height: clamp(50px,6vw,62px);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text);
+      cursor: pointer;
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--row-accent, var(--border));
+      transition: border-color .2s, transform .18s ease, background .35s, color .35s;
+      will-change: transform;
+    }
+    .standings-row:hover {
+      transform: translateY(-2px);
+      border-color: rgba(231,87,25,.4);
+      border-left-color: var(--row-accent, var(--orange));
+      background: rgba(231,87,25,.03);
+    }
+    .standings-row:active { transform: translateY(0); }
+
+    .standings-row__left {
+      display: flex; align-items: center;
+      gap: clamp(8px,1.6vw,13px);
+      min-width: 0; flex: 1;
+    }
+    .standings-row__logo {
+      width: clamp(28px,4.2vw,40px);
+      height: clamp(28px,4.2vw,40px);
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .standings-row__seed {
+      font-family: var(--font-mono);
+      font-size: clamp(12px,1.8vw,14px);
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.45);
+      flex-shrink: 0;
+      min-width: 22px;
+    }
+    html.light .standings-row__seed {
+      color: rgba(42,33,64,.5);
+    }
+    .standings-row__name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(14px,2.2vw,18px);
+      letter-spacing: .02em;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color .35s;
+    }
+    html.light .standings-row__name {
+      color: #08052f;
+    }
+    .standings-row__abbr { display: none; }
+
+    .standings-row__right {
+      display: flex; align-items: center;
+      gap: clamp(6px,1.2vw,10px);
+      flex-shrink: 0;
+    }
+    .standings-row__icons {
+      display: flex; align-items: center;
+    }
+    .standings-row__icon {
+      width: clamp(28px,4vw,36px);
+      height: clamp(28px,4vw,36px);
+      object-fit: contain;
+      border-radius: 0;
+      background: transparent;
+    }
+    .standings-row__icon + .standings-row__icon {
+      margin-left: clamp(-14px,-2vw,-10px);
+    }
+    .standings-row__record {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(14px,2.4vw,18px);
+      white-space: nowrap;
+      color: #ffffff;
+      transition: color .35s;
+    }
+    html.light .standings-row__record {
+      color: #08052f;
+    }
+
+    /* ── TEAM DETAIL VIEW ── */
+    #teamsDetailView { display: none; animation: fadeSlideUp .4s ease both; }
+    #teamsDetailView.visible { display: block; }
+
+    /* Team hero banner */
+    .team-banner {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 36px 40px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: flex-end;
+      gap: 28px;
+      min-height: 180px;
+      transition: background .5s ease;
+    }
+    .team-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 60%, transparent 100%);
       pointer-events: none;
     }
-    .placeholder-eyebrow {
-      font-family: var(--font-mono); font-size: .72rem;
-      letter-spacing: .3em; color: var(--orange);
-      text-transform: uppercase; margin-bottom: 22px;
-      animation: fadeUp .8s ease both;
+    .team-banner__logo {
+      position: relative; z-index: 1;
+      width: 90px; height: 90px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,.5));
+      flex-shrink: 0;
     }
-    .placeholder-eyebrow::before { content: '// '; opacity: .5; }
-    .placeholder-title {
-      font-family: var(--font-display); font-weight: 900;
-      font-size: clamp(4rem, 12vw, 10rem);
-      line-height: .9; text-transform: uppercase;
-      color: var(--heading); letter-spacing: -.01em;
-      animation: fadeUp .8s .15s ease both;
-      transition: color 0.35s;
+    .team-banner__info { position: relative; z-index: 1; }
+    .team-banner__name {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+      color: #fff;
+      line-height: .92;
     }
-    .placeholder-title .ghost {
-      -webkit-text-stroke: 2px rgba(35,26,165,.7);
-      color: transparent;
+    .team-banner__season {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-top: 8px;
     }
-    .wip-badge {
-      display: inline-flex; align-items: center; gap: 10px;
-      margin-top: 36px; padding: 10px 24px;
-      border: 1px solid rgba(231,87,25,.3); border-radius: 3px;
-      background: rgba(231,87,25,.06);
-      font-family: var(--font-mono); font-size: .72rem;
-      letter-spacing: .18em; text-transform: uppercase;
-      color: var(--text-muted);
-      animation: fadeUp .8s .3s ease both;
-    }
-    .wip-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--orange);
-      animation: blink 1.8s ease-in-out infinite;
-    }
-    .placeholder-sub {
-      font-family: var(--font-body); font-size: 1.05rem;
-      font-weight: 300; letter-spacing: .06em;
-      color: var(--text-muted);
-      max-width: 420px; margin: 20px auto 0;
-      line-height: 1.7;
-      animation: fadeUp .8s .4s ease both;
-    }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 10px;
-      margin-top: 48px;
-      font-family: var(--font-mono); font-size: .75rem;
-      letter-spacing: .14em; text-transform: uppercase;
-      text-decoration: none; padding: 13px 30px;
-      border: 1px solid rgba(231,87,25,.35); border-radius: 3px;
-      color: var(--orange); background: rgba(231,87,25,.06);
-      transition: all .2s;
-      animation: fadeUp .8s .5s ease both;
-    }
-    .back-btn:hover {
-      background: rgba(231,87,25,.12);
-      border-color: var(--orange);
-      transform: translateY(-2px);
-    }
-    .deco-lines { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-    .deco-line  { position: absolute; background: rgba(35,26,165,.12); }
-    .deco-line.h { height: 1px; left: 0; right: 0; }
-    .deco-line.v { width: 1px; top: 0; bottom: 0; }
+    .team-banner__season span { color: #fff; font-weight: 700; }
 
-    /* MOBILE */
+    /* Stats grid below banner */
+    .team-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .team-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+      transition: background .35s;
+    }
+    .team-stat-card__label {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .team-stat-card__value {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.8rem;
+      line-height: 1;
+      color: var(--heading);
+      transition: color .35s;
+    }
+    .team-stat-card__value.orange { color: var(--orange); }
+
+    /* Two-column detail layout */
+    .team-detail-cols {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Win chart */
+    .team-chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: background .35s;
+      margin-bottom: 24px;
+    }
+    .team-chart-card__header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+    }
+    .team-chart-card__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+    }
+    .team-chart-card__title {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .team-chart-card__body {
+      padding: 20px;
+      height: 220px;
+      position: relative;
+    }
+
+    /* OFF/DEF gauges */
+    .team-gauges {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: background .35s;
+      margin-bottom: 24px;
+    }
+    .team-gauges__header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+    }
+    .team-gauges__body {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+    .gauge-wrap {
+      position: relative;
+      width: 130px; height: 130px;
+    }
+    .gauge-wrap svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    .gauge-wrap circle { fill: none; stroke-width: 10; }
+    .gauge-track { stroke: var(--border); }
+    @keyframes gaugeCountUp { from { opacity:0; transform:scale(.7); } to { opacity:1; transform:scale(1); } }
+    .gauge-progress { stroke-linecap: round; stroke-dasharray: 0 999; transition: stroke-dashoffset 1s cubic-bezier(.22,1,.36,1), stroke 1s ease; }
+    .gauge-wrap.animate-in .gauge-progress { /* transition fires on dash offset change */ }
+    .gauge-content__val { transition: color .35s; animation: none; }
+    .gauge-content__val.counting { animation: gaugeCountUp .4s ease both; }
+    .gauge-inner {
+      position: absolute; top: 50%; left: 50%;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      transform: translate(-50%,-50%);
+      transition: background .35s;
+    }
+    .gauge-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .gauge-content__label {
+      font-family: var(--font-mono);
+      font-size: .58rem; letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 2px;
+    }
+    .gauge-content__val {
+      font-family: var(--font-display);
+      font-weight: 900; font-size: 1.5rem;
+      color: var(--heading); line-height: 1;
+      transition: color .35s;
+    }
+    .gauge-content__rank {
+      font-family: var(--font-mono);
+      font-size: .6rem; color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Roster table */
+    .team-roster-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: background .35s;
+    }
+    .team-roster-card__header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+    }
+    .roster-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
+    .roster-scroll::-webkit-scrollbar { height: 4px; }
+    .roster-scroll::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 99px; }
+    .roster-table { border-collapse: collapse; width: 100%; min-width: 500px; font-family: var(--font-body); }
+    .roster-table thead tr { border-bottom: 1px solid var(--border-soft); }
+    .roster-table th {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--text-muted); padding: 10px 14px;
+      text-align: right; font-weight: 400;
+      white-space: nowrap; cursor: pointer; user-select: none;
+      transition: color .15s;
+    }
+    .roster-table th:first-child { text-align: left; }
+    .roster-table th:hover { color: var(--heading); }
+    .roster-table th.sort-asc, .roster-table th.sort-desc { color: var(--orange); }
+    .roster-table tbody tr { border-bottom: 1px solid var(--border-soft); transition: background .12s; }
+    .roster-table tbody tr:last-child { border-bottom: none; }
+    .roster-table tbody tr:hover td { background: rgba(231,87,25,.04); }
+    .roster-table td { padding: 0 14px; height: 3rem; text-align: right; font-size: .9rem; color: var(--text); vertical-align: middle; white-space: nowrap; }
+    .roster-table td:first-child { text-align: left; font-weight: 600; color: var(--heading); transition: color .35s; }
+    .roster-empty { padding: 28px 20px; font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+
+    /* ── MOBILE ── */
     @media (max-width: 768px) {
-      .placeholder-wrap { padding: 90px 24px 60px; }
-      .placeholder-title { font-size: clamp(3rem, 16vw, 7rem); }
-      .placeholder-sub { font-size: .95rem; }
-      .back-btn { padding: 12px 24px; font-size: .7rem; }
+      .teams-inner { padding: 0 16px; }
+      .teams-page  { padding: 80px 0 60px; }
+      .standings-grid { grid-template-columns: 1fr; }
+      .standings-conf-label { order: 0; }
+      .standings-grid > div:nth-child(1) { order: 1; } /* EAST */
+      .standings-grid > div:nth-child(2) { order: 2; } /* WEST */
+      .standings-row__name { display: none; }
+      .standings-row__abbr { display: inline; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px,4vw,18px); letter-spacing: .06em; }
+      .team-stats-grid { grid-template-columns: repeat(2,1fr); }
+      .team-detail-cols { grid-template-columns: 1fr; }
+      .team-banner { padding: 24px 20px; }
+      .team-banner__logo { width: 60px; height: 60px; }
+      .teams-controls { gap: 8px; }
+      .ege-select { min-width: 140px; font-size: .65rem; padding: 10px 32px 10px 10px; }
+      .teams-back-btn { margin-left: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .standings-row, .standings-row:hover, .standings-row:active { transition: none; transform: none; }
     }
   </style>
 </head>
@@ -106,41 +509,693 @@
       <span>EGE <span class="accent">NBA</span> Simulation</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html" data-num="01">Home</a></li>
+      <li><a href="index.html"   data-num="01">Home</a></li>
       <li><a href="players.html" data-num="02">Players</a></li>
-      <li><a href="teams.html" data-num="03" class="active">Teams</a></li>
+      <li><a href="teams.html"   data-num="03" class="active">Teams</a></li>
       <li><a href="history.html" data-num="04">History</a></li>
-      <li><a href="draft.html" data-num="05">Draft</a></li>
+      <li><a href="draft.html"   data-num="05">Draft</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
 
-  <div class="placeholder-wrap">
-    <div class="placeholder-glow"></div>
-    <div class="deco-lines">
-      <div class="deco-line h" style="top:25%"></div>
-      <div class="deco-line h" style="top:75%"></div>
-      <div class="deco-line v" style="left:15%"></div>
-      <div class="deco-line v" style="right:15%"></div>
-    </div>
-    <p class="placeholder-eyebrow">franchises · league history</p>
-    <h1 class="placeholder-title">
-      Teams<br>
-      <span class="ghost">Franchises</span>
-    </h1>
-    <div class="wip-badge">
-      <span class="wip-dot"></span>
-      Under Construction · Coming Soon
-    </div>
-    <p class="placeholder-sub">Every franchise in the EGE simulation — win-loss records, roster histories, and season-by-season breakdowns.</p>
-    <a href="index.html" class="back-btn">← Back to Home</a>
-  </div>
+  <div class="teams-page">
+    <div class="teams-inner">
+
+      <!-- Controls -->
+      <div class="teams-controls">
+        <!-- Team select -->
+        <div class="ege-select-wrap">
+          <select id="teamSelect" class="ege-select" aria-label="Select team">
+            <option value="">Standings</option>
+            <option value="atlantahawks">Atlanta Hawks</option>
+            <option value="bostonceltics">Boston Celtics</option>
+            <option value="brooklynnets">Brooklyn Nets</option>
+            <option value="charlottehornets">Charlotte Hornets</option>
+            <option value="chicagobulls">Chicago Bulls</option>
+            <option value="clevelandcavaliers">Cleveland Cavaliers</option>
+            <option value="dallasmavericks">Dallas Mavericks</option>
+            <option value="denvernuggets">Denver Nuggets</option>
+            <option value="detroitpistons">Detroit Pistons</option>
+            <option value="goldenstatewarriors">Golden State Warriors</option>
+            <option value="houstonrockets">Houston Rockets</option>
+            <option value="indianapacers">Indiana Pacers</option>
+            <option value="losangelesclippers">Los Angeles Clippers</option>
+            <option value="losangeleslakers">Los Angeles Lakers</option>
+            <option value="miamiheat">Miami Heat</option>
+            <option value="milwaukeebucks">Milwaukee Bucks</option>
+            <option value="minnesotatimberwolves">Minnesota Timberwolves</option>
+            <option value="neworleanspelicans">New Orleans Pelicans</option>
+            <option value="newyorkknicks">New York Knicks</option>
+            <option value="oklahomacitythunder">Oklahoma City Thunder</option>
+            <option value="orlandomagic">Orlando Magic</option>
+            <option value="philadelphia76ers">Philadelphia 76ers</option>
+            <option value="phoenixsuns">Phoenix Suns</option>
+            <option value="portlandtrailblazers">Portland Trail Blazers</option>
+            <option value="sacramentokings">Sacramento Kings</option>
+            <option value="sanantoniospurs">San Antonio Spurs</option>
+            <option value="torontoraptors">Toronto Raptors</option>
+            <option value="utahjazz">Utah Jazz</option>
+            <option value="vancouvergrizzlies">Vancouver Grizzlies</option>
+            <option value="washingtonwizards">Washington Wizards</option>
+            <option value="stlouisspirit">St. Louis Spirit</option>
+            <option value="mexicocityflight">Mexico City Flight</option>
+          </select>
+          <svg class="ege-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>
+        </div>
+
+        <!-- Prev year -->
+        <button class="year-arrow-btn" id="yearPrevBtn" aria-label="Previous year" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+
+        <!-- Year select -->
+        <div class="ege-select-wrap">
+          <select id="yearSelect" class="ege-select" aria-label="Select year" style="min-width:110px;">
+            <option value="2017-18">2017-18</option>
+            <option value="2018-19">2018-19</option>
+            <option value="2019-20">2019-20</option>
+            <option value="2020-21">2020-21</option>
+            <option value="2021-22">2021-22</option>
+            <option value="2022-23">2022-23</option>
+            <option value="2023-24">2023-24</option>
+            <option value="2024-25">2024-25</option>
+            <option value="2025-26">2025-26</option>
+            <option value="2026-27">2026-27</option>
+            <option value="2027-28">2027-28</option>
+            <option value="2028-29">2028-29</option>
+            <option value="2029-30">2029-30</option>
+            <option value="2030-31">2030-31</option>
+            <option value="2031-32">2031-32</option>
+            <option value="2032-33">2032-33</option>
+          </select>
+          <svg class="ege-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>
+        </div>
+
+        <!-- Next year -->
+        <button class="year-arrow-btn" id="yearNextBtn" aria-label="Next year">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <!-- Back to standings -->
+        <button class="teams-back-btn" id="teamsBackBtn" aria-label="Back to standings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Standings
+        </button>
+      </div>
+
+      <!-- STANDINGS VIEW -->
+      <div id="teamsStandingsView">
+        <div class="standings-grid">
+          <div>
+            <div class="standings-conf-label">Eastern Conference</div>
+            <div class="standings-list" id="standingsEast"></div>
+          </div>
+          <div>
+            <div class="standings-conf-label">Western Conference</div>
+            <div class="standings-list" id="standingsWest"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEAM DETAIL VIEW -->
+      <div id="teamsDetailView">
+        <!-- Banner -->
+        <div class="team-banner" id="teamBanner">
+          <img class="team-banner__logo" id="teamBannerLogo" src="" alt="">
+          <div class="team-banner__info">
+            <div class="team-banner__name" id="teamBannerName">—</div>
+            <div class="team-banner__season">Season <span id="teamBannerSeason">—</span></div>
+          </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="team-stats-grid">
+          <div class="team-stat-card">
+            <div class="team-stat-card__label">// Record</div>
+            <div class="team-stat-card__value" id="teamStatRecord">—</div>
+          </div>
+          <div class="team-stat-card">
+            <div class="team-stat-card__label">// Win %</div>
+            <div class="team-stat-card__value orange" id="teamStatPct">—</div>
+          </div>
+          <div class="team-stat-card">
+            <div class="team-stat-card__label">// Conf Rank</div>
+            <div class="team-stat-card__value" id="teamStatRank">—</div>
+          </div>
+          <div class="team-stat-card">
+            <div class="team-stat-card__label">// Playoffs</div>
+            <div class="team-stat-card__value" id="teamStatPlayoffs" style="font-size:1rem;">—</div>
+          </div>
+        </div>
+
+        <!-- Columns -->
+        <div class="team-detail-cols">
+          <div>
+            <!-- Roster -->
+            <div class="team-roster-card">
+              <div class="team-roster-card__header">
+                <div class="team-chart-card__dot"></div>
+                <span class="team-chart-card__title">Roster</span>
+              </div>
+              <div class="roster-scroll">
+                <table class="roster-table" id="rosterTable">
+                  <thead><tr>
+                    <th>Player</th><th>Pos</th><th>Age</th><th>OVR</th>
+                    <th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th>
+                  </tr></thead>
+                  <tbody id="rosterTbody"></tbody>
+                </table>
+                <div class="roster-empty" id="rosterEmpty" style="display:none;">No roster data for this season.</div>
+              </div>
+            </div>
+
+            <!-- Win history chart -->
+            <div class="team-chart-card" style="margin-top:24px;">
+              <div class="team-chart-card__header">
+                <div class="team-chart-card__dot"></div>
+                <span class="team-chart-card__title">Win History</span>
+              </div>
+              <div class="team-chart-card__body">
+                <canvas id="teamWinChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <!-- OFF/DEF gauges -->
+            <div class="team-gauges" id="teamGaugesCard" style="display:none;">
+              <div class="team-gauges__header">
+                <div class="team-chart-card__dot"></div>
+                <span class="team-chart-card__title">Offensive &amp; Defensive Rating</span>
+              </div>
+              <div class="team-gauges__body">
+                <div class="gauge-wrap" data-type="off">
+                  <svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="40"/><circle class="gauge-progress" cx="50" cy="50" r="40"/></svg>
+                  <div class="gauge-inner"></div>
+                  <div class="gauge-content">
+                    <div class="gauge-content__label">OFF</div>
+                    <div class="gauge-content__val" id="gaugeOffVal">—</div>
+                    <div class="gauge-content__rank" id="gaugeOffRank">—</div>
+                  </div>
+                </div>
+                <div class="gauge-wrap" data-type="def">
+                  <svg viewBox="0 0 100 100"><circle class="gauge-track" cx="50" cy="50" r="40"/><circle class="gauge-progress" cx="50" cy="50" r="40"/></svg>
+                  <div class="gauge-inner"></div>
+                  <div class="gauge-content">
+                    <div class="gauge-content__label">DEF</div>
+                    <div class="gauge-content__val" id="gaugeDefVal">—</div>
+                    <div class="gauge-content__rank" id="gaugeDefRank">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /teams-inner -->
+  </div><!-- /teams-page -->
 
   <footer>
     <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
-    <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
+    <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
+    <ul class="footer-links">
+      <li><a href="players.html">Players</a></li>
+      <li><a href="history.html">History</a></li>
+      <li><a href="draft.html">Draft</a></li>
+    </ul>
   </footer>
 
   <script src="shared.js"></script>
+  <script src="team-stats.js"></script>
+  <script>
+  (function () {
+    /* ─── DATA ACCESS ─────────────────────────────────────────── */
+    function TEAM_INFO()    { return window.EGE_TEAM_INFO    || {}; }
+    function SEASON_STATS() { return window.EGE_SEASON_STATS || {}; }
+    function RATINGS()      { return window.EGE_RATINGS      || {}; }
+    function ROSTERS()      { return window.EGE_ROSTERS      || {}; }
+    function PLAYER_ICONS() { return window.EGE_PLAYER_ICONS || {}; }
+
+    /* ─── CONSTANTS ───────────────────────────────────────────── */
+    var TEAM_LOGOS = {
+      "Atlanta Hawks":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hawks2_orig.png",
+      "Boston Celtics":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bos_orig.png",
+      "Brooklyn Nets":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bkn_orig.png",
+      "Charlotte Hornets":       "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cha_orig.png",
+      "Chicago Bulls":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/chi_orig.png",
+      "Cleveland Cavaliers":     "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cle_orig.png",
+      "Dallas Mavericks":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/dal_orig.png",
+      "Denver Nuggets":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/den_orig.png",
+      "Detroit Pistons":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/det_orig.png",
+      "Golden State Warriors":   "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/gsw_orig.png",
+      "Houston Rockets":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/rockets2_orig.png",
+      "Indiana Pacers":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/ind_orig.png",
+      "Los Angeles Clippers":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lac_orig.png",
+      "Los Angeles Lakers":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lal_orig.png",
+      "Miami Heat":              "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mia_orig.png",
+      "Milwaukee Bucks":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png",
+      "Minnesota Timberwolves":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/min_orig.png",
+      "New Orleans Pelicans":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nop_orig.png",
+      "New York Knicks":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nyk_orig.png",
+      "Oklahoma City Thunder":   "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/okc_orig.png",
+      "Orlando Magic":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png",
+      "Philadelphia 76ers":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png",
+      "Phoenix Suns":            "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/phx2_orig.png",
+      "Portland Trail Blazers":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/por_orig.png",
+      "Sacramento Kings":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sac2_orig.png",
+      "San Antonio Spurs":       "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png",
+      "Toronto Raptors":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/raptors2_orig.png",
+      "Utah Jazz":               "https://logos.logofury.com/logo_src/20dba3b5841d7dc92dc0c589c08493f7.png",
+      "Washington Wizards":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png",
+      "Mexico City Flight":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mex_orig.png",
+      "St. Louis Spirit":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png",
+      "Vancouver Grizzlies":     "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png",
+    };
+    var TEAM_COLORS = {
+      "Los Angeles Lakers":"#552583","San Antonio Spurs":"#000000","Atlanta Hawks":"#cc092f",
+      "Boston Celtics":"#007A33","Brooklyn Nets":"#000000","Charlotte Hornets":"#1D1160",
+      "Chicago Bulls":"#bc032b","Cleveland Cavaliers":"#72253d","Dallas Mavericks":"#00538C",
+      "Denver Nuggets":"#0E2240","Detroit Pistons":"#C8102E","Golden State Warriors":"#1D428A",
+      "Houston Rockets":"#CE1141","Indiana Pacers":"#002D62","Los Angeles Clippers":"#031c3d",
+      "Vancouver Grizzlies":"#5D76A9","Miami Heat":"#98002E","Milwaukee Bucks":"#00471B",
+      "Minnesota Timberwolves":"#0C2340","New Orleans Pelicans":"#0C2340","New York Knicks":"#ff6720",
+      "Oklahoma City Thunder":"#007AC1","Orlando Magic":"#0050b5","Philadelphia 76ers":"#006BB6",
+      "Phoenix Suns":"#1D1160","Portland Trail Blazers":"#E03A3E","Sacramento Kings":"#5A2D81",
+      "Toronto Raptors":"#CE1141","Utah Jazz":"#4e008e","Washington Wizards":"#002144",
+      "Mexico City Flight":"#07b4c0","St. Louis Spirit":"#d16405",
+    };
+    var SLUG_ABBR = {
+      atlantahawks:"ATL",bostonceltics:"BOS",brooklynnets:"BKN",charlottehornets:"CHA",
+      chicagobulls:"CHI",clevelandcavaliers:"CLE",dallasmavericks:"DAL",denvernuggets:"DEN",
+      detroitpistons:"DET",goldenstatewarriors:"GSW",houstonrockets:"HOU",indianapacers:"IND",
+      losangelesclippers:"LAC",losangeleslakers:"LAL",miamiheat:"MIA",milwaukeebucks:"MIL",
+      minnesotatimberwolves:"MIN",neworleanspelicans:"NOP",newyorkknicks:"NYK",
+      oklahomacitythunder:"OKC",orlandomagic:"ORL",philadelphia76ers:"PHI",phoenixsuns:"PHX",
+      portlandtrailblazers:"POR",sacramentokings:"SAC",sanantoniospurs:"SAS",torontoraptors:"TOR",
+      utahjazz:"UTA",vancouvergrizzlies:"VAN",washingtonwizards:"WAS",
+      mexicocityflight:"MEX",stlouisspirit:"STL",
+    };
+    var ABBR_BY_NAME = {};
+    Object.keys(SLUG_ABBR).forEach(function(s){ var ti = TEAM_INFO(); if(ti[s]) ABBR_BY_NAME[ti[s].name] = SLUG_ABBR[s]; });
+
+    /* ─── URL HELPERS ─────────────────────────────────────────── */
+    function parseHash() {
+      var raw = (location.hash||'').slice(1).trim().toLowerCase();
+      if (!raw) return { slug:'', yy:'' };
+      var last2 = raw.slice(-2);
+      if (/^\d{2}$/.test(last2)) return { slug: raw.slice(0,-2), yy: last2 };
+      return { slug: raw, yy: '' };
+    }
+    function suffixToSeason(yy) {
+      if (!/^\d{2}$/.test(yy)) return '';
+      var end = parseInt(yy,10);
+      var start = (end-1+100)%100;
+      return '20'+String(start).padStart(2,'0')+'-'+String(end).padStart(2,'0');
+    }
+    function seasonToSuffix(s) {
+      if (!s||!s.includes('-')) return '';
+      return (s.split('-')[1]||'').padStart(2,'0');
+    }
+    function setHash(slug, season) {
+      var yy = seasonToSuffix(season);
+      if (!slug) { history.replaceState(null,'',location.pathname+location.search); return; }
+      history.replaceState(null,'',location.pathname+location.search+'#'+slug+yy);
+    }
+    function fireHash() { try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch(e){} }
+
+    /* ─── DOM REFS ────────────────────────────────────────────── */
+    var teamSel    = document.getElementById('teamSelect');
+    var yearSel    = document.getElementById('yearSelect');
+    var prevBtn    = document.getElementById('yearPrevBtn');
+    var nextBtn    = document.getElementById('yearNextBtn');
+    var backBtn    = document.getElementById('teamsBackBtn');
+    var standView  = document.getElementById('teamsStandingsView');
+    var detailView = document.getElementById('teamsDetailView');
+    var eastList   = document.getElementById('standingsEast');
+    var westList   = document.getElementById('standingsWest');
+
+    /* ─── YEAR SELECT INIT ────────────────────────────────────── */
+    function syncYearArrows() {
+      prevBtn.disabled = yearSel.selectedIndex <= 0;
+      nextBtn.disabled = yearSel.selectedIndex >= yearSel.options.length - 1;
+    }
+    function initLatestYear() {
+      yearSel.selectedIndex = yearSel.options.length - 1;
+      syncYearArrows();
+    }
+    initLatestYear();
+
+    prevBtn.addEventListener('click', function(){
+      if (prevBtn.disabled) return;
+      yearSel.selectedIndex--;
+      yearSel.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+    nextBtn.addEventListener('click', function(){
+      if (nextBtn.disabled) return;
+      yearSel.selectedIndex++;
+      yearSel.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+
+    /* ─── TEAM SELECT SYNC ────────────────────────────────────── */
+    function syncDropdownsFromHash() {
+      var h = parseHash();
+      if (!h.slug) { teamSel.value = ''; }
+      else {
+        var opt = Array.from(teamSel.options).find(function(o){ return o.value===h.slug; });
+        teamSel.value = opt ? h.slug : '';
+      }
+      if (h.yy) {
+        var season = suffixToSeason(h.yy);
+        var yOpt = Array.from(yearSel.options).find(function(o){ return o.value===season; });
+        if (yOpt) yearSel.value = season;
+      }
+      syncYearArrows();
+    }
+
+    teamSel.addEventListener('change', function(){
+      var slug = teamSel.value;
+      var season = yearSel.value;
+      setHash(slug, season);
+      render();
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    yearSel.addEventListener('change', function(){
+      syncYearArrows();
+      var h = parseHash();
+      if (h.slug) { setHash(h.slug, yearSel.value); }
+      render();
+    });
+    backBtn.addEventListener('click', function(){
+      teamSel.value = '';
+      setHash('', yearSel.value);
+      render();
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    window.addEventListener('hashchange', function(){
+      syncDropdownsFromHash();
+      render();
+    });
+
+    /* ─── STANDINGS RENDERING ─────────────────────────────────── */
+    function isEastern(slug) {
+      var ti = TEAM_INFO()[slug];
+      return ti && String(ti.division).toLowerCase().includes('eastern');
+    }
+    function buildStandingsRow(slug, stats, seed, year) {
+      var ti = TEAM_INFO()[slug] || {};
+      var teamName = ti.name || slug;
+      var logo = TEAM_LOGOS[teamName] || '';
+      var bg = TEAM_COLORS[teamName] || '#333';
+      var record = stats.record || 'N/A';
+      var yy = seasonToSuffix(year);
+      var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
+      var players = Array.isArray(stats.players) ? stats.players : [];
+      var icons = players.map(function(n){ return PLAYER_ICONS()[n]; }).filter(Boolean);
+      var iconsHtml = icons.length
+        ? '<div class="standings-row__icons">'+icons.map(function(u,i){
+            return '<img class="standings-row__icon" src="'+u+'" alt="" loading="lazy" style="z-index:'+(20-i)+';">';
+          }).join('')+'</div>'
+        : '';
+      return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg+';">'
+        +'<div class="standings-row__left">'
+          +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
+          +'<div class="standings-row__seed">'+seed+'.</div>'
+          +'<div class="standings-row__name">'+teamName+'</div>'
+          +'<div class="standings-row__abbr">'+abbr+'</div>'
+        +'</div>'
+        +'<div class="standings-row__right">'
+          +iconsHtml
+          +'<div class="standings-row__record">'+record+'</div>'
+        +'</div>'
+      +'</a>';
+    }
+    function renderStandings(year) {
+      var ss = SEASON_STATS()[year];
+      if (!ss) { eastList.innerHTML = '<div class="roster-empty">No data for this season.</div>'; westList.innerHTML=''; return; }
+      var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
+      var sorted = slugs.slice().sort(function(a,b){
+        var ra = parseInt(String(ss[a].rank||'').replace(/\D/g,''),10)||9999;
+        var rb = parseInt(String(ss[b].rank||'').replace(/\D/g,''),10)||9999;
+        return ra-rb||String(a).localeCompare(String(b));
+      });
+      var east=[],west=[];
+      sorted.forEach(function(s){ (isEastern(s)?east:west).push(s); });
+      eastList.innerHTML = east.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
+      westList.innerHTML = west.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
+      // Wire clicks
+      document.querySelectorAll('.standings-row').forEach(function(a){
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          var href = a.getAttribute('href')||'';
+          if (!href.startsWith('#')) return;
+          history.replaceState(null,'',location.pathname+location.search+href);
+          syncDropdownsFromHash();
+          render();
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      });
+    }
+
+    /* ─── TEAM DETAIL RENDERING ───────────────────────────────── */
+    var _winChart = null;
+
+    function hexToRgba(hex,a){
+      hex = hex.replace('#','');
+      var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+      return 'rgba('+r+','+g+','+b+','+a+')';
+    }
+    function ordinal(n){
+      if (!Number.isFinite(n)) return '—';
+      var s=['th','st','nd','rd'],v=n%100;
+      return n+(s[(v-20)%10]||s[v]||s[0]);
+    }
+    function computeRanks(obj) {
+      var teams = Object.keys(obj||{}).filter(function(k){ return k!=='__meta'; });
+      var offSorted = teams.slice().sort(function(a,b){ return (obj[b].off||-Infinity)-(obj[a].off||-Infinity); });
+      var defSorted = teams.slice().sort(function(a,b){ return (obj[a].def||Infinity)-(obj[b].def||Infinity); });
+      var offR={},defR={};
+      offSorted.forEach(function(a,i){ offR[a]=i+1; });
+      defSorted.forEach(function(a,i){ defR[a]=i+1; });
+      return {offR:offR, defR:defR, count:teams.length};
+    }
+    function renderGauge(el, value, type) {
+      var prog = el.querySelector('.gauge-progress');
+      var r = prog.r.baseVal.value;
+      var circ = 2*Math.PI*r;
+      var min=105, max=125;
+      var clamped = Math.max(min,Math.min(value,max));
+      var score = type==='off' ? (clamped-min)/(max-min) : (max-clamped)/(max-min);
+      score = Math.max(0,Math.min(score,1));
+      // Start at 0, animate in
+      prog.style.strokeDasharray = circ+' '+circ;
+      prog.style.strokeDashoffset = circ; // start empty
+      var dashLen = circ;
+      var green='#00cc66',orange='#ff9900',red='#ff3300';
+      var lerpColor = function(a,b,t){
+        var c1=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];
+        var c2=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];
+        return 'rgb('+Math.round(c1[0]+(c2[0]-c1[0])*t)+','+Math.round(c1[1]+(c2[1]-c1[1])*t)+','+Math.round(c1[2]+(c2[2]-c1[2])*t)+')';
+      };
+      prog.style.stroke = score>=0.5 ? lerpColor(green,orange,(1-score)*2) : lerpColor(orange,red,(0.5-score)*2);
+      // Trigger fill animation after a small delay so transition fires
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          prog.style.strokeDashoffset = dashLen*(1-score);
+        });
+      });
+      // Count-up the value display
+      var valEl = el.querySelector('.gauge-content__val');
+      if (valEl) {
+        valEl.classList.remove('counting');
+        void valEl.offsetWidth;
+        valEl.classList.add('counting');
+        var start = null, duration = 700, target = value;
+        function step(ts) {
+          if (!start) start = ts;
+          var p = Math.min((ts-start)/duration, 1);
+          var ease = 1 - Math.pow(1-p, 3);
+          valEl.textContent = (ease*target).toFixed(1);
+          if (p < 1) requestAnimationFrame(step);
+          else valEl.textContent = target.toFixed(1);
+        }
+        requestAnimationFrame(step);
+      }
+    }
+    function renderDetail(slug, year) {
+      var ti = TEAM_INFO()[slug] || {};
+      var teamName = ti.name || slug;
+      var logo = TEAM_LOGOS[teamName] || '';
+      var bg = TEAM_COLORS[teamName] || '#333';
+      var ss = (SEASON_STATS()[year]||{})[slug] || null;
+      var abbr = SLUG_ABBR[slug] || '';
+
+      // Banner
+      var banner = document.getElementById('teamBanner');
+      banner.style.background = bg;
+      document.getElementById('teamBannerLogo').src = logo;
+      document.getElementById('teamBannerLogo').alt = teamName;
+      document.getElementById('teamBannerName').textContent = teamName;
+      document.getElementById('teamBannerSeason').textContent = year;
+
+      // Quick stats
+      document.getElementById('teamStatRecord').textContent = ss ? ss.record : '—';
+      document.getElementById('teamStatPct').textContent    = ss ? ss.pct    : '—';
+      document.getElementById('teamStatRank').textContent   = ss ? ss.rank   : '—';
+      var playoffsEl = document.getElementById('teamStatPlayoffs');
+      playoffsEl.textContent = ss ? (ss.playoffs||'—') : '—';
+      playoffsEl.style.fontSize = ss && ss.playoffs && ss.playoffs.length > 8 ? '.85rem' : '1rem';
+
+      // Win history chart
+      var allSeasons = Object.keys(SEASON_STATS()).sort();
+      var labels=[], data=[];
+      allSeasons.forEach(function(s){
+        var row = (SEASON_STATS()[s]||{})[slug];
+        if (row && row.record) {
+          var m = String(row.record).match(/^(\d+)/);
+          if (m) { labels.push(s); data.push(parseInt(m[1],10)); }
+        }
+      });
+      if (_winChart) { _winChart.destroy(); _winChart=null; }
+      // Read actual computed colors from the site's CSS variables at render time
+      var isLight    = document.documentElement.classList.contains('light');
+      var labelColor = isLight ? 'rgba(42,33,64,.5)'   : 'rgba(208,208,208,.45)';
+      var gridColor  = isLight ? 'rgba(35,26,165,.14)'  : 'rgba(35,26,165,.22)';
+      var ctx = document.getElementById('teamWinChart').getContext('2d');
+      _winChart = new Chart(ctx, {
+        type:'line',
+        data:{ labels:labels, datasets:[{ data:data, tension:.4, borderColor:bg, backgroundColor:hexToRgba(bg,.3), fill:true, borderWidth:3, pointRadius:0, pointHoverRadius:6, hitRadius:18 }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:function(i){ return i[0].label; }, label:function(c){ return 'Wins: '+c.parsed.y; } } } },
+          scales:{
+            x:{ ticks:{ color:labelColor, font:{size:10} }, grid:{color:gridColor} },
+            y:{ min:5, max:75, ticks:{ stepSize:10, color:labelColor, font:{size:10} }, grid:{color:gridColor} }
+          },
+          onClick:function(evt){
+            if (!_winChart) return;
+            var pts = _winChart.getElementsAtEventForMode(evt,'nearest',{intersect:false},true);
+            if (!pts||!pts.length) return;
+            var clickedYear = _winChart.data.labels[pts[0].index];
+            if (!clickedYear) return;
+            var yOpt = Array.from(yearSel.options).find(function(o){ return o.value===clickedYear; });
+            if (yOpt) { yearSel.value=clickedYear; yearSel.dispatchEvent(new Event('change',{bubbles:true})); }
+          }
+        }
+      });
+
+      // OFF/DEF gauges
+      var ratingsYear = RATINGS()[year];
+      var gaugesCard = document.getElementById('teamGaugesCard');
+      if (ratingsYear && abbr && ratingsYear[abbr]) {
+        var ranks = computeRanks(ratingsYear);
+        var teamRatings = ratingsYear[abbr];
+        var offRank = (teamRatings.offRank||ranks.offR[abbr]);
+        var defRank = (teamRatings.defRank||ranks.defR[abbr]);
+        document.getElementById('gaugeOffVal').textContent  = Number(teamRatings.off).toFixed(1);
+        document.getElementById('gaugeOffRank').textContent = ordinal(offRank);
+        document.getElementById('gaugeDefVal').textContent  = Number(teamRatings.def).toFixed(1);
+        document.getElementById('gaugeDefRank').textContent = ordinal(defRank);
+        renderGauge(document.querySelector('.gauge-wrap[data-type="off"]'), teamRatings.off, 'off');
+        renderGauge(document.querySelector('.gauge-wrap[data-type="def"]'), teamRatings.def, 'def');
+        gaugesCard.style.display = 'block';
+      } else {
+        gaugesCard.style.display = 'none';
+      }
+
+      // Roster
+      var rostYear = ROSTERS()[year];
+      var rostData = rostYear && abbr && rostYear[abbr] ? rostYear[abbr] : null;
+      var tbody = document.getElementById('rosterTbody');
+      var emptyEl = document.getElementById('rosterEmpty');
+      if (!rostData || !rostData.length) {
+        tbody.innerHTML = ''; emptyEl.style.display='block';
+      } else {
+        emptyEl.style.display = 'none';
+        tbody.innerHTML = rostData.map(function(p){
+          return '<tr>'
+            +'<td>'+p[0]+'</td>'
+            +'<td>'+p[1]+'</td>'
+            +'<td>'+p[2]+'</td>'
+            +'<td>'+p[3]+'</td>'
+            +'<td>'+Number(p[4]).toFixed(1)+'</td>'
+            +'<td>'+Number(p[5]).toFixed(1)+'</td>'
+            +'<td>'+Number(p[6]).toFixed(1)+'</td>'
+            +'<td>'+Number(p[7]).toFixed(1)+'</td>'
+            +'<td>'+Number(p[8]).toFixed(1)+'</td>'
+            +'</tr>';
+        }).join('');
+        // Sorting
+        var ths = document.getElementById('rosterTable').querySelectorAll('thead th');
+        ths.forEach(function(th,ci){
+          if (th.dataset.bound) return; th.dataset.bound='1';
+          var lbl = th.textContent.trim(); th.dataset.lbl=lbl;
+          th.addEventListener('click', function(){
+            var state = th.dataset.sort||'none';
+            var next = state==='none'?'desc':state==='desc'?'asc':'none';
+            ths.forEach(function(h){ h.dataset.sort='none'; h.textContent=h.dataset.lbl; h.classList.remove('sort-asc','sort-desc'); });
+            th.dataset.sort=next;
+            if (next==='asc')  { th.textContent=lbl+'▲'; th.classList.add('sort-asc'); }
+            if (next==='desc') { th.textContent=lbl+'▼'; th.classList.add('sort-desc'); }
+            var rows = Array.from(tbody.rows);
+            if (next==='none') { rows.sort(function(a,b){ return Number(a.dataset.oi)-Number(b.dataset.oi); }); }
+            else {
+              rows.sort(function(a,b){
+                var av=(a.cells[ci]||{}).textContent||'', bv=(b.cells[ci]||{}).textContent||'';
+                var an=parseFloat(av),bn=parseFloat(bv);
+                var cmp=(!isNaN(an)&&!isNaN(bn))?(an-bn):av.localeCompare(bv);
+                return next==='asc'?cmp:-cmp;
+              });
+            }
+            rows.forEach(function(r,i){ r.dataset.oi=r.dataset.oi||String(i); tbody.appendChild(r); });
+          });
+        });
+        Array.from(tbody.rows).forEach(function(r,i){ r.dataset.oi=String(i); });
+      }
+    }
+
+    /* ─── MAIN RENDER ─────────────────────────────────────────── */
+    function render() {
+      var h = parseHash();
+      var year = yearSel.value;
+      var slug = h.slug || teamSel.value || '';
+      var hasTeam = !!slug;
+
+      backBtn.classList.toggle('visible', hasTeam);
+      if (hasTeam && teamSel.value !== slug) {
+        var opt = Array.from(teamSel.options).find(function(o){ return o.value===slug; });
+        if (opt) teamSel.value = slug;
+      }
+
+      if (hasTeam) {
+        standView.style.display = 'none';
+        detailView.classList.add('visible');
+        renderDetail(slug, year);
+      } else {
+        standView.style.display = 'block';
+        detailView.classList.remove('visible');
+        renderStandings(year);
+      }
+    }
+
+    /* ─── INIT ────────────────────────────────────────────────── */
+    syncDropdownsFromHash();
+    render();
+
+    // Re-render chart when light/dark mode is toggled so colors update immediately
+    var modeBtn = document.getElementById('mode-toggle');
+    if (modeBtn) {
+      modeBtn.addEventListener('click', function() {
+        requestAnimationFrame(function() {
+          var h = parseHash();
+          var slug = h.slug || teamSel.value || '';
+          if (slug && _winChart) {
+            renderDetail(slug, yearSel.value);
+          }
+        });
+      });
+    }
+  })();
+  </script>
 </body>
 </html>
