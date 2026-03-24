@@ -112,6 +112,20 @@ var PLAYER_STATS = {
             { type:'Pick',   text:'2033 1st Round Pick' }
           ],
           notes:''
+        },
+        {
+          date:'July 4, 2033',
+          fromTeam:'Indiana Pacers',
+          toTeam:'San Antonio Spurs',
+          sent:[
+            { type:'Player', text:'Cooper Clark' }
+          ],
+          received:[
+            { type:'Player', text:'Malik Lewis' },
+            { type:'Player', text:'Max Christie' },
+            { type:'Pick',   text:'2037 1st Round Pick Swap' }
+          ],
+          notes:''
         }
       ],
       seasons: [
@@ -130,10 +144,10 @@ var PLAYER_STATS = {
         { season:'2030-31', team:'Indiana Pacers',       salary:'$40.89M', option:'' },
         { season:'2031-32', team:'Indiana Pacers',       salary:'$43.77M', option:'' },
         { season:'2032-33', team:'Indiana Pacers',       salary:'$46.82M', option:'' },
-        { season:'2033-34', team:'Indiana Pacers',       salary:'$34.76M', option:'' },
-        { season:'2034-35', team:'Indiana Pacers',       salary:'$39.82M', option:'' },
-        { season:'2035-36', team:'Indiana Pacers',       salary:'$44.64M', option:'' },
-        { season:'2036-37', team:'Indiana Pacers',       salary:'$49.54M', option:'' },
+        { season:'2033-34', team:'San Antonio Spurs',       salary:'$34.76M', option:'' },
+        { season:'2034-35', team:'San Antonio Spurs',       salary:'$39.82M', option:'' },
+        { season:'2035-36', team:'San Antonio Spurs',       salary:'$44.64M', option:'' },
+        { season:'2036-37', team:'San Antonio Spurs',       salary:'$49.54M', option:'' },
       ]
     },
     awards: {
@@ -203,6 +217,7 @@ var PLAYER_STATS = {
       { team:'Los Angeles Lakers', name:'Away',  number:'5', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2018–2024', img:'' },
       { team:'Team USA',   name:'Home',  number:'5', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2024–2027', img:'' },
       { team:'Indiana Pacers',   name:'Away',  number:'5', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2024–2027', img:'' },
+      { team:'San Antonio Spurs',   name:'Away',  number:'5', bg:'#000000', stroke:'#c2c2c2', num:'#ffffff', seasons:'2024–2027', img:'' },
     ],
   },
 
@@ -415,6 +430,19 @@ var PLAYER_STATS = {
             { type:'Player', text:'Alex Costanza' }
           ],
           notes:''
+        },
+        {
+          date:'July 1, 2033',
+          fromTeam:'Houston Rockets',
+          toTeam:'Mexico City Flight',
+          sent:[
+            { type:'Player', text:'Sam Stogsdill' },
+            { type:'Pick',   text:'2036 2nd Round Pick' },
+          ],
+          received:[
+            { type:'Player', text:'Nolan Traore' }
+          ],
+          notes:''
         }
       ],
       seasons: [
@@ -433,8 +461,8 @@ var PLAYER_STATS = {
         { season:'2030-31', team:'Houston Rockets',    salary:'$38.31M', option:'' },
         { season:'2031-32', team:'Houston Rockets',    salary:'$41.38M', option:'' },
         { season:'2032-33', team:'Houston Rockets',    salary:'$44.44M', option:'' },
-        { season:'2033-34', team:'Houston Rockets',    salary:'$47.51M', option:'' },
-        { season:'2034-35', team:'Houston Rockets',    salary:'$50.57M', option:'' },
+        { season:'2033-34', team:'Mexico City Flight',    salary:'$47.51M', option:'' },
+        { season:'2034-35', team:'Mexico City Flight',    salary:'$50.57M', option:'' },
       ]
     },
     awards: {
@@ -471,6 +499,7 @@ var PLAYER_STATS = {
       { team:'Washington Wizards', name:'Away',  number:'34', bg:'#ff0000', stroke:'#000080', num:'#ffffff', seasons:'2018–2027', img:'' },
       { team:'Team USA', name:'Away',  number:'13', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2018–2027', img:'' },
       { team:'Houston Rockets',    name:'Away',  number:'33', bg:'#ff0000', stroke:'#FFFFFF', num:'#ffffff', seasons:'2027–Present', img:'' },
+      { team:'Mexico City Flight',    name:'Away',  number:'34', bg:'#07b4c0', stroke:'#e54c19', num:'#ffffff', seasons:'2027–Present', img:'' },
     ],
   },
 
@@ -685,6 +714,7 @@ var PLAYER_STATS = {
         { date:'June 15, 2025',      team:'Denver Nuggets',  years:4, total:'$180.55M', aav:'$45.14M', note:'' },
         { date:'July 4, 2029',       team:'Indiana Pacers',  years:2, total:'$12.78M',  aav:'$6.39M',  note:'Player Option Waived' },
         { date:'July 1, 2030',       team:'Indiana Pacers',  years:3, total:'$37.93M',  aav:'$12.64M', note:'' },
+        { date:'July 2, 2033',       team:'St. Louis Spirit',  years:1, total:'$2.57M',  aav:'$2.57M', note:'' },
       ],
       trades: [
         {
@@ -732,7 +762,9 @@ var PLAYER_STATS = {
         { season:'2029-30', team:'Indiana Pacers',  salary:'$6.07M',  option:'' },
         { season:'2030-31', team:'Indiana Pacers',  salary:'$14.74M', option:'' },
         { season:'2031-32', team:'Indiana Pacers',  salary:'$12.98M', option:'' },
-        { season:'2032-33', team:'Indiana Pacers',  salary:'$10.21M', option:'player' },
+        { season:'2032-33', team:'Indiana Pacers',  salary:'$10.21M', option:'' },
+        { season:'2033-34', team:'St. Louis Spirit',  salary:'$2.57M', option:'' },
+
       ]
     },
     awards: {
@@ -767,6 +799,7 @@ var PLAYER_STATS = {
       { team:'Denver Nuggets', name:'Home',  number:'8', bg:'#0c2240', stroke:'#f9c646', num:'#ffffff', seasons:'2025–2029', img:'' },
       { team:'Indiana Pacers', name:'Home',  number:'24', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2025–2029', img:'' },
       { team:'Indiana Pacers', name:'Home',  number:'1', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2025–2029', img:'' },
+      { team:'St. Louis Spirit', name:'Home',  number:'8', bg:'#d16407', stroke:'#ffffff', num:'#ffffff', seasons:'2033–2034', img:'' },
     ]
   }
 
