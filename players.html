@@ -106,7 +106,7 @@
     .splits-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
 
     /* Scroll wrapper */
-    .splits-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; touch-action:pan-x; }
+    .splits-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; touch-action:pan-x pan-y; }
     .splits-scroll::-webkit-scrollbar { height:4px; }
     .splits-scroll::-webkit-scrollbar-track { background:transparent; }
     .splits-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
@@ -325,7 +325,7 @@
     /* Salary table — styled exactly like splits-table */
     .ct-card { border:1px solid var(--border); border-radius:6px; overflow:clip; background:var(--bg-card); transition:background .35s; margin-bottom:28px; }
     .ct-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
-    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x; }
+    .ct-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x pan-y; }
     .ct-scroll::-webkit-scrollbar { height:4px; }
     .ct-scroll::-webkit-scrollbar-track { background:transparent; }
     .ct-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
@@ -386,7 +386,7 @@
 
     /* Salary chart */
     .contracts-chart-body { padding:20px; height:210px; position:relative; }
-    .ct-chart-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x; }
+    .ct-chart-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; display:block; border-radius:0 0 6px 6px; touch-action:pan-x pan-y; }
     .ct-chart-scroll::-webkit-scrollbar { height:4px; }
     .ct-chart-scroll::-webkit-scrollbar-track { background:transparent; }
     .ct-chart-scroll::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
@@ -1176,6 +1176,38 @@
     });
   }
 
+  /* ── TEAM ABBR → SLUG MAP (for linking team cells to teams.html) ── */
+  var ABBR_TO_SLUG = {
+    'ATL':'atlantahawks',      'BOS':'bostonceltics',       'BKN':'brooklynnets',
+    'CHA':'charlottehornets',  'CHI':'chicagobulls',        'CLE':'clevelandcavaliers',
+    'DAL':'dallasmavericks',   'DEN':'denvernuggets',       'DET':'detroitpistons',
+    'GSW':'goldenstatewarriors','HOU':'houstonrockets',     'IND':'indianapacers',
+    'LAC':'losangelesclippers','LAL':'losangeleslakers',    'MIA':'miamiheat',
+    'MIL':'milwaukeebucks',    'MIN':'minnesotatimberwolves','NOP':'neworleanspelicans',
+    'NYK':'newyorkknicks',     'OKC':'oklahomacitythunder', 'ORL':'orlandomagic',
+    'PHI':'philadelphia76ers', 'PHX':'phoenixsuns',         'POR':'portlandtrailblazers',
+    'SAC':'sacramentokings',   'SAS':'sanantoniospurs',     'TOR':'torontoraptors',
+    'UTA':'utahjazz',          'VAN':'vancouvergrizzlies',  'WAS':'washingtonwizards',
+    'MEX':'mexicocityflight',  'STL':'stlouisspirit',
+  };
+
+  /* Converts '2025-26' → '26', '2029-30' → '30' etc. */
+  function seasonSuffix(s) {
+    if (!s || !String(s).includes('-')) return '';
+    return (String(s).split('-')[1] || '').replace(/\D/g,'').slice(-2).padStart(2,'0');
+  }
+
+  /* Returns a linked team cell for pro rows, plain text for college/unknown */
+  function teamCell(abbr, season) {
+    var slug = ABBR_TO_SLUG[abbr];
+    if (!slug) return abbr; // college or unrecognised — plain text
+    var yy = seasonSuffix(season);
+    if (!yy) return abbr;
+    return '<a href="teams.html#' + slug + yy + '" '
+      + 'style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;font-weight:700;cursor:pointer;">'
+      + abbr + '</a>';
+  }
+
   /* ── PER GAME TABLE ── */
   function renderPGTable(key, mode) {
     pgMode = mode || 'regular';
@@ -1210,7 +1242,7 @@
         return;
       }
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
-      tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+row.team+'</td>';
+      tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+teamCell(row.team,row.season)+'</td>';
       tbody+='<td class="hi">'+fmt1(row.ppg)+'</td><td>'+fmt1(row.rpg)+'</td><td>'+fmt1(row.apg)+'</td>';
       tbody+='<td>'+fmt1(row.spg)+'</td><td>'+fmt1(row.bpg)+'</td><td>'+fmt1(row.topg)+'</td>';
       tbody+='<td>'+row.fgp+'</td><td>'+row.tpp+'</td><td>'+row.ftp+'</td>';

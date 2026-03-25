@@ -74,7 +74,7 @@ window.EGE_SEASON_STATS = {
     brooklynnets:          { record: "20-62", pct: ".244", rank: "14th", playoffs: "Did not qualify" },
     atlantahawks:          { record: "16-66", pct: ".195", rank: "15th", playoffs: "Did not qualify" },
     /* WEST */
-    goldenstatewarriors:   { record: "64-18", pct: ".780", rank: "1st",  playoffs: "N/A" },
+    goldenstatewarriors:   { record: "64-18", pct: ".780", rank: "1st",  playoffs: "Champions", finals_mvp: "Kevin Durant" },
     sanantoniospurs:       { record: "58-24", pct: ".707", rank: "2nd",  playoffs: "N/A" },
     utahjazz:              { record: "56-26", pct: ".683", rank: "3rd",  playoffs: "N/A" },
     houstonrockets:        { record: "52-30", pct: ".634", rank: "4th",  playoffs: "N/A" },
@@ -111,7 +111,7 @@ window.EGE_SEASON_STATS = {
     brooklynnets:          { record: "16-66", pct: ".195", rank: "15th", playoffs: "Did not qualify" },
     /* WEST */
     sacramentokings:       { record: "65-17", pct: ".793", rank: "1st",  playoffs: "N/A" },
-    goldenstatewarriors:   { record: "65-17", pct: ".793", rank: "2nd",  playoffs: "N/A" },
+    goldenstatewarriors:   { record: "65-17", pct: ".793", rank: "2nd",  playoffs: "Champions", finals_mvp: "Stephen Curry" },
     denvernuggets:         { record: "64-18", pct: ".780", rank: "3rd",  playoffs: "N/A" },
     sanantoniospurs:       { record: "55-27", pct: ".671", rank: "4th",  playoffs: "N/A" },
     utahjazz:              { record: "53-29", pct: ".646", rank: "5th",  playoffs: "N/A" },
@@ -131,7 +131,7 @@ window.EGE_SEASON_STATS = {
   "2019-20": {
     /* EAST */
     milwaukeebucks:        { record: "67-15", pct: ".817", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
-    miamiheat:             { record: "66-16", pct: ".805", rank: "2nd",  playoffs: "N/A" },
+    miamiheat:             { record: "66-16", pct: ".805", rank: "2nd",  playoffs: "Champions", finals_mvp: "Kevin Durant" },
     philadelphia76ers:     { record: "62-20", pct: ".756", rank: "3rd",  playoffs: "N/A" },
     bostonceltics:         { record: "56-26", pct: ".683", rank: "4th",  playoffs: "N/A" },
     orlandomagic:          { record: "45-37", pct: ".549", rank: "5th",  playoffs: "N/A", players: ["Isaac Vitel"] },
@@ -166,7 +166,7 @@ window.EGE_SEASON_STATS = {
   /* ── 2020-21 ──────────────────────────────────────────────── */
   "2020-21": {
     /* EAST */
-    milwaukeebucks:        { record: "66-16", pct: ".805", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
+    milwaukeebucks:        { record: "66-16", pct: ".805", rank: "1st",  playoffs: "Champions", finals_mvp: "Giannis Antetokounmpo", players: ["Jaykeb Stewart"] },
     bostonceltics:         { record: "60-22", pct: ".732", rank: "2nd",  playoffs: "N/A" },
     washingtonwizards:     { record: "54-28", pct: ".659", rank: "3rd",  playoffs: "N/A", players: ["Sam Stogsdill"] },
     miamiheat:             { record: "54-28", pct: ".659", rank: "4th",  playoffs: "N/A" },
@@ -220,7 +220,7 @@ window.EGE_SEASON_STATS = {
     /* WEST */
     utahjazz:              { record: "67-15", pct: ".817", rank: "1st",  playoffs: "N/A" },
     dallasmavericks:       { record: "61-21", pct: ".744", rank: "2nd",  playoffs: "N/A" },
-    losangeleslakers:      { record: "58-24", pct: ".707", rank: "3rd",  playoffs: "N/A", players: ["Paxon Hatch"] },
+    losangeleslakers:      { record: "58-24", pct: ".707", rank: "3rd",  playoffs: "Champions", finals_mvp: "Paxon Hatch", players: ["Paxon Hatch"] },
     sacramentokings:       { record: "55-27", pct: ".671", rank: "4th",  playoffs: "N/A" },
     sanantoniospurs:       { record: "55-27", pct: ".671", rank: "5th",  playoffs: "N/A" },
     neworleanspelicans:    { record: "51-31", pct: ".622", rank: "6th",  playoffs: "N/A" },
@@ -238,7 +238,7 @@ window.EGE_SEASON_STATS = {
   /* ── 2022-23 ──────────────────────────────────────────────── */
   "2022-23": {
     /* EAST */
-    milwaukeebucks:        { record: "63-19", pct: ".768", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
+    milwaukeebucks:        { record: "63-19", pct: ".768", rank: "1st",  playoffs: "Champions", finals_mvp: "Giannis Antetokounmpo", players: ["Jaykeb Stewart"] },
     orlandomagic:          { record: "60-22", pct: ".732", rank: "2nd",  playoffs: "N/A", players: ["Isaac Vitel"] },
     bostonceltics:         { record: "58-24", pct: ".707", rank: "3rd",  playoffs: "N/A" },
     washingtonwizards:     { record: "51-31", pct: ".622", rank: "4th",  playoffs: "N/A", players: ["Sam Stogsdill"] },
@@ -274,7 +274,7 @@ window.EGE_SEASON_STATS = {
   /* ── 2023-24 ──────────────────────────────────────────────── */
   "2023-24": {
     /* EAST */
-    milwaukeebucks:        { record: "70-12", pct: ".854", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
+    milwaukeebucks:        { record: "70-12", pct: ".854", rank: "1st",  playoffs: "Champions", finals_mvp: "Giannis Antetokounmpo", players: ["Jaykeb Stewart"] },
     bostonceltics:         { record: "62-20", pct: ".756", rank: "2nd",  playoffs: "N/A" },
     orlandomagic:          { record: "60-22", pct: ".732", rank: "3rd",  playoffs: "N/A", players: ["Isaac Vitel"] },
     atlantahawks:          { record: "59-23", pct: ".720", rank: "4th",  playoffs: "N/A" },
@@ -310,7 +310,7 @@ window.EGE_SEASON_STATS = {
   /* ── 2024-25 ──────────────────────────────────────────────── */
   "2024-25": {
     /* EAST */
-    milwaukeebucks:        { record: "64-18", pct: ".780", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
+    milwaukeebucks:        { record: "64-18", pct: ".780", rank: "1st",  playoffs: "Champions", finals_mvp: "Giannis Antetokounmpo", players: ["Jaykeb Stewart"] },
     bostonceltics:         { record: "52-30", pct: ".634", rank: "2nd",  playoffs: "N/A" },
     chicagobulls:          { record: "52-30", pct: ".634", rank: "3rd",  playoffs: "N/A" },
     atlantahawks:          { record: "50-32", pct: ".610", rank: "4th",  playoffs: "N/A" },
@@ -362,7 +362,7 @@ window.EGE_SEASON_STATS = {
     philadelphia76ers:     { record: "28-54", pct: ".341", rank: "14th", playoffs: "Did not qualify" },
     newyorkknicks:         { record: "22-60", pct: ".268", rank: "15th", playoffs: "Did not qualify" },
     /* WEST */
-    losangeleslakers:      { record: "59-23", pct: ".720", rank: "1st",  playoffs: "N/A", players: ["Paxon Hatch", "Cooper Clark"] },
+    losangeleslakers:      { record: "59-23", pct: ".720", rank: "1st",  playoffs: "Champions", finals_mvp: "Paxon Hatch", players: ["Paxon Hatch", "Cooper Clark"] },
     dallasmavericks:       { record: "56-26", pct: ".683", rank: "2nd",  playoffs: "N/A" },
     houstonrockets:        { record: "44-38", pct: ".537", rank: "3rd",  playoffs: "N/A" },
     sacramentokings:       { record: "49-33", pct: ".598", rank: "4th",  playoffs: "N/A" },
@@ -382,7 +382,7 @@ window.EGE_SEASON_STATS = {
   /* ── 2026-27 ──────────────────────────────────────────────── */
   "2026-27": {
     /* EAST */
-    brooklynnets:          { record: "53-29", pct: ".646", rank: "1st",  playoffs: "N/A" },
+    brooklynnets:          { record: "53-29", pct: ".646", rank: "1st",  playoffs: "Champions", finals_mvp: "Cade Cunningham" },
     miamiheat:             { record: "51-31", pct: ".622", rank: "2nd",  playoffs: "N/A" },
     atlantahawks:          { record: "50-32", pct: ".610", rank: "3rd",  playoffs: "N/A" },
     orlandomagic:          { record: "49-33", pct: ".598", rank: "4th",  playoffs: "N/A" },
@@ -419,7 +419,7 @@ window.EGE_SEASON_STATS = {
   "2027-28": {
     /* EAST */
     chicagobulls:          { record: "65-17", pct: ".793", rank: "1st",  playoffs: "N/A", players: ["Jaykeb Stewart"] },
-    milwaukeebucks:        { record: "56-26", pct: ".683", rank: "2nd",  playoffs: "N/A" },
+    milwaukeebucks:        { record: "56-26", pct: ".683", rank: "2nd",  playoffs: "Champions", finals_mvp: "De'Aaron Fox" },
     brooklynnets:          { record: "51-31", pct: ".622", rank: "3rd",  playoffs: "N/A" },
     indianapacers:         { record: "48-34", pct: ".585", rank: "4th",  playoffs: "N/A" },
     torontoraptors:        { record: "46-36", pct: ".561", rank: "5th",  playoffs: "N/A" },
@@ -473,7 +473,7 @@ window.EGE_SEASON_STATS = {
     /* WEST */
     sanantoniospurs:       { record: "63-19", pct: ".768", rank: "1st",  playoffs: "N/A" },
     dallasmavericks:       { record: "57-25", pct: ".695", rank: "2nd",  playoffs: "N/A" },
-    losangelesclippers:    { record: "56-26", pct: ".683", rank: "3rd",  playoffs: "N/A" },
+    losangelesclippers:    { record: "56-26", pct: ".683", rank: "3rd",  playoffs: "Champions", finals_mvp: "Zion Williamson" },
     losangeleslakers:      { record: "55-27", pct: ".671", rank: "4th",  playoffs: "N/A", players: ["Paxon Hatch", "Cooper Clark"] },
     goldenstatewarriors:   { record: "50-32", pct: ".610", rank: "5th",  playoffs: "N/A" },
     oklahomacitythunder:   { record: "49-33", pct: ".598", rank: "6th",  playoffs: "N/A" },
@@ -509,7 +509,7 @@ window.EGE_SEASON_STATS = {
     milwaukeebucks:        { record: "22-60", pct: ".268", rank: "15th", playoffs: "Did not qualify" },
     newyorkknicks:         { record: "20-62", pct: ".244", rank: "16th", playoffs: "Did not qualify" },
     /* WEST */
-    goldenstatewarriors:   { record: "65-17", pct: ".793", rank: "1st",  playoffs: "N/A" },
+    goldenstatewarriors:   { record: "65-17", pct: ".793", rank: "1st",  playoffs: "Champions", finals_mvp: "Darryn Peterson" },
     houstonrockets:        { record: "61-21", pct: ".744", rank: "2nd",  playoffs: "N/A", players: ["Sam Stogsdill"] },
     sanantoniospurs:       { record: "59-23", pct: ".720", rank: "3rd",  playoffs: "N/A" },
     losangelesclippers:    { record: "54-28", pct: ".659", rank: "4th",  playoffs: "N/A" },
@@ -531,7 +531,7 @@ window.EGE_SEASON_STATS = {
   "2030-31": {
     /* EAST */
     detroitpistons:        { record: "54-28", pct: ".659", rank: "1st",  playoffs: "N/A" },
-    philadelphia76ers:     { record: "53-29", pct: ".646", rank: "2nd",  playoffs: "N/A" },
+    philadelphia76ers:     { record: "53-29", pct: ".646", rank: "2nd",  playoffs: "Champions", finals_mvp: "Cooper Flagg" },
     miamiheat:             { record: "52-30", pct: ".634", rank: "3rd",  playoffs: "N/A" },
     orlandomagic:          { record: "50-32", pct: ".610", rank: "4th",  playoffs: "N/A" },
     charlottehornets:      { record: "48-34", pct: ".585", rank: "5th",  playoffs: "N/A" },
@@ -585,7 +585,7 @@ window.EGE_SEASON_STATS = {
     clevelandcavaliers:    { record: "27-55", pct: ".329", rank: "15th", playoffs: "Did not qualify" },
     stlouisspirit:         { record: "18-64", pct: ".220", rank: "16th", playoffs: "Did not qualify" },
     /* WEST */
-    oklahomacitythunder:   { record: "65-17", pct: ".793", rank: "1st",  playoffs: "N/A" },
+    oklahomacitythunder:   { record: "65-17", pct: ".793", rank: "1st",  playoffs: "Champions", finals_mvp: "Jayson Tatum" },
     losangelesclippers:    { record: "54-28", pct: ".659", rank: "2nd",  playoffs: "N/A" },
     vancouvergrizzlies:    { record: "54-28", pct: ".659", rank: "3rd",  playoffs: "N/A" },
     mexicocityflight:      { record: "53-29", pct: ".646", rank: "4th",  playoffs: "N/A" },
@@ -606,7 +606,7 @@ window.EGE_SEASON_STATS = {
   "2032-33": {
     /* EAST */
     charlottehornets:      { record: "62-20", pct: ".756", rank: "1st",  playoffs: "N/A" },
-    philadelphia76ers:     { record: "60-22", pct: ".732", rank: "2nd",  playoffs: "N/A" },
+    philadelphia76ers:     { record: "60-22", pct: ".732", rank: "2nd",  playoffs: "Champions", finals_mvp: "Cooper Flagg" },
     detroitpistons:        { record: "56-26", pct: ".683", rank: "3rd",  playoffs: "N/A" },
     torontoraptors:        { record: "53-29", pct: ".646", rank: "4th",  playoffs: "N/A" },
     miamiheat:             { record: "51-31", pct: ".622", rank: "5th",  playoffs: "N/A" },

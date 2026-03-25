@@ -497,7 +497,7 @@
     .roster-scroll {
       width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
       scrollbar-width: thin; scrollbar-color: var(--orange) transparent;
-      touch-action: pan-x;
+      touch-action: pan-x pan-y;
     }
     .roster-scroll::-webkit-scrollbar { height: 4px; }
     .roster-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -540,7 +540,6 @@
       text-align: left; font-family: var(--font-mono);
       font-size: .65rem; letter-spacing: .08em;
       color: var(--text); font-weight: 500;
-      text-transform: uppercase;
     }
     .roster-table td.sort-col { background: rgba(231,87,25,.04); }
     .roster-table td.hi { color: var(--text); font-weight: 600; font-size: .92rem; }
@@ -564,10 +563,159 @@
       text-transform: uppercase; color: var(--text-muted);
     }
 
+    /* ── NBA CHAMPIONS CARD ── */
+    .champ-card {
+      display: none;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #1a1200 0%, #2a1f00 40%, #1a1200 100%);
+      border: 1px solid rgba(255,200,40,.35);
+      animation: champReveal .6s ease both;
+    }
+    .champ-card.visible { display: block; }
+
+    @keyframes champReveal {
+      from { opacity:0; transform:translateY(16px) scale(.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    /* Shimmer sweep across the card */
+    .champ-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        transparent 30%,
+        rgba(255,210,60,.08) 50%,
+        transparent 70%);
+      background-size: 200% 100%;
+      animation: champShimmer 2.8s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes champShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Pulsing gold border glow */
+    .champ-card::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,200,40,.6);
+      animation: champGlow 2s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes champGlow {
+      0%,100% { box-shadow: 0 0 8px rgba(255,185,20,.3), inset 0 0 8px rgba(255,185,20,.05); border-color: rgba(255,200,40,.4); }
+      50%      { box-shadow: 0 0 28px rgba(255,185,20,.65), inset 0 0 16px rgba(255,185,20,.12); border-color: rgba(255,220,60,.9); }
+    }
+
+    .champ-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(255,185,20,.2);
+      background: rgba(255,185,20,.07);
+      position: relative; z-index: 2;
+    }
+    .champ-header-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #ffc820;
+      animation: champDotPulse 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes champDotPulse {
+      0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 4px #ffc820; }
+      50%      { opacity:.6; transform:scale(1.3); box-shadow:0 0 10px #ffc820; }
+    }
+    .champ-header-title {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: #ffc820;
+    }
+
+    .champ-body {
+      padding: 22px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      position: relative; z-index: 2;
+    }
+
+    /* Trophy logo with spin-in + float */
+    .champ-trophy {
+      width: 90px; height: 90px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 18px rgba(255,185,20,.7)) drop-shadow(0 4px 12px rgba(0,0,0,.6));
+      animation: trophySpin .8s cubic-bezier(.22,1,.36,1) both, trophyFloat 3s ease-in-out 1s infinite;
+    }
+    @keyframes trophySpin {
+      from { opacity:0; transform:scale(.4) rotate(-20deg); }
+      to   { opacity:1; transform:scale(1) rotate(0deg); }
+    }
+    @keyframes trophyFloat {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+
+    /* Year banner */
+    .champ-year {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 2.4rem; letter-spacing: .04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #ffe066 0%, #ffc820 40%, #e8960a 70%, #ffd84d 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 6px rgba(255,150,0,.5));
+      animation: champReveal .7s .2s ease both;
+    }
+
+    .champ-label {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,200,40,.55);
+      margin-top: -8px;
+      animation: champReveal .7s .3s ease both;
+    }
+
+    /* Finals MVP section */
+    .champ-mvp-wrap {
+      width: 100%;
+      border-top: 1px solid rgba(255,185,20,.18);
+      padding-top: 14px;
+      text-align: center;
+      animation: champReveal .7s .4s ease both;
+    }
+    .champ-mvp-label {
+      font-family: var(--font-mono); font-size: .55rem;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,200,40,.5);
+      margin-bottom: 6px;
+    }
+    .champ-mvp-name {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 1.15rem; text-transform: uppercase;
+      letter-spacing: .04em;
+      background: linear-gradient(135deg, #ffe066, #ffc820, #f0a800);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .champ-mvp-empty {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .1em; color: rgba(255,185,20,.3);
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .teams-inner { padding: 0 12px; box-sizing: border-box; }
-      .teams-page  { padding: 68px 0 60px; }
+      /* Nav is position:relative on mobile (shared.css), so no top padding needed */
+      .teams-page  { padding: 16px 0 60px; }
 
       /* Controls: row1 = team select full width, row2 = [<][year][>][back] */
       .teams-controls { gap: 8px; flex-wrap: wrap; }
@@ -793,7 +941,7 @@
             <div class="team-roster-card">
               <div class="team-roster-card__header">
                 <div class="team-chart-card__dot"></div>
-                <span class="team-chart-card__title" id="rosterTableLabel">Regular Season · Per Game</span>
+                <span class="team-chart-card__title" id="rosterTableLabel">Roster</span>
               </div>
               <div class="roster-scroll">
                 <table class="roster-table" id="rosterTable">
@@ -851,6 +999,22 @@
                     <div class="gauge-content__val" id="gaugeDefVal">—</div>
                     <div class="gauge-content__rank" id="gaugeDefRank">—</div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <!-- NBA Champions card -->
+            <div class="champ-card" id="champCard">
+              <div class="champ-header">
+                <div class="champ-header-dot"></div>
+                <span class="champ-header-title">NBA Champions</span>
+              </div>
+              <div class="champ-body">
+                <img class="champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Championship Trophy">
+                <div class="champ-year" id="champYear">—</div>
+                <div class="champ-label">NBA Champions</div>
+                <div class="champ-mvp-wrap">
+                  <div class="champ-mvp-label">🏆 Finals MVP</div>
+                  <div class="champ-mvp-name" id="champMvp"></div>
                 </div>
               </div>
             </div>
@@ -917,6 +1081,25 @@
       "St. Louis Spirit":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png",
       "Vancouver Grizzlies":     "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png",
     };
+    /* ── STANDINGS-ONLY logo overrides ── */
+    var STANDINGS_LOGOS_ALWAYS = {
+      "Utah Jazz":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/uta_orig.png",
+      "Houston Rockets":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hou_orig.png",
+      "Toronto Raptors":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/tor_orig.png",
+      "Atlanta Hawks":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/atl_orig.png",
+    };
+    /* 76ers: light mode = new blue logo, dark mode = existing logo */
+    var SIXERS_LIGHT_LOGO = "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ers-blue_orig.png";
+
+    function getStandingsLogo(teamName) {
+      if (STANDINGS_LOGOS_ALWAYS[teamName]) return STANDINGS_LOGOS_ALWAYS[teamName];
+      if (teamName === "Philadelphia 76ers") {
+        var isLight = document.documentElement.classList.contains('light');
+        return isLight ? SIXERS_LIGHT_LOGO : (TEAM_LOGOS[teamName] || '');
+      }
+      return TEAM_LOGOS[teamName] || '';
+    }
+
     var TEAM_COLORS = {
       "Los Angeles Lakers":"#552583","San Antonio Spurs":"#000000","Atlanta Hawks":"#cc092f",
       "Boston Celtics":"#007A33","Brooklyn Nets":"#000000","Charlotte Hornets":"#1D1160",
@@ -1050,7 +1233,7 @@
     function buildStandingsRow(slug, stats, seed, year) {
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
-      var logo = TEAM_LOGOS[teamName] || '';
+      var logo = getStandingsLogo(teamName);
       var bg = TEAM_COLORS[teamName] || '#333';
       var record = stats.record || 'N/A';
       var yy = seasonToSuffix(year);
@@ -1177,7 +1360,7 @@
 
       // Banner
       var banner = document.getElementById('teamBanner');
-      banner.style.background = bg;
+      banner.style.background = bg; // fallback solid color
       document.getElementById('teamBannerLogo').src = logo;
       document.getElementById('teamBannerLogo').alt = teamName;
       document.getElementById('teamBannerName').textContent = teamName;
@@ -1190,6 +1373,31 @@
       var playoffsEl = document.getElementById('teamStatPlayoffs');
       playoffsEl.textContent = ss ? (ss.playoffs||'—') : '—';
       playoffsEl.style.fontSize = ss && ss.playoffs && ss.playoffs.length > 8 ? '.85rem' : '1rem';
+
+      // Champions card — show only if playoffs === 'Champions'
+      var champCard = document.getElementById('champCard');
+      var isChamp = ss && (ss.playoffs||'').trim() === 'Champions';
+      if (champCard) {
+        if (isChamp) {
+          // Populate year and Finals MVP
+          document.getElementById('champYear').textContent = year;
+          var mvpEl = document.getElementById('champMvp');
+          if (ss.finals_mvp) {
+            mvpEl.textContent = ss.finals_mvp;
+            mvpEl.style.display = '';
+            mvpEl.previousElementSibling && (mvpEl.previousElementSibling.style.display = '');
+          } else {
+            mvpEl.textContent = '';
+            mvpEl.innerHTML = '<span class="champ-mvp-empty">— Not recorded —</span>';
+          }
+          // Restart animations by removing + re-adding class
+          champCard.classList.remove('visible');
+          void champCard.offsetWidth;
+          champCard.classList.add('visible');
+        } else {
+          champCard.classList.remove('visible');
+        }
+      }
 
       // Win history chart
       var allSeasons = Object.keys(SEASON_STATS()).sort();
@@ -1260,13 +1468,33 @@
       return isNaN(v) ? '—' : (Math.round(v * 10) / 10).toFixed(1);
     }
 
+    /* Sim players — abbreviated name as it appears in roster data → players.html hash */
+    var SIM_PLAYERS = {
+      'C. Clark':     'clark-traditional-splits',
+      'S. Stogsdill': 'stogsdill-traditional-splits',
+      'J. Stewart':   'stewart-traditional-splits',
+      'I. Vitel':     'vitel-traditional-splits',
+      'P. Hatch':     'hatch-traditional-splits',
+    };
+
+    function rosterNameCell(name) {
+      var hash = SIM_PLAYERS[name];
+      if (hash) {
+        return '<a href="players.html#'+hash+'" '
+          + 'style="color:var(--orange);text-decoration:underline;text-underline-offset:3px;font-weight:700;cursor:pointer;" '
+          + 'title="View profile">'
+          + name + '</a>';
+      }
+      return name;
+    }
+
     function renderRoster(slug, year, scope) {
       var abbr2 = SLUG_ABBR[slug] || '';
       var rostYear = ROSTERS()[year];
       var rostData = rostYear && abbr2 && rostYear[abbr2] ? rostYear[abbr2] : null;
 
       var labelEl = document.getElementById('rosterTableLabel');
-      if (labelEl) labelEl.textContent = (scope === 'playoffs' ? 'Playoffs' : 'Regular Season') + ' · Per Game';
+      if (labelEl) labelEl.textContent = 'Roster';
 
       var table   = document.getElementById('rosterTable');
       var tbody   = document.getElementById('rosterTbody');
@@ -1284,7 +1512,7 @@
         var spg = (p[7]==='N/A'||p[7]===undefined||p[7]===null) ? '—' : fmt1r(p[7]);
         var bpg = (p[8]==='N/A'||p[8]===undefined||p[8]===null) ? '—' : fmt1r(p[8]);
         rows += '<tr data-orig="'+idx+'">'
-          + '<td>'+p[0]+'</td>'
+          + '<td>'+rosterNameCell(p[0])+'</td>'
           + '<td>'+p[1]+'</td>'
           + '<td>'+p[2]+'</td>'
           + '<td class="hi">'+p[3]+'</td>'
@@ -1296,25 +1524,34 @@
           + '</tr>';
       });
 
+      // Team Totals row:
+      // - Age: average rounded to nearest tenth
+      // - OVR: average rounded to nearest tenth
+      // - PPG/RPG/APG/SPG/BPG: summed totals across all players
       var numericRows = rostData.filter(function(p){ return !isNaN(parseFloat(p[4])); });
       if (numericRows.length) {
         var n = numericRows.length;
-        var sumOvr=0,sumPpg=0,sumRpg=0,sumApg=0,sumSpg=0,sumBpg=0,spgCount=0,bpgCount=0;
+        var sumAge=0, sumOvr=0, sumPpg=0, sumRpg=0, sumApg=0, sumSpg=0, sumBpg=0, spgCount=0, bpgCount=0;
         numericRows.forEach(function(p){
-          sumOvr+=parseFloat(p[3])||0; sumPpg+=parseFloat(p[4])||0;
-          sumRpg+=parseFloat(p[5])||0; sumApg+=parseFloat(p[6])||0;
+          sumAge+=parseFloat(p[2])||0;
+          sumOvr+=parseFloat(p[3])||0;
+          sumPpg+=parseFloat(p[4])||0;
+          sumRpg+=parseFloat(p[5])||0;
+          sumApg+=parseFloat(p[6])||0;
           if(p[7]!=='N/A'&&p[7]!=null&&!isNaN(parseFloat(p[7]))){ sumSpg+=parseFloat(p[7]); spgCount++; }
           if(p[8]!=='N/A'&&p[8]!=null&&!isNaN(parseFloat(p[8]))){ sumBpg+=parseFloat(p[8]); bpgCount++; }
         });
+        var avgAge = fmt1r(sumAge/n);   // average, nearest tenth
+        var avgOvr = fmt1r(sumOvr/n);  // average, nearest tenth
         rows += '<tr class="roster-career-row" data-career="1">'
-          + '<td>Team Avg</td><td></td>'
-          + '<td>'+(sumOvr/n).toFixed(0)+'</td>'
-          + '<td class="hi">'+(sumOvr/n).toFixed(0)+'</td>'
-          + '<td class="hi">'+fmt1r(sumPpg/n)+'</td>'
-          + '<td>'+fmt1r(sumRpg/n)+'</td>'
-          + '<td>'+fmt1r(sumApg/n)+'</td>'
-          + '<td>'+(spgCount?fmt1r(sumSpg/spgCount):'—')+'</td>'
-          + '<td>'+(bpgCount?fmt1r(sumBpg/bpgCount):'—')+'</td>'
+          + '<td>Team Totals</td><td></td>'
+          + '<td>'+avgAge+'</td>'
+          + '<td class="hi">'+avgOvr+'</td>'
+          + '<td class="hi">'+fmt1r(sumPpg)+'</td>'
+          + '<td>'+fmt1r(sumRpg)+'</td>'
+          + '<td>'+fmt1r(sumApg)+'</td>'
+          + '<td>'+(spgCount?fmt1r(sumSpg):'—')+'</td>'
+          + '<td>'+(bpgCount?fmt1r(sumBpg):'—')+'</td>'
           + '</tr>';
       }
 
@@ -1424,10 +1661,14 @@
           var slug = h.slug || teamSel.value || '';
           if (slug && _winChart) {
             renderDetail(slug, yearSel.value);
+          } else {
+            /* Re-render standings so 76ers logo swaps instantly on mode change */
+            renderStandings(yearSel.value);
           }
         });
       });
     }
+
   })();
   </script>
 </body>
