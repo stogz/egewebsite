@@ -22,6 +22,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 0 60px;
+      box-sizing: border-box;
     }
 
     /* ── CONTROLS BAR ── */
@@ -99,6 +100,7 @@
       cursor: pointer;
       transition: border-color .2s, color .2s, background .35s;
       margin-left: auto;
+      flex-shrink: 0;
     }
     .teams-back-btn.visible { display: flex; }
     .teams-back-btn:hover { border-color: rgba(231,87,25,.5); color: var(--orange); }
@@ -334,6 +336,10 @@
       gap: 24px;
       align-items: start;
     }
+    /* CRITICAL: grid children must have min-width:0 at ALL sizes so overflow-x:auto
+       works inside them. Without this, the cell's min-size = content size (table min-width)
+       and the grid never shrinks, causing page overflow instead of table scroll. */
+    .team-detail-cols > div { min-width: 0; }
 
     /* Win chart */
     .team-chart-card {
@@ -367,7 +373,10 @@
       padding: 20px;
       height: 220px;
       position: relative;
+      max-width: 100%;
+      overflow: hidden;
     }
+    .team-chart-card__body canvas { max-width: 100%; }
 
     /* OFF/DEF gauges */
     .team-gauges {
@@ -377,6 +386,7 @@
       overflow: hidden;
       transition: background .35s;
       margin-bottom: 24px;
+      max-width: 100%;
     }
     .team-gauges__header {
       display: flex; align-items: center; gap: 10px;
@@ -437,13 +447,14 @@
       margin-top: 3px;
     }
 
-    /* Roster table */
+    /* ── ROSTER / SPLITS-STYLE TABLE ── */
     .team-roster-card {
-      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 6px;
       overflow: hidden;
+      background: var(--bg-card);
       transition: background .35s;
+      animation: fadeSlideUp .28s ease both;
     }
     .team-roster-card__header {
       display: flex; align-items: center; gap: 10px;
@@ -451,46 +462,173 @@
       border-bottom: 1px solid var(--border-soft);
       background: rgba(35,26,165,.07);
     }
-    .roster-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--orange) transparent; }
+    /* Controls bar above the roster card */
+    .roster-controls {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .roster-section-label {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .24em; text-transform: uppercase;
+      color: var(--orange); margin-bottom: 6px; display: block;
+    }
+    .roster-section-title {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 1.6rem; text-transform: uppercase;
+      color: var(--heading); line-height: 1; transition: color .35s;
+    }
+    .roster-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+    }
+    .roster-toggle-btn {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 8px 18px; background: transparent;
+      border: none; color: var(--text-muted);
+      cursor: pointer; transition: background .2s, color .2s;
+      white-space: nowrap;
+    }
+    .roster-toggle-btn.active { background: var(--orange); color: #fff; }
+    .roster-toggle-btn:hover:not(.active) { background: rgba(231,87,25,.1); color: var(--text); }
+
+    /* Scroll wrapper — copied exactly from players.html .splits-scroll */
+    .roster-scroll {
+      width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin; scrollbar-color: var(--orange) transparent;
+      touch-action: pan-x;
+    }
     .roster-scroll::-webkit-scrollbar { height: 4px; }
+    .roster-scroll::-webkit-scrollbar-track { background: transparent; }
     .roster-scroll::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 99px; }
-    .roster-table { border-collapse: collapse; width: 100%; min-width: 500px; font-family: var(--font-body); }
-    .roster-table thead tr { border-bottom: 1px solid var(--border-soft); }
+
+    /* Table — pixel-perfect match of splits-table */
+    .roster-table {
+      border-collapse: collapse; width: 100%;
+      min-width: 560px; font-family: var(--font-body);
+    }
+    .roster-table thead tr { background: transparent; border-bottom: 1px solid var(--border-soft); }
     .roster-table th {
-      font-family: var(--font-mono); font-size: .58rem;
+      font-family: var(--font-mono); font-size: .6rem;
       letter-spacing: .14em; text-transform: uppercase;
-      color: var(--text-muted); padding: 10px 14px;
-      text-align: right; font-weight: 400;
-      white-space: nowrap; cursor: pointer; user-select: none;
-      transition: color .15s;
+      color: var(--text-muted); padding: 12px 14px;
+      text-align: right; white-space: nowrap; font-weight: 400;
+      cursor: pointer; user-select: none;
+      transition: color .15s, background .15s;
+      height: 2.4rem; vertical-align: middle;
     }
     .roster-table th:first-child { text-align: left; }
-    .roster-table th:hover { color: var(--heading); }
-    .roster-table th.sort-asc, .roster-table th.sort-desc { color: var(--orange); }
+    .roster-table th:hover { color: var(--heading); background: rgba(231,87,25,.04); }
+    .roster-table th.sort-asc, .roster-table th.sort-desc { color: var(--heading); }
+    .roster-table th.sort-col { background: rgba(231,87,25,.05); }
+    .roster-sort-arrow {
+      display: inline-block; margin-left: 3px; font-size: .55rem;
+      color: var(--orange); opacity: 0; transition: opacity .15s; vertical-align: middle;
+    }
+    .roster-table th.sort-asc .roster-sort-arrow,
+    .roster-table th.sort-desc .roster-sort-arrow { opacity: 1; }
+
     .roster-table tbody tr { border-bottom: 1px solid var(--border-soft); transition: background .12s; }
     .roster-table tbody tr:last-child { border-bottom: none; }
     .roster-table tbody tr:hover td { background: rgba(231,87,25,.04); }
-    .roster-table td { padding: 0 14px; height: 3rem; text-align: right; font-size: .9rem; color: var(--text); vertical-align: middle; white-space: nowrap; }
-    .roster-table td:first-child { text-align: left; font-weight: 600; color: var(--heading); transition: color .35s; }
-    .roster-empty { padding: 28px 20px; font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+    .roster-table td {
+      padding: 0 14px; color: var(--text); text-align: right;
+      height: 3rem; white-space: nowrap; font-size: .92rem; font-weight: 600;
+    }
+    .roster-table td:first-child {
+      text-align: left; font-family: var(--font-mono);
+      font-size: .65rem; letter-spacing: .08em;
+      color: var(--text); font-weight: 500;
+      text-transform: uppercase;
+    }
+    .roster-table td.sort-col { background: rgba(231,87,25,.04); }
+    .roster-table td.hi { color: var(--text); font-weight: 600; font-size: .92rem; }
+
+    /* Career / totals row */
+    .roster-table tr.roster-career-row td {
+      font-weight: 700; border-top: 2px solid var(--border);
+      height: 3rem; background: var(--bg-card) !important;
+      font-size: .92rem;
+    }
+    .roster-table tr.roster-career-row td:first-child {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .12em; color: var(--orange); text-transform: uppercase;
+    }
+    .roster-table tr.roster-career-row td.sort-col { background: rgba(231,87,25,.06) !important; }
+    .roster-table tr.roster-career-row:hover td { background: var(--bg-card) !important; }
+
+    .roster-empty {
+      padding: 28px 20px; font-family: var(--font-mono);
+      font-size: .65rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      .teams-inner { padding: 0 16px; }
-      .teams-page  { padding: 80px 0 60px; }
-      .standings-grid { grid-template-columns: 1fr; }
-      .standings-conf-label { order: 0; }
-      .standings-grid > div:nth-child(1) { order: 1; } /* EAST */
-      .standings-grid > div:nth-child(2) { order: 2; } /* WEST */
+      .teams-inner { padding: 0 12px; box-sizing: border-box; }
+      .teams-page  { padding: 68px 0 60px; }
+
+      /* Controls: row1 = team select full width, row2 = [<][year][>][back] */
+      .teams-controls { gap: 8px; flex-wrap: wrap; }
+      .teams-controls .ege-select-wrap:first-child { width: 100%; flex: none; order: 1; }
+      .teams-controls .ege-select-wrap:first-child .ege-select { width: 100%; min-width: unset; }
+      #yearPrevBtn { order: 2; flex-shrink: 0; }
+      .teams-controls .ege-select-wrap:not(:first-child) { flex: 1; order: 3; min-width: 0; }
+      .teams-controls .ege-select-wrap:not(:first-child) .ege-select { width: 100%; min-width: unset; }
+      #yearNextBtn { order: 4; flex-shrink: 0; }
+      .teams-back-btn { order: 5; margin-left: 0; flex-shrink: 0; }
+      .ege-select { font-size: .65rem; padding: 10px 32px 10px 10px; }
+
+      /* Standings */
+      .standings-grid { grid-template-columns: 1fr; gap: 24px; }
       .standings-row__name { display: none; }
-      .standings-row__abbr { display: inline; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px,4vw,18px); letter-spacing: .06em; }
-      .team-stats-grid { grid-template-columns: repeat(2,1fr); }
-      .team-detail-cols { grid-template-columns: 1fr; }
-      .team-banner { padding: 24px 20px; }
-      .team-banner__logo { width: 60px; height: 60px; }
-      .teams-controls { gap: 8px; }
-      .ege-select { min-width: 140px; font-size: .65rem; padding: 10px 32px 10px 10px; }
-      .teams-back-btn { margin-left: 0; }
+      .standings-row__abbr { display: inline; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px,4vw,17px); letter-spacing: .06em; }
+      .standings-row { padding: 10px 12px; min-height: 48px; }
+
+      /* Team banner */
+      .team-banner { padding: 18px 14px; min-height: auto; }
+      .team-banner__logo { width: 48px; height: 48px; }
+      .team-banner__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+
+      /* Stat cards — 2 col */
+      .team-stats-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 14px; }
+      .team-stat-card { padding: 12px 10px; }
+      .team-stat-card__value { font-size: 1.3rem; }
+
+      /* Single column detail layout */
+      .team-detail-cols { grid-template-columns: 1fr; gap: 14px; }
+      .team-detail-cols > div { min-width: 0; width: 100%; }
+
+      /* Win chart */
+      .team-chart-card__body { height: 160px; padding: 12px 10px; }
+
+      /* Gauges */
+      .team-gauges__body { gap: 12px; padding: 14px 12px; justify-content: center; }
+      .gauge-wrap { width: 100px; height: 100px; }
+      .gauge-inner { width: 76px; height: 76px; }
+      .gauge-content__val { font-size: 1.1rem; }
+      .gauge-content__label { font-size: .52rem; }
+      .gauge-content__rank { font-size: .52rem; }
+
+      /* Roster — exact players.html mobile scroll fix */
+      .team-roster-card { overflow: visible; }
+      .team-roster-card__header { border-radius: 6px 6px 0 0; }
+      .roster-scroll { border-radius: 0 0 6px 6px; overflow-x: auto; }
+    }
+
+    /* ── SUB-400px ── */
+    @media (max-width: 400px) {
+      .teams-inner { padding: 0 8px; }
+      .team-stats-grid { gap: 6px; }
+      .team-stat-card { padding: 10px 8px; }
+      .team-stat-card__value { font-size: 1.1rem; }
+      .team-banner__name { font-size: clamp(1.2rem, 6vw, 1.8rem); }
+      .team-banner__logo { width: 40px; height: 40px; }
+      .team-chart-card__body { height: 130px; padding: 8px; }
+      .gauge-wrap { width: 86px; height: 86px; }
+      .gauge-inner { width: 64px; height: 64px; }
+      .gauge-content__val { font-size: .95rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -651,17 +789,24 @@
         <!-- Columns -->
         <div class="team-detail-cols">
           <div>
-            <!-- Roster -->
+            <!-- Roster (Traditional Splits style) -->
             <div class="team-roster-card">
               <div class="team-roster-card__header">
                 <div class="team-chart-card__dot"></div>
-                <span class="team-chart-card__title">Roster</span>
+                <span class="team-chart-card__title" id="rosterTableLabel">Regular Season · Per Game</span>
               </div>
               <div class="roster-scroll">
                 <table class="roster-table" id="rosterTable">
                   <thead><tr>
-                    <th>Player</th><th>Pos</th><th>Age</th><th>OVR</th>
-                    <th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th>
+                    <th>Player<span class="roster-sort-arrow"></span></th>
+                    <th>Pos<span class="roster-sort-arrow"></span></th>
+                    <th>Age<span class="roster-sort-arrow"></span></th>
+                    <th>OVR<span class="roster-sort-arrow"></span></th>
+                    <th>PPG<span class="roster-sort-arrow"></span></th>
+                    <th>RPG<span class="roster-sort-arrow"></span></th>
+                    <th>APG<span class="roster-sort-arrow"></span></th>
+                    <th>SPG<span class="roster-sort-arrow"></span></th>
+                    <th>BPG<span class="roster-sort-arrow"></span></th>
                   </tr></thead>
                   <tbody id="rosterTbody"></tbody>
                 </table>
@@ -1103,56 +1248,144 @@
         gaugesCard.style.display = 'none';
       }
 
-      // Roster
-      var rostYear = ROSTERS()[year];
-      var rostData = rostYear && abbr && rostYear[abbr] ? rostYear[abbr] : null;
-      var tbody = document.getElementById('rosterTbody');
-      var emptyEl = document.getElementById('rosterEmpty');
-      if (!rostData || !rostData.length) {
-        tbody.innerHTML = ''; emptyEl.style.display='block';
-      } else {
-        emptyEl.style.display = 'none';
-        tbody.innerHTML = rostData.map(function(p){
-          return '<tr>'
-            +'<td>'+p[0]+'</td>'
-            +'<td>'+p[1]+'</td>'
-            +'<td>'+p[2]+'</td>'
-            +'<td>'+p[3]+'</td>'
-            +'<td>'+Number(p[4]).toFixed(1)+'</td>'
-            +'<td>'+Number(p[5]).toFixed(1)+'</td>'
-            +'<td>'+Number(p[6]).toFixed(1)+'</td>'
-            +'<td>'+Number(p[7]).toFixed(1)+'</td>'
-            +'<td>'+Number(p[8]).toFixed(1)+'</td>'
-            +'</tr>';
-        }).join('');
-        // Sorting
-        var ths = document.getElementById('rosterTable').querySelectorAll('thead th');
-        ths.forEach(function(th,ci){
-          if (th.dataset.bound) return; th.dataset.bound='1';
-          var lbl = th.textContent.trim(); th.dataset.lbl=lbl;
-          th.addEventListener('click', function(){
-            var state = th.dataset.sort||'none';
-            var next = state==='none'?'desc':state==='desc'?'asc':'none';
-            ths.forEach(function(h){ h.dataset.sort='none'; h.textContent=h.dataset.lbl; h.classList.remove('sort-asc','sort-desc'); });
-            th.dataset.sort=next;
-            if (next==='asc')  { th.textContent=lbl+'▲'; th.classList.add('sort-asc'); }
-            if (next==='desc') { th.textContent=lbl+'▼'; th.classList.add('sort-desc'); }
-            var rows = Array.from(tbody.rows);
-            if (next==='none') { rows.sort(function(a,b){ return Number(a.dataset.oi)-Number(b.dataset.oi); }); }
-            else {
-              rows.sort(function(a,b){
-                var av=(a.cells[ci]||{}).textContent||'', bv=(b.cells[ci]||{}).textContent||'';
-                var an=parseFloat(av),bn=parseFloat(bv);
-                var cmp=(!isNaN(an)&&!isNaN(bn))?(an-bn):av.localeCompare(bv);
-                return next==='asc'?cmp:-cmp;
-              });
-            }
-            rows.forEach(function(r,i){ r.dataset.oi=r.dataset.oi||String(i); tbody.appendChild(r); });
-          });
-        });
-        Array.from(tbody.rows).forEach(function(r,i){ r.dataset.oi=String(i); });
-      }
+      // Roster — splits-style
+      renderRoster(slug, year, _rosterScope);
     }
+
+    /* ─── ROSTER HELPERS (outside renderDetail) ──────────────── */
+    var _rosterScope = 'regular';
+
+    function fmt1r(n) {
+      var v = parseFloat(n);
+      return isNaN(v) ? '—' : (Math.round(v * 10) / 10).toFixed(1);
+    }
+
+    function renderRoster(slug, year, scope) {
+      var abbr2 = SLUG_ABBR[slug] || '';
+      var rostYear = ROSTERS()[year];
+      var rostData = rostYear && abbr2 && rostYear[abbr2] ? rostYear[abbr2] : null;
+
+      var labelEl = document.getElementById('rosterTableLabel');
+      if (labelEl) labelEl.textContent = (scope === 'playoffs' ? 'Playoffs' : 'Regular Season') + ' · Per Game';
+
+      var table   = document.getElementById('rosterTable');
+      var tbody   = document.getElementById('rosterTbody');
+      var emptyEl = document.getElementById('rosterEmpty');
+
+      if (!rostData || !rostData.length) {
+        tbody.innerHTML = ''; emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+
+      var rows = '';
+      rostData.forEach(function(p, idx) {
+        var ppg = fmt1r(p[4]), rpg = fmt1r(p[5]), apg = fmt1r(p[6]);
+        var spg = (p[7]==='N/A'||p[7]===undefined||p[7]===null) ? '—' : fmt1r(p[7]);
+        var bpg = (p[8]==='N/A'||p[8]===undefined||p[8]===null) ? '—' : fmt1r(p[8]);
+        rows += '<tr data-orig="'+idx+'">'
+          + '<td>'+p[0]+'</td>'
+          + '<td>'+p[1]+'</td>'
+          + '<td>'+p[2]+'</td>'
+          + '<td class="hi">'+p[3]+'</td>'
+          + '<td class="hi">'+ppg+'</td>'
+          + '<td>'+rpg+'</td>'
+          + '<td>'+apg+'</td>'
+          + '<td>'+spg+'</td>'
+          + '<td>'+bpg+'</td>'
+          + '</tr>';
+      });
+
+      var numericRows = rostData.filter(function(p){ return !isNaN(parseFloat(p[4])); });
+      if (numericRows.length) {
+        var n = numericRows.length;
+        var sumOvr=0,sumPpg=0,sumRpg=0,sumApg=0,sumSpg=0,sumBpg=0,spgCount=0,bpgCount=0;
+        numericRows.forEach(function(p){
+          sumOvr+=parseFloat(p[3])||0; sumPpg+=parseFloat(p[4])||0;
+          sumRpg+=parseFloat(p[5])||0; sumApg+=parseFloat(p[6])||0;
+          if(p[7]!=='N/A'&&p[7]!=null&&!isNaN(parseFloat(p[7]))){ sumSpg+=parseFloat(p[7]); spgCount++; }
+          if(p[8]!=='N/A'&&p[8]!=null&&!isNaN(parseFloat(p[8]))){ sumBpg+=parseFloat(p[8]); bpgCount++; }
+        });
+        rows += '<tr class="roster-career-row" data-career="1">'
+          + '<td>Team Avg</td><td></td>'
+          + '<td>'+(sumOvr/n).toFixed(0)+'</td>'
+          + '<td class="hi">'+(sumOvr/n).toFixed(0)+'</td>'
+          + '<td class="hi">'+fmt1r(sumPpg/n)+'</td>'
+          + '<td>'+fmt1r(sumRpg/n)+'</td>'
+          + '<td>'+fmt1r(sumApg/n)+'</td>'
+          + '<td>'+(spgCount?fmt1r(sumSpg/spgCount):'—')+'</td>'
+          + '<td>'+(bpgCount?fmt1r(sumBpg/bpgCount):'—')+'</td>'
+          + '</tr>';
+      }
+
+      tbody.innerHTML = rows;
+      initRosterSort(table);
+    }
+
+    function initRosterSort(table) {
+      var tbody = table.tBodies[0]; if (!tbody) return;
+      Array.from(tbody.rows).forEach(function(r, i){ if (!r.dataset.originalIndex) r.dataset.originalIndex = String(i); });
+      var headers = Array.from(table.querySelectorAll('thead th'));
+      headers.forEach(function(th, colIdx){
+        var fresh = th.cloneNode(true);
+        th.parentNode.replaceChild(fresh, th);
+        fresh.dataset.sortState = 'none';
+        fresh.addEventListener('click', function(){
+          var curr = fresh.dataset.sortState || 'none';
+          var next = curr==='none' ? 'desc' : curr==='desc' ? 'asc' : 'none';
+          var allTh = Array.from(table.querySelectorAll('thead th'));
+          allTh.forEach(function(h){
+            h.dataset.sortState = 'none';
+            h.classList.remove('sort-asc','sort-desc','sort-col');
+            var a = h.querySelector('.roster-sort-arrow'); if (a) a.textContent = '';
+          });
+          Array.from(table.querySelectorAll('td.sort-col')).forEach(function(el){ el.classList.remove('sort-col'); });
+          fresh.dataset.sortState = next;
+          var arrow = fresh.querySelector('.roster-sort-arrow');
+          if (next==='desc') { fresh.classList.add('sort-desc'); if (arrow) arrow.textContent = '▼'; }
+          else if (next==='asc') { fresh.classList.add('sort-asc'); if (arrow) arrow.textContent = '▲'; }
+          var rows = Array.from(tbody.rows);
+          if (next==='none') {
+            rows.sort(function(a,b){ return Number(a.dataset.originalIndex)-Number(b.dataset.originalIndex); });
+          } else {
+            rows.sort(function(a,b){
+              var aC=a.dataset.career==='1', bC=b.dataset.career==='1';
+              if (aC||bC) return aC ? 1 : -1;
+              var aT=(a.cells[colIdx]?a.cells[colIdx].textContent:'').trim();
+              var bT=(b.cells[colIdx]?b.cells[colIdx].textContent:'').trim();
+              var aN=parseFloat(aT), bN=parseFloat(bT);
+              var cmp=(!isNaN(aN)&&!isNaN(bN)) ? aN-bN : aT.localeCompare(bT);
+              return next==='asc' ? cmp : -cmp;
+            });
+          }
+          rows.forEach(function(r){ tbody.appendChild(r); });
+          if (next!=='none') {
+            fresh.classList.add('sort-col');
+            Array.from(tbody.rows).forEach(function(r){
+              if (r.dataset.career==='1') return;
+              var cell=r.cells[colIdx]; if (cell) cell.classList.add('sort-col');
+            });
+          }
+        });
+      });
+    }
+
+    // Wire scope toggle
+    (function(){
+      var wrap = document.getElementById('rosterScopeToggle');
+      if (!wrap) return;
+      wrap.querySelectorAll('.roster-toggle-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          wrap.querySelectorAll('.roster-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          _rosterScope = btn.dataset.scope || 'regular';
+          var h = parseHash();
+          var slug2 = h.slug || (document.getElementById('teamSelect')||{}).value || '';
+          var year2 = (document.getElementById('yearSelect')||{}).value || '';
+          if (slug2 && year2) renderRoster(slug2, year2, _rosterScope);
+        });
+      });
+    })();
 
     /* ─── MAIN RENDER ─────────────────────────────────────────── */
     function render() {
