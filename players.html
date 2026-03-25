@@ -319,6 +319,8 @@
     }
     /* ══ CONTRACTS PANEL ══ */
     .contracts-layout { display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start; }
+    /* Grid children must have min-width:0 so overflow-x:auto works inside them */
+    .contracts-layout > div { min-width: 0; }
 
     /* Salary table — styled exactly like splits-table */
     .ct-card { border:1px solid var(--border); border-radius:6px; overflow:clip; background:var(--bg-card); transition:background .35s; margin-bottom:28px; }
@@ -421,6 +423,7 @@
     /* Mobile contracts */
     @media (max-width:768px) {
       .contracts-layout { grid-template-columns:1fr; gap:20px; }
+      .contracts-layout > div { min-width: 0; width: 100%; }
       .ct-table { min-width:360px; }
       .ct-chart-inner { min-width:320px; }
       .trade-grid { grid-template-columns:1fr; gap:10px; }
