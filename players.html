@@ -33,10 +33,10 @@
     /* Banner */
     .player-banner { position:relative; z-index:2; background:var(--bg-card); border-bottom:1px solid rgba(231,87,25,.2); overflow:visible; transition:background .35s; height:315px; }
     .player-banner-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 80% 50%,rgba(231,87,25,.15) 0%,transparent 60%),radial-gradient(ellipse at 20% 50%,rgba(35,26,165,.2) 0%,transparent 60%); pointer-events:none; transition:background 0.6s ease; }
-    .player-banner-inner { position:relative; z-index:1; display:flex; align-items:flex-end; gap:56px; padding:0 60px; max-width:1400px; height:315px; }
+    .player-banner-inner { position:relative; z-index:1; display:flex; align-items:flex-end; gap:56px; padding:0 60px; max-width:1400px; height:315px; margin:0 auto; width:100%; box-sizing:border-box; }
     .player-headshot { width:220px; height:280px; border-radius:0; background:transparent; border:none; display:flex; align-items:flex-end; justify-content:center; flex-shrink:0; overflow:visible; position:relative; margin-bottom:-2px; }
     .player-headshot-placeholder { font-family:var(--font-display); font-weight:900; font-size:4rem; color:var(--orange); }
-    .player-banner-info { flex:1; padding-bottom:26px; align-self:flex-end; }
+    .player-banner-info { flex:1; padding-bottom:0; align-self:center; }
     .player-banner-team { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.28em; text-transform:uppercase; color:var(--orange); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
     .player-banner-team::before { content:''; display:inline-block; width:24px; height:2px; background:var(--orange); }
     .player-banner-name { font-family:var(--font-display); font-weight:900; font-size:clamp(3rem,5.5vw,6rem); text-transform:uppercase; letter-spacing:-.02em; line-height:.88; color:var(--heading); transition:color .35s; margin-bottom:14px; display:flex; align-items:center; flex-wrap:nowrap; gap:0; }
@@ -46,7 +46,8 @@
     .banner-meta-value { font-family:var(--font-display); font-weight:700; font-size:1.25rem; color:var(--heading); letter-spacing:.02em; transition:color .35s; }
 
     /* Subnav */
-    .player-subnav { position:sticky; top:56px; z-index:50; background:var(--bg-nav); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0 60px; display:flex; gap:0; overflow-x:auto; scrollbar-width:none; transition:background .35s; }
+    .player-subnav { position:sticky; top:56px; z-index:50; background:var(--bg-nav); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:0; display:flex; gap:0; overflow-x:auto; scrollbar-width:none; transition:background .35s; }
+    .player-subnav-inner { display:flex; gap:0; max-width:1400px; width:100%; margin:0 auto; padding:0 60px; box-sizing:border-box; }
     .player-subnav::-webkit-scrollbar { display:none; }
     .subnav-tab { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); padding:18px 20px; border:none; border-bottom:2px solid transparent; background:none; cursor:pointer; white-space:nowrap; transition:color .2s,border-color .2s; user-select:none; }
     .subnav-tab:hover { color:var(--text); }
@@ -58,7 +59,7 @@
     .subnav-mobile-select { display:none; }
 
     /* Content */
-    .player-content { position:relative; z-index:2; padding:52px 60px 100px; max-width:1400px; }
+    .player-content { position:relative; z-index:2; padding:52px 60px 100px; max-width:1400px; margin:0 auto; width:100%; box-sizing:border-box; }
     .content-panel { display:none; }
     .content-panel.active { display:block; animation:fadeSlideUp .3s ease both; }
 
@@ -275,7 +276,8 @@
       .player-banner-meta { justify-content:flex-start; gap:10px; }
       .banner-meta-value { font-size:1rem; }
       .banner-meta-label { font-size:.5rem; }
-      .player-subnav { padding:0 12px; top:0; overflow-x:auto; }
+      .player-subnav { padding:0; top:0; overflow-x:auto; }
+      .player-subnav-inner { padding:0 12px; }
       .subnav-tab { display:none; }
       .subnav-mobile-select {
         display:block;
@@ -684,20 +686,22 @@
     </div>
 
     <div class="player-subnav">
-      <button class="subnav-tab active" data-tab="bio">Bio</button>
-      <button class="subnav-tab" data-tab="traditional-splits">Traditional Splits</button>
-      <button class="subnav-tab" data-tab="awards">Awards</button>
-      <button class="subnav-tab" data-tab="contracts">Contracts</button>
-      <button class="subnav-tab" data-tab="career-high">Career High</button>
-      <button class="subnav-tab" data-tab="shoes">Shoes</button>
-      <select class="subnav-mobile-select" id="subnav-mobile-select" aria-label="Select section">
-        <option value="bio">Bio</option>
-        <option value="traditional-splits">Traditional Splits</option>
-        <option value="awards">Awards</option>
-        <option value="contracts">Contracts</option>
-        <option value="career-high">Career High</option>
-        <option value="shoes">Shoes</option>
-      </select>
+      <div class="player-subnav-inner">
+        <button class="subnav-tab active" data-tab="bio">Bio</button>
+        <button class="subnav-tab" data-tab="traditional-splits">Traditional Splits</button>
+        <button class="subnav-tab" data-tab="awards">Awards</button>
+        <button class="subnav-tab" data-tab="contracts">Contracts</button>
+        <button class="subnav-tab" data-tab="career-high">Career High</button>
+        <button class="subnav-tab" data-tab="shoes">Shoes</button>
+        <select class="subnav-mobile-select" id="subnav-mobile-select" aria-label="Select section">
+          <option value="bio">Bio</option>
+          <option value="traditional-splits">Traditional Splits</option>
+          <option value="awards">Awards</option>
+          <option value="contracts">Contracts</option>
+          <option value="career-high">Career High</option>
+          <option value="shoes">Shoes</option>
+        </select>
+      </div>
     </div>
 
     <div class="player-content">
@@ -945,6 +949,9 @@
     'HOU':'Houston Rockets',
     'UTA':'Utah Jazz',
     'VAN':'Vancouver Grizzlies',
+    'SAS':'San Antonio Spurs',
+    'MEX':'Mexico City Flight',
+    'STL':'St. Louis Spirit',
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
@@ -964,6 +971,9 @@
     'Houston Rockets':      { primary:'#CE1141', secondary:'#000000' },
     'Utah Jazz':            { primary:'#002B5C', secondary:'#F9A01B' },
     'Vancouver Grizzlies':  { primary:'#5D76A9', secondary:'#F5A623' },
+    'San Antonio Spurs':    { primary:'#000000', secondary:'#C4CED4' },
+    'Mexico City Flight':   { primary:'#07b4c0', secondary:'#e75719' },
+    'St. Louis Spirit':     { primary:'#d16405', secondary:'#ffffff' },
   };
 
   var PLAYER_HEADSHOTS = {
@@ -1100,11 +1110,6 @@
     document.getElementById('profile-team-line').textContent = p.number+' · '+p.position+' · '+teamDisplay;
     var meta = document.getElementById('profile-meta');
     meta.innerHTML='';
-    [{label:'Position',val:p.position},{label:'Number',val:p.number},{label:'Team',val:teamDisplay}].forEach(function(m){
-      var d=document.createElement('div'); d.className='banner-meta-item';
-      d.innerHTML='<span class="banner-meta-label">'+m.label+'</span><span class="banner-meta-value">'+m.val+'</span>';
-      meta.appendChild(d);
-    });
   }
 
   /* ── BIO (driven by PLAYER_STATS) ── */
