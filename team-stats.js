@@ -642,7 +642,7 @@ window.EGE_SEASON_STATS = {
 
   "2033-34": {
     /* EAST */
-    philadelphia76ers:     { record: "58-24", pct: ".707", rank: "1st",  playoffs: "N/A" },
+    philadelphia76ers:     { record: "58-24", pct: ".707", rank: "1st",  playoffs: "Champions", finals_mvp: "Cooper Flagg" },
     charlottehornets:      { record: "52-30", pct: ".634", rank: "2nd",  playoffs: "N/A" },
     torontoraptors:        { record: "51-31", pct: ".622", rank: "3rd",  playoffs: "N/A" },
     detroitpistons:        { record: "48-34", pct: ".585", rank: "4th",  playoffs: "N/A" },

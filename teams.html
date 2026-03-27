@@ -314,7 +314,7 @@
     /* Stats grid below banner */
     .team-stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-bottom: 28px;
     }
@@ -323,7 +323,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 20px;
-      transition: background .35s;
+      transition: background .35s, transform .2s, border-color .2s, box-shadow .2s;
     }
     .team-stat-card__label {
       font-family: var(--font-mono);
@@ -342,6 +342,117 @@
       transition: color .35s;
     }
     .team-stat-card__value.orange { color: var(--orange); }
+
+    /* ── TEAM PAGE HOVER INTERACTIONS ── */
+    /* Stat cards */
+    .team-stat-card {
+      cursor: default;
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    .team-stat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(231,87,25,.35);
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .team-stat-card:hover .team-stat-card__label {
+      color: var(--orange);
+      transition: color .2s;
+    }
+    .team-stat-card:hover .team-stat-card__value {
+      color: var(--heading);
+    }
+
+    /* Chart / card headers — dot pulses on hover */
+    .team-chart-card:hover .team-chart-card__dot,
+    .team-gauges:hover .team-chart-card__dot,
+    .team-roster-card:hover .team-chart-card__dot,
+    .playoff-result-card:hover .team-chart-card__dot,
+    .trends-card:hover .team-chart-card__dot {
+      animation: none;
+      background: #e75719;
+      box-shadow: 0 0 6px rgba(231,87,25,.8);
+      transform: scale(1.3);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    /* Win chart card lift */
+    .team-chart-card {
+      transform: translateY(0);
+      transition: background .35s, transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .team-chart-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(231,87,25,.25);
+      box-shadow: 0 6px 20px rgba(0,0,0,.15);
+    }
+
+    /* Gauges lift + individual gauge scale */
+    .team-gauges {
+      transition: background .35s, transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .team-gauges:hover {
+      border-color: rgba(231,87,25,.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
+    .gauge-wrap {
+      transition: transform .25s ease;
+    }
+    .gauge-wrap:hover {
+      transform: scale(1.06);
+    }
+    .gauge-content__val {
+      transition: color .2s;
+    }
+    .gauge-wrap:hover .gauge-content__val {
+      color: var(--orange);
+    }
+
+    /* Roster card lift */
+    .team-roster-card {
+      transition: background .35s, border-color .2s, box-shadow .2s;
+    }
+    .team-roster-card:hover {
+      border-color: rgba(231,87,25,.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
+
+    /* Trend rows — slide value on hover */
+    .trend-row {
+      transition: background .15s, padding-right .15s;
+    }
+    .trend-row:hover {
+      background: rgba(231,87,25,.04);
+      padding-right: 20px;
+    }
+    .trend-row:hover .trend-label {
+      color: var(--text);
+      transition: color .15s;
+    }
+    .trend-value {
+      transition: transform .15s;
+    }
+    .trend-row:hover .trend-value {
+      transform: scale(1.08);
+    }
+
+    /* Trends card lift */
+    .trends-card {
+      transition: background .35s, border-color .2s, box-shadow .2s;
+    }
+    .trends-card:hover {
+      border-color: rgba(231,87,25,.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
+
+    /* Postseason series card lift */
+    .playoff-result-card {
+      transition: background .35s, border-color .2s, box-shadow .2s;
+    }
+    .playoff-result-card:hover {
+      border-color: rgba(231,87,25,.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
 
     /* Two-column detail layout */
     .team-detail-cols {
@@ -577,6 +688,115 @@
       text-transform: uppercase; color: var(--text-muted);
     }
 
+    /* ── TRENDS CARD ── */
+    .trends-card {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg-card);
+      transition: background .35s;
+      animation: fadeSlideUp .35s ease both;
+    }
+    .trends-card__header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+    }
+    .trend-row {
+      display: flex; align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      gap: 10px;
+    }
+    .trend-row:last-child { border-bottom: none; }
+    .trend-label {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text-muted); flex: 1;
+    }
+    .trend-arrow {
+      font-size: .75rem; flex-shrink: 0; line-height: 1;
+    }
+    .trend-value {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: .95rem; flex-shrink: 0;
+      min-width: 52px; text-align: right;
+    }
+    /* Intensity tiers — positive */
+    .trend-pos-lo  { color: #4caf82; }
+    .trend-pos-mid { color: #22c76e; }
+    .trend-pos-hi  { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,120,.45); }
+    /* Intensity tiers — negative */
+    .trend-neg-lo  { color: #e07070; }
+    .trend-neg-mid { color: #e84040; }
+    .trend-neg-hi  { color: #ff2020; text-shadow: 0 0 8px rgba(255,40,40,.45); }
+    /* Neutral */
+    .trend-zero { color: var(--text-muted); }
+    /* Arrow colours mirror value */
+    .trend-pos-lo  .trend-arrow, .trend-pos-mid .trend-arrow, .trend-pos-hi  .trend-arrow { color: inherit; }
+    .trend-neg-lo  .trend-arrow, .trend-neg-mid .trend-arrow, .trend-neg-hi  .trend-arrow { color: inherit; }
+    .trend-zero .trend-arrow { color: var(--text-muted); }
+
+    /* ── POSTSEASON SERIES CARD ── */
+    .playoff-result-card {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg-card);
+      transition: background .35s;
+      animation: fadeSlideUp .4s ease both;
+    }
+    .playoff-result-card__header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+    }
+    /* Each series row */
+    .ps-series-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: background .15s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .ps-series-row:last-child { border-bottom: none; }
+    .ps-series-row:hover { background: rgba(231,87,25,.05); }
+    .ps-series-logo {
+      width: 28px; height: 28px; object-fit: contain; flex-shrink: 0;
+    }
+    .ps-series-info { flex: 1; min-width: 0; }
+    .ps-series-round {
+      font-family: var(--font-mono); font-size: .56rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 3px;
+    }
+    .ps-series-matchup {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: .95rem; color: var(--heading);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color .35s;
+    }
+    .ps-series-score {
+      font-family: var(--font-mono); font-weight: 700;
+      font-size: .9rem; flex-shrink: 0; text-align: right;
+    }
+    .ps-series-score.won  { color: var(--orange); }
+    .ps-series-score.lost { color: var(--text-muted); }
+    .ps-series-score.champ { color: #ffc820; }
+    /* No postseason row */
+    .ps-no-data {
+      padding: 18px 16px;
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
     /* ── NBA CHAMPIONS CARD ── */
     .champ-card {
       display: none;
@@ -729,7 +949,7 @@
        PLAYOFF BRACKET
     ══════════════════════════════════════ */
     #teamsBracketView {
-      margin-top: 48px;
+      margin-bottom: 48px;
       animation: fadeSlideUp .4s ease both;
     }
     .bracket-section-header {
@@ -958,7 +1178,7 @@
     }
 
     @media (max-width: 768px) {
-      #teamsBracketView { margin-top: 32px; }
+      #teamsBracketView { margin-bottom: 32px; }
       .bracket-team__name { font-size: .7rem; }
     }
 
@@ -1022,7 +1242,7 @@
       .team-banner__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
 
       /* Stat cards — 2 col */
-      .team-stats-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 14px; }
+      .team-stats-grid { grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
       .team-stat-card { padding: 12px 10px; }
       .team-stat-card__value { font-size: 1.3rem; }
 
@@ -1172,6 +1392,13 @@
         </button>
       </div>
 
+      <!-- PLAYOFF BRACKET VIEW -->
+      <div id="teamsBracketView" style="display:none;">
+        <div class="bracket-scroll">
+          <div class="bracket-grid" id="bracketGrid"></div>
+        </div>
+      </div>
+
       <!-- STANDINGS VIEW -->
       <div id="teamsStandingsView">
         <div class="standings-grid">
@@ -1183,13 +1410,6 @@
             <div class="standings-conf-label">Eastern Conference</div>
             <div class="standings-list" id="standingsEast"></div>
           </div>
-        </div>
-      </div>
-
-      <!-- PLAYOFF BRACKET VIEW -->
-      <div id="teamsBracketView" style="display:none;">
-        <div class="bracket-scroll">
-          <div class="bracket-grid" id="bracketGrid"></div>
         </div>
       </div>
 
@@ -1218,10 +1438,7 @@
             <div class="team-stat-card__label">// Conf Rank</div>
             <div class="team-stat-card__value" id="teamStatRank">—</div>
           </div>
-          <div class="team-stat-card">
-            <div class="team-stat-card__label">// Playoffs</div>
-            <div class="team-stat-card__value" id="teamStatPlayoffs" style="font-size:1rem;">—</div>
-          </div>
+
         </div>
 
         <!-- Columns -->
@@ -1265,6 +1482,23 @@
           </div>
 
           <div>
+            <!-- NBA Champions card -->
+            <div class="champ-card" id="champCard">
+              <div class="champ-header">
+                <div class="champ-header-dot"></div>
+                <span class="champ-header-title">NBA Champions</span>
+              </div>
+              <div class="champ-body">
+                <img class="champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Championship Trophy">
+                <div class="champ-year" id="champYear">—</div>
+                <div class="champ-label">NBA Champions</div>
+                <div class="champ-mvp-wrap">
+                  <div class="champ-mvp-label">🏆 Finals MVP</div>
+                  <div class="champ-mvp-name" id="champMvp"></div>
+                </div>
+              </div>
+            </div>
+
             <!-- OFF/DEF gauges -->
             <div class="team-gauges" id="teamGaugesCard" style="display:none;">
               <div class="team-gauges__header">
@@ -1292,21 +1526,23 @@
                 </div>
               </div>
             </div>
-            <!-- NBA Champions card -->
-            <div class="champ-card" id="champCard">
-              <div class="champ-header">
-                <div class="champ-header-dot"></div>
-                <span class="champ-header-title">NBA Champions</span>
+
+            <!-- Postseason Series card -->
+            <div class="playoff-result-card" id="playoffResultCard" style="display:none;">
+              <div class="playoff-result-card__header">
+                <div class="team-chart-card__dot"></div>
+                <span class="team-chart-card__title">Postseason Series</span>
               </div>
-              <div class="champ-body">
-                <img class="champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Championship Trophy">
-                <div class="champ-year" id="champYear">—</div>
-                <div class="champ-label">NBA Champions</div>
-                <div class="champ-mvp-wrap">
-                  <div class="champ-mvp-label">🏆 Finals MVP</div>
-                  <div class="champ-mvp-name" id="champMvp"></div>
-                </div>
+              <div id="playoffSeriesList"></div>
+            </div>
+
+            <!-- Trends card -->
+            <div class="trends-card" id="trendsCard" style="display:none;">
+              <div class="trends-card__header">
+                <div class="team-chart-card__dot"></div>
+                <span class="team-chart-card__title">Trends vs. Prior Season</span>
               </div>
+              <div id="trendsList"></div>
             </div>
           </div>
         </div>
@@ -1435,10 +1671,13 @@
       if (!s||!s.includes('-')) return '';
       return (s.split('-')[1]||'').padStart(2,'0');
     }
-    function setHash(slug, season) {
+    function setHash(slug, season, push) {
       var yy = seasonToSuffix(season);
-      if (!slug) { history.replaceState(null,'',location.pathname+location.search); return; }
-      history.replaceState(null,'',location.pathname+location.search+'#'+slug+yy);
+      var url = slug
+        ? location.pathname+location.search+'#'+slug+yy
+        : location.pathname+location.search;
+      if (push) { history.pushState(null,'',url); }
+      else       { history.replaceState(null,'',url); }
     }
     function fireHash() { try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch(e){} }
 
@@ -1494,23 +1733,27 @@
     teamSel.addEventListener('change', function(){
       var slug = teamSel.value;
       var season = yearSel.value;
-      setHash(slug, season);
+      setHash(slug, season, true); // push so back button works
       render();
       window.scrollTo({top:0,behavior:'smooth'});
     });
     yearSel.addEventListener('change', function(){
       syncYearArrows();
       var h = parseHash();
-      if (h.slug) { setHash(h.slug, yearSel.value); }
+      if (h.slug) { setHash(h.slug, yearSel.value, false); }
       render();
     });
     backBtn.addEventListener('click', function(){
       teamSel.value = '';
-      setHash('', yearSel.value);
+      setHash('', yearSel.value, false);
       render();
       window.scrollTo({top:0,behavior:'smooth'});
     });
-    window.addEventListener('hashchange', function(){
+    // Prevent browser from restoring scroll position on back/forward
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    window.addEventListener('popstate', function(){
+      window.scrollTo({top:0,behavior:'instant'});
       syncDropdownsFromHash();
       render();
     });
@@ -1574,7 +1817,7 @@
           e.preventDefault();
           var href = a.getAttribute('href')||'';
           if (!href.startsWith('#')) return;
-          history.replaceState(null,'',location.pathname+location.search+href);
+          history.pushState(null,'',location.pathname+location.search+href);
           syncDropdownsFromHash();
           render();
           window.scrollTo({top:0,behavior:'smooth'});
@@ -1647,6 +1890,110 @@
         requestAnimationFrame(step);
       }
     }
+    /* ─── POSTSEASON SERIES RENDERER ────────────────────────── */
+    function derivePlayoffResult(slug, year, bData, ss) {
+      // Kept for champion card compatibility
+      var result = { isChamp: false };
+      if (!bData) {
+        result.isChamp = ss && (ss.playoffs||'').trim() === 'Champions';
+        return result;
+      }
+      var fin = bData.finals;
+      if (fin && (fin.top===slug || fin.bot===slug)) {
+        var fMyW = fin.top===slug ? fin.topW : fin.botW;
+        var fOpW = fin.top===slug ? fin.botW : fin.topW;
+        result.isChamp = fMyW > fOpW;
+      }
+      return result;
+    }
+
+    function renderPostseasonSeries(slug, year, bData, ss) {
+      var card  = document.getElementById('playoffResultCard');
+      var list  = document.getElementById('playoffSeriesList');
+      if (!card || !list) return;
+
+      var playoffs = ss ? (ss.playoffs||'').trim() : '';
+
+      // No bracket data or did not qualify
+      if (!bData || playoffs === 'Did not qualify') {
+        card.style.display = 'none';
+        return;
+      }
+
+      // Collect all series involving this team
+      var series = [];
+      var conf = isEastern(slug) ? 'east' : 'west';
+      var roundDefs = [
+        { key:'r1', label:'First Round',       conf: conf },
+        { key:'r2', label:'Conf. Semifinals',  conf: conf },
+        { key:'r3', label:'Conf. Finals',      conf: conf },
+        { key:'finals', label:'NBA Finals',    conf: 'finals' },
+      ];
+
+      roundDefs.forEach(function(rd) {
+        var rounds = rd.conf === 'finals'
+          ? (bData.finals ? [bData.finals] : [])
+          : (bData[rd.conf] && bData[rd.conf][rd.key] || []);
+
+        rounds.forEach(function(m) {
+          if (!m) return;
+          if (m.top !== slug && m.bot !== slug) return;
+          var myW  = m.top===slug ? m.topW : m.botW;
+          var opW  = m.top===slug ? m.botW : m.topW;
+          var opSlug = m.top===slug ? m.bot : m.top;
+          series.push({ label: rd.label, myW: myW, opW: opW, opSlug: opSlug, isFinals: rd.conf==='finals' });
+        });
+      });
+
+      // Not in bracket at all — check play-in
+      if (!series.length) {
+        list.innerHTML = '<div class="ps-no-data">Did not make playoffs</div>';
+        card.style.display = 'block';
+        return;
+      }
+
+      var yy = seasonToSuffix(year);
+      var html = series.map(function(s) {
+        var won = s.myW > s.opW;
+        var isChampSeries = s.isFinals && won;
+        var scoreStr = s.myW + '–' + s.opW;
+        var scoreCls = isChampSeries ? 'champ' : won ? 'won' : 'lost';
+        var resultWord = won ? 'Won' : 'Lost';
+
+        // Opponent info
+        var opTi   = TEAM_INFO()[s.opSlug] || {};
+        var opName = opTi.name || s.opSlug;
+        var opAbbr = SLUG_ABBR[s.opSlug] || (s.opSlug||'').slice(0,3).toUpperCase();
+        var opLogo = getStandingsLogo(opName);
+        var opLink = '#' + s.opSlug + yy;
+
+        return '<a class="ps-series-row" href="' + opLink + '">'
+          + (opLogo ? '<img class="ps-series-logo" src="' + opLogo + '" alt="' + opName + '">' : '')
+          + '<div class="ps-series-info">'
+            + '<div class="ps-series-round">' + s.label + '</div>'
+            + '<div class="ps-series-matchup">' + resultWord + ' vs. ' + opAbbr + '</div>'
+          + '</div>'
+          + '<div class="ps-series-score ' + scoreCls + '">' + scoreStr + '</div>'
+        + '</a>';
+      }).join('');
+
+      list.innerHTML = html;
+      card.style.display = 'block';
+
+      // Wire clicks to navigate to opponent's team page
+      card.querySelectorAll('.ps-series-row').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+          e.preventDefault();
+          var href = a.getAttribute('href') || '';
+          if (!href.startsWith('#')) return;
+          history.pushState(null,'',location.pathname+location.search+href);
+          syncDropdownsFromHash();
+          render();
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      });
+    }
+
     function renderDetail(slug, year) {
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
@@ -1667,27 +2014,21 @@
       document.getElementById('teamStatRecord').textContent = ss ? ss.record : '—';
       document.getElementById('teamStatPct').textContent    = ss ? ss.pct    : '—';
       document.getElementById('teamStatRank').textContent   = ss ? ss.rank   : '—';
-      var playoffsEl = document.getElementById('teamStatPlayoffs');
-      playoffsEl.textContent = ss ? (ss.playoffs||'—') : '—';
-      playoffsEl.style.fontSize = ss && ss.playoffs && ss.playoffs.length > 8 ? '.85rem' : '1rem';
-
-      // Champions card — show only if playoffs === 'Champions'
+      // Derive playoff result from bracket data
       var champCard = document.getElementById('champCard');
-      var isChamp = ss && (ss.playoffs||'').trim() === 'Champions';
+      var bData = (BRACKETS()[year]) || null;
+      var playoffResult = derivePlayoffResult(slug, year, bData, ss);
+
+      // Champions card
       if (champCard) {
-        if (isChamp) {
-          // Populate year and Finals MVP
+        if (playoffResult.isChamp) {
           document.getElementById('champYear').textContent = year;
           var mvpEl = document.getElementById('champMvp');
-          if (ss.finals_mvp) {
+          if (ss && ss.finals_mvp) {
             mvpEl.textContent = ss.finals_mvp;
-            mvpEl.style.display = '';
-            mvpEl.previousElementSibling && (mvpEl.previousElementSibling.style.display = '');
           } else {
-            mvpEl.textContent = '';
             mvpEl.innerHTML = '<span class="champ-mvp-empty">— Not recorded —</span>';
           }
-          // Restart animations by removing + re-adding class
           champCard.classList.remove('visible');
           void champCard.offsetWidth;
           champCard.classList.add('visible');
@@ -1695,6 +2036,9 @@
           champCard.classList.remove('visible');
         }
       }
+
+      // Postseason series card
+      renderPostseasonSeries(slug, year, bData, ss);
 
       // Win history chart
       var allSeasons = Object.keys(SEASON_STATS()).sort();
@@ -1755,6 +2099,9 @@
 
       // Roster — splits-style
       renderRoster(slug, year, _rosterScope);
+
+      // Trends
+      renderTrends(slug, year, abbr);
     }
 
     /* ─── ROSTER HELPERS (outside renderDetail) ──────────────── */
@@ -2159,6 +2506,108 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       });
+    }
+
+    /* ─── TRENDS CARD ───────────────────────────────────────── */
+    function renderTrends(slug, year, abbr) {
+      var card = document.getElementById('trendsCard');
+      var list = document.getElementById('trendsList');
+      if (!card || !list) return;
+
+      // Get prior season
+      var allYears = Object.keys(SEASON_STATS()).sort();
+      var yearIdx  = allYears.indexOf(year);
+      if (yearIdx <= 0) { card.style.display = 'none'; return; }
+      var prevYear = allYears[yearIdx - 1];
+
+      var ssCurr = (SEASON_STATS()[year]     || {})[slug];
+      var ssPrev = (SEASON_STATS()[prevYear] || {})[slug];
+      var rtCurr = abbr && (RATINGS()[year]     || {})[abbr];
+      var rtPrev = abbr && (RATINGS()[prevYear] || {})[abbr];
+      var roCurr = abbr && (ROSTERS()[year]     || {})[abbr];
+      var roPrev = abbr && (ROSTERS()[prevYear] || {})[abbr];
+
+      // Need at least season stats for both years
+      if (!ssCurr || !ssPrev) { card.style.display = 'none'; return; }
+
+      // Helper: parse wins from record string e.g. "52-30"
+      function wins(ss) {
+        if (!ss || !ss.record) return null;
+        var m = String(ss.record).match(/^(\d+)/);
+        return m ? parseInt(m[1], 10) : null;
+      }
+
+      // Helper: compute roster average for a stat index
+      function rosterAvg(roData, idx) {
+        if (!roData || !roData.length) return null;
+        var valid = roData.filter(function(p){ return !isNaN(parseFloat(p[idx])); });
+        if (!valid.length) return null;
+        var sum = valid.reduce(function(a,p){ return a + parseFloat(p[idx]); }, 0);
+        return sum / valid.length;
+      }
+
+      // Build metrics list: { label, curr, prev, invertGood }
+      // invertGood=true means lower is better (DRTG, Age)
+      var metrics = [];
+
+      if (rtCurr && rtPrev) {
+        metrics.push({ label:'ORTG', curr:parseFloat(rtCurr.off), prev:parseFloat(rtPrev.off), dp:1, thresh:[0.5,2], invertGood:false });
+        metrics.push({ label:'DRTG', curr:parseFloat(rtCurr.def), prev:parseFloat(rtPrev.def), dp:1, thresh:[0.5,2], invertGood:true });
+      }
+
+      var ageCurr = rosterAvg(roCurr, 2), agePrev = rosterAvg(roPrev, 2);
+      if (ageCurr!==null && agePrev!==null)
+        metrics.push({ label:'Avg Age', curr:ageCurr, prev:agePrev, dp:1, thresh:[0.5,1.5], invertGood:true });
+
+      var ovrCurr = rosterAvg(roCurr, 3), ovrPrev = rosterAvg(roPrev, 3);
+      if (ovrCurr!==null && ovrPrev!==null)
+        metrics.push({ label:'Avg OVR', curr:ovrCurr, prev:ovrPrev, dp:1, thresh:[1,3], invertGood:false });
+
+      var ppgCurr = rosterAvg(roCurr, 4), ppgPrev = rosterAvg(roPrev, 4);
+      if (ppgCurr!==null && ppgPrev!==null)
+        metrics.push({ label:'Avg PPG', curr:ppgCurr, prev:ppgPrev, dp:1, thresh:[1,4], invertGood:false });
+
+      var rpgCurr = rosterAvg(roCurr, 5), rpgPrev = rosterAvg(roPrev, 5);
+      if (rpgCurr!==null && rpgPrev!==null)
+        metrics.push({ label:'Avg RPG', curr:rpgCurr, prev:rpgPrev, dp:1, thresh:[0.5,2], invertGood:false });
+
+      var apgCurr = rosterAvg(roCurr, 6), apgPrev = rosterAvg(roPrev, 6);
+      if (apgCurr!==null && apgPrev!==null)
+        metrics.push({ label:'Avg APG', curr:apgCurr, prev:apgPrev, dp:1, thresh:[0.5,2], invertGood:false });
+
+      var spgCurr = rosterAvg(roCurr, 7), spgPrev = rosterAvg(roPrev, 7);
+      if (spgCurr!==null && spgPrev!==null && spgCurr!==undefined && spgPrev!==undefined)
+        metrics.push({ label:'Avg SPG', curr:spgCurr, prev:spgPrev, dp:2, thresh:[0.1,0.4], invertGood:false });
+
+      var wCurr = wins(ssCurr), wPrev = wins(ssPrev);
+      if (wCurr!==null && wPrev!==null)
+        metrics.push({ label:'Wins', curr:wCurr, prev:wPrev, dp:0, thresh:[3,8], invertGood:false });
+
+      if (!metrics.length) { card.style.display = 'none'; return; }
+
+      // Render each metric
+      list.innerHTML = metrics.map(function(m) {
+        if (isNaN(m.curr) || isNaN(m.prev)) return '';
+        var diff = m.curr - m.prev;
+        var absDiff = Math.abs(diff);
+        var isGood = m.invertGood ? diff < 0 : diff > 0;
+        var isPos  = isGood;
+        var tier = absDiff === 0 ? 'zero'
+                 : absDiff < m.thresh[0] ? (isPos ? 'pos-lo'  : 'neg-lo')
+                 : absDiff < m.thresh[1] ? (isPos ? 'pos-mid' : 'neg-mid')
+                 :                          (isPos ? 'pos-hi'  : 'neg-hi');
+        var cls    = 'trend-' + tier;
+        var arrow  = diff === 0 ? '—' : diff > 0 ? '▲' : '▼';
+        var sign   = diff > 0 ? '+' : '';
+        var valStr = sign + diff.toFixed(m.dp);
+        return '<div class="trend-row '+cls+'">'
+          + '<span class="trend-label">'+m.label+'</span>'
+          + '<span class="trend-arrow">'+arrow+'</span>'
+          + '<span class="trend-value">'+valStr+'</span>'
+          + '</div>';
+      }).join('');
+
+      card.style.display = 'block';
     }
 
   })();
