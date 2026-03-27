@@ -4527,3 +4527,621 @@ window.EGE_ROSTERS = {
   },
 
 }; /* end EGE_ROSTERS */
+
+/* ══════════════════════════════════════════════════════════════
+   EGE_BRACKETS — Playoff bracket data per season
+   Structure per season:
+   {
+     east: {
+       r1: [ {top: "SLUG", topW: 4, bot: "SLUG", botW: 2}, ... ] // 4 matchups seed 1v8, 2v7, 3v6, 4v5
+       r2: [ {top: "SLUG", topW: 4, bot: "SLUG", botW: 1}, ... ] // 2 matchups
+       r3: [ {top: "SLUG", topW: 4, bot: "SLUG", botW: 2} ]      // conf finals
+     },
+     west: { same structure },
+     finals: { top: "SLUG", topW: 4, bot: "SLUG", botW: 0 }      // NBA Finals
+   }
+   - top/bot are team slugs (e.g. "losangeleslakers")
+   - topW/botW are wins in that series
+   - Leave a round empty [] if not yet played
+   ══════════════════════════════════════════════════════════════ */
+window.EGE_BRACKETS = {
+  "2017-18": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "torontoraptors",     topW: 4, bot: "washingtonwizards",     botW: 0 },  /* 1 vs 8 */
+        { top: "miamiheat",     topW: 4, bot: "philadelphia76ers",  botW: 2 },  /* 4 vs 5 */
+        { top: "bostonceltics",      topW: 4, bot: "indianapacers",          botW: 1 },  /* 3 vs 6 */
+        { top: "clevelandcavaliers",  topW: 3, bot: "detroitpistons",       botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "torontoraptors",     topW: 4, bot: "miamiheat",     botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "bostonceltics",  topW: 4, bot: "detroitpistons",          botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "torontoraptors",     topW: 3, bot: "bostonceltics",  botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "goldenstatewarriors",    topW: 4, bot: "losangeleslakers",     botW: 0 },  /* 1 vs 8 */
+        { top: "houstonrockets",    topW: 4, bot: "denvernuggets",           botW: 3 },  /* 4 vs 5 */
+        { top: "utahjazz",      topW: 4, bot: "minnesotatimberwolves",   botW: 1 },  /* 3 vs 6 */
+        { top: "sanantoniospurs",topW: 4, bot: "sacramentokings",        botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "goldenstatewarriors",    topW: 4, bot: "houstonrockets",    botW: 2 },  /* 1/8 vs 4/5 */
+        { top: "sanantoniospurs",topW: 4, bot: "utahjazz",      botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "goldenstatewarriors",    topW: 4, bot: "sanantoniospurs",botW: 2 },
+      ],
+    },
+    finals: { top: "goldenstatewarriors", topW: 4, bot: "bostonceltics", botW: 0 },
+  },
+  "2018-19": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "detroitpistons",     botW: 0 },  /* 1 vs 8 */
+        { top: "torontoraptors",     topW: 4, bot: "washingtonwizards",  botW: 1 },  /* 4 vs 5 */
+        { top: "bostonceltics",      topW: 2, bot: "miamiheat",          botW: 4 },  /* 3 vs 6 */
+        { top: "philadelphia76ers",  topW: 4, bot: "orlandomagic",       botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 2, bot: "torontoraptors",     botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "philadelphia76ers",  topW: 4, bot: "miamiheat",          botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "torontoraptors",     topW: 1, bot: "philadelphia76ers",  botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "sacramentokings",    topW: 4, bot: "houstonrockets",     botW: 0 },  /* 1 vs 8 */
+        { top: "sanantoniospurs",    topW: 4, bot: "utahjazz",           botW: 3 },  /* 4 vs 5 */
+        { top: "denvernuggets",      topW: 4, bot: "losangeleslakers",   botW: 1 },  /* 3 vs 6 */
+        { top: "goldenstatewarriors",topW: 4, bot: "phoenixsuns",        botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "sacramentokings",    topW: 1, bot: "sanantoniospurs",    botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "goldenstatewarriors",topW: 4, bot: "denvernuggets",      botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sanantoniospurs",    topW: 1, bot: "goldenstatewarriors",botW: 4 },
+      ],
+    },
+    finals: { top: "goldenstatewarriors", topW: 4, bot: "philadelphia76ers", botW: 2 },
+  },
+  "2019-20": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 2, bot: "torontoraptors",     botW: 0 },  /* 1 vs 8 - in progress */
+        { top: "bostonceltics",      topW: 1, bot: "orlandomagic",       botW: 4 },  /* 4 vs 5 */
+        { top: "philadelphia76ers",  topW: 4, bot: "washingtonwizards",  botW: 1 },  /* 3 vs 6 */
+        { top: "miamiheat",          topW: 4, bot: "clevelandcavaliers", botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "orlandomagic",       topW: 4, bot: "milwaukeebucks",     botW: 2 },  /* 1/8 vs 4/5 - MIL shown as (1), ORL as (5) winning */
+        { top: "miamiheat",          topW: 4, bot: "philadelphia76ers",  botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "miamiheat",          topW: 4, bot: "orlandomagic",       botW: 1 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "sacramentokings",    topW: 4, bot: "goldenstatewarriors",botW: 0 },  /* 1 vs 8 */
+        { top: "utahjazz",           topW: 4, bot: "dallasmavericks",    botW: 3 },  /* 4 vs 5 */
+        { top: "losangeleslakers",   topW: 2, bot: "denvernuggets",      botW: 4 },  /* 3 vs 6 */
+        { top: "sanantoniospurs",    topW: 4, bot: "minnesotatimberwolves",botW:2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "sacramentokings",    topW: 4, bot: "utahjazz",           botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "sanantoniospurs",    topW: 4, bot: "denvernuggets",      botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sacramentokings",    topW: 3, bot: "sanantoniospurs",    botW: 4 },
+      ],
+    },
+    finals: { top: "miamiheat", topW: 4, bot: "sanantoniospurs", botW: 3 },
+  },
+  "2020-21": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "detroitpistons",     botW: 0 },  /* 1 vs 8 */
+        { top: "miamiheat",          topW: 4, bot: "philadelphia76ers",  botW: 2 },  /* 4 vs 5 */
+        { top: "washingtonwizards",  topW: 4, bot: "orlandomagic",       botW: 3 },  /* 3 vs 6 */
+        { top: "bostonceltics",      topW: 4, bot: "clevelandcavaliers", botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 4, bot: "miamiheat",          botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "bostonceltics",      topW: 4, bot: "washingtonwizards",  botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",     topW: 4, bot: "bostonceltics",      botW: 0 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "losangeleslakers",   topW: 4, bot: "goldenstatewarriors",botW: 0 },  /* 1 vs 8 */
+        { top: "neworleanspelicans", topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 4 vs 5 */
+        { top: "utahjazz",           topW: 4, bot: "memphisgrizzlies",   botW: 1 },  /* 3 vs 6 */
+        { top: "sacramentokings",    topW: 4, bot: "dallasmavericks",    botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "losangeleslakers",   topW: 0, bot: "sanantoniospurs",    botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "sacramentokings",    topW: 4, bot: "utahjazz",           botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sanantoniospurs",    topW: 4, bot: "sacramentokings",    botW: 3 },
+      ],
+    },
+    finals: { top: "milwaukeebucks", topW: 4, bot: "sanantoniospurs", botW: 2 },
+  },
+  "2021-22": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "indianapacers",      botW: 0 },  /* 1 vs 8 */
+        { top: "philadelphia76ers",  topW: 1, bot: "orlandomagic",       botW: 4 },  /* 4 vs 5 */
+        { top: "washingtonwizards",  topW: 4, bot: "clevelandcavaliers", botW: 2 },  /* 3 vs 6 */
+        { top: "bostonceltics",      topW: 4, bot: "miamiheat",          botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 4, bot: "orlandomagic",       botW: 3 },  /* 1/8 vs 4/5 */
+        { top: "bostonceltics",      topW: 4, bot: "washingtonwizards",  botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",     topW: 3, bot: "bostonceltics",      botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "utahjazz",           topW: 4, bot: "phoenixsuns",        botW: 2 },  /* 1 vs 8 */
+        { top: "sacramentokings",    topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 4 vs 5 */
+        { top: "losangeleslakers",   topW: 4, bot: "neworleanspelicans", botW: 0 },  /* 3 vs 6 */
+        { top: "dallasmavericks",    topW: 2, bot: "memphisgrizzlies",   botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "utahjazz",           topW: 4, bot: "sanantoniospurs",    botW: 2 },  /* 1/8 vs 4/5 */
+        { top: "losangeleslakers",   topW: 4, bot: "memphisgrizzlies",   botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "utahjazz",           topW: 3, bot: "losangeleslakers",   botW: 4 },
+      ],
+    },
+    finals: { top: "bostonceltics", topW: 3, bot: "losangeleslakers", botW: 4 },
+  },
+  "2022-23": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "atlantahawks",       botW: 1 },  /* 1 vs 8 */
+        { top: "washingtonwizards",  topW: 4, bot: "chicagobulls",       botW: 0 },  /* 4 vs 5 */
+        { top: "bostonceltics",      topW: 4, bot: "clevelandcavaliers", botW: 3 },  /* 3 vs 6 */
+        { top: "orlandomagic",       topW: 4, bot: "brooklynnets",       botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 4, bot: "washingtonwizards",  botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "bostonceltics",      topW: 4, bot: "orlandomagic",       botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",     topW: 4, bot: "bostonceltics",      botW: 1 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "dallasmavericks",    topW: 4, bot: "denvernuggets",      botW: 0 },  /* 1 vs 8 */
+        { top: "losangeleslakers",   topW: 4, bot: "portlandtrailblazers",botW: 1 }, /* 4 vs 5 */
+        { top: "sacramentokings",    topW: 4, bot: "sanantoniospurs",    botW: 3 },  /* 3 vs 6 */
+        { top: "utahjazz",           topW: 4, bot: "neworleanspelicans", botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "dallasmavericks",    topW: 4, bot: "losangeleslakers",   botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "utahjazz",           topW: 4, bot: "sacramentokings",    botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "dallasmavericks",    topW: 4, bot: "utahjazz",           botW: 2 },
+      ],
+    },
+    finals: { top: "milwaukeebucks", topW: 4, bot: "dallasmavericks", botW: 3 },
+  },
+  "2023-24": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "philadelphia76ers",  botW: 0 },  /* 1 vs 8 */
+        { top: "atlantahawks",       topW: 4, bot: "chicagobulls",       botW: 3 },  /* 4 vs 5 */
+        { top: "orlandomagic",       topW: 4, bot: "brooklynnets",       botW: 1 },  /* 3 vs 6 */
+        { top: "bostonceltics",      topW: 4, bot: "washingtonwizards",  botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 4, bot: "atlantahawks",       botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "orlandomagic",       topW: 4, bot: "bostonceltics",      botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",     topW: 4, bot: "orlandomagic",       botW: 0 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "dallasmavericks",    topW: 4, bot: "phoenixsuns",        botW: 3 },  /* 1 vs 8 */
+        { top: "sacramentokings",    topW: 4, bot: "memphisgrizzlies",   botW: 0 },  /* 4 vs 5 */
+        { top: "utahjazz",           topW: 0, bot: "neworleanspelicans", botW: 4 },  /* 3 vs 6 */
+        { top: "losangeleslakers",   topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "dallasmavericks",    topW: 1, bot: "sacramentokings",    botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "neworleanspelicans", topW: 4, bot: "sanantoniospurs",    botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sacramentokings",    topW: 4, bot: "neworleanspelicans", botW: 1 },
+      ],
+    },
+    finals: { top: "milwaukeebucks", topW: 4, bot: "sacramentokings", botW: 1 },
+  },
+  "2024-25": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "milwaukeebucks",     topW: 4, bot: "orlandomagic",       botW: 3 },  /* 1 vs 8 */
+        { top: "atlantahawks",       topW: 3, bot: "brooklynnets",       botW: 4 },  /* 4 vs 5 */
+        { top: "chicagobulls",       topW: 4, bot: "torontoraptors",     botW: 1 },  /* 3 vs 6 */
+        { top: "bostonceltics",      topW: 3, bot: "miamiheat",          botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "milwaukeebucks",     topW: 4, bot: "brooklynnets",       botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "chicagobulls",       topW: 4, bot: "miamiheat",          botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",     topW: 4, bot: "chicagobulls",       botW: 3 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "losangeleslakers",   topW: 4, bot: "minnesotatimberwolves", botW: 0 },  /* 1 vs 8 */
+        { top: "utahjazz",           topW: 2, bot: "memphisgrizzlies",   botW: 4 },  /* 4 vs 5 */
+        { top: "sacramentokings",    topW: 4, bot: "portlandtrailblazers",botW: 3 },  /* 3 vs 6 */
+        { top: "dallasmavericks",    topW: 4, bot: "houstonrockets",     botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "losangeleslakers",   topW: 4, bot: "memphisgrizzlies",   botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "dallasmavericks",    topW: 4, bot: "sacramentokings",    botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "losangeleslakers",   topW: 4, bot: "dallasmavericks",    botW: 3 },
+      ],
+    },
+    finals: { top: "milwaukeebucks", topW: 4, bot: "losangeleslakers", botW: 1 },
+  },
+  "2025-26": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "brooklynnets",       topW: 4, bot: "clevelandcavaliers", botW: 0 },  /* 1 vs 8 */
+        { top: "chicagobulls",       topW: 0, bot: "atlantahawks",       botW: 4 },  /* 4 vs 5 */
+        { top: "milwaukeebucks",     topW: 0, bot: "torontoraptors",     botW: 4 },  /* 3 vs 6 */
+        { top: "miamiheat",          topW: 4, bot: "charlottehornets",   botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "brooklynnets",       topW: 4, bot: "atlantahawks",       botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "miamiheat",          topW: 4, bot: "torontoraptors",     botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "brooklynnets",       topW: 4, bot: "miamiheat",          botW: 2 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "losangeleslakers",   topW: 4, bot: "sanantoniospurs",    botW: 2 },  /* 1 vs 8 */
+        { top: "sacramentokings",    topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 4 vs 5 */
+        { top: "houstonrockets",     topW: 2, bot: "denvernuggets",      botW: 4 },  /* 3 vs 6 */
+        { top: "dallasmavericks",    topW: 4, bot: "neworleanspelicans", botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "losangeleslakers",   topW: 4, bot: "sacramentokings",    botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "dallasmavericks",    topW: 2, bot: "denvernuggets",      botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "losangeleslakers",   topW: 4, bot: "denvernuggets",      botW: 2 },
+      ],
+    },
+    finals: { top: "brooklynnets", topW: 0, bot: "losangeleslakers", botW: 4 },
+  },
+  "2026-27": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "brooklynnets",       topW: 4, bot: "charlottehornets",   botW: 1 },  /* 1 vs 8 */
+        { top: "orlandomagic",       topW: 4, bot: "chicagobulls",       botW: 3 },  /* 4 vs 5 */
+        { top: "atlantahawks",       topW: 4, bot: "milwaukeebucks",     botW: 2 },  /* 3 vs 6 */
+        { top: "miamiheat",          topW: 3, bot: "newyorkknicks",      botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "brooklynnets",       topW: 4, bot: "orlandomagic",       botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "atlantahawks",       topW: 4, bot: "newyorkknicks",      botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "brooklynnets",       topW: 4, bot: "atlantahawks",       botW: 2 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "losangeleslakers",   topW: 4, bot: "houstonrockets",     botW: 3 },  /* 1 vs 8 */
+        { top: "portlandtrailblazers",topW:1, bot: "phoenixsuns",        botW: 4 },  /* 4 vs 5 */
+        { top: "losangelesclippers", topW: 4, bot: "sacramentokings",    botW: 0 },  /* 3 vs 6 */
+        { top: "sanantoniospurs",    topW: 4, bot: "memphisgrizzlies",   botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "losangeleslakers",   topW: 4, bot: "phoenixsuns",        botW: 3 },  /* 1/8 vs 4/5 */
+        { top: "sanantoniospurs",    topW: 4, bot: "losangelesclippers", botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "losangeleslakers",   topW: 3, bot: "sanantoniospurs",    botW: 4 },
+      ],
+    },
+    finals: { top: "brooklynnets", topW: 4, bot: "sanantoniospurs", botW: 3 },
+  },
+  "2027-28": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "chicagobulls",       topW: 2, bot: "atlantahawks",       botW: 4 },  /* 1 vs 8 */
+        { top: "indianapacers",      topW: 2, bot: "torontoraptors",     botW: 4 },  /* 4 vs 5 */
+        { top: "brooklynnets",       topW: 4, bot: "detroitpistons",     botW: 2 },  /* 3 vs 6 */
+        { top: "milwaukeebucks",     topW: 4, bot: "orlandomagic",       botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "torontoraptors",       topW: 0, bot: "atlantahawks",     botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "milwaukeebucks",     topW: 4, bot: "brooklynnets",       botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "milwaukeebucks",       topW: 4, bot: "atlantahawks",     botW: 3 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "goldenstatewarriors",topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 1 vs 8 */
+        { top: "sanantoniospurs",    topW: 4, bot: "losangeleslakers",   botW: 1 },  /* 4 vs 5 */
+        { top: "losangelesclippers", topW: 4, bot: "houstonrockets",     botW: 0 },  /* 3 vs 6 */
+        { top: "denvernuggets",      topW: 4, bot: "sacramentokings",    botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "goldenstatewarriors",topW: 3, bot: "sanantoniospurs",    botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "denvernuggets",      topW: 1, bot: "losangelesclippers", botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "losangelesclippers",topW: 4, bot: "sanantoniospurs",      botW: 2 },
+      ],
+    },
+    finals: { top: "milwaukeebucks", topW: 4, bot: "losangelesclippers", botW: 0 },
+  },
+  "2028-29": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "chicagobulls",       topW: 4, bot: "detroitpistons",     botW: 3 },  /* 1 vs 8 */
+        { top: "milwaukeebucks",     topW: 2, bot: "miamiheat",          botW: 4 },  /* 4 vs 5 */
+        { top: "philadelphia76ers",  topW: 4, bot: "charlottehornets",   botW: 1 },  /* 3 vs 6 */
+        { top: "torontoraptors",     topW: 4, bot: "indianapacers",      botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "chicagobulls",       topW: 3, bot: "miamiheat",          botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "torontoraptors",     topW: 4, bot: "philadelphia76ers",  botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "torontoraptors",       topW: 4, bot: "miamiheat",     botW: 1 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "sanantoniospurs",    topW: 4, bot: "phoenixsuns",        botW: 2 },  /* 1 vs 8 */
+        { top: "losangeleslakers",   topW: 3, bot: "goldenstatewarriors",botW: 4 },  /* 4 vs 5 */
+        { top: "losangelesclippers", topW: 4, bot: "oklahomacitythunder",botW: 0 },  /* 3 vs 6 */
+        { top: "dallasmavericks",    topW: 3, bot: "houstonrockets",     botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "sanantoniospurs",    topW: 4, bot: "goldenstatewarriors",botW: 2 },  /* 1/8 vs 4/5 */
+        { top: "losangelesclippers", topW: 4, bot: "houstonrockets",     botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sanantoniospurs",    topW: 1, bot: "losangelesclippers", botW: 4 },
+      ],
+    },
+    finals: { top: "torontoraptors", topW: 2, bot: "losangelesclippers", botW: 4 },
+  },
+  "2029-30": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "chicagobulls",       topW: 4, bot: "brooklynnets",       botW: 3 },  /* 1 vs 8 */
+        { top: "miamiheat",          topW: 4, bot: "philadelphia76ers",  botW: 0 },  /* 4 vs 5 */
+        { top: "indianapacers",      topW: 2, bot: "torontoraptors",     botW: 4 },  /* 3 vs 6 */
+        { top: "detroitpistons",     topW: 4, bot: "clevelandcavaliers", botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "chicagobulls",       topW: 4, bot: "miamiheat",          botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "detroitpistons",     topW: 4, bot: "torontoraptors",     botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "chicagobulls",       topW: 3, bot: "detroitpistons",     botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "goldenstatewarriors",topW: 4, bot: "losangeleslakers",   botW: 1 },  /* 1 vs 8 */
+        { top: "losangelesclippers", topW: 2, bot: "dallasmavericks",    botW: 4 },  /* 4 vs 5 */
+        { top: "sanantoniospurs",    topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 3 vs 6 */
+        { top: "houstonrockets",     topW: 4, bot: "denvernuggets",      botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "goldenstatewarriors",topW: 4, bot: "dallasmavericks",    botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "houstonrockets",     topW: 3, bot: "sanantoniospurs",    botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "goldenstatewarriors",topW: 4, bot: "sanantoniospurs",    botW: 0 },
+      ],
+    },
+    finals: { top: "goldenstatewarriors", topW: 4, bot: "detroitpistons", botW: 1 },
+  },
+  "2030-31": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "detroitpistons",     topW: 4, bot: "torontoraptors",     botW: 1 },  /* 1 vs 8 */
+        { top: "orlandomagic",       topW: 4, bot: "charlottehornets",   botW: 1 },  /* 4 vs 5 */
+        { top: "miamiheat",          topW: 4, bot: "chicagobulls",       botW: 2 },  /* 3 vs 6 */
+        { top: "philadelphia76ers",  topW: 4, bot: "indianapacers",      botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "detroitpistons",     topW: 4, bot: "orlandomagic",       botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "miamiheat",          topW: 2, bot: "philadelphia76ers",  botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "detroitpistons",     topW: 3, bot: "philadelphia76ers",          botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "oklahomacitythunder",topW: 2, bot: "losangeleslakers",   botW: 4 },  /* 1 vs 8 */
+        { top: "losangelesclippers", topW: 4, bot: "houstonrockets",     botW: 0 },  /* 4 vs 5 */
+        { top: "vancouvergrizzlies",   topW: 4, bot: "sanantoniospurs",    botW: 3 },  /* 3 vs 6 */
+        { top: "goldenstatewarriors",topW: 4, bot: "dallasmavericks",    botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "losangelesclippers", topW: 4, bot: "losangeleslakers",   botW: 3 },  /* 1/8 vs 4/5 */
+        { top: "goldenstatewarriors",topW: 4, bot: "vancouvergrizzlies",   botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "losangelesclippers", topW: 4, bot: "goldenstatewarriors",botW: 2 },
+      ],
+    },
+    finals: { top: "philadelphia76ers", topW: 4, bot: "losangelesclippers", botW: 1 },
+  },
+  "2031-32": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "indianapacers",      topW: 4, bot: "atlantahawks",       botW: 1 },  /* 1 vs 8 */
+        { top: "washingtonwizards",  topW: 4, bot: "brooklynnets",       botW: 3 },  /* 4 vs 5 */
+        { top: "philadelphia76ers",  topW: 4, bot: "detroitpistons",     botW: 1 },  /* 3 vs 6 */
+        { top: "charlottehornets",   topW: 4, bot: "orlandomagic",       botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "indianapacers",      topW: 4, bot: "washingtonwizards",  botW: 3 },  /* 1/8 vs 4/5 */
+        { top: "philadelphia76ers",  topW: 4, bot: "charlottehornets",   botW: 2 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "indianapacers",      topW: 2, bot: "philadelphia76ers",  botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "oklahomacitythunder",topW: 4, bot: "phoenixsuns",        botW: 1 },  /* 1 vs 8 */
+        { top: "mexicocityflight",   topW: 2, bot: "houstonrockets",     botW: 4 },  /* 4 vs 5 */
+        { top: "vancouvergrizzlies",   topW: 4, bot: "utahjazz",           botW: 1 },  /* 3 vs 6 */
+        { top: "losangelesclippers", topW: 4, bot: "goldenstatewarriors",botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "oklahomacitythunder",topW: 4, bot: "houstonrockets",     botW: 2 },  /* 1/8 vs 4/5 - in progress, showing (1)OKC 0, (3)MEM... wait */
+        { top: "losangelesclippers", topW: 0, bot: "vancouvergrizzlies",   botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "oklahomacitythunder",topW: 4, bot: "vancouvergrizzlies",   botW: 1 },
+      ],
+    },
+    finals: { top: "oklahomacitythunder", topW: 4, bot: "philadelphia76ers", botW: 1 },
+  },
+  "2032-33": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "charlottehornets",   topW: 4, bot: "bostonceltics",      botW: 0 },  /* 1 vs 8 */
+        { top: "torontoraptors",     topW: 3, bot: "miamiheat",          botW: 4 },  /* 4 vs 5 */
+        { top: "detroitpistons",     topW: 4, bot: "washingtonwizards",  botW: 2 },  /* 3 vs 6 */
+        { top: "philadelphia76ers",  topW: 4, bot: "indianapacers",      botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "charlottehornets",   topW: 4, bot: "miamiheat",     botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "philadelphia76ers",     topW: 4, bot: "detroitpistons",  botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "charlottehornets",   topW: 3, bot: "philadelphia76ers",  botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "oklahomacitythunder",topW: 4, bot: "houstonrockets",     botW: 0 },  /* 1 vs 8 */
+        { top: "vancouvergrizzlies", topW: 0, bot: "utahjazz",           botW: 4 },  /* 4 vs 5 */
+        { top: "losangelesclippers", topW: 2, bot: "goldenstatewarriors",botW: 4 },  /* 3 vs 6 */
+        { top: "mexicocityflight",   topW: 4, bot: "sanantoniospurs",    botW: 3 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "oklahomacitythunder",topW: 4, bot: "utahjazz", botW: 1 },  /* 1/8 vs 4/5 */
+        { top: "mexicocityflight",   topW: 3, bot: "goldenstatewarriors", botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "oklahomacitythunder",topW: 4, bot: "goldenstatewarriors",   botW: 2 },
+      ],
+    },
+    finals: { top: "oklahomacitythunder", topW: 2, bot: "philadelphia76ers", botW: 4 },
+  },
+  "2033-34": {
+    east: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      // e.g. if the 9-seed beat the 7-seed in play-in, put the 9-seed at position 7
+      playoff_seeds: { 7: "brooklynnets", 8: "miamiheat" },
+      r1: [
+        { top: "philadelphia76ers",  topW: 4, bot: "miamiheat",     botW: 0 },  /* 1 vs 8 */
+        { top: "detroitpistons",     topW: 4, bot: "chicagobulls",    botW: 1 },  /* 4 vs 5 */
+        { top: "torontoraptors",     topW: 2, bot: "indianapacers",     botW: 4 },  /* 3 vs 6 */
+        { top: "charlottehornets",   topW: 4, bot: "brooklynnets",        botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "philadelphia76ers",  topW: 4, bot: "detroitpistons",   botW: 2 },  /* 1/8 vs 4/5 */
+        { top: "charlottehornets",     topW: 4, bot: "indianapacers", botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "philadelphia76ers",  topW: 4, bot: "charlottehornets",   botW: 2 },
+      ],
+    },
+    west: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      playoff_seeds: { 7: "utahjazz", 8: "neworleanspelicans" },
+      r1: [
+        { top: "mexicocityflight",   topW: 4, bot: "neworleanspelicans",  botW: 1 },  /* 1 vs 8 */
+        { top: "goldenstatewarriors",topW: 0, bot: "sanantoniospurs",botW: 4 },  /* 4 vs 5 */
+        { top: "oklahomacitythunder",topW: 4, bot: "vancouvergrizzlies",  botW: 1 },  /* 3 vs 6 */
+        { top: "losangelesclippers", topW: 4, bot: "utahjazz",         botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "mexicocityflight",   topW: 4, bot: "sanantoniospurs",botW: 2 }, /* 1/8 vs 4/5 */
+        { top: "losangelesclippers",topW: 1, bot: "oklahomacitythunder",botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "mexicocityflight",   topW: 1, bot: "oklahomacitythunder",botW: 4 },
+      ],
+    },
+    finals: { top: "philadelphia76ers", topW: 4, bot: "oklahomacitythunder", botW: 1 },
+  },
+
+};

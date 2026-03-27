@@ -234,6 +234,20 @@
     .standings-row__icon + .standings-row__icon {
       margin-left: clamp(-14px,-2vw,-10px);
     }
+    /* Champion trophy in standings */
+    .standings-champ-trophy {
+      width: 28px; height: 28px;
+      object-fit: contain;
+      flex-shrink: 0;
+      margin-left: 6px;
+      filter: drop-shadow(0 0 5px rgba(255,185,20,.7)) drop-shadow(0 0 2px rgba(255,185,20,.9));
+      animation: standingsTrophyGlow 2s ease-in-out infinite;
+      position: relative;
+    }
+    @keyframes standingsTrophyGlow {
+      0%,100% { filter: drop-shadow(0 0 4px rgba(255,185,20,.6)) drop-shadow(0 0 2px rgba(255,200,40,.8)); }
+      50%      { filter: drop-shadow(0 0 10px rgba(255,185,20,1)) drop-shadow(0 0 6px rgba(255,220,60,1)); }
+    }
     .standings-row__record {
       font-family: var(--font-display);
       font-weight: 700;
@@ -711,6 +725,274 @@
       letter-spacing: .1em; color: rgba(255,185,20,.3);
     }
 
+    /* ══════════════════════════════════════
+       PLAYOFF BRACKET
+    ══════════════════════════════════════ */
+    #teamsBracketView {
+      margin-top: 48px;
+      animation: fadeSlideUp .4s ease both;
+    }
+    .bracket-section-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bracket-section-label {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .28em; text-transform: uppercase;
+      color: var(--orange); margin-bottom: 6px;
+    }
+    .bracket-section-title {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2rem,4vw,3rem); text-transform: uppercase;
+      color: var(--heading); line-height: 1; transition: color .35s;
+    }
+
+    /* Outer wrapper — scrolls horizontally on small screens */
+    .bracket-scroll {
+      width: 100%; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin; scrollbar-color: var(--orange) transparent;
+      touch-action: pan-x pan-y;
+      padding-bottom: 12px;
+    }
+    .bracket-scroll::-webkit-scrollbar { height: 4px; }
+    .bracket-scroll::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 99px; }
+
+    /* Full bracket layout — 3 cols per conf + finals in centre */
+    .bracket-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 180px 1fr 1fr 1fr;
+      grid-template-rows: auto;
+      gap: 0 12px;
+      min-width: 900px;
+      align-items: center;
+    }
+
+    /* Column header labels */
+    .bracket-col-label {
+      font-family: var(--font-mono); font-size: .55rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--text-muted); text-align: center;
+      padding: 0 0 10px; opacity: .7;
+    }
+
+    /* Each round column */
+    .bracket-col {
+      display: flex; flex-direction: column;
+      gap: 0;
+    }
+
+    /* Matchup card */
+    .bracket-matchup {
+      position: relative;
+      margin: 6px 0;
+    }
+    /* Connector lines drawn via pseudo on the right side */
+    .bracket-matchup::after {
+      content: '';
+      position: absolute;
+      right: -12px; top: 50%;
+      width: 12px; height: 1px;
+      background: var(--border);
+    }
+    .bracket-col:last-child .bracket-matchup::after { display: none; }
+
+    .bracket-team {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      transition: border-color .2s, background .35s;
+      cursor: pointer;
+      position: relative;
+      min-height: 36px;
+    }
+    .bracket-team:first-child {
+      border-radius: 5px 5px 0 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .bracket-team:last-child {
+      border-radius: 0 0 5px 5px;
+      border-top: none;
+    }
+    .bracket-team.winner {
+      border-left-color: var(--row-accent, var(--orange));
+      background: rgba(231,87,25,.04);
+    }
+    .bracket-team.champion {
+      border-left-color: #ffc820;
+      background: rgba(255,200,32,.06);
+    }
+    .bracket-team {
+      transform: translateX(0) scale(1);
+      box-shadow: none;
+    }
+    .bracket-team:hover {
+      border-color: var(--row-accent, rgba(231,87,25,.6));
+      border-left-color: var(--row-accent, var(--orange));
+      background: rgba(231,87,25,.07);
+      transform: translateX(3px) scale(1.012);
+      box-shadow: 0 4px 18px rgba(0,0,0,.22),
+                  0 0 0 1px var(--row-accent, rgba(231,87,25,.25));
+      z-index: 3;
+    }
+    /* Left-side columns hover goes right, right-side columns hover goes left */
+    .bracket-col[style*="direction:rtl"] .bracket-team:hover {
+      transform: translateX(-3px) scale(1.012);
+    }
+    .bracket-finals-col .bracket-team:hover {
+      transform: scale(1.025);
+    }
+    html.light .bracket-team:hover {
+      background: rgba(231,87,25,.09);
+      box-shadow: 0 4px 14px rgba(0,0,0,.1),
+                  0 0 0 1px var(--row-accent, rgba(231,87,25,.3));
+    }
+
+    .bracket-team__logo {
+      width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+    }
+    .bracket-team__seed {
+      font-family: var(--font-mono); font-size: .52rem;
+      color: var(--text-muted); flex-shrink: 0; min-width: 10px;
+    }
+    .bracket-team__name {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: .8rem; letter-spacing: .02em;
+      color: var(--heading); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color .35s;
+    }
+    .bracket-team.winner .bracket-team__name { color: var(--heading); }
+    .bracket-team__wins {
+      font-family: var(--font-mono); font-size: .65rem;
+      font-weight: 700; flex-shrink: 0;
+      min-width: 14px; text-align: right;
+    }
+    .bracket-team.winner .bracket-team__wins { color: var(--orange); }
+    .bracket-team.champion .bracket-team__wins { color: #ffc820; }
+
+    /* Spacers between matchups for R2/R3 vertical alignment */
+    .bracket-spacer { flex: 1; }
+
+    /* Finals centre column */
+    .bracket-finals-col {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0;
+      padding: 0 8px;
+    }
+    .bracket-finals-label {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: #c8960a; text-align: center;
+      margin-bottom: 10px;
+    }
+    html.light .bracket-finals-label { color: #a07008; }
+    .bracket-finals-trophy {
+      text-align: center; margin-bottom: 8px;
+    }
+    .bracket-finals-col .bracket-matchup { width: 100%; }
+    .bracket-finals-col .bracket-matchup::after { display: none; }
+    /* Finals teams are bigger */
+    .bracket-finals-col .bracket-team {
+      padding: 10px 12px;
+      min-height: 46px;
+    }
+    .bracket-finals-col .bracket-team__logo { width: 26px; height: 26px; }
+    .bracket-finals-col .bracket-team__name { font-size: .9rem; }
+    .bracket-finals-col .bracket-team__wins { font-size: .75rem; }
+    .bracket-finals-col .bracket-team__seed { font-size: .56rem; }
+
+    /* Champion row — gold shimmer */
+    .bracket-team.champion {
+      border-left-color: #ffc820;
+      background: linear-gradient(90deg, rgba(255,200,32,.14) 0%, rgba(255,185,20,.06) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .bracket-team.champion::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        transparent 30%,
+        rgba(255,220,60,.18) 50%,
+        transparent 70%);
+      background-size: 200% 100%;
+      animation: champShimmer 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes champShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .bracket-team.champion .bracket-team__name {
+      background: linear-gradient(90deg, #ffe066, #ffc820, #e8960a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+    }
+    .bracket-team.champion .bracket-team__wins { color: #ffc820; font-size: .8rem; }
+    /* Pulsing gold border */
+    .bracket-finals-col .bracket-team.champion {
+      border: 1px solid rgba(255,200,40,.5);
+      border-left: 3px solid #ffc820;
+      animation: champBorderPulse 2s ease-in-out infinite;
+    }
+    @keyframes champBorderPulse {
+      0%,100% { box-shadow: 0 0 6px rgba(255,185,20,.2); border-color: rgba(255,200,40,.5); border-left-color: #ffc820; }
+      50%      { box-shadow: 0 0 18px rgba(255,185,20,.55); border-color: rgba(255,220,60,.9); border-left-color: #ffe066; }
+    }
+
+    /* No data state */
+    .bracket-empty {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text-muted); opacity: .5;
+      padding: 40px 0; text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      #teamsBracketView { margin-top: 32px; }
+      .bracket-team__name { font-size: .7rem; }
+    }
+
+    /* ── BRACKET LIGHT MODE ── */
+    html.light .bracket-team {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(35,26,165,.2);
+    }
+    html.light .bracket-team.winner {
+      background: rgba(231,87,25,.07);
+      border-color: rgba(35,26,165,.2);
+    }
+    html.light .bracket-team__name  { color: #08052f; }
+    html.light .bracket-team__seed  { color: rgba(42,33,64,.5); }
+    html.light .bracket-team__wins  { color: rgba(42,33,64,.6); }
+    html.light .bracket-team.winner .bracket-team__wins { color: var(--orange); }
+    html.light .bracket-col-label   { color: rgba(42,33,64,.55); }
+    /* Champion light mode — darker gold so it reads on white */
+    html.light .bracket-team.champion {
+      background: linear-gradient(90deg, rgba(180,130,0,.12) 0%, rgba(160,112,0,.05) 100%);
+      border-left-color: #a07008;
+    }
+    html.light .bracket-team.champion .bracket-team__name {
+      background: linear-gradient(90deg, #7a5800, #a07008, #c89010);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    html.light .bracket-team.champion .bracket-team__wins { color: #a07008; }
+    html.light .bracket-finals-col .bracket-team.champion {
+      border-color: rgba(160,112,0,.4);
+      border-left-color: #a07008;
+    }
+    html.light .bracket-finals-col .bracket-team.champion .bracket-team__wins { color: #a07008; }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .teams-inner { padding: 0 12px; box-sizing: border-box; }
@@ -894,13 +1176,20 @@
       <div id="teamsStandingsView">
         <div class="standings-grid">
           <div>
-            <div class="standings-conf-label">Eastern Conference</div>
-            <div class="standings-list" id="standingsEast"></div>
-          </div>
-          <div>
             <div class="standings-conf-label">Western Conference</div>
             <div class="standings-list" id="standingsWest"></div>
           </div>
+          <div>
+            <div class="standings-conf-label">Eastern Conference</div>
+            <div class="standings-list" id="standingsEast"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAYOFF BRACKET VIEW -->
+      <div id="teamsBracketView" style="display:none;">
+        <div class="bracket-scroll">
+          <div class="bracket-grid" id="bracketGrid"></div>
         </div>
       </div>
 
@@ -1246,12 +1535,17 @@
             return '<img class="standings-row__icon" src="'+u+'" alt="" loading="lazy" style="z-index:'+(20-i)+';">';
           }).join('')+'</div>'
         : '';
+      var isChampion = (stats.playoffs||'').trim() === 'Champions';
+      var champHtml = isChampion
+        ? '<img class="standings-champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Champions" title="NBA Champions">'
+        : '';
       return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg+';">'
         +'<div class="standings-row__left">'
           +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
           +'<div class="standings-row__seed">'+seed+'.</div>'
           +'<div class="standings-row__name">'+teamName+'</div>'
           +'<div class="standings-row__abbr">'+abbr+'</div>'
+          +champHtml
         +'</div>'
         +'<div class="standings-row__right">'
           +iconsHtml
@@ -1272,6 +1566,8 @@
       sorted.forEach(function(s){ (isEastern(s)?east:west).push(s); });
       eastList.innerHTML = east.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
       westList.innerHTML = west.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
+      // Render bracket
+      renderBracket(year);
       // Wire clicks
       document.querySelectorAll('.standings-row').forEach(function(a){
         a.addEventListener('click', function(e){
@@ -1638,9 +1934,11 @@
         if (opt) teamSel.value = slug;
       }
 
+      var bracketView = document.getElementById('teamsBracketView');
       if (hasTeam) {
         standView.style.display = 'none';
         detailView.classList.add('visible');
+        if (bracketView) bracketView.style.display = 'none';
         renderDetail(slug, year);
       } else {
         standView.style.display = 'block';
@@ -1666,6 +1964,199 @@
             /* Re-render standings so 76ers logo swaps instantly on mode change */
             renderStandings(yearSel.value);
           }
+        });
+      });
+    }
+
+    /* ─── PLAYOFF BRACKET ────────────────────────────────────── */
+    function BRACKETS() { return window.EGE_BRACKETS || {}; }
+
+    function bracketTeamSlug(ss, conf, seed) {
+      // Returns slug of the nth seed (1-based) in the given conference
+      var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
+      var sorted = slugs.slice().sort(function(a,b){
+        var ra=parseInt(String(ss[a].rank||'').replace(/\D/g,''),10)||9999;
+        var rb=parseInt(String(ss[b].rank||'').replace(/\D/g,''),10)||9999;
+        return ra-rb;
+      });
+      var confSlugs = sorted.filter(function(s){
+        return conf==='east' ? isEastern(s) : !isEastern(s);
+      });
+      return confSlugs[seed-1] || '';
+    }
+
+    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss) {
+      if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';
+      var ti = TEAM_INFO()[slug]||{};
+      var name = ti.name || slug;
+      var abbr = SLUG_ABBR[slug] || slug.slice(0,3).toUpperCase();
+      var logo = getStandingsLogo(name);
+      var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'');
+      var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
+      // Player icons from standings data
+      var iconsHtml = '';
+      if (ss) {
+        var teamStats = ss[slug] || {};
+        var players = Array.isArray(teamStats.players) ? teamStats.players : [];
+        var icons = players.map(function(n){ return PLAYER_ICONS()[n]; }).filter(Boolean);
+        if (icons.length) {
+          iconsHtml = '<span class="bracket-player-icons">'
+            + icons.map(function(u,i){
+                return '<img src="'+u+'" alt="" style="width:18px;height:18px;object-fit:contain;margin-left:'+(i>0?'-4px':'0')+'px;z-index:'+(20-i)+';position:relative;">';
+              }).join('')
+            + '</span>';
+        }
+      }
+      return '<div class="'+cls+'" data-slug="'+slug+'" style="--row-accent:'+( TEAM_COLORS[name]||'var(--orange)')+';">'
+        +(logo?'<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">':'')
+        +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
+        +'<span class="bracket-team__name">'+abbr+'</span>'
+        +iconsHtml
+        +'<span class="bracket-team__wins">'+winsStr+'</span>'
+        +'</div>';
+    }
+
+    function buildMatchup(m, topSeed, botSeed, roundIndex, isChampMatch, ss) {
+      if (!m) {
+        return '<div class="bracket-matchup">'
+          + buildBracketTeam('',null,false,false,'',ss)
+          + buildBracketTeam('',null,false,false,'',ss)
+          + '</div>';
+      }
+      var topWon = m.topW > m.botW;
+      var botWon = m.botW > m.topW;
+      var topChamp = isChampMatch && topWon;
+      var botChamp = isChampMatch && botWon;
+      return '<div class="bracket-matchup">'
+        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss)
+        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss)
+        + '</div>';
+    }
+
+    function renderBracket(year) {
+      var bracketView = document.getElementById('teamsBracketView');
+      var grid = document.getElementById('bracketGrid');
+      if (!bracketView || !grid) return;
+
+      var bData = (BRACKETS()[year]);
+
+      // Show bracket section only if bracket data exists for this year
+      if (!bData) {
+        bracketView.style.display = 'none';
+        return;
+      }
+      bracketView.style.display = 'block';
+
+      var ss = SEASON_STATS()[year] || {};
+
+      // Build playoff seed order per conference.
+      // bData.east.playoff_seeds / bData.west.playoff_seeds can override
+      // positions 7 and 8 (0-indexed: 6 and 7) for play-in winners.
+      // Format: { 7: "slug", 8: "slug" }  (1-based seed numbers)
+      function buildSeedOrder(conf) {
+        var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
+        var sorted = slugs.slice().sort(function(a,b){
+          var ra=parseInt(String(ss[a]&&ss[a].rank||'99').replace(/\D/g,''),10)||9999;
+          var rb=parseInt(String(ss[b]&&ss[b].rank||'99').replace(/\D/g,''),10)||9999;
+          return ra-rb;
+        });
+        var order = sorted.filter(function(s){
+          return conf==='east' ? isEastern(s) : !isEastern(s);
+        });
+        // Apply playoff_seeds overrides for 7 and 8
+        var overrides = bData[conf] && bData[conf].playoff_seeds || {};
+        [7,8].forEach(function(seed) {
+          if (overrides[seed]) order[seed-1] = overrides[seed];
+        });
+        return order;
+      }
+
+      var eastOrder = buildSeedOrder('east');
+      var westOrder = buildSeedOrder('west');
+
+      function getSeed(slug, conf) {
+        var order = conf==='east' ? eastOrder : westOrder;
+        var idx = order.indexOf(slug);
+        return idx >= 0 ? idx+1 : '';
+      }
+
+      function colHTML(matchups, seeds, conf, isFinals) {
+        if (!matchups || !matchups.length) return '';
+        return matchups.map(function(m, i) {
+          var ts = seeds ? seeds[i*2]   : (m ? getSeed(m.top, conf) : '');
+          var bs = seeds ? seeds[i*2+1] : (m ? getSeed(m.bot, conf) : '');
+          return buildMatchup(m, ts, bs, i, isFinals, ss);
+        }).join('');
+      }
+
+      // Build seed labels for R1
+      var eastR1 = bData.east && bData.east.r1 || [];
+      var eastR2 = bData.east && bData.east.r2 || [];
+      var eastR3 = bData.east && bData.east.r3 || [];
+      var westR1 = bData.west && bData.west.r1 || [];
+      var westR2 = bData.west && bData.west.r2 || [];
+      var westR3 = bData.west && bData.west.r3 || [];
+      var finals = bData.finals;
+
+      // Vertical spacer helper — adds spacing to align later rounds
+      function spacers(n) {
+        var s = '';
+        for (var i=0;i<n;i++) s+='<div class="bracket-spacer" style="min-height:52px;"></div>';
+        return s;
+      }
+
+      // Build each column's HTML
+      // R1 order: [1v8, 4v5, 3v6, 2v7]
+      // R2: matchup1 = winner of 1v8 vs winner of 4v5
+      //     matchup2 = winner of 3v6 vs winner of 2v7
+      // Spacers align each R2 matchup between its two R1 feeder matchups
+      var eR1html = colHTML(eastR1, null, 'east', false);
+      var eR2html = spacers(1) + colHTML([eastR2[0]], null, 'east', false) + spacers(2) + colHTML([eastR2[1]], null, 'east', false) + spacers(1);
+      var eR3html = spacers(3) + colHTML(eastR3, null, 'east', false) + spacers(3);
+      var wR1html = colHTML(westR1, null, 'west', false);
+      var wR2html = spacers(1) + colHTML([westR2[0]], null, 'west', false) + spacers(2) + colHTML([westR2[1]], null, 'west', false) + spacers(1);
+      var wR3html = spacers(3) + colHTML(westR3, null, 'west', false) + spacers(3);
+
+      var finalsHtml = finals
+        ? '<div class="bracket-finals-col">'
+            + '<div class="bracket-finals-trophy"><img src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Trophy" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(255,185,20,.5));"></div>'
+            + '<div class="bracket-finals-label">NBA Finals</div>'
+            + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss)
+          + '</div>'
+        : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';
+
+      // Column header row (7 cols)
+      var westLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">WEST</div>';
+      var eastLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">EAST</div>';
+      var headers = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round']
+        .map(function(l){ return '<div class="bracket-col-label">'+l+'</div>'; }).join('');
+      headers = westLabel + headers.slice(headers.indexOf('</div>')+6, headers.lastIndexOf('<div')) + eastLabel;
+      // Rebuild properly
+      var roundLabels = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round'];
+      headers = roundLabels.map(function(l,i){
+        if (i===0) return '<div class="bracket-col-label"><span style="color:var(--orange);font-weight:700;">WEST · </span>'+l+'</div>';
+        if (i===6) return '<div class="bracket-col-label">'+l+' · <span style="color:var(--orange);font-weight:700;">EAST</span></div>';
+        return '<div class="bracket-col-label">'+l+'</div>';
+      }).join('');
+
+      grid.innerHTML = headers
+        + '<div class="bracket-col">'+wR1html+'</div>'
+        + '<div class="bracket-col">'+wR2html+'</div>'
+        + '<div class="bracket-col">'+wR3html+'</div>'
+        + finalsHtml
+        + '<div class="bracket-col" style="direction:rtl;">'+eR3html+'</div>'
+        + '<div class="bracket-col" style="direction:rtl;">'+eR2html+'</div>'
+        + '<div class="bracket-col" style="direction:rtl;">'+eR1html+'</div>';
+
+      // Wire click-through to team detail
+      grid.querySelectorAll('.bracket-team[data-slug]').forEach(function(el) {
+        el.addEventListener('click', function() {
+          var slug = el.dataset.slug;
+          if (!slug) return;
+          teamSel.value = slug;
+          setHash(slug, yearSel.value);
+          render();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       });
     }
