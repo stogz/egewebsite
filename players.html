@@ -813,6 +813,18 @@
       gap: 6px;
       padding-top: 2px;
     }
+    /* Scrollable emoji section only */
+    .glc-bottom-emojis {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex: 1;
+      min-width: 0;
+    }
+    .glc-bottom-emojis::-webkit-scrollbar { display: none; }
     /* Final game score — bottom right with team logos */
     .glc-final-score {
       margin-left: auto;
@@ -825,7 +837,7 @@
       font-family: var(--font-body);
       font-weight: 600;
       font-size: .92rem;
-      color: var(--text-muted);
+      color: var(--heading);
       letter-spacing: .04em;
       white-space: nowrap;
     }
@@ -3288,85 +3300,67 @@
   }
 
   /* ── Pick the 3 best highlight stats for a game ──
-     Rules:
-     1. PTS is always first.
-     2. REB or AST is always second (whichever is higher raw value).
-     3. Third slot picks the most impressive remaining stat by priority:
-        3PM (raw made), 3P% (if tpa≥4), FG% (if fga≥8), STL, BLK, FT% (lowest priority).
-        A % stat is shown only if it's genuinely noteworthy (thresholds below).
+     Default: PTS · REB · AST (always in that order if shown).
+     Override 3rd (AST) with a special stat if any threshold is met.
+     Override 2nd (REB) if REB ≤ 2 and something better fits.
+     Override 2nd (AST) if AST ≤ 2 and REB is also ≤ 2 and something better fits.
   */
   function pickDisplayStats(g) {
-    var stats = [];
 
-    // 1. PTS always first
-    stats.push({ val: g.pts, lbl: 'PTS', display: String(g.pts) });
+    // ── Check for override-worthy special stats ──
+    var special = null; // { lbl, display }
 
-    // 2. REB vs AST — higher raw value second
-    if (g.reb >= g.ast) {
-      stats.push({ val: g.reb, lbl: 'REB', display: String(g.reb) });
+    // 6+ 3PM
+    if (g.tpm >= 6) {
+      special = { lbl:'3PM', display: String(g.tpm) };
+    }
+    // 5+ STL
+    if (!special && g.stl >= 5) {
+      special = { lbl:'STL', display: String(g.stl) };
+    }
+    // 5+ BLK
+    if (!special && g.blk >= 5) {
+      special = { lbl:'BLK', display: String(g.blk) };
+    }
+    // FG% ≥ 70% on 8+ attempts
+    if (!special && g.fga >= 8 && (g.fgm / g.fga) >= 0.70) {
+      special = { lbl:'FG%', display: Math.round(g.fgm / g.fga * 100) + '%' };
+    }
+    // 3P% ≥ 60% on 5+ attempts
+    if (!special && g.tpa >= 5 && (g.tpm / g.tpa) >= 0.60) {
+      special = { lbl:'3P%', display: Math.round(g.tpm / g.tpa * 100) + '%' };
+    }
+
+    var pts = { lbl:'PTS', display: String(g.pts) };
+    var reb = { lbl:'REB', display: String(g.reb) };
+    var ast = { lbl:'AST', display: String(g.ast) };
+
+    // ── Decide 2nd slot ──
+    // If REB is very low (≤2), prefer AST in the 2nd slot
+    var second = (g.reb <= 2 && g.ast > g.reb) ? ast : reb;
+
+    // ── Decide 3rd slot ──
+    var third;
+    if (special) {
+      // Special stat overrides the 3rd slot
+      third = special;
+    } else if (second.lbl === 'REB') {
+      // Normal case: 3rd is AST
+      third = ast;
     } else {
-      stats.push({ val: g.ast, lbl: 'AST', display: String(g.ast) });
-    }
-
-    // 3. Third stat — evaluate candidates
-    var remaining = [];
-
-    // Raw counting stats (reb/ast whichever wasn't used)
-    var usedSecond = stats[1].lbl;
-    if (usedSecond !== 'REB') remaining.push({ priority: g.reb,   lbl:'REB', display:String(g.reb),   sort:g.reb });
-    if (usedSecond !== 'AST') remaining.push({ priority: g.ast,   lbl:'AST', display:String(g.ast),   sort:g.ast });
-
-    // 3PM — show if made ≥ 3
-    if (g.tpm >= 3) {
-      remaining.push({ priority: g.tpm * 4 + 10, lbl:'3PM', display:String(g.tpm), sort:g.tpm*4+10 });
-    }
-
-    // 3P% — show if tpa ≥ 4 and pct ≥ 50%
-    if (g.tpa >= 4) {
-      var tpp = g.tpm / g.tpa * 100;
-      if (tpp >= 50) {
-        remaining.push({ priority: tpp / 2 + 8, lbl:'3P%', display: tpp.toFixed(0) + '%', sort: tpp/2+8 });
+      // 2nd is AST (low REB case): 3rd tries REB, but if REB ≤ 2 use STL/BLK/fallback
+      if (g.reb > 2) {
+        third = reb;
+      } else if (g.stl >= 2) {
+        third = { lbl:'STL', display: String(g.stl) };
+      } else if (g.blk >= 2) {
+        third = { lbl:'BLK', display: String(g.blk) };
+      } else {
+        third = reb; // show it even if low, better than nothing
       }
     }
 
-    // FG% — show if fga ≥ 8 and pct ≥ 55%
-    if (g.fga >= 8) {
-      var fgp = g.fgm / g.fga * 100;
-      if (fgp >= 55) {
-        remaining.push({ priority: fgp / 3 + 5, lbl:'FG%', display: fgp.toFixed(0) + '%', sort: fgp/3+5 });
-      }
-    }
-
-    // STL
-    if (g.stl >= 2) {
-      remaining.push({ priority: g.stl * 5, lbl:'STL', display:String(g.stl), sort:g.stl*5 });
-    }
-
-    // BLK
-    if (g.blk >= 2) {
-      remaining.push({ priority: g.blk * 4, lbl:'BLK', display:String(g.blk), sort:g.blk*4 });
-    }
-
-    // FT% — lowest priority, show only if fta ≥ 6 and pct ≥ 85%
-    if (g.fta >= 6) {
-      var ftp = g.ftm / g.fta * 100;
-      if (ftp >= 85) {
-        remaining.push({ priority: ftp / 6, lbl:'FT%', display: ftp.toFixed(0) + '%', sort: ftp/6 });
-      }
-    }
-
-    // Sort descending by priority, pick best
-    remaining.sort(function(a,b){ return b.sort - a.sort; });
-    if (remaining.length) {
-      stats.push({ val: remaining[0].sort, lbl: remaining[0].lbl, display: remaining[0].display });
-    } else {
-      // fallback: STL or BLK or TOV
-      if (g.stl > 0) stats.push({ lbl:'STL', display:String(g.stl) });
-      else if (g.blk > 0) stats.push({ lbl:'BLK', display:String(g.blk) });
-      else stats.push({ lbl:'TOV', display:String(g.tov) });
-    }
-
-    return stats; // always 3 elements
+    return [pts, second, third];
   }
 
   function renderPerformancesTable(key, games) {
@@ -3565,6 +3559,7 @@
       }
 
       html += '<div class="glc-bottom">'
+        + '<div class="glc-bottom-emojis">'
         + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
         + '<span style="position:relative;">'
         + '<button class="glc-reaction-add" title="Add reaction">+</button>'
@@ -3573,6 +3568,7 @@
         + '<button class="glc-emoji-submit">Add</button>'
         + '</div>'
         + '</span>'
+        + '</div>'
         + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
         + '</div>';
 
@@ -3617,9 +3613,10 @@
 
       html += '<div class="glc-detail"><div class="glc-detail-inner">';
 
-      // Header: Final Stats only (score is on the card now)
+      // Header: Final Stats left · season right
       html += '<div class="glc-detail-header">';
       html += '<span class="glc-detail-title">Final Stats</span>';
+      html += '<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.7;">'+(g.season||'')+'</span>';
       html += '</div>'; // close header
 
       // All stats on one flex-wrap row
