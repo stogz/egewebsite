@@ -8,309 +8,89 @@
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <style>
-    body { display:flex; flex-direction:column; min-height:100vh; }
+    .placeholder-wrap {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 40px 80px;
+      text-align: center;
+    }
+    .placeholder-glow {
+      position: absolute;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(35,26,165,.2) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .placeholder-eyebrow {
+      font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .3em; color: var(--orange);
+      text-transform: uppercase; margin-bottom: 22px;
+      animation: fadeUp .8s ease both;
+    }
+    .placeholder-eyebrow::before { content: '// '; opacity: .5; }
+    .placeholder-title {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(4rem, 12vw, 10rem);
+      line-height: .9; text-transform: uppercase;
+      color: var(--heading); letter-spacing: -.01em;
+      animation: fadeUp .8s .15s ease both;
+      transition: color 0.35s;
+    }
+    .placeholder-title .ghost {
+      -webkit-text-stroke: 2px rgba(35,26,165,.7);
+      color: transparent;
+    }
+    .wip-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 36px; padding: 10px 24px;
+      border: 1px solid rgba(231,87,25,.3); border-radius: 3px;
+      background: rgba(231,87,25,.06);
+      font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--text-muted);
+      animation: fadeUp .8s .3s ease both;
+    }
+    .wip-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--orange);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    .placeholder-sub {
+      font-family: var(--font-body); font-size: 1.05rem;
+      font-weight: 300; letter-spacing: .06em;
+      color: var(--text-muted);
+      max-width: 420px; margin: 20px auto 0;
+      line-height: 1.7;
+      animation: fadeUp .8s .4s ease both;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 48px;
+      font-family: var(--font-mono); font-size: .75rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      text-decoration: none; padding: 13px 30px;
+      border: 1px solid rgba(231,87,25,.35); border-radius: 3px;
+      color: var(--orange); background: rgba(231,87,25,.06);
+      transition: all .2s;
+      animation: fadeUp .8s .5s ease both;
+    }
+    .back-btn:hover {
+      background: rgba(231,87,25,.12);
+      border-color: var(--orange);
+      transform: translateY(-2px);
+    }
+    .deco-lines { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .deco-line  { position: absolute; background: rgba(35,26,165,.12); }
+    .deco-line.h { height: 1px; left: 0; right: 0; }
+    .deco-line.v { width: 1px; top: 0; bottom: 0; }
 
-    .history-page { position:relative; z-index:2; flex:1; padding:90px 0 100px; }
-    .history-inner { max-width:1400px; margin:0 auto; padding:0 60px; box-sizing:border-box; }
-
-    /* ── HERO ── */
-    .history-hero { margin-bottom:36px; animation:fadeSlideUp .5s ease both; }
-    .history-eyebrow { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.3em; text-transform:uppercase; color:var(--orange); margin-bottom:10px; }
-    .history-eyebrow::before { content:'// '; opacity:.5; }
-    .history-title { font-family:var(--font-display); font-weight:900; font-size:clamp(3rem,6vw,5.5rem); text-transform:uppercase; letter-spacing:-.02em; line-height:.9; color:var(--heading); transition:color .35s; }
-    .history-title .ghost { -webkit-text-stroke:2px rgba(35,26,165,.6); color:transparent; }
-
-    /* ── TABS ── */
-    .history-tabs {
-      display:flex; align-items:center; gap:0; flex-wrap:wrap;
-      border-bottom:1px solid var(--border);
-      margin-bottom:36px;
-      animation:fadeSlideUp .5s .08s ease both;
-    }
-    .history-tab {
-      font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em;
-      text-transform:uppercase; padding:16px 22px;
-      background:transparent; border:none; border-bottom:2px solid transparent;
-      color:var(--text-muted); cursor:pointer;
-      transition:color .18s; white-space:nowrap;
-      position:relative;
-    }
-    .history-tab::after {
-      content:''; position:absolute; bottom:-1px; left:50%; right:50%;
-      height:2px; background:var(--orange);
-      transition:left .22s ease, right .22s ease;
-      border-radius:2px 2px 0 0;
-    }
-    .history-tab:hover { color:var(--text); }
-    .history-tab.active { color:var(--orange); }
-    .history-tab.active::after { left:0; right:0; }
-
-    /* ── SEARCH BAR ── */
-    .history-search-wrap {
-      position:relative; margin-bottom:32px; max-width:440px;
-      animation:fadeSlideUp .3s ease both;
-    }
-    .history-search {
-      width:100%; padding:13px 48px 13px 18px;
-      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em;
-      color:var(--text); background:var(--bg-card);
-      border:1px solid var(--border); border-radius:4px;
-      outline:none; box-sizing:border-box;
-      transition:border-color .2s, background .35s;
-    }
-    .history-search::placeholder { color:var(--text-muted); }
-    .history-search:focus { border-color:var(--orange); }
-    .history-search-icon {
-      position:absolute; right:16px; top:50%; transform:translateY(-50%);
-      color:var(--text-muted); pointer-events:none; font-size:1rem;
-    }
-
-    /* ── PANELS ── */
-    .history-panel { display:none; }
-    .history-panel.active { display:block; animation:fadeSlideUp .3s ease both; }
-
-    /* ── AWARD LIST ── */
-    .award-list { display:flex; flex-direction:column; gap:8px; }
-
-    .award-row {
-      display:flex; align-items:center; gap:16px;
-      background:var(--bg-card); border:1px solid var(--border);
-      border-left:4px solid transparent;
-      border-radius:6px; padding:16px 20px;
-      transition:transform .18s, border-color .2s, box-shadow .2s, background .35s;
-      position:relative; overflow:hidden;
-    }
-    .award-row::after {
-      content:''; position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(231,87,25,.05) 0%, transparent 50%);
-      opacity:0; transition:opacity .2s; pointer-events:none;
-    }
-    .award-row:hover { transform:translateX(5px); border-left-color:rgba(231,87,25,.5); box-shadow:0 4px 20px rgba(0,0,0,.2); }
-    .award-row:hover::after { opacity:1; }
-
-    .award-row.sim-player { border-left-color:var(--orange); }
-    .award-row.champion-row {
-      border-left-color:#ffc820;
-      background:linear-gradient(90deg, rgba(255,185,20,.07) 0%, var(--bg-card) 50%);
-      animation:champRowPulse 3s ease-in-out infinite;
-    }
-    @keyframes champRowPulse {
-      0%,100% { box-shadow:none; }
-      50%      { box-shadow:0 0 14px rgba(255,185,20,.18); }
-    }
-
-    .award-row__season {
-      font-family:var(--font-mono); font-size:.65rem; letter-spacing:.08em;
-      color:var(--text-muted); flex-shrink:0; min-width:72px;
-    }
-    .award-row__logo { width:40px; height:40px; object-fit:contain; flex-shrink:0; }
-    .award-row__logo-sm { width:24px; height:24px; object-fit:contain; flex-shrink:0; }
-    .award-row__info { flex:1; min-width:0; }
-    .award-row__name {
-      font-family:var(--font-display); font-weight:900;
-      font-size:1.35rem; text-transform:uppercase; letter-spacing:.02em;
-      color:var(--heading); line-height:1; transition:color .35s;
-    }
-    .award-row__sub {
-      font-family:var(--font-mono); font-size:.58rem; letter-spacing:.1em;
-      text-transform:uppercase; color:var(--text-muted); margin-top:5px;
-    }
-    .award-row__tag {
-      font-family:var(--font-mono); font-size:.6rem; letter-spacing:.1em;
-      text-transform:uppercase; padding:5px 12px; border-radius:3px;
-      flex-shrink:0;
-    }
-    /* Champions — gold name */
-    .award-row.champion-row .award-row__name {
-      background:linear-gradient(90deg,#ffe066,#ffc820,#e8960a);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .award-row.champion-row .award-row__season { color:#b8880a; }
-    /* Sim player — orange name */
-    .award-row.sim-player .award-row__name { color:var(--orange); }
-    /* Tag colours */
-    .tag-gold   { background:rgba(255,185,20,.1); color:#c8960a; border:1px solid rgba(255,185,20,.3); }
-    .tag-orange { background:rgba(231,87,25,.1);  color:var(--orange); border:1px solid rgba(231,87,25,.25); }
-    .tag-blue   { background:rgba(35,26,165,.1);  color:#7b72e0; border:1px solid rgba(35,26,165,.25); }
-
-    /* ── STATS PANEL CATS ── */
-    .stats-cats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
-    .stats-cat-btn {
-      font-family:var(--font-mono); font-size:.65rem; letter-spacing:.1em;
-      text-transform:uppercase; padding:8px 18px;
-      background:var(--bg-card); border:1px solid var(--border); border-radius:3px;
-      color:var(--text-muted); cursor:pointer; transition:all .18s;
-    }
-    .stats-cat-btn:hover { border-color:rgba(231,87,25,.4); color:var(--text); }
-    .stats-cat-btn.active { background:var(--orange); color:#fff; border-color:var(--orange); }
-
-    /* ── SEARCH ── */
-    /* Suggestion chips */
-    .search-suggestions {
-      display:flex; flex-wrap:wrap; gap:8px;
-      margin-bottom:28px; min-height:40px;
-    }
-    .search-chip {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 14px;
-      background:var(--bg-card); border:1px solid var(--border); border-radius:4px;
-      font-family:var(--font-mono); font-size:.62rem; letter-spacing:.08em;
-      text-transform:uppercase; color:var(--text-muted);
-      cursor:pointer; transition:all .18s;
-    }
-    .search-chip:hover { border-color:rgba(231,87,25,.5); color:var(--heading); transform:translateY(-1px); }
-    .search-chip.player-chip { border-left:3px solid var(--orange); }
-    .search-chip.team-chip   { border-left:3px solid rgba(35,26,165,.7); }
-    .search-chip img { width:20px; height:20px; object-fit:contain; flex-shrink:0; }
-    .search-chip .chip-label { color:var(--heading); font-weight:700; }
-    .search-chip .chip-type  { color:var(--text-muted); font-size:.52rem; }
-
-    /* Profile card */
-    .search-profile {
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:8px; overflow:hidden; margin-bottom:28px;
-      animation:fadeSlideUp .3s ease both;
-    }
-    .search-profile__header {
-      display:flex; align-items:center; gap:16px;
-      padding:20px 24px;
-      background:rgba(35,26,165,.07);
-      border-bottom:1px solid var(--border-soft);
-    }
-    .search-profile__logo { width:48px; height:48px; object-fit:contain; flex-shrink:0; }
-    .search-profile__name {
-      font-family:var(--font-display); font-weight:900;
-      font-size:clamp(1.4rem,3vw,2.2rem); text-transform:uppercase;
-      letter-spacing:-.01em; color:var(--heading); transition:color .35s;
-    }
-    .search-profile__name.sim { color:var(--orange); }
-    .search-profile__meta {
-      font-family:var(--font-mono); font-size:.58rem; letter-spacing:.14em;
-      text-transform:uppercase; color:var(--text-muted); margin-top:4px;
-    }
-    .search-profile__back {
-      margin-left:auto; font-family:var(--font-mono); font-size:.6rem;
-      letter-spacing:.1em; text-transform:uppercase;
-      padding:8px 16px; background:transparent;
-      border:1px solid var(--border); border-radius:3px;
-      color:var(--text-muted); cursor:pointer; flex-shrink:0;
-      transition:all .18s;
-    }
-    .search-profile__back:hover { border-color:var(--orange); color:var(--orange); }
-
-    /* Award tiles inside profile */
-    .profile-awards { padding:20px 24px; }
-    .profile-awards-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-      gap:10px; margin-bottom:20px;
-    }
-    .profile-award-tile {
-      background:rgba(35,26,165,.06); border:1px solid var(--border);
-      border-radius:6px; padding:14px 14px 12px;
-      transition:transform .18s, border-color .2s, box-shadow .2s;
-      position:relative; overflow:hidden;
-    }
-    .profile-award-tile::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:2px;
-      background:linear-gradient(90deg,var(--orange),var(--blue));
-      transform:scaleX(0); transform-origin:left; transition:transform .3s;
-    }
-    .profile-award-tile:hover { transform:translateY(-2px); border-color:rgba(231,87,25,.3); box-shadow:0 4px 14px rgba(0,0,0,.18); }
-    .profile-award-tile:hover::before { transform:scaleX(1); }
-    .profile-award-tile__icon { font-size:1.1rem; margin-bottom:7px; }
-    .profile-award-tile__label {
-      font-family:var(--font-mono); font-size:.52rem; letter-spacing:.14em;
-      text-transform:uppercase; color:var(--orange); margin-bottom:4px;
-    }
-    .profile-award-tile__years {
-      font-family:var(--font-display); font-weight:700; font-size:.95rem;
-      color:var(--heading); transition:color .35s;
-    }
-    .profile-award-tile__count {
-      font-family:var(--font-mono); font-size:.55rem; color:var(--text-muted);
-      margin-top:3px;
-    }
-    /* Champion tile — gold */
-    .profile-award-tile.gold-tile {
-      background:rgba(255,185,20,.08); border-color:rgba(255,185,20,.3);
-    }
-    .profile-award-tile.gold-tile .profile-award-tile__label { color:#c8960a; }
-    .profile-award-tile.gold-tile .profile-award-tile__years {
-      background:linear-gradient(90deg,#ffe066,#ffc820,#e8960a);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-
-    /* All-NBA section in profile */
-    .profile-allnba { margin-top:4px; }
-    .profile-section-title {
-      font-family:var(--font-mono); font-size:.6rem; letter-spacing:.22em;
-      text-transform:uppercase; color:var(--text-muted); margin-bottom:10px;
-    }
-    .allnba-year-row {
-      display:flex; align-items:center; gap:12px;
-      padding:9px 14px; border-bottom:1px solid var(--border-soft);
-      transition:background .12s;
-    }
-    .allnba-year-row:last-child { border-bottom:none; }
-    .allnba-year-row:hover { background:rgba(231,87,25,.04); }
-    .allnba-yr { font-family:var(--font-mono); font-size:.6rem; color:var(--text-muted); min-width:68px; }
-    .allnba-team-badge {
-      font-family:var(--font-mono); font-size:.6rem; letter-spacing:.08em;
-      text-transform:uppercase; padding:3px 10px; border-radius:3px;
-    }
-    .allnba-first  { background:rgba(200,150,10,.12); color:#c8960a; border:1px solid rgba(200,150,10,.3); }
-    .allnba-second { background:rgba(130,154,170,.1);  color:#8a9aaa; border:1px solid rgba(130,154,170,.25); }
-    .allnba-third  { background:rgba(160,96,48,.1);   color:#a06030; border:1px solid rgba(160,96,48,.25); }
-
-    /* Stat titles section in profile */
-    .stat-title-row {
-      display:flex; align-items:center; gap:12px;
-      padding:9px 14px; border-bottom:1px solid var(--border-soft);
-      transition:background .12s;
-    }
-    .stat-title-row:last-child { border-bottom:none; }
-    .stat-title-row:hover { background:rgba(231,87,25,.04); }
-    .stat-title-yr  { font-family:var(--font-mono); font-size:.6rem; color:var(--text-muted); min-width:68px; }
-    .stat-title-cat { font-family:var(--font-display); font-weight:700; font-size:.9rem; color:var(--heading); flex:1; transition:color .35s; }
-    .stat-title-val { font-family:var(--font-mono); font-size:.65rem; color:var(--orange); }
-
-    .search-group { margin-bottom:32px; }
-    .search-group-title {
-      font-family:var(--font-display); font-weight:900; font-size:1.3rem;
-      text-transform:uppercase; color:var(--heading);
-      padding-bottom:10px; border-bottom:1px solid var(--border);
-      margin-bottom:12px; transition:color .35s;
-    }
-    .history-section-label {
-      font-family:var(--font-mono); font-size:.6rem; letter-spacing:.24em;
-      text-transform:uppercase; color:var(--orange); margin-bottom:18px; display:block;
-    }
-    .history-empty {
-      font-family:var(--font-mono); font-size:.65rem; letter-spacing:.14em;
-      text-transform:uppercase; color:var(--text-muted); opacity:.5;
-      padding:60px 0; text-align:center;
-    }
-
-    @media (max-width:768px) {
-      .profile-awards-grid { grid-template-columns:repeat(2,1fr); }
-      .search-profile__header { flex-wrap:wrap; }
-      .search-profile__back { margin-left:0; margin-top:8px; }
-    }
-
-    @keyframes fadeSlideUp {
-      from { opacity:0; transform:translateY(16px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width:768px) {
-      .history-inner { padding:0 14px; }
-      .history-page  { padding:14px 0 80px; }
-      .history-tab   { padding:12px 14px; font-size:.6rem; letter-spacing:.06em; }
-      .history-search-wrap { max-width:100%; }
-      .award-row { padding:12px 14px; gap:10px; }
-      .award-row__logo { width:30px; height:30px; }
-      .award-row__name { font-size:1.1rem; }
+    @media (max-width: 768px) {
+      .placeholder-wrap { padding: 90px 24px 60px; }
+      .placeholder-title { font-size: clamp(3rem, 16vw, 7rem); }
+      .placeholder-sub { font-size: .95rem; }
+      .back-btn { padding: 12px 24px; font-size: .7rem; }
     }
   </style>
 </head>
@@ -325,585 +105,41 @@
       <span>EGE <span class="accent">NBA</span> Simulation</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html"   data-num="01">Home</a></li>
+      <li><a href="index.html" data-num="01">Home</a></li>
       <li><a href="players.html" data-num="02">Players</a></li>
-      <li><a href="teams.html"   data-num="03">Teams</a></li>
+      <li><a href="teams.html" data-num="03">Teams</a></li>
       <li><a href="history.html" data-num="04" class="active">History</a></li>
-      <li><a href="draft.html"   data-num="05">Draft</a></li>
+      <li><a href="draft.html" data-num="05">Draft</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
 
-  <div class="history-page">
-    <div class="history-inner">
-
-      <div class="history-hero">
-        <p class="history-eyebrow">champions · awards · records</p>
-        <h1 class="history-title">League<br><span class="ghost">History</span></h1>
-      </div>
-
-      <div class="history-tabs" id="historyTabs">
-        <button class="history-tab active" data-tab="champions">Champions</button>
-        <button class="history-tab" data-tab="mvp">MVPs</button>
-        <button class="history-tab" data-tab="roty">ROTY</button>
-        <button class="history-tab" data-tab="sixmoty">6MOTY</button>
-        <button class="history-tab" data-tab="dpoy">DPOY</button>
-        <button class="history-tab" data-tab="mip">MIP</button>
-        <button class="history-tab" data-tab="stats">Stats</button>
-        <button class="history-tab" data-tab="search">🔍 Search</button>
-      </div>
-
-      <div class="history-search-wrap" id="searchWrap" style="display:none;">
-        <input class="history-search" id="historySearch" type="text" placeholder="Search any player name..." autocomplete="off" />
-        <span class="history-search-icon">⌕</span>
-      </div>
-
-      <div class="history-panel active" id="panel-champions"></div>
-      <div class="history-panel" id="panel-mvp"></div>
-      <div class="history-panel" id="panel-roty"></div>
-      <div class="history-panel" id="panel-sixmoty"></div>
-      <div class="history-panel" id="panel-dpoy"></div>
-      <div class="history-panel" id="panel-mip"></div>
-      <div class="history-panel" id="panel-stats"></div>
-      <div class="history-panel" id="panel-search">
-        <div class="search-suggestions" id="searchSuggestions"></div>
-        <div id="searchProfile"></div>
-      </div>
-
+  <div class="placeholder-wrap">
+    <div class="placeholder-glow"></div>
+    <div class="deco-lines">
+      <div class="deco-line h" style="top:25%"></div>
+      <div class="deco-line h" style="top:75%"></div>
+      <div class="deco-line v" style="left:15%"></div>
+      <div class="deco-line v" style="right:15%"></div>
     </div>
+    <p class="placeholder-eyebrow">history · seasons · champions</p>
+    <h1 class="placeholder-title">
+      League<br>
+      <span class="ghost">History</span>
+    </h1>
+    <div class="wip-badge">
+      <span class="wip-dot"></span>
+      Under Construction · Coming Soon
+    </div>
+    <p class="placeholder-sub">Season-by-season records, award winners, championship history, and all-time statistical leaders for the EGE simulation.</p>
+    <a href="index.html" class="back-btn">← Back to Home</a>
   </div>
 
   <footer>
     <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
-    <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
-    <ul class="footer-links">
-      <li><a href="players.html">Players</a></li>
-      <li><a href="teams.html">Teams</a></li>
-      <li><a href="draft.html">Draft</a></li>
-    </ul>
+    <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
   </footer>
 
   <script src="shared.js"></script>
-  <script src="team-stats.js"></script>
-  <script src="league-history.js"></script>
-  <script>
-  (function() {
-    var TROPHY = 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png';
-    var SIM = ['Cooper Clark','Sam Stogsdill','Jaykeb Stewart','Isaac Vitel','Paxon Hatch'];
-    function sim(n){ return SIM.indexOf(n) !== -1; }
-
-    var LOGOS = {
-      'Atlanta Hawks':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hawks2_orig.png',
-      'Boston Celtics':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bos_orig.png',
-      'Brooklyn Nets':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bkn_orig.png',
-      'Charlotte Hornets':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cha_orig.png',
-      'Chicago Bulls':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/chi_orig.png',
-      'Cleveland Cavaliers':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cle_orig.png',
-      'Dallas Mavericks':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/dal_orig.png',
-      'Denver Nuggets':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/den_orig.png',
-      'Detroit Pistons':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/det_orig.png',
-      'Golden State Warriors':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/gsw_orig.png',
-      'Houston Rockets':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hou_orig.png',
-      'Indiana Pacers':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/ind_orig.png',
-      'Los Angeles Clippers':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lac_orig.png',
-      'Los Angeles Lakers':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lal_orig.png',
-      'Miami Heat':             'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mia_orig.png',
-      'Milwaukee Bucks':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png',
-      'Minnesota Timberwolves': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/min_orig.png',
-      'New Orleans Pelicans':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nop_orig.png',
-      'New York Knicks':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nyk_orig.png',
-      'Oklahoma City Thunder':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/okc_orig.png',
-      'Orlando Magic':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png',
-      'Philadelphia 76ers':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png',
-      'Phoenix Suns':           'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/phx2_orig.png',
-      'Portland Trail Blazers': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/por_orig.png',
-      'Sacramento Kings':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sac2_orig.png',
-      'San Antonio Spurs':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png',
-      'Toronto Raptors':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/raptors2_orig.png',
-      'Utah Jazz':              'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/uta_orig.png',
-      'Vancouver Grizzlies':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png',
-      'Washington Wizards':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png',
-      'Mexico City Flight':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mex_orig.png',
-      'St. Louis Spirit':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png',
-    };
-
-    // Merge champion + finals_mvp from EGE_SEASON_STATS into each season record
-    function mergeChampData(historyArr) {
-      var ss = window.EGE_SEASON_STATS || {};
-      var ti = window.EGE_TEAM_INFO    || {};
-      return historyArr.map(function(s) {
-        var merged = {};
-        // copy all existing fields
-        Object.keys(s).forEach(function(k){ merged[k] = s[k]; });
-        // look up champion + finals_mvp from team-stats
-        var seasonData = ss[s.season] || {};
-        Object.keys(seasonData).forEach(function(slug) {
-          var td = seasonData[slug];
-          if (td && (td.playoffs||'').trim() === 'Champions') {
-            var teamInfo = ti[slug] || {};
-            merged.champion   = teamInfo.name || slug;
-            merged.finals_mvp = td.finals_mvp || merged.finals_mvp || '—';
-          }
-        });
-        return merged;
-      });
-    }
-
-    var DATA = mergeChampData(window.EGE_LEAGUE_HISTORY || []).slice().reverse();
-
-    /* ── Row builder ── */
-    function row(season, name, sub, logoSrc, tagText, tagCls, isChamp) {
-      var s = sim(name);
-      var cls = 'award-row'+(isChamp?' champion-row':'')+(s&&!isChamp?' sim-player':'');
-      var logo = logoSrc ? '<img class="award-row__logo" src="'+logoSrc+'" alt="">' : '';
-      var tag  = tagText ? '<span class="award-row__tag '+(tagCls||'tag-orange')+'">'+tagText+'</span>' : '';
-      return '<div class="'+cls+'">'
-        +'<span class="award-row__season">'+season+'</span>'
-        +logo
-        +'<div class="award-row__info">'
-          +'<div class="award-row__name">'+name+'</div>'
-          +(sub?'<div class="award-row__sub">'+sub+'</div>':'')
-        +'</div>'
-        +tag
-        +'</div>';
-    }
-
-    /* ── Champions ── */
-    function buildChampions() {
-      var html = '<span class="history-section-label">// nba champions · newest first</span><div class="award-list">';
-      DATA.forEach(function(s) {
-        var logo = LOGOS[s.champion] || '';
-        html += row(s.season, s.champion, 'Finals MVP: '+(s.finals_mvp||'—'), logo, null, null, true);
-      });
-      html += '</div>';
-      document.getElementById('panel-champions').innerHTML = html;
-    }
-
-    /* ── Generic award panel ── */
-    function buildAward(panelId, field, label, getLogo) {
-      var html = '<span class="history-section-label">// '+label+' · newest first</span><div class="award-list">';
-      DATA.forEach(function(s) {
-        var winner = s[field] || '—';
-        var logo = getLogo ? getLogo(s) : '';
-        html += row(s.season, winner, null, logo, null, null, false);
-      });
-      html += '</div>';
-      document.getElementById(panelId).innerHTML = html;
-    }
-
-    /* ── Stats panel ── */
-    var activeCat = 'scoring';
-    var CATS = {
-      scoring:  { label:'Scoring Title',  unit:'PPG', icon:'🏀' },
-      rebounds: { label:'Rebound Title',  unit:'RPG', icon:'💪' },
-      assists:  { label:'Assist Title',   unit:'APG', icon:'🎯' },
-    };
-    function buildStats(cat) {
-      activeCat = cat;
-      var btns = Object.keys(CATS).map(function(k){
-        return '<button class="stats-cat-btn'+(k===cat?' active':'')+'" data-cat="'+k+'">'+CATS[k].label+'</button>';
-      }).join('');
-      var def = CATS[cat];
-      var list = '<div class="award-list">';
-      DATA.forEach(function(s) {
-        var d = s[cat];
-        if (!d) return;
-        list += row(s.season, d.player, null, '', d.value+' '+def.unit, 'tag-blue', false);
-      });
-      list += '</div>';
-      var panel = document.getElementById('panel-stats');
-      panel.innerHTML = '<div class="stats-cats">'+btns+'</div>'
-        +'<span class="history-section-label">// '+def.label.toLowerCase()+' · newest first</span>'
-        +list;
-      panel.querySelectorAll('.stats-cat-btn').forEach(function(b){
-        b.addEventListener('click', function(){ buildStats(b.dataset.cat); });
-      });
-    }
-
-    /* ════════════════════════════════════
-       SEARCH — CHIPS + PROFILE VIEW
-    ════════════════════════════════════ */
-
-    /* Collect all unique players and teams from the data */
-    function collectEntities() {
-      var players = {}, teams = {};
-      var AWARD_PLAYER_FIELDS = ['finals_mvp','mvp','roty','dpoy','mip','sixmoty'];
-      DATA.forEach(function(s) {
-        // Champion team
-        if (s.champion) teams[s.champion] = true;
-        // Award winners (players)
-        AWARD_PLAYER_FIELDS.forEach(function(f){ if(s[f]) players[s[f]] = true; });
-        // Stat leaders
-        ['scoring','rebounds','assists'].forEach(function(f){ if(s[f]&&s[f].player) players[s[f].player]=true; });
-        // All-NBA
-        if (s.all_nba) {
-          ['first','second','third'].forEach(function(t){
-            (s.all_nba[t]||[]).forEach(function(p){ players[p]=true; });
-          });
-        }
-      });
-      return {
-        players: Object.keys(players).sort(),
-        teams:   Object.keys(teams).sort(),
-      };
-    }
-
-    var ENTITIES = collectEntities();
-
-    /* Build suggestion chips matching query */
-    function buildSuggestions(q) {
-      var sugEl = document.getElementById('searchSuggestions');
-      var profEl = document.getElementById('searchProfile');
-      q = (q||'').trim().toLowerCase();
-
-      if (q.length < 2) {
-        sugEl.innerHTML = '<div class="history-empty" style="padding:20px 0;">Search for a player or team name.</div>';
-        profEl.innerHTML = '';
-        return;
-      }
-
-      var matchP = ENTITIES.players.filter(function(p){ return p.toLowerCase().indexOf(q)!==-1; });
-      var matchT = ENTITIES.teams.filter(function(t){ return t.toLowerCase().indexOf(q)!==-1; });
-
-      if (!matchP.length && !matchT.length) {
-        sugEl.innerHTML = '<div class="history-empty" style="padding:20px 0;">No matches for "'+q+'".</div>';
-        profEl.innerHTML = '';
-        return;
-      }
-
-      var html = '';
-      matchP.forEach(function(p) {
-        var isSp = sim(p);
-        html += '<button class="search-chip player-chip" data-type="player" data-name="'+p+'">'
-          +'<span class="chip-type">Player</span>'
-          +'<span class="chip-label'+(isSp?' sim':'')+'">'+ p +'</span>'
-          +'</button>';
-      });
-      matchT.forEach(function(t) {
-        var logo = LOGOS[t] || '';
-        html += '<button class="search-chip team-chip" data-type="team" data-name="'+t+'">'
-          +(logo?'<img src="'+logo+'" alt="">':'')
-          +'<span class="chip-type">Team</span>'
-          +'<span class="chip-label">'+t+'</span>'
-          +'</button>';
-      });
-      sugEl.innerHTML = html;
-      profEl.innerHTML = '';
-
-      sugEl.querySelectorAll('.search-chip').forEach(function(chip) {
-        chip.addEventListener('click', function() {
-          var type = chip.dataset.type;
-          var name = chip.dataset.name;
-          if (type==='player') showPlayerProfile(name);
-          else showTeamProfile(name);
-        });
-      });
-    }
-
-    /* ── PLAYER PROFILE ── */
-    function showPlayerProfile(name) {
-      var isSp = sim(name);
-
-      // Collect all awards for this player
-      var awards = {
-        champion:  [],
-        finals_mvp:[],
-        mvp:       [],
-        dpoy:      [],
-        roty:      [],
-        mip:       [],
-        sixmoty:   [],
-        scoring:   [],
-        rebounds:  [],
-        assists:   [],
-        allnba:    [],
-      };
-      var AWARD_PLAYER_FIELDS = [
-        {key:'finals_mvp',label:'Finals MVP',icon:'🏆'},
-        {key:'mvp',       label:'MVP',       icon:'👑'},
-        {key:'dpoy',      label:'DPOY',      icon:'🛡️'},
-        {key:'roty',      label:'ROTY',      icon:'🌟'},
-        {key:'mip',       label:'MIP',       icon:'📈'},
-        {key:'sixmoty',   label:'6MOTY',     icon:'⚡'},
-      ];
-
-      DATA.forEach(function(s) {
-        if (s.champion === name) awards.champion.push(s.season);
-        AWARD_PLAYER_FIELDS.forEach(function(f){
-          if (s[f.key]===name) awards[f.key].push(s.season);
-        });
-        ['scoring','rebounds','assists'].forEach(function(f){
-          if (s[f] && s[f].player===name) awards[f].push({season:s.season,value:s[f].value});
-        });
-        if (s.all_nba) {
-          ['first','second','third'].forEach(function(tier){
-            if ((s.all_nba[tier]||[]).indexOf(name)!==-1)
-              awards.allnba.push({season:s.season,tier:tier});
-          });
-        }
-      });
-
-      // Total award count for meta
-      var totalAwards = awards.champion.length + awards.finals_mvp.length + awards.mvp.length
-        + awards.dpoy.length + awards.roty.length + awards.mip.length + awards.sixmoty.length
-        + awards.scoring.length + awards.rebounds.length + awards.assists.length + awards.allnba.length;
-
-      // ── Header ──
-      var html = '<div class="search-profile">'
-        +'<div class="search-profile__header">'
-          +'<div class="search-profile__info">'
-            +'<div class="search-profile__name'+(isSp?' sim':'')+'">'+name+'</div>'
-            +'<div class="search-profile__meta">'+totalAwards+' career award'+(totalAwards!==1?'s':'')+' in EGE history</div>'
-          +'</div>'
-          +'<button class="search-profile__back" id="backToSearch">← Back</button>'
-        +'</div>'
-        +'<div class="profile-awards">';
-
-      // Award tiles
-      var tileDefs = [
-        { key:'champion',   label:'Championships', icon:'🏆', gold:true  },
-        { key:'finals_mvp', label:'Finals MVP',    icon:'🏆', gold:true  },
-        { key:'mvp',        label:'MVP',           icon:'👑', gold:false },
-        { key:'dpoy',       label:'DPOY',          icon:'🛡️', gold:false },
-        { key:'roty',       label:'ROTY',          icon:'🌟', gold:false },
-        { key:'mip',        label:'MIP',           icon:'📈', gold:false },
-        { key:'sixmoty',    label:'6MOTY',         icon:'⚡', gold:false },
-        { key:'scoring',    label:'Scoring Titles',icon:'🏀', gold:false, isStat:true },
-        { key:'rebounds',   label:'Rebound Titles',icon:'💪', gold:false, isStat:true },
-        { key:'assists',    label:'Assist Titles', icon:'🎯', gold:false, isStat:true },
-      ];
-      html += '<div class="profile-awards-grid">';
-      tileDefs.forEach(function(t) {
-        var items = awards[t.key];
-        if (!items || !items.length) return;
-        var years = t.isStat ? items.map(function(i){return i.season;}) : items;
-        var cnt = items.length;
-        var yrs = years.slice(0,3).join(', ')+(cnt>3?'…':'');
-        html += '<div class="profile-award-tile'+(t.gold?' gold-tile':'')+'">'
-          +'<div class="profile-award-tile__icon">'+t.icon+'</div>'
-          +'<div class="profile-award-tile__label">'+t.label+'</div>'
-          +'<div class="profile-award-tile__years">'+yrs+'</div>'
-          +'<div class="profile-award-tile__count">'+cnt+'x</div>'
-          +'</div>';
-      });
-      html += '</div>';
-
-      // All-NBA section
-      if (awards.allnba.length) {
-        html += '<div class="profile-allnba">'
-          +'<div class="profile-section-title">// All-NBA Selections</div>'
-          +'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;">';
-        awards.allnba.forEach(function(a) {
-          var cls = 'allnba-'+a.tier;
-          var lbl = a.tier==='first'?'First Team':a.tier==='second'?'Second Team':'Third Team';
-          html += '<div class="allnba-year-row">'
-            +'<span class="allnba-yr">'+a.season+'</span>'
-            +'<span class="allnba-team-badge '+cls+'">'+lbl+'</span>'
-            +'</div>';
-        });
-        html += '</div></div>';
-      }
-
-      // Stat titles detail
-      var statTitles = [];
-      if (awards.scoring.length)  awards.scoring.forEach(function(i){ statTitles.push({s:i.season,cat:'Scoring Title',val:i.value+' PPG'}); });
-      if (awards.rebounds.length) awards.rebounds.forEach(function(i){ statTitles.push({s:i.season,cat:'Rebound Title',val:i.value+' RPG'}); });
-      if (awards.assists.length)  awards.assists.forEach(function(i){ statTitles.push({s:i.season,cat:'Assist Title', val:i.value+' APG'}); });
-      if (statTitles.length) {
-        statTitles.sort(function(a,b){ return b.s.localeCompare(a.s); });
-        html += '<div style="margin-top:16px;">'
-          +'<div class="profile-section-title">// Stat Titles</div>'
-          +'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;">';
-        statTitles.forEach(function(t){
-          html += '<div class="stat-title-row">'
-            +'<span class="stat-title-yr">'+t.s+'</span>'
-            +'<span class="stat-title-cat">'+t.cat+'</span>'
-            +'<span class="stat-title-val">'+t.val+'</span>'
-            +'</div>';
-        });
-        html += '</div></div>';
-      }
-
-      html += '</div></div>';
-
-      if (!totalAwards) {
-        html = '<div class="search-profile"><div class="search-profile__header">'
-          +'<div class="search-profile__info"><div class="search-profile__name">'+name+'</div>'
-          +'<div class="search-profile__meta">No individual awards found in EGE history</div></div>'
-          +'<button class="search-profile__back" id="backToSearch">← Back</button>'
-          +'</div></div>';
-      }
-
-      document.getElementById('searchProfile').innerHTML = html;
-      document.getElementById('searchSuggestions').style.display = 'none';
-      var back = document.getElementById('backToSearch');
-      if (back) back.addEventListener('click', function(){
-        document.getElementById('searchSuggestions').style.display = '';
-        document.getElementById('searchProfile').innerHTML = '';
-      });
-    }
-
-    /* ── TEAM PROFILE ── */
-    function showTeamProfile(teamName) {
-      var logo = LOGOS[teamName] || '';
-      var champSeasons = [];
-      var playerAwards = {}; // playerName -> [{awardLabel, season}]
-      var AWARD_PLAYER_FIELDS = [
-        {key:'finals_mvp',label:'Finals MVP'},
-        {key:'mvp',       label:'MVP'},
-        {key:'dpoy',      label:'DPOY'},
-        {key:'roty',      label:'ROTY'},
-        {key:'mip',       label:'MIP'},
-        {key:'sixmoty',   label:'6MOTY'},
-      ];
-
-      // Need team-stats data to know which players were on this team per season
-      var seasonStats = (window.EGE_SEASON_STATS) || null;
-
-      DATA.forEach(function(s) {
-        if (s.champion === teamName) champSeasons.push(s.season);
-
-        // Find players who were on this team this season (from EGE_SEASON_STATS players[] array)
-        var playersOnTeam = [];
-        if (seasonStats && seasonStats[s.season]) {
-          Object.keys(seasonStats[s.season]).forEach(function(slug) {
-            var td = seasonStats[s.season][slug];
-            // match team name
-            var ti = window.EGE_TEAM_INFO && window.EGE_TEAM_INFO[slug];
-            if (ti && ti.name === teamName && Array.isArray(td.players)) {
-              playersOnTeam = td.players;
-            }
-          });
-        }
-
-        // Check each award winner against players on this team
-        AWARD_PLAYER_FIELDS.forEach(function(f){
-          var winner = s[f.key];
-          if (winner && playersOnTeam.indexOf(winner) !== -1) {
-            if (!playerAwards[winner]) playerAwards[winner] = [];
-            playerAwards[winner].push({label:f.label, season:s.season});
-          }
-        });
-        ['scoring','rebounds','assists'].forEach(function(f){
-          var d = s[f];
-          if (d && d.player && playersOnTeam.indexOf(d.player) !== -1) {
-            if (!playerAwards[d.player]) playerAwards[d.player] = [];
-            playerAwards[d.player].push({label:f.charAt(0).toUpperCase()+f.slice(1)+' Title', season:s.season});
-          }
-        });
-        if (s.all_nba) {
-          ['first','second','third'].forEach(function(tier){
-            (s.all_nba[tier]||[]).forEach(function(p){
-              if (playersOnTeam.indexOf(p) !== -1) {
-                if (!playerAwards[p]) playerAwards[p] = [];
-                playerAwards[p].push({
-                  label:'All-NBA '+(tier==='first'?'First':tier==='second'?'Second':'Third')+' Team',
-                  season:s.season
-                });
-              }
-            });
-          });
-        }
-      });
-
-      var html = '<div class="search-profile">'
-        +'<div class="search-profile__header">'
-          +(logo?'<img class="search-profile__logo" src="'+logo+'" alt="">':'')
-          +'<div class="search-profile__info">'
-            +'<div class="search-profile__name">'+teamName+'</div>'
-            +'<div class="search-profile__meta">'
-              +(champSeasons.length?champSeasons.length+'x champion · ':'')
-              +'EGE History Profile'
-            +'</div>'
-          +'</div>'
-          +'<button class="search-profile__back" id="backToSearch">← Back</button>'
-        +'</div>'
-        +'<div class="profile-awards">';
-
-      // Champion tiles
-      if (champSeasons.length) {
-        html += '<div class="profile-awards-grid">'
-          +'<div class="profile-award-tile gold-tile">'
-            +'<div class="profile-award-tile__icon">🏆</div>'
-            +'<div class="profile-award-tile__label">Championships</div>'
-            +'<div class="profile-award-tile__years">'+champSeasons.slice(0,3).join(', ')+(champSeasons.length>3?'…':'')+'</div>'
-            +'<div class="profile-award-tile__count">'+champSeasons.length+'x</div>'
-          +'</div></div>';
-      }
-
-      // Player awards while on this team
-      var playerKeys = Object.keys(playerAwards);
-      if (playerKeys.length) {
-        html += '<div style="margin-top:16px;">'
-          +'<div class="profile-section-title">// Player Awards Won While on This Team</div>';
-        playerKeys.forEach(function(p) {
-          var isSp = sim(p);
-          var items = playerAwards[p];
-          html += '<div style="margin-bottom:10px;">'
-            +'<div style="font-family:var(--font-display);font-weight:700;font-size:1rem;'
-              +'color:'+(isSp?'var(--orange)':'var(--heading)')+';'
-              +'text-transform:uppercase;letter-spacing:.04em;'
-              +'margin-bottom:6px;transition:color .35s;">'+p+'</div>'
-            +'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;">';
-          items.forEach(function(a){
-            html += '<div class="stat-title-row">'
-              +'<span class="stat-title-yr">'+a.season+'</span>'
-              +'<span class="stat-title-cat">'+a.label+'</span>'
-              +'</div>';
-          });
-          html += '</div></div>';
-        });
-        html += '</div>';
-      }
-
-      if (!champSeasons.length && !playerKeys.length) {
-        html += '<div class="history-empty" style="padding:30px 0;">No individual or team awards found for this team.</div>';
-      }
-
-      html += '</div></div>';
-
-      document.getElementById('searchProfile').innerHTML = html;
-      document.getElementById('searchSuggestions').style.display = 'none';
-      var back = document.getElementById('backToSearch');
-      if (back) back.addEventListener('click', function(){
-        document.getElementById('searchSuggestions').style.display = '';
-        document.getElementById('searchProfile').innerHTML = '';
-      });
-    }
-
-    /* ── Init ── */
-    buildChampions();
-    buildAward('panel-mvp',     'mvp',     'most valuable player');
-    buildAward('panel-roty',    'roty',    'rookie of the year');
-    buildAward('panel-sixmoty', 'sixmoty', 'sixth man of the year');
-    buildAward('panel-dpoy',    'dpoy',    'defensive player of year');
-    buildAward('panel-mip',     'mip',     'most improved player');
-    buildStats('scoring');
-    buildSuggestions('');
-
-    /* ── Tab wiring ── */
-    var searchWrap = document.getElementById('searchWrap');
-    document.getElementById('historyTabs').addEventListener('click', function(e) {
-      var tab = e.target.closest('.history-tab');
-      if (!tab) return;
-      document.querySelectorAll('.history-tab').forEach(function(t){ t.classList.remove('active'); });
-      tab.classList.add('active');
-      var key = tab.dataset.tab;
-      document.querySelectorAll('.history-panel').forEach(function(p){ p.classList.remove('active'); });
-      var panel = document.getElementById('panel-'+key);
-      if (panel) { panel.classList.remove('active'); void panel.offsetWidth; panel.classList.add('active'); }
-      searchWrap.style.display = key==='search' ? 'block' : 'none';
-      if (key==='search') document.getElementById('historySearch').focus();
-    });
-
-    /* ── Search wiring ── */
-    var st;
-    document.getElementById('historySearch').addEventListener('input', function(e) {
-      clearTimeout(st);
-      st = setTimeout(function(){ buildSuggestions(e.target.value); }, 160);
-    });
-
-  })();
-  </script>
 </body>
 </html>
