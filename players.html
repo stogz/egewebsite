@@ -574,6 +574,430 @@
       .player-select-card:hover { transform:none; }
       .player-select-card:active { border-color:rgba(231,87,25,.5); background:rgba(231,87,25,.04); }
     }
+    /* ══ GAMES PANEL ══ */
+    .games-controls { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    .games-section-label { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.24em; text-transform:uppercase; color:var(--orange); margin-bottom:6px; display:block; }
+    .games-section-title { font-family:var(--font-display); font-weight:900; font-size:1.6rem; text-transform:uppercase; color:var(--heading); line-height:1; transition:color .35s; margin-bottom:0; }
+    .games-toggle { display:inline-flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+    .games-toggle-btn { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; padding:8px 18px; background:transparent; border:none; color:var(--text-muted); cursor:pointer; transition:background .2s,color .2s; white-space:nowrap; }
+    .games-toggle-btn.active { background:var(--orange); color:#fff; }
+    .games-toggle-btn:hover:not(.active) { background:rgba(231,87,25,.1); color:var(--text); }
+    .games-season-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .games-season-select-label { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); }
+
+    /* ── GAME LOG CARDS ── */
+    .game-log-list { display:flex; flex-direction:column; gap:14px; }
+
+    /* Outer wrapper — handles the expand/collapse border */
+    .game-log-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-card);
+      transition: border-color .22s, background .35s;
+    }
+    .game-log-card:hover { border-color: rgba(231,87,25,.4); }
+
+    /* Clickable summary row */
+    .glc-summary {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 20px 24px 20px 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s;
+    }
+    .glc-summary:hover { background: rgba(231,87,25,.03); }
+    .game-log-card.is-open .glc-summary { background: rgba(231,87,25,.03); }
+
+    /* ── CIRCLE HEADSHOT ── */
+    .glc-headshot-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+    .glc-headshot-circle {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    /* 50% transparent matte team-colour fill */
+    .glc-headshot-circle-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+    .glc-headshot-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 50%;
+      display: block;
+    }
+    .glc-headshot-initials {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 3rem;
+      color: #ffffff;
+    }
+    /* Team logo — no circle/border, raw image, bottom-right of headshot */
+    .glc-team-logo {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+    .glc-team-logo img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.55));
+    }
+
+    /* ── MAIN CONTENT ── */
+    .glc-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Top row: name · opp · date · game score */
+    .glc-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .glc-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--heading);
+      letter-spacing: .02em;
+      transition: color .35s;
+      white-space: nowrap;
+    }
+    .glc-dot-sep { color: var(--text-muted); font-size: .8rem; flex-shrink: 0; }
+    .glc-opp-info {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .glc-date {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      opacity: .5;
+      white-space: nowrap;
+    }
+    /* Game type label in top row (Regular Season / Game 1 etc) */
+    .glc-game-type {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    /* Opponent + logo inline in bottom row */
+    .glc-bottom-opp {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .glc-bottom-opp img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+    .glc-bottom-date {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      opacity: .5;
+      white-space: nowrap;
+    }
+    /* Game score — top right, always white */
+    .glc-score-right {
+      margin-left: auto;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .glc-gamescore {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 2.2rem;
+      line-height: 1;
+      color: #ffffff;
+    }
+    /* Basketball icon — white in dark mode, black in light mode */
+    .glc-ball-icon {
+      width: 22px;
+      height: 22px;
+      display: block;
+      object-fit: contain;
+      content: url('bballwhite.png');
+    }
+    html.light .glc-ball-icon {
+      content: url('bballblack.png');
+    }
+
+    /* Big 3 stats */
+    .glc-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      flex-wrap: nowrap;
+    }
+    .glc-stat-block {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-right: 28px;
+    }
+    .glc-stat-val {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 3.6rem;
+      line-height: 1;
+      color: #ffffff;
+    }
+    .glc-stat-lbl {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      letter-spacing: .05em;
+      padding-bottom: 6px;
+    }
+
+    /* W/L + final score bottom row */
+    .glc-bottom {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .glc-result-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px; height: 24px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      flex-shrink: 0;
+    }
+    .glc-result-badge.w { background: rgba(16,148,76,.14); color: rgba(16,148,76,.9); border: 1px solid rgba(16,148,76,.25); }
+    .glc-result-badge.l { background: rgba(211,47,47,.12); color: rgba(211,47,47,.85); border: 1px solid rgba(211,47,47,.2); }
+    .glc-score-text {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    /* Expand hint */
+    .glc-expand-hint {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: .5;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity .2s, color .2s;
+    }
+    .glc-summary:hover .glc-expand-hint,
+    .game-log-card.is-open .glc-expand-hint { opacity: 1; color: var(--orange); }
+    .glc-expand-arrow {
+      display: inline-block;
+      font-size: .6rem;
+      transition: transform .3s ease;
+    }
+    .game-log-card.is-open .glc-expand-arrow { transform: rotate(180deg); }
+
+    /* ── EXPANDABLE DETAIL PANEL ── */
+    .glc-detail {
+      max-height: 0;
+      overflow: hidden;
+      border-top: 0px solid var(--border);
+      transition: max-height .5s ease, border-top-width .4s;
+    }
+    .game-log-card.is-open .glc-detail {
+      max-height: 500px;
+      border-top: 1px solid var(--border);
+    }
+    .glc-detail-inner {
+      padding: 18px 24px 22px;
+    }
+
+    /* Top header row: "Final Stats" left, score+logos right */
+    .glc-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .glc-detail-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--heading);
+      transition: color .35s;
+    }
+    /* Score + logos */
+    .glc-detail-score-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .glc-detail-logo {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      display: block;
+    }
+    .glc-detail-score-text {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1.25rem;
+      letter-spacing: .02em;
+      color: var(--heading);
+      white-space: nowrap;
+    }
+    /* winning score is orange only — not bold */
+    .glc-detail-score-text .win { color: var(--orange); }
+
+    /* Single flex-wrap stat row — all stats on one line, wraps naturally */
+    .glc-detail-stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 36px;
+      align-items: flex-end;
+    }
+    .glc-detail-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .glc-detail-stat-val {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1.75rem;
+      line-height: 1;
+      color: var(--heading);
+      transition: color .35s;
+      white-space: nowrap;
+    }
+    .glc-detail-stat-lbl {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Header row above card list */
+    .games-list-header {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg-card);
+      transition: background .35s;
+      margin-bottom: 12px;
+    }
+    .games-list-header-inner {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .glh-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:blink 1.8s ease-in-out infinite; }
+    .glh-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
+    .glh-badge { font-family:var(--font-mono); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 10px; border-radius:3px; background:rgba(231,87,25,.1); color:var(--orange); border:1px solid rgba(231,87,25,.2); margin-left:auto; }
+
+    /* Empty state */
+    .games-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px; text-align:center; border:1px solid var(--border); border-radius:14px; background:var(--bg-card); }
+    .games-empty-icon { font-size:2rem; margin-bottom:16px; opacity:.35; }
+    .games-empty-title { font-family:var(--font-display); font-weight:700; font-size:1.4rem; text-transform:uppercase; color:var(--heading); margin-bottom:8px; transition:color .35s; }
+    .games-empty-sub { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); }
+
+    @media (max-width:768px) {
+      .games-controls { flex-direction:column; align-items:flex-start; }
+      .glc-summary { padding: 14px 16px 14px 14px; gap: 14px; }
+      .glc-headshot-wrap { width: 90px; height: 90px; }
+      .glc-team-logo { width: 34px; height: 34px; bottom: -4px; right: -4px; }
+      .glc-team-logo img { width: 34px; height: 34px; }
+      .glc-name { font-size: 1.05rem; }
+      .glc-stat-val { font-size: 2.4rem; }
+      .glc-stat-block { margin-right: 16px; }
+      .glc-gamescore { font-size: 1.6rem; }
+      .glc-ball-icon { width: 18px; height: 18px; }
+      .glc-date { display: none; }
+    }
+    @media (max-width:480px) {
+      .glc-headshot-wrap { width: 68px; height: 68px; }
+      .glc-team-logo { width: 26px; height: 26px; bottom: -3px; right: -3px; }
+      .glc-team-logo img { width: 26px; height: 26px; }
+      .glc-name { font-size: .9rem; }
+      .glc-opp-info { display: none; }
+      .glc-stat-val { font-size: 1.8rem; }
+      .glc-stat-lbl { font-size: .8rem; }
+      .glc-stat-block { margin-right: 12px; }
+      .glc-gamescore { font-size: 1.3rem; }
+      .glc-ball-icon { width: 15px; height: 15px; }
+    }
+
     /* ── STICKY FOOTER ── */
     body {
       display: flex;
@@ -692,6 +1116,7 @@
         <button class="subnav-tab" data-tab="awards">Awards</button>
         <button class="subnav-tab" data-tab="contracts">Contracts</button>
         <button class="subnav-tab" data-tab="career-high">Career High</button>
+        <button class="subnav-tab" data-tab="games">Games</button>
         <button class="subnav-tab" data-tab="shoes">Shoes</button>
         <select class="subnav-mobile-select" id="subnav-mobile-select" aria-label="Select section">
           <option value="bio">Bio</option>
@@ -699,6 +1124,7 @@
           <option value="awards">Awards</option>
           <option value="contracts">Contracts</option>
           <option value="career-high">Career High</option>
+          <option value="games">Games</option>
           <option value="shoes">Shoes</option>
         </select>
       </div>
@@ -824,6 +1250,9 @@
       <div class="content-panel" id="panel-career-high">
         <!-- Rendered by renderCareerHigh(key) -->
       </div>
+      <div class="content-panel" id="panel-games">
+        <!-- Rendered by renderGames(key) -->
+      </div>
       <div class="content-panel" id="panel-shoes">
         <!-- Rendered by renderShoes(key) -->
       </div>
@@ -842,6 +1271,7 @@
 
   <script src="stats.js"></script>
   <script src="player-stats.js"></script>
+  <script src="player-games.js"></script>
   <script src="shared.js"></script>
   <script>
   /* ══════════════════════════════════════════
@@ -866,57 +1296,61 @@
     }
   };
 
-  var TABS = ['bio','traditional-splits','awards','contracts','career-high','shoes'];
+  var TABS = ['bio','traditional-splits','awards','contracts','career-high','games','shoes'];
 
   /* ── HEADSHOT IMAGES ── */
   /* ── TEAM LOGOS ── */
   var _isLight = document.documentElement.classList.contains('light');
   var TEAM_LOGOS = {
-    'Los Angeles Lakers':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lal_orig.png',
-    'Los Angeles Clippers':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lac_orig.png',
-    'Indiana Pacers':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/ind_orig.png',
-    'Milwaukee Bucks':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png',
-    'New York Knicks':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nyk_orig.png',
-    'Chicago Bulls':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/chi_orig.png',
-    'Orlando Magic':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png',
-    'Denver Nuggets':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/den_orig.png',
-    'Washington Wizards':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png',
-    'Houston Rockets':       _isLight
+    // ── All 30 NBA teams ──
+    'Atlanta Hawks':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hawks2_orig.png',
+    'Boston Celtics':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bos_orig.png',
+    'Brooklyn Nets':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bkn_orig.png',
+    'Charlotte Hornets':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cha_orig.png',
+    'Chicago Bulls':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/chi_orig.png',
+    'Cleveland Cavaliers':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cle_orig.png',
+    'Dallas Mavericks':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/dal_orig.png',
+    'Denver Nuggets':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/den_orig.png',
+    'Detroit Pistons':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/det_orig.png',
+    'Golden State Warriors':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/gsw_orig.png',
+    'Houston Rockets':        _isLight
       ? 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hou_orig.png'
       : 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/rockets2_orig.png',
-    'Atlanta Hawks':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hawks2_orig.png',
-    'Boston Celtics':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bos_orig.png',
-    'Brooklyn Nets':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bkn_orig.png',
-    'Charlotte Hornets':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cha_orig.png',
-    'Cleveland Cavaliers':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cle_orig.png',
-    'Dallas Mavericks':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/dal_orig.png',
-    'Detroit Pistons':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/det_orig.png',
-    'Golden State Warriors': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/gsw_orig.png',
-    'Miami Heat':            'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mia_orig.png',
-    'Minnesota Timberwolves':'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/min_orig.png',
-    'New Orleans Pelicans':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nop_orig.png',
-    'Oklahoma City Thunder': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/okc_orig.png',
-    'Philadelphia 76ers':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png',
-    'Phoenix Suns':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/phx2_orig.png',
-    'Portland Trail Blazers':'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/por_orig.png',
-    'Sacramento Kings':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sac2_orig.png',
-    'San Antonio Spurs':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png',
-    'Toronto Raptors':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/raptors2_orig.png',
-    'Utah Jazz':             _isLight
+    'Indiana Pacers':         'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/ind_orig.png',
+    'Los Angeles Clippers':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lac_orig.png',
+    'Los Angeles Lakers':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lal_orig.png',
+    'Miami Heat':             'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mia_orig.png',
+    'Milwaukee Bucks':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png',
+    'Minnesota Timberwolves': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/min_orig.png',
+    'New Orleans Pelicans':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nop_orig.png',
+    'New York Knicks':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nyk_orig.png',
+    'Oklahoma City Thunder':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/okc_orig.png',
+    'Orlando Magic':          'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png',
+    'Philadelphia 76ers':     _isLight
+      ? 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ers-blue_orig.png'
+      : 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png',
+    'Phoenix Suns':           'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/phx2_orig.png',
+    'Portland Trail Blazers': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/por_orig.png',
+    'Sacramento Kings':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sac2_orig.png',
+    'San Antonio Spurs':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png',
+    'Toronto Raptors':        'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/raptors2_orig.png',
+    'Utah Jazz':              _isLight
       ? 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/uta_orig.png'
       : 'https://logos.logofury.com/logo_src/20dba3b5841d7dc92dc0c589c08493f7.png',
-    'Vancouver Grizzlies':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png',
-    'Mexico City Flight':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mex_orig.png',
-    'St. Louis Spirit':      'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png',
-    // College teams
-    'FSU':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/fsu-seminoles_orig.png',
-    'DUKE':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/duke-blue-devils_orig.png',
-    'KU':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/kansas-jayhawks-1946-logo-svg_2.png',
-    'AU':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/arizona-wildcats-logo-svg.png?1745441103',
-    'LOU':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/louisville-cardinals-logo-svg.png?1746770401',
-    'UCLA':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/ucla-bruins-logo-svg.png?1746204102',
+    'Washington Wizards':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png',
+    // ── EGE expansion / historical teams ──
+    'Vancouver Grizzlies':    'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png',
+    'Mexico City Flight':     'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mex_orig.png',
+    'St. Louis Spirit':       'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png',
+    // ── College teams ──
+    'FSU':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/fsu-seminoles_orig.png',
+    'DUKE': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/duke-blue-devils_orig.png',
+    'KU':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/kansas-jayhawks-1946-logo-svg_2.png',
+    'AU':   'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/arizona-wildcats-logo-svg.png?1745441103',
+    'LOU':  'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/louisville-cardinals-logo-svg.png?1746770401',
+    'UCLA': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/ucla-bruins-logo-svg.png?1746204102',
   };
-  // Refresh mode-dependent team logos (called before any render)
+  // Refresh mode-dependent logos
   function refreshModeLogos() {
     var light = document.documentElement.classList.contains('light');
     TEAM_LOGOS['Houston Rockets'] = light
@@ -925,6 +1359,9 @@
     TEAM_LOGOS['Utah Jazz'] = light
       ? 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/uta_orig.png'
       : 'https://logos.logofury.com/logo_src/20dba3b5841d7dc92dc0c589c08493f7.png';
+    TEAM_LOGOS['Philadelphia 76ers'] = light
+      ? 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ers-blue_orig.png'
+      : 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png';
     // Update banner logo if visible
     var bannerLogo = document.getElementById('banner-team-logo');
     if (bannerLogo && currentKey) {
@@ -935,45 +1372,82 @@
     }
   }
 
-  // Map abbreviations used in regular-season rows to full team names
+  // Map abbreviations to full team names
   var TEAM_ABBR = {
-    'LAL':'Los Angeles Lakers',
-    'LAC':'Los Angeles Clippers',
-    'IND':'Indiana Pacers',
-    'MIL':'Milwaukee Bucks',
-    'NYK':'New York Knicks',
-    'CHI':'Chicago Bulls',
-    'ORL':'Orlando Magic',
-    'DEN':'Denver Nuggets',
-    'WAS':'Washington Wizards',
-    'HOU':'Houston Rockets',
-    'UTA':'Utah Jazz',
-    'VAN':'Vancouver Grizzlies',
-    'SAS':'San Antonio Spurs',
-    'MEX':'Mexico City Flight',
-    'STL':'St. Louis Spirit',
+    // All 30 NBA teams
+    'ATL': 'Atlanta Hawks',
+    'BOS': 'Boston Celtics',
+    'BKN': 'Brooklyn Nets',
+    'CHA': 'Charlotte Hornets',
+    'CHI': 'Chicago Bulls',
+    'CLE': 'Cleveland Cavaliers',
+    'DAL': 'Dallas Mavericks',
+    'DEN': 'Denver Nuggets',
+    'DET': 'Detroit Pistons',
+    'GSW': 'Golden State Warriors',
+    'HOU': 'Houston Rockets',
+    'IND': 'Indiana Pacers',
+    'LAC': 'Los Angeles Clippers',
+    'LAL': 'Los Angeles Lakers',
+    'MIA': 'Miami Heat',
+    'MIL': 'Milwaukee Bucks',
+    'MIN': 'Minnesota Timberwolves',
+    'NOP': 'New Orleans Pelicans',
+    'NYK': 'New York Knicks',
+    'OKC': 'Oklahoma City Thunder',
+    'ORL': 'Orlando Magic',
+    'PHI': 'Philadelphia 76ers',
+    'PHX': 'Phoenix Suns',
+    'POR': 'Portland Trail Blazers',
+    'SAC': 'Sacramento Kings',
+    'SAS': 'San Antonio Spurs',
+    'TOR': 'Toronto Raptors',
+    'UTA': 'Utah Jazz',
+    'WAS': 'Washington Wizards',
+    // EGE expansion / historical
+    'VAN': 'Vancouver Grizzlies',
+    'MEX': 'Mexico City Flight',
+    'STL': 'St. Louis Spirit',
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
   }
 
-  // Primary and secondary colors per team for the banner gradient
+  // Primary and secondary colors per team for banner gradients
   var TEAM_BANNER_COLORS = {
-    'Los Angeles Lakers':   { primary:'#552583', secondary:'#FDB927' },
-    'Los Angeles Clippers': { primary:'#C8102E', secondary:'#1D428A' },
-    'Indiana Pacers':       { primary:'#002D62', secondary:'#FDBB30' },
-    'Milwaukee Bucks':      { primary:'#00471B', secondary:'#EEE1C6' },
-    'New York Knicks':      { primary:'#006BB6', secondary:'#F58426' },
-    'Chicago Bulls':        { primary:'#CE1141', secondary:'#000000' },
-    'Orlando Magic':        { primary:'#0077C0', secondary:'#C4CED4' },
-    'Denver Nuggets':       { primary:'#0E2240', secondary:'#FEC524' },
-    'Washington Wizards':   { primary:'#002B5C', secondary:'#E31837' },
-    'Houston Rockets':      { primary:'#CE1141', secondary:'#000000' },
-    'Utah Jazz':            { primary:'#002B5C', secondary:'#F9A01B' },
-    'Vancouver Grizzlies':  { primary:'#5D76A9', secondary:'#F5A623' },
-    'San Antonio Spurs':    { primary:'#000000', secondary:'#C4CED4' },
-    'Mexico City Flight':   { primary:'#07b4c0', secondary:'#e75719' },
-    'St. Louis Spirit':     { primary:'#d16405', secondary:'#ffffff' },
+    'Atlanta Hawks':          { primary:'#CC092F', secondary:'#C1C6C8' },
+    'Boston Celtics':         { primary:'#007A33', secondary:'#BA9653' },
+    'Brooklyn Nets':          { primary:'#000000', secondary:'#FFFFFF' },
+    'Charlotte Hornets':      { primary:'#1D1160', secondary:'#00788C' },
+    'Chicago Bulls':          { primary:'#CE1141', secondary:'#000000' },
+    'Cleveland Cavaliers':    { primary:'#860038', secondary:'#FDBB30' },
+    'Dallas Mavericks':       { primary:'#00538C', secondary:'#002B5E' },
+    'Denver Nuggets':         { primary:'#0E2240', secondary:'#FEC524' },
+    'Detroit Pistons':        { primary:'#C8102E', secondary:'#1D42BA' },
+    'Golden State Warriors':  { primary:'#1D428A', secondary:'#FFC72C' },
+    'Houston Rockets':        { primary:'#CE1141', secondary:'#000000' },
+    'Indiana Pacers':         { primary:'#002D62', secondary:'#FDBB30' },
+    'Los Angeles Clippers':   { primary:'#C8102E', secondary:'#1D428A' },
+    'Los Angeles Lakers':     { primary:'#552583', secondary:'#FDB927' },
+    'Miami Heat':             { primary:'#98002E', secondary:'#F9A01B' },
+    'Milwaukee Bucks':        { primary:'#00471B', secondary:'#EEE1C6' },
+    'Minnesota Timberwolves': { primary:'#0C2340', secondary:'#236192' },
+    'New Orleans Pelicans':   { primary:'#0C2340', secondary:'#C8102E' },
+    'New York Knicks':        { primary:'#006BB6', secondary:'#F58426' },
+    'Oklahoma City Thunder':  { primary:'#007AC1', secondary:'#EF3B24' },
+    'Orlando Magic':          { primary:'#0077C0', secondary:'#C4CED4' },
+    'Philadelphia 76ers':     { primary:'#006BB6', secondary:'#ED174C' },
+    'Phoenix Suns':           { primary:'#1D1160', secondary:'#E56020' },
+    'Portland Trail Blazers': { primary:'#E03A3E', secondary:'#000000' },
+    'Sacramento Kings':       { primary:'#5A2D81', secondary:'#63727A' },
+    'San Antonio Spurs':      { primary:'#000000', secondary:'#C4CED4' },
+    'Toronto Raptors':        { primary:'#CE1141', secondary:'#000000' },
+    'Utah Jazz':              { primary:'#002B5C', secondary:'#F9A01B' },
+    'Washington Wizards':     { primary:'#002B5C', secondary:'#E31837' },
+    // EGE expansion / historical
+    'Vancouver Grizzlies':    { primary:'#5D76A9', secondary:'#F5A623' },
+    'Mexico City Flight':     { primary:'#07b4c0', secondary:'#e75719' },
+    'St. Louis Spirit':       { primary:'#d16405', secondary:'#ffffff' },
   };
 
   var PLAYER_HEADSHOTS = {
@@ -2652,6 +3126,427 @@
     });
   }
 
+  /* ── GAMES LOG ── */
+  var gamesMode   = 'regular'; // 'regular' | 'playoffs'
+  var gamesSeason = 'all';
+
+  /* ── Game Score formula ── */
+  function calcGameScore(g) {
+    return g.pts + (0.4*g.fgm) - (0.7*g.fga) - (0.4*(g.fta - g.ftm))
+           + (0.5*g.reb) + g.stl + (0.7*g.ast) + (0.7*g.blk) - g.tov;
+  }
+
+  /* ── F. Lastname ── */
+  function abbrevName(fullName) {
+    var parts = (fullName||'').trim().split(/\s+/);
+    if (parts.length < 2) return fullName;
+    return parts[0].charAt(0) + '. ' + parts.slice(1).join(' ');
+  }
+
+  /* ── hex → rgba ── */
+  function hexRgba(hex, a) {
+    if (!hex || hex.charAt(0) !== '#') return 'rgba(35,26,165,'+a+')';
+    var r=parseInt(hex.slice(1,3),16), gg=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+gg+','+b+','+a+')';
+  }
+
+  /* ── Derive team abbreviation from PLAYER_STATS for a given season ── */
+  function teamForSeason(key, season, type) {
+    var rows = ((PLAYER_STATS[key]||{})[type||'regular']||[]);
+    for (var i=0; i<rows.length; i++) {
+      if (rows[i].season === season) return rows[i].team || '';
+    }
+    // fall back to nearest season before
+    var best = null;
+    rows.forEach(function(r){
+      if (r.season <= season) best = r.team;
+    });
+    return best || '';
+  }
+
+  /* ── Pick the 3 best highlight stats for a game ──
+     Rules:
+     1. PTS is always first.
+     2. REB or AST is always second (whichever is higher raw value).
+     3. Third slot picks the most impressive remaining stat by priority:
+        3PM (raw made), 3P% (if tpa≥4), FG% (if fga≥8), STL, BLK, FT% (lowest priority).
+        A % stat is shown only if it's genuinely noteworthy (thresholds below).
+  */
+  function pickDisplayStats(g) {
+    var stats = [];
+
+    // 1. PTS always first
+    stats.push({ val: g.pts, lbl: 'PTS', display: String(g.pts) });
+
+    // 2. REB vs AST — higher raw value second
+    if (g.reb >= g.ast) {
+      stats.push({ val: g.reb, lbl: 'REB', display: String(g.reb) });
+    } else {
+      stats.push({ val: g.ast, lbl: 'AST', display: String(g.ast) });
+    }
+
+    // 3. Third stat — evaluate candidates
+    var remaining = [];
+
+    // Raw counting stats (reb/ast whichever wasn't used)
+    var usedSecond = stats[1].lbl;
+    if (usedSecond !== 'REB') remaining.push({ priority: g.reb,   lbl:'REB', display:String(g.reb),   sort:g.reb });
+    if (usedSecond !== 'AST') remaining.push({ priority: g.ast,   lbl:'AST', display:String(g.ast),   sort:g.ast });
+
+    // 3PM — show if made ≥ 3
+    if (g.tpm >= 3) {
+      remaining.push({ priority: g.tpm * 4 + 10, lbl:'3PM', display:String(g.tpm), sort:g.tpm*4+10 });
+    }
+
+    // 3P% — show if tpa ≥ 4 and pct ≥ 50%
+    if (g.tpa >= 4) {
+      var tpp = g.tpm / g.tpa * 100;
+      if (tpp >= 50) {
+        remaining.push({ priority: tpp / 2 + 8, lbl:'3P%', display: tpp.toFixed(0) + '%', sort: tpp/2+8 });
+      }
+    }
+
+    // FG% — show if fga ≥ 8 and pct ≥ 55%
+    if (g.fga >= 8) {
+      var fgp = g.fgm / g.fga * 100;
+      if (fgp >= 55) {
+        remaining.push({ priority: fgp / 3 + 5, lbl:'FG%', display: fgp.toFixed(0) + '%', sort: fgp/3+5 });
+      }
+    }
+
+    // STL
+    if (g.stl >= 2) {
+      remaining.push({ priority: g.stl * 5, lbl:'STL', display:String(g.stl), sort:g.stl*5 });
+    }
+
+    // BLK
+    if (g.blk >= 2) {
+      remaining.push({ priority: g.blk * 4, lbl:'BLK', display:String(g.blk), sort:g.blk*4 });
+    }
+
+    // FT% — lowest priority, show only if fta ≥ 6 and pct ≥ 85%
+    if (g.fta >= 6) {
+      var ftp = g.ftm / g.fta * 100;
+      if (ftp >= 85) {
+        remaining.push({ priority: ftp / 6, lbl:'FT%', display: ftp.toFixed(0) + '%', sort: ftp/6 });
+      }
+    }
+
+    // Sort descending by priority, pick best
+    remaining.sort(function(a,b){ return b.sort - a.sort; });
+    if (remaining.length) {
+      stats.push({ val: remaining[0].sort, lbl: remaining[0].lbl, display: remaining[0].display });
+    } else {
+      // fallback: STL or BLK or TOV
+      if (g.stl > 0) stats.push({ lbl:'STL', display:String(g.stl) });
+      else if (g.blk > 0) stats.push({ lbl:'BLK', display:String(g.blk) });
+      else stats.push({ lbl:'TOV', display:String(g.tov) });
+    }
+
+    return stats; // always 3 elements
+  }
+
+  function renderGamesTable(key, games) {
+    var panel = document.getElementById('panel-games');
+    if (!panel) return;
+    var p = PLAYERS[key];
+
+    var filtered = games.filter(function(g){
+      if (g.type !== gamesMode) return false;
+      if (gamesSeason !== 'all' && g.season !== gamesSeason) return false;
+      return true;
+    });
+
+    var sorted = filtered.slice().sort(function(a,b){
+      return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+    });
+
+    var seasonSet = {};
+    games.forEach(function(g){ if (g.type === gamesMode) seasonSet[g.season] = true; });
+    var seasons = Object.keys(seasonSet).sort().reverse();
+
+    var html = '';
+
+    // Controls
+    html += '<div class="games-controls">'
+      + '<div><p class="games-section-label">// game log</p><h3 class="games-section-title">Game Log</h3></div>'
+      + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">';
+    if (seasons.length > 0) {
+      html += '<div class="games-season-select-wrap"><span class="games-season-select-label">Season</span>'
+        + '<select class="chart-select" id="games-season-select">'
+        + '<option value="all"' + (gamesSeason==='all'?' selected':'') + '>All Seasons</option>';
+      seasons.forEach(function(s){
+        html += '<option value="'+s+'"'+(gamesSeason===s?' selected':'')+'>'+s+'</option>';
+      });
+      html += '</select></div>';
+    }
+    html += '<div class="games-toggle">'
+      + '<button class="games-toggle-btn'+(gamesMode==='regular'?' active':'')+'" data-gmode="regular">Regular Season</button>'
+      + '<button class="games-toggle-btn'+(gamesMode==='playoffs'?' active':'')+'" data-gmode="playoffs">Playoffs</button>'
+      + '</div></div></div>';
+
+    // Header card
+    html += '<div class="games-list-header"><div class="games-list-header-inner">'
+      + '<div class="glh-dot"></div>'
+      + '<span class="glh-title">'+p.name+' · '+(gamesMode==='regular'?'Regular Season':'Playoffs')+'</span>'
+      + (filtered.length ? '<span class="glh-badge">'+filtered.length+' '+(filtered.length===1?'game':'games')+'</span>' : '')
+      + '</div></div>';
+
+    if (!sorted.length) {
+      html += '<div class="games-empty"><div class="games-empty-icon">📋</div>'
+        + '<div class="games-empty-title">No Games Logged</div>'
+        + '<div class="games-empty-sub">Add game data to player-games.js to populate this log</div>'
+        + '</div>';
+      panel.innerHTML = html;
+      wireGamesControls(panel, key, games);
+      return;
+    }
+
+    html += '<div class="game-log-list">';
+
+    // ── Pre-compute playoff game numbers per season ──
+    // For each season in playoffs mode, number games chronologically (Game 1, Game 2 …)
+    var playoffGameNums = {};
+    if (gamesMode === 'playoffs') {
+      var bySeasonDate = {};
+      filtered.forEach(function(g) {
+        var k = g.season;
+        if (!bySeasonDate[k]) bySeasonDate[k] = [];
+        bySeasonDate[k].push(g.date);
+      });
+      Object.keys(bySeasonDate).forEach(function(k) {
+        bySeasonDate[k].sort();
+        bySeasonDate[k].forEach(function(d, i) {
+          playoffGameNums[k + '|' + d] = i + 1;
+        });
+      });
+    }
+
+    // Number words for game labels
+    var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
+
+    sorted.forEach(function(g) {
+      // ── Team lookup from season ──
+      var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
+      var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
+      var colors    = TEAM_BANNER_COLORS[teamName] || { primary:'#231aa5', secondary:'#e75719' };
+      var accent    = colors.primary;
+      var logoUrl   = TEAM_LOGOS[teamName] || '';
+      var headshot  = PLAYER_HEADSHOTS[key] || '';
+
+      // ── Game score — always white ──
+      var gs = calcGameScore(g);
+      var gsAbs = Math.abs(gs).toFixed(1);
+      var gsSign = gs < 0 ? '−' : '';
+
+      var ballHtml = '<img class="glc-ball-icon" src="bballwhite.png" alt="">';
+
+      // ── Display stats ──
+      var displayStats = pickDisplayStats(g);
+
+      var isWin = (g.result||'').toUpperCase() === 'W';
+      var haHome = g.home ? 'vs' : '@';
+
+      // ── Shooting percentages for detail panel ──
+      var fgpStr = g.fga > 0 ? (g.fgm/g.fga*100).toFixed(1)+'%' : '—';
+      var tppStr = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
+      var ftpStr = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
+
+      // ── Game type label ──
+      var gameTypeLabel;
+      if (g.type === 'playoffs') {
+        var gNum = playoffGameNums[g.season + '|' + g.date];
+        gameTypeLabel = 'Game ' + (NUM_WORDS[gNum - 1] || gNum);
+      } else {
+        gameTypeLabel = 'Regular Season';
+      }
+
+      // ── Opponent info for bottom row ──
+      var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
+      var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
+      var oppFullShort = oppTeamName.split(' ').slice(-1)[0]; // last word e.g. "Warriors"
+
+      html += '<div class="game-log-card">';
+
+      // ── CLICKABLE SUMMARY ROW ──
+      html += '<div class="glc-summary">';
+
+      // Circle headshot
+      html += '<div class="glc-headshot-wrap">';
+      html += '<div class="glc-headshot-circle">';
+      html += '<div class="glc-headshot-circle-bg" style="background:'+accent+';"></div>';
+      if (headshot) {
+        html += '<img class="glc-headshot-img" src="'+headshot+'" alt="'+p.name+'">';
+      } else {
+        html += '<div class="glc-headshot-initials">'+p.initials+'</div>';
+      }
+      html += '</div>'; // .glc-headshot-circle
+      if (logoUrl) {
+        html += '<div class="glc-team-logo"><img src="'+logoUrl+'" alt="'+teamName+'"></div>';
+      }
+      html += '</div>'; // .glc-headshot-wrap
+
+      // Main content
+      html += '<div class="glc-main">';
+
+      // Top row: game type label (left) · ball icon + game score (right)
+      html += '<div class="glc-top">'
+        + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
+        + '<span class="glc-score-right">'
+        + ballHtml
+        + '<span class="glc-gamescore">'+gsSign+gsAbs+'</span>'
+        + '</span>'
+        + '</div>';
+
+      // Big 3 stats
+      html += '<div class="glc-stats">';
+      displayStats.forEach(function(s){
+        html += '<div class="glc-stat-block">'
+          + '<span class="glc-stat-val">'+s.display+'</span>'
+          + '<span class="glc-stat-lbl">'+s.lbl+'</span>'
+          + '</div>';
+      });
+      html += '</div>';
+
+      // Bottom row: W/L · vs. Team {logo} · date · expand hint
+      var oppLogoHtml = oppLogoUrl
+        ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
+        : '';
+      html += '<div class="glc-bottom">'
+        + '<span class="glc-result-badge '+(isWin?'w':'l')+'">'+(isWin?'W':'L')+'</span>'
+        + '<span class="glc-bottom-opp">'+haHome+' '+oppFullShort+oppLogoHtml+'</span>'
+        + '<span class="glc-dot-sep">·</span>'
+        + '<span class="glc-bottom-date">'+g.date+'</span>'
+        + '<span class="glc-expand-hint">Details <span class="glc-expand-arrow">▼</span></span>'
+        + '</div>';
+
+      html += '</div>'; // .glc-main
+      html += '</div>'; // .glc-summary
+
+      // ── EXPANDABLE DETAIL PANEL ──
+      // TS% = PTS / (2 * (FGA + 0.44 * FTA))
+      var tsPct = (g.fga + 0.44 * g.fta) > 0
+        ? (g.pts / (2 * (g.fga + 0.44 * g.fta)) * 100).toFixed(1) + '%'
+        : '—';
+
+      // Score display: away score on left, home score on right
+      // g.home = true means the player's team is home (right side)
+      // g.score stored as "ourScore-theirScore"
+      var scoreHtml = g.score || '—';
+      if (g.score && g.score.indexOf('-') !== -1) {
+        var scoreParts = g.score.split('-');
+        var ourScore  = scoreParts[0].trim();
+        var theirScore = scoreParts[1].trim();
+        var ourWon = isWin;
+        if (g.home) {
+          // home (right): our score on right, opp on left
+          scoreHtml = (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>')
+            + '-'
+            + (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore);
+        } else {
+          // away (left): our score on left, opp on right
+          scoreHtml = (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore)
+            + '-'
+            + (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>');
+        }
+      }
+
+      // Opponent logo
+      // (oppTeamName and oppLogoUrl already declared above in summary row section)
+
+      // stat helper — no hi class at all
+      function detStat(val, lbl) {
+        return '<div class="glc-detail-stat">'
+          + '<span class="glc-detail-stat-val">'+val+'</span>'
+          + '<span class="glc-detail-stat-lbl">'+lbl+'</span>'
+          + '</div>';
+      }
+
+      html += '<div class="glc-detail"><div class="glc-detail-inner">';
+
+      // Header: Final Stats | logos + score
+      // Away logo · score · home logo  (home always right)
+      html += '<div class="glc-detail-header">';
+      html += '<span class="glc-detail-title">Final Stats</span>';
+      html += '<div class="glc-detail-score-block">';
+      if (g.home) {
+        // away opp on left, our team on right
+        if (oppLogoUrl) html += '<img class="glc-detail-logo" src="'+oppLogoUrl+'" alt="'+oppTeamName+'">';
+        html += '<span class="glc-detail-score-text">'+scoreHtml+'</span>';
+        if (logoUrl)    html += '<img class="glc-detail-logo" src="'+logoUrl+'" alt="'+teamName+'">';
+      } else {
+        // our team away on left, opp home on right
+        if (logoUrl)    html += '<img class="glc-detail-logo" src="'+logoUrl+'" alt="'+teamName+'">';
+        html += '<span class="glc-detail-score-text">'+scoreHtml+'</span>';
+        if (oppLogoUrl) html += '<img class="glc-detail-logo" src="'+oppLogoUrl+'" alt="'+oppTeamName+'">';
+      }
+      html += '</div></div>'; // score-block + header
+
+      // All stats on one flex-wrap row
+      html += '<div class="glc-detail-stat-row">';
+      html += detStat(g.min,            'MIN');
+      html += detStat(g.pts,            'PTS');
+      html += detStat(g.reb,            'REB');
+      html += detStat(g.ast,            'AST');
+      html += detStat(g.stl,            'STL');
+      html += detStat(g.blk,            'BLK');
+      html += detStat(fgpStr,           'FG%');
+      html += detStat(g.fgm+'/'+g.fga, 'FG');
+      html += detStat(g.tpm+'/'+g.tpa, '3FG');
+      html += detStat(g.ftm+'/'+g.fta, 'FTS');
+      html += detStat(g.tov,            'TO');
+      html += detStat(tsPct,            'TS%');
+      html += detStat(gsSign+gsAbs,     'HOOP SCORE');
+      html += '</div>';
+
+      html += '</div></div>'; // .glc-detail-inner / .glc-detail
+
+      html += '</div>'; // .game-log-card
+    });
+
+    html += '</div>'; // .game-log-list
+    panel.innerHTML = html;
+    wireGamesControls(panel, key, games);
+  }
+
+  function wireGamesControls(panel, key, games) {
+    var SUPABASE_URL      = 'https://wspmprjqqhtxekzyensq.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
+    var seasonSel = document.getElementById('games-season-select');
+    if (seasonSel) {
+      seasonSel.addEventListener('change', function(){
+        gamesSeason = this.value;
+        renderGamesTable(key, games);
+      });
+    }
+    panel.querySelectorAll('.games-toggle-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        gamesMode   = btn.dataset.gmode;
+        gamesSeason = 'all';
+        renderGamesTable(key, games);
+      });
+    });
+    // Wire card expand/collapse — click summary row toggles is-open on parent card
+    panel.querySelectorAll('.glc-summary').forEach(function(summary){
+      summary.addEventListener('click', function(){
+        var card = summary.closest('.game-log-card');
+        if (!card) return;
+        var isOpen = card.classList.contains('is-open');
+        // Close all others first
+        panel.querySelectorAll('.game-log-card.is-open').forEach(function(c){ c.classList.remove('is-open'); });
+        // Toggle this one
+        if (!isOpen) card.classList.add('is-open');
+      });
+    });
+  }
+
+  function renderGames(key) {
+    var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[key]) || [];
+    gamesMode   = 'regular';
+    gamesSeason = 'all';
+    renderGamesTable(key, games);
+  }
+
     /* ── TAB SWITCH ── */
   function switchTab(tab, key, push) {
     // Fade out current panel briefly before switching
@@ -2666,6 +3561,9 @@
     }
     if(tab==='career-high'){
       renderCareerHigh(key);
+    }
+    if(tab==='games'){
+      renderGames(key);
     }
     if(tab==='contracts'){
       renderContracts(key);

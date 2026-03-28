@@ -4672,7 +4672,7 @@ window.EGE_BRACKETS = {
       r1: [
         { top: "losangeleslakers",   topW: 4, bot: "goldenstatewarriors",botW: 0 },  /* 1 vs 8 */
         { top: "neworleanspelicans", topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 4 vs 5 */
-        { top: "utahjazz",           topW: 4, bot: "memphisgrizzlies",   botW: 1 },  /* 3 vs 6 */
+        { top: "utahjazz",           topW: 4, bot: "vancouvergrizzlies",   botW: 1 },  /* 3 vs 6 */
         { top: "sacramentokings",    topW: 4, bot: "dallasmavericks",    botW: 1 },  /* 2 vs 7 */
       ],
       r2: [
@@ -4708,11 +4708,11 @@ window.EGE_BRACKETS = {
         { top: "utahjazz",           topW: 4, bot: "phoenixsuns",        botW: 2 },  /* 1 vs 8 */
         { top: "sacramentokings",    topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 4 vs 5 */
         { top: "losangeleslakers",   topW: 4, bot: "neworleanspelicans", botW: 0 },  /* 3 vs 6 */
-        { top: "dallasmavericks",    topW: 2, bot: "memphisgrizzlies",   botW: 4 },  /* 2 vs 7 */
+        { top: "dallasmavericks",    topW: 2, bot: "vancouvergrizzlies",   botW: 4 },  /* 2 vs 7 */
       ],
       r2: [
         { top: "utahjazz",           topW: 4, bot: "sanantoniospurs",    botW: 2 },  /* 1/8 vs 4/5 */
-        { top: "losangeleslakers",   topW: 4, bot: "memphisgrizzlies",   botW: 1 },  /* 3/6 vs 2/7 */
+        { top: "losangeleslakers",   topW: 4, bot: "vancouvergrizzlies",   botW: 1 },  /* 3/6 vs 2/7 */
       ],
       r3: [
         { top: "utahjazz",           topW: 3, bot: "losangeleslakers",   botW: 4 },
@@ -4776,7 +4776,7 @@ window.EGE_BRACKETS = {
       playoff_seeds: {},
       r1: [
         { top: "dallasmavericks",    topW: 4, bot: "phoenixsuns",        botW: 3 },  /* 1 vs 8 */
-        { top: "sacramentokings",    topW: 4, bot: "memphisgrizzlies",   botW: 0 },  /* 4 vs 5 */
+        { top: "sacramentokings",    topW: 4, bot: "vancouvergrizzlies",   botW: 0 },  /* 4 vs 5 */
         { top: "utahjazz",           topW: 0, bot: "neworleanspelicans", botW: 4 },  /* 3 vs 6 */
         { top: "losangeleslakers",   topW: 2, bot: "sanantoniospurs",    botW: 4 },  /* 2 vs 7 */
       ],
@@ -4811,12 +4811,12 @@ window.EGE_BRACKETS = {
       playoff_seeds: {},
       r1: [
         { top: "losangeleslakers",   topW: 4, bot: "minnesotatimberwolves", botW: 0 },  /* 1 vs 8 */
-        { top: "utahjazz",           topW: 2, bot: "memphisgrizzlies",   botW: 4 },  /* 4 vs 5 */
+        { top: "utahjazz",           topW: 2, bot: "vancouvergrizzlies",   botW: 4 },  /* 4 vs 5 */
         { top: "sacramentokings",    topW: 4, bot: "portlandtrailblazers",botW: 3 },  /* 3 vs 6 */
         { top: "dallasmavericks",    topW: 4, bot: "houstonrockets",     botW: 2 },  /* 2 vs 7 */
       ],
       r2: [
-        { top: "losangeleslakers",   topW: 4, bot: "memphisgrizzlies",   botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "losangeleslakers",   topW: 4, bot: "vancouvergrizzlies",   botW: 0 },  /* 1/8 vs 4/5 */
         { top: "dallasmavericks",    topW: 4, bot: "sacramentokings",    botW: 0 },  /* 3/6 vs 2/7 */
       ],
       r3: [
@@ -4846,7 +4846,7 @@ window.EGE_BRACKETS = {
       playoff_seeds: {},
       r1: [
         { top: "losangeleslakers",   topW: 4, bot: "sanantoniospurs",    botW: 2 },  /* 1 vs 8 */
-        { top: "sacramentokings",    topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 4 vs 5 */
+        { top: "sacramentokings",    topW: 4, bot: "vancouvergrizzlies",   botW: 2 },  /* 4 vs 5 */
         { top: "houstonrockets",     topW: 2, bot: "denvernuggets",      botW: 4 },  /* 3 vs 6 */
         { top: "dallasmavericks",    topW: 4, bot: "neworleanspelicans", botW: 2 },  /* 2 vs 7 */
       ],
@@ -4883,7 +4883,7 @@ window.EGE_BRACKETS = {
         { top: "losangeleslakers",   topW: 4, bot: "houstonrockets",     botW: 3 },  /* 1 vs 8 */
         { top: "portlandtrailblazers",topW:1, bot: "phoenixsuns",        botW: 4 },  /* 4 vs 5 */
         { top: "losangelesclippers", topW: 4, bot: "sacramentokings",    botW: 0 },  /* 3 vs 6 */
-        { top: "sanantoniospurs",    topW: 4, bot: "memphisgrizzlies",   botW: 3 },  /* 2 vs 7 */
+        { top: "sanantoniospurs",    topW: 4, bot: "vancouvergrizzlies",   botW: 3 },  /* 2 vs 7 */
       ],
       r2: [
         { top: "losangeleslakers",   topW: 4, bot: "phoenixsuns",        botW: 3 },  /* 1/8 vs 4/5 */
@@ -4915,7 +4915,7 @@ window.EGE_BRACKETS = {
     west: {
       playoff_seeds: {},
       r1: [
-        { top: "goldenstatewarriors",topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 1 vs 8 */
+        { top: "goldenstatewarriors",topW: 4, bot: "vancouvergrizzlies",   botW: 2 },  /* 1 vs 8 */
         { top: "sanantoniospurs",    topW: 4, bot: "losangeleslakers",   botW: 1 },  /* 4 vs 5 */
         { top: "losangelesclippers", topW: 4, bot: "houstonrockets",     botW: 0 },  /* 3 vs 6 */
         { top: "denvernuggets",      topW: 4, bot: "sacramentokings",    botW: 1 },  /* 2 vs 7 */
@@ -4987,7 +4987,7 @@ window.EGE_BRACKETS = {
       r1: [
         { top: "goldenstatewarriors",topW: 4, bot: "losangeleslakers",   botW: 1 },  /* 1 vs 8 */
         { top: "losangelesclippers", topW: 2, bot: "dallasmavericks",    botW: 4 },  /* 4 vs 5 */
-        { top: "sanantoniospurs",    topW: 4, bot: "memphisgrizzlies",   botW: 2 },  /* 3 vs 6 */
+        { top: "sanantoniospurs",    topW: 4, bot: "vancouvergrizzlies",   botW: 2 },  /* 3 vs 6 */
         { top: "houstonrockets",     topW: 4, bot: "denvernuggets",      botW: 1 },  /* 2 vs 7 */
       ],
       r2: [
