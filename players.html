@@ -3364,18 +3364,17 @@
       return true;
     });
 
-    // Sort based on gamesSort
-    var sorted = filtered.slice().sort(function(a, b){
-      if (gamesSort === 'oldest') {
-        return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
-      } else if (gamesSort === 'best') {
-        return calcGameScore(b) - calcGameScore(a);
-      } else if (gamesSort === 'worst') {
-        return calcGameScore(a) - calcGameScore(b);
-      } else { // latest (default)
-        return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
-      }
-    });
+    // Sort based on gamesSort — no date, so use array index as entry order
+    var sorted = filtered.slice();
+    if (gamesSort === 'oldest') {
+      // keep as-entered order (first entered = oldest)
+    } else if (gamesSort === 'best') {
+      sorted.sort(function(a, b){ return calcGameScore(b) - calcGameScore(a); });
+    } else if (gamesSort === 'worst') {
+      sorted.sort(function(a, b){ return calcGameScore(a) - calcGameScore(b); });
+    } else { // latest — reverse entry order
+      sorted.reverse();
+    }
 
     // Season options from ALL games (both types) so switching type doesn't reset it
     var seasonSet = {};
@@ -3426,27 +3425,6 @@
 
     html += '<div class="game-log-list">';
 
-    // ── Pre-compute playoff game numbers per season ──
-    // For each season in playoffs mode, number games chronologically (Game 1, Game 2 …)
-    var playoffGameNums = {};
-    if (gamesMode === 'playoffs') {
-      var bySeasonDate = {};
-      filtered.forEach(function(g) {
-        var k = g.season;
-        if (!bySeasonDate[k]) bySeasonDate[k] = [];
-        bySeasonDate[k].push(g.date);
-      });
-      Object.keys(bySeasonDate).forEach(function(k) {
-        bySeasonDate[k].sort();
-        bySeasonDate[k].forEach(function(d, i) {
-          playoffGameNums[k + '|' + d] = i + 1;
-        });
-      });
-    }
-
-    // Number words for game labels
-    var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
-
     sorted.forEach(function(g) {
       // ── Team lookup from season ──
       var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
@@ -3475,29 +3453,22 @@
       var ftpStr = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
 
       // ── Game type label ──
+      var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
       var gameTypeLabel;
       if (g.type === 'playoffs') {
-        var gNum = playoffGameNums[g.season + '|' + g.date];
-        gameTypeLabel = 'Game ' + (NUM_WORDS[gNum - 1] || gNum);
+        if (g.game) {
+          var gIdx = parseInt(g.game, 10);
+          gameTypeLabel = 'Game ' + (NUM_WORDS[gIdx - 1] || g.game);
+        } else {
+          gameTypeLabel = 'Playoffs';
+        }
       } else {
         gameTypeLabel = 'Regular Season';
       }
 
-      // ── Opponent info for bottom row ──
+      // ── Opponent info ──
       var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
       var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
-
-      // ── Format date: "2034-5-2" → "May 2, 2034" ──
-      var MONTHS = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-      var dateParts = String(g.date).split('-');
-      var formattedDate = g.date;
-      if (dateParts.length === 3) {
-        var dYear  = dateParts[0];
-        var dMonth = parseInt(dateParts[1], 10) - 1;
-        var dDay   = parseInt(dateParts[2], 10);
-        formattedDate = (MONTHS[dMonth] || dateParts[1]) + ' ' + dDay + ', ' + dYear;
-      }
 
       html += '<div class="game-log-card">';
 
@@ -3545,7 +3516,8 @@
 
       // Bottom row: date · @ vs opp-abbr opp-logo · W/L · Details
       // ── Unique storage key for this game's reactions ──
-      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.date;
+      // ── Unique storage key for this performance's reactions ──
+      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.type + ':' + g.opp + ':' + (g.game || 'r');
 
       var oppLogoHtml = oppLogoUrl
         ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
@@ -3610,12 +3582,11 @@
 
       html += '<div class="glc-detail"><div class="glc-detail-inner">';
 
-      // Header: W/L · Final Stats · date | logos + score
+      // Header: W/L · Final Stats | logos + score
       html += '<div class="glc-detail-header">';
       html += '<div style="display:flex;align-items:center;gap:8px;">'
         + '<span class="glc-result-badge '+(isWin?'w':'l')+'">'+(isWin?'W':'L')+'</span>'
         + '<span class="glc-detail-title">Final Stats</span>'
-        + '<span style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:.1em;color:var(--text-muted);opacity:.6;">'+formattedDate+'</span>'
         + '</div>';
       html += '<div class="glc-detail-score-block">';
       if (g.home) {
