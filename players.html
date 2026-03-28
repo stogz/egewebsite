@@ -813,6 +813,22 @@
       gap: 6px;
       padding-top: 2px;
     }
+    /* Final game score — bottom right with team logos */
+    .glc-final-score {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .glc-final-score-text {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--text-muted);
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
     .glc-result-badge {
       display: inline-flex;
       align-items: center;
@@ -3493,7 +3509,7 @@
       // Main content
       html += '<div class="glc-main">';
 
-      // Top row: abbreviated name · game type · ball icon + game score
+      // Top row: abbreviated name · game type · ball icon + hoop score (top right)
       html += '<div class="glc-top">'
         + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
         + '<span class="glc-dot-sep">·</span>'
@@ -3523,9 +3539,30 @@
         ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
         : '';
 
-      // Preset emoji options shown in picker
-      // Preset emoji options shown in picker
-      var presetHtml = '';
+      // ── Final score for bottom row: away logo · score · home logo, winner orange ──
+      var finalScoreHtml = '';
+      if (g.score && g.score.indexOf('-') !== -1) {
+        var fsParts   = g.score.split('-');
+        var ourScore  = fsParts[0].trim();
+        var theirScore = fsParts[1].trim();
+        var awayLogo, homeLogo, awayScore, homeScore, awayWon, homeWon;
+        if (g.home) {
+          // we are home (right), opp is away (left)
+          awayLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          homeLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          awayScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+          homeScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+        } else {
+          // we are away (left), opp is home (right)
+          awayLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          homeLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          awayScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+          homeScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+        }
+        finalScoreHtml = awayLogo + '<span class="glc-final-score-text">'+awayScore+'-'+homeScore+'</span>' + homeLogo;
+      } else {
+        finalScoreHtml = '<span class="glc-final-score-text">'+(g.score||'')+'</span>';
+      }
 
       html += '<div class="glc-bottom">'
         + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
@@ -3536,6 +3573,7 @@
         + '<button class="glc-emoji-submit">Add</button>'
         + '</div>'
         + '</span>'
+        + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
         + '</div>';
 
       html += '</div>'; // .glc-main
@@ -3569,9 +3607,6 @@
         }
       }
 
-      // Opponent logo
-      // (oppTeamName and oppLogoUrl already declared above in summary row section)
-
       // stat helper — no hi class at all
       function detStat(val, lbl) {
         return '<div class="glc-detail-stat">'
@@ -3582,25 +3617,10 @@
 
       html += '<div class="glc-detail"><div class="glc-detail-inner">';
 
-      // Header: W/L · Final Stats | logos + score
+      // Header: Final Stats only (score is on the card now)
       html += '<div class="glc-detail-header">';
-      html += '<div style="display:flex;align-items:center;gap:8px;">'
-        + '<span class="glc-result-badge '+(isWin?'w':'l')+'">'+(isWin?'W':'L')+'</span>'
-        + '<span class="glc-detail-title">Final Stats</span>'
-        + '</div>';
-      html += '<div class="glc-detail-score-block">';
-      if (g.home) {
-        // away opp on left, our team on right
-        if (oppLogoUrl) html += '<img class="glc-detail-logo" src="'+oppLogoUrl+'" alt="'+oppTeamName+'">';
-        html += '<span class="glc-detail-score-text">'+scoreHtml+'</span>';
-        if (logoUrl)    html += '<img class="glc-detail-logo" src="'+logoUrl+'" alt="'+teamName+'">';
-      } else {
-        // our team away on left, opp home on right
-        if (logoUrl)    html += '<img class="glc-detail-logo" src="'+logoUrl+'" alt="'+teamName+'">';
-        html += '<span class="glc-detail-score-text">'+scoreHtml+'</span>';
-        if (oppLogoUrl) html += '<img class="glc-detail-logo" src="'+oppLogoUrl+'" alt="'+oppTeamName+'">';
-      }
-      html += '</div></div>'; // score-block + header
+      html += '<span class="glc-detail-title">Final Stats</span>';
+      html += '</div>'; // close header
 
       // All stats on one flex-wrap row
       html += '<div class="glc-detail-stat-row">';
@@ -3727,18 +3747,22 @@
       var top3 = entries.slice(0, 3);
       container.innerHTML = top3.map(function(r){
         var isMine = (r.emoji === mine);
-        return '<span class="glc-reaction-pill'+(isMine?' mine':'')+'" data-rkey="'+rkey+'" data-emoji="'+r.emoji+'" title="'+(isMine?'Click to remove your reaction':'')+'">'
+        return '<span class="glc-reaction-pill'+(isMine?' mine':'')+'" data-rkey="'+rkey+'" data-emoji="'+r.emoji+'" title="'+(isMine?'Remove your reaction':'Add this reaction')+'" style="cursor:pointer;">'
           + r.emoji
           + '<span class="glc-reaction-count">'+r.count+'</span>'
           + (isMine ? '<span class="glc-reaction-remove-hint">✕</span>' : '')
           + '</span>';
       }).join('');
 
-      // Wire remove clicks on "mine" pills
-      container.querySelectorAll('.glc-reaction-pill.mine').forEach(function(pill){
+      // Wire clicks on all pills — mine removes, others add
+      container.querySelectorAll('.glc-reaction-pill').forEach(function(pill){
         pill.addEventListener('click', function(e){
           e.stopPropagation();
-          removeReaction(rkey, pill.dataset.emoji);
+          if (pill.classList.contains('mine')) {
+            removeReaction(rkey, pill.dataset.emoji);
+          } else {
+            submitReaction(rkey, pill.dataset.emoji);
+          }
         });
       });
     }
