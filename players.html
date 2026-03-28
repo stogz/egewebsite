@@ -768,6 +768,7 @@
       line-height: 1;
       color: #ffffff;
     }
+    html.light .glc-gamescore { color: #1a1a1a; }
     /* Basketball icon — white in dark mode, black in light mode */
     .glc-ball-icon {
       width: 22px;
@@ -800,6 +801,7 @@
       line-height: 1;
       color: #ffffff;
     }
+    html.light .glc-stat-val { color: #1a1a1a; }
     .glc-stat-lbl {
       font-family: var(--font-body);
       font-weight: 500;
@@ -858,6 +860,114 @@
       transition: transform .3s ease;
     }
     .game-log-card.is-open .glc-expand-arrow { transform: rotate(180deg); }
+
+    /* ── EMOJI REACTIONS ── */
+    .glc-reactions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 6px;
+    }
+    /* Existing reaction pill */
+    .glc-reaction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: rgba(35,26,165,.08);
+      border: 1px solid var(--border-soft);
+      font-size: .82rem;
+      line-height: 1;
+      cursor: default;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .glc-reaction-pill:hover { background: rgba(231,87,25,.08); border-color: rgba(231,87,25,.25); }
+    /* Pill for the user's own reaction — highlighted, clickable to remove */
+    .glc-reaction-pill.mine {
+      background: rgba(231,87,25,.15);
+      border-color: rgba(231,87,25,.5);
+      cursor: pointer;
+    }
+    .glc-reaction-pill.mine:hover { background: rgba(211,47,47,.15); border-color: rgba(211,47,47,.5); }
+    .glc-reaction-pill.mine .glc-reaction-count { color: var(--orange); }
+    .glc-reaction-remove-hint {
+      font-family: var(--font-mono);
+      font-size: .45rem;
+      color: rgba(211,47,47,.7);
+      letter-spacing: .04em;
+      margin-left: 1px;
+    }
+    .glc-reaction-count {
+      font-family: var(--font-mono);
+      font-size: .56rem;
+      color: var(--text-muted);
+      letter-spacing: .04em;
+    }
+    /* Add-reaction button */
+    .glc-reaction-add {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px; height: 22px;
+      border-radius: 99px;
+      background: transparent;
+      border: 1px dashed var(--border);
+      font-size: .8rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background .15s, border-color .15s, color .15s;
+      padding: 0;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .glc-reaction-add:hover { background: rgba(231,87,25,.08); border-color: rgba(231,87,25,.35); color: var(--orange); }
+    /* Emoji picker popover */
+    .glc-emoji-picker {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .glc-emoji-picker.open { display: flex; }
+    .glc-emoji-input {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 1.1rem;
+      color: var(--text);
+      outline: none;
+      width: 52px;
+      text-align: center;
+      font-family: var(--font-body);
+    }
+    .glc-emoji-submit {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: .7rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      letter-spacing: .06em;
+      transition: opacity .15s;
+      flex-shrink: 0;
+    }
+    .glc-emoji-submit:hover { opacity: .85; }
 
     /* ── EXPANDABLE DETAIL PANEL ── */
     .glc-detail {
@@ -3364,7 +3474,18 @@
       // ── Opponent info for bottom row ──
       var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
       var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
-      var oppFullShort = oppTeamName.split(' ').slice(-1)[0]; // last word e.g. "Warriors"
+
+      // ── Format date: "2034-5-2" → "May 2, 2034" ──
+      var MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+      var dateParts = String(g.date).split('-');
+      var formattedDate = g.date;
+      if (dateParts.length === 3) {
+        var dYear  = dateParts[0];
+        var dMonth = parseInt(dateParts[1], 10) - 1;
+        var dDay   = parseInt(dateParts[2], 10);
+        formattedDate = (MONTHS[dMonth] || dateParts[1]) + ' ' + dDay + ', ' + dYear;
+      }
 
       html += '<div class="game-log-card">';
 
@@ -3389,8 +3510,10 @@
       // Main content
       html += '<div class="glc-main">';
 
-      // Top row: game type label (left) · ball icon + game score (right)
+      // Top row: abbreviated name · game type · ball icon + game score
       html += '<div class="glc-top">'
+        + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
+        + '<span class="glc-dot-sep">·</span>'
         + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
         + '<span class="glc-score-right">'
         + ballHtml
@@ -3408,15 +3531,31 @@
       });
       html += '</div>';
 
-      // Bottom row: W/L · vs. Team {logo} · date · expand hint
+      // Bottom row: date · @ vs opp-abbr opp-logo · W/L · Details
+      // ── Unique storage key for this game's reactions ──
+      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.date;
+
       var oppLogoHtml = oppLogoUrl
         ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
         : '';
+
+      // Preset emoji options shown in picker
+      // Preset emoji options shown in picker
+      var presetHtml = '';
+
       html += '<div class="glc-bottom">'
-        + '<span class="glc-result-badge '+(isWin?'w':'l')+'">'+(isWin?'W':'L')+'</span>'
-        + '<span class="glc-bottom-opp">'+haHome+' '+oppFullShort+oppLogoHtml+'</span>'
+        + '<span class="glc-bottom-date">'+formattedDate+'</span>'
         + '<span class="glc-dot-sep">·</span>'
-        + '<span class="glc-bottom-date">'+g.date+'</span>'
+        + '<span class="glc-bottom-opp">'+haHome+' '+g.opp+' '+oppLogoHtml+'</span>'
+        + '<span class="glc-result-badge '+(isWin?'w':'l')+'">'+(isWin?'W':'L')+'</span>'
+        + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
+        + '<span style="position:relative;">'
+        + '<button class="glc-reaction-add" title="Add reaction">+</button>'
+        + '<div class="glc-emoji-picker">'
+        + '<input class="glc-emoji-input" maxlength="2" placeholder="😀" type="text" inputmode="text" autocomplete="off">'
+        + '<button class="glc-emoji-submit">Add</button>'
+        + '</div>'
+        + '</span>'
         + '<span class="glc-expand-hint">Details <span class="glc-expand-arrow">▼</span></span>'
         + '</div>';
 
@@ -3510,8 +3649,6 @@
   }
 
   function wireGamesControls(panel, key, games) {
-    var SUPABASE_URL      = 'https://wspmprjqqhtxekzyensq.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
     var seasonSel = document.getElementById('games-season-select');
     if (seasonSel) {
       seasonSel.addEventListener('change', function(){
@@ -3526,18 +3663,183 @@
         renderGamesTable(key, games);
       });
     });
-    // Wire card expand/collapse — click summary row toggles is-open on parent card
+
+    // Wire card expand/collapse
     panel.querySelectorAll('.glc-summary').forEach(function(summary){
-      summary.addEventListener('click', function(){
+      summary.addEventListener('click', function(e){
+        // Don't toggle if clicking inside reaction area
+        if (e.target.closest('.glc-reactions') || e.target.closest('.glc-reaction-add') || e.target.closest('.glc-emoji-picker')) return;
         var card = summary.closest('.game-log-card');
         if (!card) return;
         var isOpen = card.classList.contains('is-open');
-        // Close all others first
         panel.querySelectorAll('.game-log-card.is-open').forEach(function(c){ c.classList.remove('is-open'); });
-        // Toggle this one
         if (!isOpen) card.classList.add('is-open');
       });
     });
+
+    // ── REACTION SYSTEM (Supabase + localStorage for per-user tracking) ──
+    // localStorage key: 'ege_reactions' → { [rkey]: emoji | null }
+    // Stores which emoji THIS user reacted with on each game (one per game).
+
+    var SUPABASE_URL      = 'https://wspmprjqqhtxekzyensq.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
+
+    // ── localStorage helpers ──
+    var LS_KEY = 'ege_reactions';
+    function lsGet() {
+      try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e) { return {}; }
+    }
+    function lsSet(data) {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+    }
+    function myReaction(rkey) { return lsGet()[rkey] || null; }
+    function setMyReaction(rkey, emoji) {
+      var d = lsGet(); d[rkey] = emoji; lsSet(d);
+    }
+    function clearMyReaction(rkey) {
+      var d = lsGet(); delete d[rkey]; lsSet(d);
+    }
+
+    function sbHeaders() {
+      return {
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation'
+      };
+    }
+
+    function fetchReactions(rkey) {
+      return fetch(
+        SUPABASE_URL + '/rest/v1/game_reactions?id=eq.' + encodeURIComponent(rkey) + '&select=counts',
+        { headers: sbHeaders() }
+      )
+      .then(function(r){ return r.json(); })
+      .then(function(rows){ return (rows && rows[0] && rows[0].counts) ? rows[0].counts : {}; });
+    }
+
+    function saveReactions(rkey, counts) {
+      return fetch(
+        SUPABASE_URL + '/rest/v1/game_reactions',
+        {
+          method: 'POST',
+          headers: Object.assign({}, sbHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          body: JSON.stringify({ id: rkey, counts: counts })
+        }
+      ).then(function(r){ return r.json(); });
+    }
+
+    /* Render reaction pills — highlights the user's own, makes it clickable to remove */
+    function renderReactionPills(rkey, counts) {
+      var container = panel.querySelector('.glc-reactions[data-rkey="'+rkey+'"]');
+      if (!container) return;
+      var mine = myReaction(rkey);
+      var entries = Object.keys(counts).map(function(e){ return { emoji:e, count:counts[e] }; });
+      entries.sort(function(a,b){ return b.count - a.count; });
+      var top3 = entries.slice(0, 3);
+      container.innerHTML = top3.map(function(r){
+        var isMine = (r.emoji === mine);
+        return '<span class="glc-reaction-pill'+(isMine?' mine':'')+'" data-rkey="'+rkey+'" data-emoji="'+r.emoji+'" title="'+(isMine?'Click to remove your reaction':'')+'">'
+          + r.emoji
+          + '<span class="glc-reaction-count">'+r.count+'</span>'
+          + (isMine ? '<span class="glc-reaction-remove-hint">✕</span>' : '')
+          + '</span>';
+      }).join('');
+
+      // Wire remove clicks on "mine" pills
+      container.querySelectorAll('.glc-reaction-pill.mine').forEach(function(pill){
+        pill.addEventListener('click', function(e){
+          e.stopPropagation();
+          removeReaction(rkey, pill.dataset.emoji);
+        });
+      });
+    }
+
+    function loadAllReactions() {
+      panel.querySelectorAll('.glc-reactions[data-rkey]').forEach(function(container){
+        var rkey = container.dataset.rkey;
+        fetchReactions(rkey).then(function(counts){
+          renderReactionPills(rkey, counts);
+        }).catch(function(){});
+      });
+    }
+
+    /* Add a reaction — one per user per game (replaces previous if different) */
+    function submitReaction(rkey, emoji) {
+      if (!emoji || !emoji.trim()) return;
+      var trimmed = emoji.trim();
+      if (/^[a-zA-Z0-9\s]+$/.test(trimmed)) return;
+
+      var prev = myReaction(rkey);
+      fetchReactions(rkey).then(function(counts){
+        // Remove previous reaction if different emoji
+        if (prev && prev !== trimmed && counts[prev]) {
+          counts[prev] = Math.max(0, counts[prev] - 1);
+          if (counts[prev] === 0) delete counts[prev];
+        }
+        // Add new — only if not already reacted with same emoji
+        if (prev !== trimmed) {
+          counts[trimmed] = (counts[trimmed] || 0) + 1;
+          setMyReaction(rkey, trimmed);
+        }
+        return saveReactions(rkey, counts).then(function(){ return counts; });
+      }).then(function(counts){
+        renderReactionPills(rkey, counts);
+      }).catch(function(err){ console.warn('Reaction save failed:', err); });
+    }
+
+    /* Remove the user's own reaction */
+    function removeReaction(rkey, emoji) {
+      fetchReactions(rkey).then(function(counts){
+        if (counts[emoji]) {
+          counts[emoji] = Math.max(0, counts[emoji] - 1);
+          if (counts[emoji] === 0) delete counts[emoji];
+        }
+        clearMyReaction(rkey);
+        return saveReactions(rkey, counts).then(function(){ return counts; });
+      }).then(function(counts){
+        renderReactionPills(rkey, counts);
+      }).catch(function(err){ console.warn('Reaction remove failed:', err); });
+    }
+
+    // Wire picker open/close and emoji selection
+    panel.querySelectorAll('.glc-reaction-add').forEach(function(btn){
+      var picker = btn.nextElementSibling;
+      var bottomRow = btn.closest('.glc-bottom');
+      var rkey = bottomRow ? (bottomRow.querySelector('.glc-reactions')||{}).dataset.rkey : null;
+      if (!picker || !rkey) return;
+
+      var input  = picker.querySelector('.glc-emoji-input');
+      var submit = picker.querySelector('.glc-emoji-submit');
+
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ if(p!==picker) p.classList.remove('open'); });
+        picker.classList.toggle('open');
+        if (picker.classList.contains('open') && input) {
+          setTimeout(function(){ input.focus(); }, 50);
+        }
+      });
+
+      function doSubmit() {
+        if (input && input.value.trim()) {
+          submitReaction(rkey, input.value.trim());
+          input.value = '';
+          picker.classList.remove('open');
+        }
+      }
+      if (submit) submit.addEventListener('click', function(e){ e.stopPropagation(); doSubmit(); });
+      if (input)  input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.stopPropagation(); doSubmit(); } });
+      picker.addEventListener('click', function(e){ e.stopPropagation(); });
+    });
+
+    // Close pickers when clicking outside
+    document.addEventListener('click', function(){
+      panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ p.classList.remove('open'); });
+    });
+
+    // Load reactions on render
+    loadAllReactions();
   }
 
   function renderGames(key) {
