@@ -211,6 +211,9 @@ var PLAYER_STATS = {
             { name: 'Midnight Shade',   img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-midnight-shade_orig.png' },
             { name: 'Flower Field',     img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-flower-field_orig.png' },
             { name: 'Down to Earth',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswags-ii-down-to-earth_orig.png' },
+            { name: 'The Overworld',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswag-ii-overworld_orig.png' },
+            { name: 'The End',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswag-ii-end_orig.png' },
+            { name: 'The Nether',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswag-ii-nether_orig.png' },
           ]
         }
       ]
