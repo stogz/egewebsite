@@ -593,6 +593,50 @@
     }
     .game-log-card:hover { border-color: rgba(231,87,25,.4); }
 
+    /* ── FIRE EFFECTS — hoop score thresholds ── */
+    /* Orange fire: score ≥ 45 */
+    .game-log-card.fire-orange { border-color: rgba(255,100,20,.3); }
+    .game-log-card.fire-orange:hover {
+      border-color: #ff6314;
+      box-shadow: 0 0 0 1px #ff6314, 0 0 24px rgba(255,100,20,.45), 0 0 60px rgba(255,60,0,.2);
+    }
+    .game-log-card.fire-orange:hover .glc-summary { background: rgba(255,80,0,.05); }
+    .game-log-card.fire-orange:hover .glc-gamescore {
+      color: #ff6314;
+      text-shadow: 0 0 12px rgba(255,100,20,.9), 0 0 30px rgba(255,60,0,.6);
+      animation: fireFlicker 0.8s ease-in-out infinite alternate;
+    }
+    .game-log-card.fire-orange:hover .glc-ball-icon {
+      filter: drop-shadow(0 0 6px rgba(255,100,20,.9));
+      animation: fireFlicker 0.8s ease-in-out infinite alternate;
+    }
+
+    /* Blue fire: score ≥ 54 */
+    .game-log-card.fire-blue { border-color: rgba(60,130,255,.3); }
+    .game-log-card.fire-blue:hover {
+      border-color: #4da6ff;
+      box-shadow: 0 0 0 1px #4da6ff, 0 0 28px rgba(60,130,255,.55), 0 0 70px rgba(30,80,255,.25);
+    }
+    .game-log-card.fire-blue:hover .glc-summary { background: rgba(60,120,255,.05); }
+    .game-log-card.fire-blue:hover .glc-gamescore {
+      color: #4da6ff;
+      text-shadow: 0 0 14px rgba(60,160,255,1), 0 0 36px rgba(30,100,255,.7);
+      animation: blueFireFlicker 0.7s ease-in-out infinite alternate;
+    }
+    .game-log-card.fire-blue:hover .glc-ball-icon {
+      filter: drop-shadow(0 0 8px rgba(60,160,255,.9));
+      animation: blueFireFlicker 0.7s ease-in-out infinite alternate;
+    }
+
+    @keyframes fireFlicker {
+      0%   { text-shadow: 0 0 10px rgba(255,100,20,.8), 0 0 24px rgba(255,60,0,.5); }
+      100% { text-shadow: 0 0 18px rgba(255,140,20,1),  0 0 42px rgba(255,80,0,.8); }
+    }
+    @keyframes blueFireFlicker {
+      0%   { text-shadow: 0 0 12px rgba(60,160,255,.8), 0 0 28px rgba(30,100,255,.5); }
+      100% { text-shadow: 0 0 22px rgba(100,190,255,1),  0 0 50px rgba(60,140,255,.9); }
+    }
+
     /* Clickable summary row */
     .glc-summary {
       display: flex;
@@ -1307,7 +1351,7 @@
         <div class="splits-card">
           <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title" id="pg-table-label">Regular Season · Per Game</span></div>
           <div class="splits-scroll"><table class="splits-table" id="pg-table"></table></div>
-          <div class="college-footnote" id="pg-footnote" style="padding:8px 16px 10px;display:none;"><span>*</span> College season — excluded from career averages and all-time stats</div>
+          <div class="college-footnote" id="pg-footnote" style="padding:8px 16px 10px;display:none;"><span>*</span> Non-NBA season, excluded from career averages.</div>
         </div>
 
         <!-- TOTALS -->
@@ -1603,7 +1647,7 @@
   /* COLLEGE_TEAMS — seasons played for these abbreviations are excluded from
      all career stats, charts, bio, and all-time metrics.
      MEX, VAN, STL are intentionally NOT in this list (they count as pro). */
-  var COLLEGE_TEAMS = ['AU','KU','LOU','FSU','DUKE','UCLA'];
+  var COLLEGE_TEAMS = ['AU','KU','LOU','FSU','DUKE','UCLA', 'FCB'];
 
   /* isProRow — exclude college seasons, dnq rows, and zero-GP rows */
   function isProRow(r) { return COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase()) === -1 && !r.dnq && r.gp > 0; }
@@ -3480,7 +3524,8 @@
       var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
       var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
 
-      html += '<div class="game-log-card">';
+      var fireClass = gs >= 54 ? ' fire-blue' : gs >= 45 ? ' fire-orange' : '';
+      html += '<div class="game-log-card'+fireClass+'">';
 
       // ── CLICKABLE SUMMARY ROW ──
       html += '<div class="glc-summary">';
@@ -3564,7 +3609,7 @@
         + '<span style="position:relative;">'
         + '<button class="glc-reaction-add" title="Add reaction">+</button>'
         + '<div class="glc-emoji-picker">'
-        + '<input class="glc-emoji-input" maxlength="2" placeholder="😀" type="text" inputmode="text" autocomplete="off">'
+        + '<input class="glc-emoji-input" maxlength="8" placeholder="😀" type="text" inputmode="text" autocomplete="off" spellcheck="false">'
         + '<button class="glc-emoji-submit">Add</button>'
         + '</div>'
         + '</span>'
@@ -3777,7 +3822,14 @@
     function submitReaction(rkey, emoji) {
       if (!emoji || !emoji.trim()) return;
       var trimmed = emoji.trim();
-      if (/^[a-zA-Z0-9\s]+$/.test(trimmed)) return;
+      // Must contain at least one emoji — reject plain text/numbers
+      // Emoji regex: covers most emoji ranges including ZWJ sequences
+      var hasEmoji = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}]/u.test(trimmed)
+        || /[\u00A9\u00AE\u203C\u2049\u2122\u2139\u231A-\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]/u.test(trimmed);
+      if (!hasEmoji) return;
+      // Strip variation selectors and keep just the base emoji
+      trimmed = trimmed.replace(/\uFE0F/g, '').trim();
+      if (!trimmed) return;
 
       var prev = myReaction(rkey);
       fetchReactions(rkey).then(function(counts){
@@ -3842,10 +3894,13 @@
       picker.addEventListener('click', function(e){ e.stopPropagation(); });
     });
 
-    // Close pickers when clicking outside
-    document.addEventListener('click', function(){
-      panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ p.classList.remove('open'); });
-    });
+    // Close pickers when clicking outside — attach once per panel, not per render
+    if (!panel._emojiClickListenerAttached) {
+      panel._emojiClickListenerAttached = true;
+      document.addEventListener('click', function(){
+        panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ p.classList.remove('open'); });
+      });
+    }
 
     // Load reactions on render
     loadAllReactions();
