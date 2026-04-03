@@ -361,6 +361,7 @@
     .ct-table tr.ct-future   td .ct-team-cell img { opacity:.5; }
     /* Career row */
     .ct-table tr.ct-career td { font-weight:700; border-top:2px solid var(--border); background:var(--bg-card) !important; height:3rem; }
+    .ct-table tr.ct-career td.ct-sort-col { background:rgba(231,87,25,.06) !important; }
     .ct-table tr.ct-career td:first-child { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.12em; color:var(--orange); text-transform:uppercase; }
     .ct-table tr.ct-career td:last-child { color:var(--orange); }
     .ct-table tr.ct-career:hover td { background:var(--bg-card) !important; }
@@ -374,17 +375,77 @@
     /* Signings feed */
     .contracts-signings { display:flex; flex-direction:column; }
     .contracts-signings-header { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); }
-    .signing-item { display:flex; gap:14px; align-items:flex-start; padding:16px 20px; border-bottom:1px solid var(--border-soft); transition:background .12s; }
+    .signing-item { padding:20px 24px; border-bottom:1px solid var(--border-soft); transition:background .12s; }
     .signing-item:last-child { border-bottom:none; }
-    .signing-item:hover { background:rgba(231,87,25,.03); }
-    .signing-logo { width:38px; height:38px; border-radius:6px; background:rgba(35,26,165,.07); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; border:1px solid var(--border-soft); }
-    .signing-logo img { width:26px; height:26px; object-fit:contain; display:block; }
-    .signing-body { flex:1; min-width:0; }
-    .signing-team { font-family:var(--font-display); font-weight:700; font-size:.95rem; color:var(--heading); letter-spacing:.02em; line-height:1.1; transition:color .35s; overflow-wrap:break-word; word-break:break-word; }
-    .signing-date { font-family:var(--font-mono); font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:7px; margin-top:2px; }
-    .signing-tags { display:flex; gap:5px; flex-wrap:wrap; }
-    .signing-tag { font-family:var(--font-mono); font-size:.56rem; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:3px; background:rgba(35,26,165,.07); color:var(--text-muted); border:1px solid var(--border-soft); }
-    .signing-note { font-family:var(--font-body); font-size:.8rem; color:var(--text-muted); margin-top:5px; font-style:italic; }
+    .signing-item:hover { background:rgba(231,87,25,.02); }
+    /* Team header row: logo + location name */
+    .signing-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .signing-logo {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      background: rgba(35,26,165,.07);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+      border: 1px solid var(--border-soft);
+    }
+    .signing-logo img { width: 20px; height: 20px; object-fit:contain; display:block; }
+    .signing-team {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--heading);
+      letter-spacing: .02em;
+      line-height: 1.1;
+      transition: color .35s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Responsive name spans — same pattern as trades */
+    .signing-team .stn-loc  { display: inline; }
+    .signing-team .stn-abbr { display: none; }
+    @media (max-width: 900px) {
+      .signing-team .stn-loc  { display: none; }
+      .signing-team .stn-abbr { display: inline; }
+    }
+    /* Tags row */
+    .signing-tags { display:flex; gap:0; margin-bottom: 0; border:1px solid var(--border-soft); border-radius:5px; overflow:hidden; }
+    .signing-tag {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 10px;
+      border-right: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.04);
+      min-width: 0;
+    }
+    .signing-tag:last-child { border-right: none; }
+    .signing-tag-label {
+      font-family: var(--font-mono);
+      font-size: .5rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+    .signing-tag-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--heading);
+      letter-spacing: .01em;
+      line-height: 1;
+      white-space: nowrap;
+      transition: color .35s;
+    }
+    .signing-date { font-family:var(--font-mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--text-muted); margin-top:10px; }
 
     /* Salary chart */
     .contracts-chart-body { padding:20px; height:210px; position:relative; }
@@ -401,26 +462,173 @@
     .ct-legend-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
 
     /* Trade history feed */
-    .trade-item { padding:16px 20px; border-bottom:1px solid var(--border-soft); transition:background .12s; }
-    .trade-item:last-child { border-bottom:none; }
-    .trade-item:hover { background:rgba(231,87,25,.03); }
-    .trade-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
-    .trade-logos { display:flex; flex-direction:row; align-items:center; gap:6px; flex-shrink:0; }
-    .trade-logo { width:32px; height:32px; border-radius:6px; background:rgba(35,26,165,.07); border:1px solid var(--border-soft); display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .trade-logo img { width:22px; height:22px; object-fit:contain; display:block; }
-    .trade-arrow { font-family:var(--font-mono); font-size:.65rem; color:var(--orange); opacity:.7; line-height:1; }
-    .trade-meta { flex:1; min-width:0; }
-    .trade-teams { font-family:var(--font-display); font-weight:700; font-size:1rem; color:var(--heading); line-height:1.15; transition:color .35s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .trade-subteams { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-top:2px; }
-    .trade-subteams .arrow { color:var(--orange); }
-    .trade-date { font-family:var(--font-mono); font-size:.54rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-top:4px; }
-    .trade-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding-top:2px; }
-    .trade-col-title { font-family:var(--font-mono); font-size:.57rem; letter-spacing:.14em; text-transform:uppercase; color:var(--orange); margin-bottom:8px; opacity:.85; }
-    .trade-assets { display:flex; flex-direction:column; gap:5px; }
-    .trade-asset { font-family:var(--font-body); font-size:.85rem; color:var(--text); font-weight:500; display:flex; align-items:baseline; gap:6px; line-height:1.3; }
-    .trade-asset-type { font-family:var(--font-mono); font-size:.48rem; letter-spacing:.08em; text-transform:uppercase; padding:2px 5px; border-radius:2px; background:rgba(35,26,165,.08); color:var(--text-muted); border:1px solid var(--border-soft); flex-shrink:0; position:relative; top:-1px; }
-    .trade-asset-type.pick { background:rgba(231,87,25,.08); color:var(--orange); border-color:rgba(231,87,25,.2); }
-    .trade-notes { font-family:var(--font-body); font-size:.8rem; color:var(--text-muted); margin-top:12px; font-style:italic; line-height:1.5; padding-top:10px; border-top:1px solid var(--border-soft); }
+    .trade-item {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-soft);
+      transition: background .12s;
+    }
+    .trade-item:last-child { border-bottom: none; }
+    .trade-item:hover { background: rgba(231,87,25,.02); }
+
+    /* Direction bar — FROM → TO with logos and full names */
+    .trade-direction {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .trade-dir-team {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .trade-dir-logo {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      background: rgba(35,26,165,.07);
+      border: 1px solid var(--border-soft);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .trade-dir-logo img { width: 20px; height: 20px; object-fit: contain; display: block; }
+    .trade-dir-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--heading);
+      letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color .35s;
+    }
+    /* Show location name by default, hide abbr */
+    .trade-dir-name .tdn-loc  { display: inline; }
+    .trade-dir-name .tdn-abbr { display: none; }
+    .trade-dir-arrow {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      color: var(--orange);
+      flex-shrink: 0;
+      opacity: .8;
+    }
+    .trade-date-line {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* Vertical asset layout — two rows stacked */
+    .trade-columns {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border-soft);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .trade-col {
+      padding: 12px 16px;
+    }
+    .trade-col:first-child {
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .trade-col-label {
+      font-family: var(--font-mono);
+      font-size: .55rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    /* Show location label by default, hide abbr label */
+    .trade-col-label .tcl-loc  { display: inline; }
+    .trade-col-label .tcl-abbr { display: none; }
+    .trade-col-label-logo {
+      width: 14px; height: 14px;
+      object-fit: contain;
+      display: inline-block;
+      opacity: .7;
+      vertical-align: middle;
+    }
+    .trade-asset-list { display: flex; flex-direction: column; gap: 5px; }
+    .trade-asset {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+    .trade-asset-badge {
+      font-family: var(--font-mono);
+      font-size: .48rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      position: relative;
+      top: -1px;
+      white-space: nowrap;
+    }
+    .trade-asset-badge.player {
+      background: rgba(35,26,165,.1);
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
+    }
+    .trade-asset-badge.pick {
+      background: rgba(231,87,25,.08);
+      color: var(--orange);
+      border: 1px solid rgba(231,87,25,.2);
+    }
+    .trade-asset-badge.cash {
+      background: rgba(16,148,76,.1);
+      color: rgba(16,148,76,.9);
+      border: 1px solid rgba(16,148,76,.2);
+    }
+    .trade-asset-none {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      color: var(--text-muted);
+      opacity: .4;
+      letter-spacing: .08em;
+    }
+    .trade-notes {
+      font-family: var(--font-body);
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      font-style: italic;
+      line-height: 1.55;
+      padding: 10px 12px;
+      border-radius: 4px;
+      background: rgba(35,26,165,.04);
+      border-left: 2px solid rgba(231,87,25,.3);
+    }
+
+    /* When the sidebar gets narrow: swap to abbreviations */
+    @container style(min-width: 0px) { /* fallback — use media query below */ }
+    @media (max-width: 900px) {
+      .trade-dir-name .tdn-loc  { display: none; }
+      .trade-dir-name .tdn-abbr { display: inline; }
+      .trade-col-label .tcl-loc  { display: none; }
+      .trade-col-label .tcl-abbr { display: inline; }
+    }
+    @media (max-width: 768px) {
+      .trade-item { padding: 16px 16px; }
+      .trade-dir-name { font-size: .85rem; }
+    }
 
     /* Mobile contracts */
     @media (max-width:768px) {
@@ -428,9 +636,6 @@
       .contracts-layout > div { min-width: 0; width: 100%; }
       .ct-table { min-width:360px; }
       .ct-chart-inner { min-width:320px; }
-      .trade-grid { grid-template-columns:1fr; gap:10px; }
-      .trade-teams { white-space:normal; word-break:break-word; max-width:100%; }
-      .signing-item { flex-wrap:wrap; }
       .signing-team { font-size:.85rem; }
     }
 
@@ -592,50 +797,6 @@
       transition: border-color .22s, background .35s;
     }
     .game-log-card:hover { border-color: rgba(231,87,25,.4); }
-
-    /* ── FIRE EFFECTS — hoop score thresholds ── */
-    /* Orange fire: score ≥ 45 */
-    .game-log-card.fire-orange { border-color: rgba(255,100,20,.3); }
-    .game-log-card.fire-orange:hover {
-      border-color: #ff6314;
-      box-shadow: 0 0 0 1px #ff6314, 0 0 24px rgba(255,100,20,.45), 0 0 60px rgba(255,60,0,.2);
-    }
-    .game-log-card.fire-orange:hover .glc-summary { background: rgba(255,80,0,.05); }
-    .game-log-card.fire-orange:hover .glc-gamescore {
-      color: #ff6314;
-      text-shadow: 0 0 12px rgba(255,100,20,.9), 0 0 30px rgba(255,60,0,.6);
-      animation: fireFlicker 0.8s ease-in-out infinite alternate;
-    }
-    .game-log-card.fire-orange:hover .glc-ball-icon {
-      filter: drop-shadow(0 0 6px rgba(255,100,20,.9));
-      animation: fireFlicker 0.8s ease-in-out infinite alternate;
-    }
-
-    /* Blue fire: score ≥ 54 */
-    .game-log-card.fire-blue { border-color: rgba(60,130,255,.3); }
-    .game-log-card.fire-blue:hover {
-      border-color: #4da6ff;
-      box-shadow: 0 0 0 1px #4da6ff, 0 0 28px rgba(60,130,255,.55), 0 0 70px rgba(30,80,255,.25);
-    }
-    .game-log-card.fire-blue:hover .glc-summary { background: rgba(60,120,255,.05); }
-    .game-log-card.fire-blue:hover .glc-gamescore {
-      color: #4da6ff;
-      text-shadow: 0 0 14px rgba(60,160,255,1), 0 0 36px rgba(30,100,255,.7);
-      animation: blueFireFlicker 0.7s ease-in-out infinite alternate;
-    }
-    .game-log-card.fire-blue:hover .glc-ball-icon {
-      filter: drop-shadow(0 0 8px rgba(60,160,255,.9));
-      animation: blueFireFlicker 0.7s ease-in-out infinite alternate;
-    }
-
-    @keyframes fireFlicker {
-      0%   { text-shadow: 0 0 10px rgba(255,100,20,.8), 0 0 24px rgba(255,60,0,.5); }
-      100% { text-shadow: 0 0 18px rgba(255,140,20,1),  0 0 42px rgba(255,80,0,.8); }
-    }
-    @keyframes blueFireFlicker {
-      0%   { text-shadow: 0 0 12px rgba(60,160,255,.8), 0 0 28px rgba(30,100,255,.5); }
-      100% { text-shadow: 0 0 22px rgba(100,190,255,1),  0 0 50px rgba(60,140,255,.9); }
-    }
 
     /* Clickable summary row */
     .glc-summary {
@@ -989,53 +1150,99 @@
       transition: background .15s, border-color .15s, color .15s;
       padding: 0;
       flex-shrink: 0;
-      position: relative;
     }
     .glc-reaction-add:hover { background: rgba(231,87,25,.08); border-color: rgba(231,87,25,.35); color: var(--orange); }
-    /* Emoji picker popover */
-    .glc-emoji-picker {
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 50%;
-      transform: translateX(-50%);
+
+    /* ── EMOJI REACTION MODAL ── */
+    #emoji-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(8,5,47,.55);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+    #emoji-modal-backdrop.open { display: flex; }
+    #emoji-modal {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px;
-      display: none;
+      border-radius: 12px;
+      padding: 28px 32px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 5px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.25);
-      z-index: 200;
-      white-space: nowrap;
+      gap: 16px;
+      min-width: 220px;
+      animation: fadeSlideUp .2s ease both;
     }
-    .glc-emoji-picker.open { display: flex; }
-    .glc-emoji-input {
+    #emoji-modal-title {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    #emoji-modal-input {
+      width: 72px;
+      height: 64px;
+      font-size: 2.4rem;
+      text-align: center;
       background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 5px 8px;
-      font-size: 1.1rem;
+      border-radius: 8px;
       color: var(--text);
       outline: none;
-      width: 52px;
-      text-align: center;
-      font-family: var(--font-body);
+      caret-color: var(--orange);
+      transition: border-color .15s;
+      font-family: sans-serif;
+      line-height: 1;
+      padding: 0;
     }
-    .glc-emoji-submit {
+    #emoji-modal-input:focus { border-color: var(--orange); }
+    #emoji-modal-input.invalid { border-color: rgba(211,47,47,.7); }
+    .emoji-modal-hint {
+      font-family: var(--font-mono);
+      font-size: .55rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: .7;
+    }
+    .emoji-modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .emoji-modal-cancel {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .emoji-modal-cancel:hover { border-color: var(--orange); color: var(--text); }
+    .emoji-modal-confirm {
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      padding: 9px 18px;
+      border-radius: 5px;
+      border: none;
       background: var(--orange);
       color: #fff;
-      border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
-      font-size: .7rem;
-      font-family: var(--font-mono);
       cursor: pointer;
-      letter-spacing: .06em;
-      transition: opacity .15s;
-      flex-shrink: 0;
+      transition: opacity .15s, transform .1s;
+      line-height: 1;
     }
-    .glc-emoji-submit:hover { opacity: .85; }
+    .emoji-modal-confirm:hover { opacity: .85; }
+    .emoji-modal-confirm:active { transform: scale(.95); }
 
     /* ── EXPANDABLE DETAIL PANEL ── */
     .glc-detail {
@@ -1149,6 +1356,26 @@
     .perf-empty-icon { font-size:2rem; margin-bottom:16px; opacity:.35; }
     .perf-empty-title { font-family:var(--font-display); font-weight:700; font-size:1.4rem; text-transform:uppercase; color:var(--heading); margin-bottom:8px; transition:color .35s; }
     .perf-empty-sub { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); }
+
+    /* ── PERFORMANCES PAGINATION ── */
+    .perf-pagination { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:28px; flex-wrap:wrap; }
+    .perf-page-info { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); margin:0 10px; white-space:nowrap; }
+    .perf-page-btn {
+      font-family:var(--font-mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+      padding:7px 13px; border-radius:3px; border:1px solid var(--border);
+      background:transparent; color:var(--text-muted); cursor:pointer;
+      transition:border-color .2s, color .2s, background .2s;
+      white-space:nowrap;
+    }
+    .perf-page-btn:hover:not(:disabled) { border-color:rgba(231,87,25,.45); color:var(--heading); background:rgba(231,87,25,.06); }
+    .perf-page-btn:disabled { opacity:.3; cursor:default; }
+    .perf-page-btn.active { border-color:var(--orange); color:var(--orange); background:rgba(231,87,25,.1); }
+    .perf-page-ellipsis { font-family:var(--font-mono); font-size:.62rem; color:var(--text-muted); padding:0 4px; }
+    @media (max-width:768px) {
+      .perf-pagination { gap:4px; }
+      .perf-page-btn { padding:6px 10px; font-size:.58rem; }
+      .perf-page-info { font-size:.55rem; margin:0 6px; }
+    }
 
     @media (max-width:768px) {
       .perf-controls { flex-direction:column; align-items:flex-start; }
@@ -1542,7 +1769,7 @@
       : 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png';
     // Update banner logo if visible
     var bannerLogo = document.getElementById('banner-team-logo');
-    if (bannerLogo && currentKey) {
+    if (bannerLogo && currentKey && (PLAYERS[currentKey]||{}).team !== 'Retired') {
       var latest = latestSeason(currentKey);
       var t2 = teamFull(latest ? latest.team : (PLAYERS[currentKey]||{}).team);
       var newSrc = TEAM_LOGOS[t2] || '';
@@ -1589,6 +1816,52 @@
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
+  }
+
+  // Reverse map: full team name → abbreviation
+  var TEAM_FULL_TO_ABBR = {};
+  Object.keys(TEAM_ABBR).forEach(function(abbr){ TEAM_FULL_TO_ABBR[TEAM_ABBR[abbr]] = abbr; });
+
+  // Full team name → city/location only (e.g. "Los Angeles Lakers" → "Los Angeles", "Mexico City Flight" → "Mexico City")
+  var TEAM_LOCATION_OVERRIDE = {
+    'Los Angeles Lakers':        'LA Lakers',
+    'Los Angeles Clippers':      'LA Clippers',
+    'Golden State Warriors':     'Golden State',
+    'Oklahoma City Thunder':     'Oklahoma City',
+    'New Orleans Pelicans':      'New Orleans',
+    'New York Knicks':           'New York',
+    'Mexico City Flight':        'Mexico City',
+    'St. Louis Spirit':          'St. Louis',
+    'San Antonio Spurs':         'San Antonio',
+    'Portland Trail Blazers':    'Portland',
+    'Indiana Pacers':            'Indiana',
+    'Utah Jazz':                 'Utah',
+    'Miami Heat':                'Miami',
+    'Boston Celtics':            'Boston',
+    'Brooklyn Nets':             'Brooklyn',
+    'Chicago Bulls':             'Chicago',
+    'Charlotte Hornets':         'Charlotte',
+    'Cleveland Cavaliers':       'Cleveland',
+    'Dallas Mavericks':          'Dallas',
+    'Denver Nuggets':            'Denver',
+    'Detroit Pistons':           'Detroit',
+    'Houston Rockets':           'Houston',
+    'Milwaukee Bucks':           'Milwaukee',
+    'Minnesota Timberwolves':    'Minnesota',
+    'Orlando Magic':             'Orlando',
+    'Philadelphia 76ers':        'Philadelphia',
+    'Phoenix Suns':              'Phoenix',
+    'Sacramento Kings':          'Sacramento',
+    'Toronto Raptors':           'Toronto',
+    'Washington Wizards':        'Washington',
+    'Vancouver Grizzlies':       'Vancouver',
+    'Atlanta Hawks':             'Atlanta',
+  };
+  function teamLocation(fullName) {
+    return TEAM_LOCATION_OVERRIDE[fullName] || fullName.split(' ').slice(0,-1).join(' ') || fullName;
+  }
+  function teamAbbrev(fullName) {
+    return TEAM_FULL_TO_ABBR[fullName] || fullName;
   }
 
   // Primary and secondary colors per team for banner gradients
@@ -1703,9 +1976,10 @@
   function renderBanner(key) {
     refreshModeLogos();
     var p = PLAYERS[key];
-    var latest = latestSeason(key);
-    var teamRaw = latest ? latest.team : p.team;
-    var team = teamFull(teamRaw);
+    var isRetired = p.team === 'Retired';
+    var latest = isRetired ? null : latestSeason(key);
+    var teamRaw = latest ? latest.team : (isRetired ? null : p.team);
+    var team = teamRaw ? teamFull(teamRaw) : null;
     // Headshot
     var hsEl = document.getElementById('profile-initials');
     var imgSrc = PLAYER_HEADSHOTS[key];
@@ -1731,9 +2005,9 @@
       var old = document.getElementById('profile-headshot-img');
       if (old) old.style.display = 'none';
     }
-    // Team-color gradient on banner
+    // Team-color gradient on banner — cleared for retired players
     var bgEl = document.querySelector('.player-banner-bg');
-    var colors = TEAM_BANNER_COLORS[team];
+    var colors = !isRetired && team ? TEAM_BANNER_COLORS[team] : null;
     if (bgEl && colors) {
       var p1 = colors.primary, p2 = colors.secondary;
       var hexToRgba = function(hex, a) {
@@ -1748,18 +2022,24 @@
       bgEl.style.background = '';
     }
 
-    // Name + current team logo inline
+    // Name — no team logo for retired players
     var nameEl = document.getElementById('profile-name');
-    var logoUrl = TEAM_LOGOS[team] || '';
-    // Name as a span so flex alignment works cleanly
+    var logoUrl = (!isRetired && team) ? (TEAM_LOGOS[team] || '') : '';
     var logoHtml = logoUrl
       ? '<span id="banner-team-logo-wrap" style="display:inline-flex;align-items:center;margin-left:18px;flex-shrink:0;"><img id="banner-team-logo" src="'+logoUrl+'" alt="'+team+'" style="height:.75em;width:auto;object-fit:contain;display:block;opacity:.85;transition:src .3s,opacity .3s;"></span>'
       : '';
     nameEl.innerHTML = '<span>'+p.name+'</span>' + logoHtml;
-    // On mobile show abbreviated team name to save space
+
+    // Team line — retired players show only number + position
     var isMobileView = window.innerWidth < 769;
-    var teamDisplay = isMobileView ? teamRaw : team;
-    document.getElementById('profile-team-line').textContent = p.number+' · '+p.position+' · '+teamDisplay;
+    var teamLine;
+    if (isRetired) {
+      teamLine = p.number + ' · ' + p.position;
+    } else {
+      var teamDisplay = isMobileView ? teamRaw : team;
+      teamLine = p.number + ' · ' + p.position + (teamDisplay ? ' · ' + teamDisplay : '');
+    }
+    document.getElementById('profile-team-line').textContent = teamLine;
     var meta = document.getElementById('profile-meta');
     meta.innerHTML='';
   }
@@ -1811,6 +2091,7 @@
     careerEl.innerHTML='';
     var champs = champCount(key);
     var stars  = starCount(key);
+    var isRetired = p.team === 'Retired';
     var careerRows = avg ? [
       {key:'Seasons',         val:String(avg.seasons)},
       {key:'Career PPG',      val:avg.ppg,   orange:true},
@@ -1819,13 +2100,15 @@
       {key:'Career FG%',      val:avg.fgp},
       {key:'All-Star Apps.',  val:stars>0?String(stars):'—'},
       {key:'Championships',   val:champs>0?String(champs):'—'},
-      {key:'Current Team',    val:latest?latest.team:'—', orange:true},
     ] : [
       {key:'Seasons',val:'—'},{key:'Career PPG',val:'—',orange:true},
       {key:'Career APG',val:'—'},{key:'Career RPG',val:'—'},
       {key:'Career FG%',val:'—'},{key:'All-Star Apps.',val:'—'},
-      {key:'Championships',val:'—'},{key:'Current Team',val:'—',orange:true}
+      {key:'Championships',val:'—'}
     ];
+    if (!isRetired) {
+      careerRows.push({key:'Current Team', val:latest?latest.team:'—', orange:true});
+    }
     careerRows.forEach(function(r){
       var d=document.createElement('div'); d.className='bio-row';
       d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val'+(r.orange?' orange':'')+'">'+r.val+'</span>';
@@ -1939,13 +2222,18 @@
     thead+='</tr></thead>';
     var tbody='<tbody>';
     data.forEach(function(row,idx){
-      var icons=(row.star?'<span class="season-icon">⭐</span>':'');
-      tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+row.team+'</td>';
+      var isCollege = COLLEGE_TEAMS.indexOf((row.team||'').toUpperCase()) !== -1;
+      var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
+      var teamTd = isCollege ? row.team : teamCell(row.team, row.season);
+      var trClass = isCollege ? ' class="college-row"' : '';
+      tbody+='<tr'+trClass+' data-orig="'+idx+'"'+(isCollege?' data-college="1"':'')+'>'+
+        '<td>'+(isCollege?'<span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span>':fmtSeason(row.season)+icons)+'</td>'+
+        '<td>'+row.age+'</td><td>'+teamTd+'</td>';
       tbody+='<td class="hi">'+row.pts+'</td>';
       ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){ tbody+='<td>'+(row[k]||0)+'</td>'; });
       tbody+='</tr>';
     });
-    var valid=data.filter(function(r){ return r.gp>0; });
+    var valid=data.filter(function(r){ return r.gp>0 && COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase())===-1; });
     if(valid.length){
       var sums={pts:0,reb:0,ast:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,min:0,gs:0,gp:0,dd:0,td:0};
       valid.forEach(function(r){ Object.keys(sums).forEach(function(k){ sums[k]+=(r[k]||0); }); });
@@ -2746,19 +3034,24 @@
           + (logo ? '<img src="'+logo+'" alt="" loading="lazy">' : '')
           + '<span>'+s.team+'</span></div>';
 
+        // helper: add sort-col class to the active sorted column
+        function tdClass(colIdx) {
+          return (sortCol === colIdx && sortDir !== 'none') ? ' class="ct-sort-col"' : '';
+        }
+
         html += '<tr class="'+optClass+'" data-season="'+s.season+'">';
-        html += '<td>'+fmtSeasonDisplay(s.season)+badge+'</td>';
-        html += '<td>'+(age||'—')+'</td>';
-        html += '<td>'+teamHtml+'</td>';
-        html += '<td>'+s.salary+'</td>';
+        html += '<td'+tdClass(0)+'>'+fmtSeasonDisplay(s.season)+badge+'</td>';
+        html += '<td'+tdClass(1)+'>'+(age||'—')+'</td>';
+        html += '<td'+tdClass(2)+'>'+teamHtml+'</td>';
+        html += '<td'+tdClass(3)+'>'+s.salary+'</td>';
         html += '</tr>';
       });
       // Career totals row (never sorted away)
       html += '<tr class="ct-career">';
-      html += '<td>Career</td>';
-      html += '<td></td>';
-      html += '<td></td>';
-      html += '<td>$'+totalEarned.toFixed(2)+'M</td>';
+      html += '<td'+(sortCol===0&&sortDir!=='none'?' class="ct-sort-col"':'')+'>Career</td>';
+      html += '<td'+(sortCol===1&&sortDir!=='none'?' class="ct-sort-col"':'')+'>  </td>';
+      html += '<td'+(sortCol===2&&sortDir!=='none'?' class="ct-sort-col"':'')+'>  </td>';
+      html += '<td'+(sortCol===3&&sortDir!=='none'?' class="ct-sort-col"':'')+'>$'+totalEarned.toFixed(2)+'M</td>';
       html += '</tr>';
       return html;
     }
@@ -2826,21 +3119,28 @@
     // ── Contract signings feed ──
     var signingItems = '';
     signings.forEach(function(s) {
-      var logo = TEAM_LOGOS[s.team] || '';
-      var logoHtml = logo ? '<img src="'+logo+'" alt="" loading="lazy">' : '';
+      var logo  = TEAM_LOGOS[s.team]  || '';
       var color = TEAM_COLORS[s.team] || '#e75719';
+      var loc   = teamLocation(s.team);
+      var abbr  = teamAbbrev(s.team);
       signingItems += '<div class="signing-item">';
-      signingItems += '<div class="signing-logo" style="border-color:'+color+'33;">'+logoHtml+'</div>';
-      signingItems += '<div class="signing-body">';
-      signingItems += '<div class="signing-team">'+s.team+'</div>';
-      signingItems += '<div class="signing-date">'+s.date+'</div>';
+      signingItems += '<div class="signing-header">'
+        + '<div class="signing-logo" style="border-color:'+color+'44;">'
+          + (logo ? '<img src="'+logo+'" alt="" loading="lazy">' : '')
+        + '</div>'
+        + '<span class="signing-team">'
+          + '<span class="stn-loc">'+loc+'</span>'
+          + '<span class="stn-abbr">'+abbr+'</span>'
+        + '</span>'
+        + '</div>';
       signingItems += '<div class="signing-tags">';
-      if (s.years) signingItems += '<span class="signing-tag">'+s.years+' yrs</span>';
-      if (s.total) signingItems += '<span class="signing-tag">'+s.total+'</span>';
-      if (s.aav)   signingItems += '<span class="signing-tag">'+s.aav+' / yr</span>';
+      if (s.years) signingItems += '<div class="signing-tag"><span class="signing-tag-label">Length</span><span class="signing-tag-value">'+s.years+' yrs</span></div>';
+      if (s.total) signingItems += '<div class="signing-tag"><span class="signing-tag-label">Total</span><span class="signing-tag-value">'+s.total+'</span></div>';
+      if (s.aav)   signingItems += '<div class="signing-tag"><span class="signing-tag-label">Per Year</span><span class="signing-tag-value">'+s.aav+'</span></div>';
       signingItems += '</div>';
-      if (s.note)  signingItems += '<div class="signing-note">'+s.note+'</div>';
-      signingItems += '</div></div>';
+      var dateLine = s.date + (s.note ? ' · ' + s.note : '');
+      signingItems += '<div class="signing-date">'+dateLine+'</div>';
+      signingItems += '</div>';
     });
 
     var signingsFeed = '<div class="ct-card contracts-signings">'
@@ -2854,60 +3154,73 @@
     if (trades.length > 0) {
       var tradeItems = '';
       trades.forEach(function(t) {
-        var fromLogo = TEAM_LOGOS[t.fromTeam] || '';
-        var toLogo   = TEAM_LOGOS[t.toTeam]   || '';
-        var fromColor = TEAM_COLORS[t.fromTeam] || '#e75719';
-        var toColor   = TEAM_COLORS[t.toTeam]   || '#231aa5';
+        var fromLogo  = TEAM_LOGOS[t.fromTeam]  || '';
+        var toLogo    = TEAM_LOGOS[t.toTeam]     || '';
+        var fromColor = TEAM_COLORS[t.fromTeam]  || '#e75719';
+        var toColor   = TEAM_COLORS[t.toTeam]    || '#231aa5';
+        var fromLoc   = teamLocation(t.fromTeam);
+        var toLoc     = teamLocation(t.toTeam);
+        var fromAbbr  = teamAbbrev(t.fromTeam);
+        var toAbbr    = teamAbbrev(t.toTeam);
 
-        // Build sent/received asset lists
         function buildAssets(arr) {
-          if (!arr || !arr.length) return '<div class="trade-asset" style="opacity:.4;">—</div>';
-          return arr.map(function(a) {
-            var typeClass = (a.type||'').toLowerCase() === 'pick' ? ' pick' : '';
+          if (!arr || !arr.length) return '<div class="trade-asset-none">Nothing</div>';
+          return '<div class="trade-asset-list">' + arr.map(function(a) {
+            var type = (a.type || '').toLowerCase();
+            var badgeClass = type === 'pick' ? 'pick' : type === 'cash' ? 'cash' : 'player';
             return '<div class="trade-asset">'
-              + '<span class="trade-asset-type'+typeClass+'">'+(a.type||'')+'</span>'
-              + '<span>'+(a.text||'')+'</span>'
+              + '<span class="trade-asset-badge ' + badgeClass + '">' + (a.type || '') + '</span>'
+              + '<span>' + (a.text || '') + '</span>'
               + '</div>';
-          }).join('');
+          }).join('') + '</div>';
+        }
+
+        function dirName(loc, abbr) {
+          return '<span class="trade-dir-name">'
+            + '<span class="tdn-loc">' + loc + '</span>'
+            + '<span class="tdn-abbr">' + abbr + '</span>'
+            + '</span>';
+        }
+        function colLabel(logo, loc, abbr, suffix) {
+          return '<div class="trade-col-label">'
+            + (logo ? '<img class="trade-col-label-logo" src="' + logo + '" alt="">' : '')
+            + '<span class="tcl-loc">' + loc + '</span>'
+            + '<span class="tcl-abbr">' + abbr + '</span>'
+            + ' ' + suffix
+            + '</div>';
         }
 
         tradeItems += '<div class="trade-item">';
-        // Header: logos + team names + date
-        tradeItems += '<div class="trade-header">';
-        tradeItems += '<div class="trade-logos">';
-        tradeItems += '<div class="trade-logo" style="border-color:'+fromColor+'33;">'
-          + (fromLogo ? '<img src="'+fromLogo+'" alt="" loading="lazy">' : '')
+        tradeItems += '<div class="trade-direction">';
+        tradeItems += '<div class="trade-dir-team">'
+          + '<div class="trade-dir-logo" style="border-color:' + fromColor + '44;">'
+            + (fromLogo ? '<img src="' + fromLogo + '" alt="" loading="lazy">' : '')
+          + '</div>'
+          + dirName(fromLoc, fromAbbr)
           + '</div>';
-        tradeItems += '<div class="trade-arrow">→</div>';
-        tradeItems += '<div class="trade-logo" style="border-color:'+toColor+'33;">'
-          + (toLogo ? '<img src="'+toLogo+'" alt="" loading="lazy">' : '')
+        tradeItems += '<div class="trade-dir-arrow">→</div>';
+        tradeItems += '<div class="trade-dir-team">'
+          + '<div class="trade-dir-logo" style="border-color:' + toColor + '44;">'
+            + (toLogo ? '<img src="' + toLogo + '" alt="" loading="lazy">' : '')
+          + '</div>'
+          + dirName(toLoc, toAbbr)
           + '</div>';
-        tradeItems += '</div>'; // .trade-logos
-        tradeItems += '<div class="trade-meta">';
-        var fromName = t.fromTeam.split(' ').pop();
-        var toName   = t.toTeam.split(' ').pop();
-        tradeItems += '<div class="trade-teams">'
-          + t.fromTeam
-          + '</div>';
-        tradeItems += '<div class="trade-subteams">'
-          + fromName + '<span class="arrow"> → </span>' + toName
-          + '</div>';
-        tradeItems += '<div class="trade-date">'+t.date+'</div>';
-        tradeItems += '</div>'; // .trade-meta
-        tradeItems += '</div>'; // .trade-header
+        tradeItems += '</div>';
 
-        // Assets grid
-        tradeItems += '<div class="trade-grid">';
-        var fromShort = t.fromTeam.split(' ').pop();
-        var toShort   = t.toTeam.split(' ').pop();
-        tradeItems += '<div><div class="trade-col-title">'+fromShort+' sent</div>'
-          + '<div class="trade-assets">'+buildAssets(t.sent)+'</div></div>';
-        tradeItems += '<div><div class="trade-col-title">'+toShort+' sent</div>'
-          + '<div class="trade-assets">'+buildAssets(t.received)+'</div></div>';
-        tradeItems += '</div>'; // .trade-grid
+        tradeItems += '<div class="trade-columns">';
+        tradeItems += '<div class="trade-col">'
+          + colLabel(fromLogo, fromLoc, fromAbbr, 'sent')
+          + buildAssets(t.sent)
+          + '</div>';
+        tradeItems += '<div class="trade-col">'
+          + colLabel(toLogo, toLoc, toAbbr, 'sent')
+          + buildAssets(t.received)
+          + '</div>';
+        tradeItems += '</div>';
 
-        if (t.notes) tradeItems += '<div class="trade-notes">'+t.notes+'</div>';
-        tradeItems += '</div>'; // .trade-item
+        if (t.notes) tradeItems += '<div class="trade-notes">' + t.notes + '</div>';
+        tradeItems += '<div class="trade-date-line">' + (t.date || '') + '</div>';
+        tradeItems += '</div>';
       });
 
       tradesFeed = '<div class="ct-card contracts-signings" style="margin-top:16px;">'
@@ -2915,7 +3228,6 @@
         + tradeItems
         + '</div>';
     }
-
     var contractsTitle = '<div class="panel-section-label">// Financial</div>'
       + '<div class="panel-section-title" style="margin-bottom:28px;">Contracts</div>';
 
@@ -3308,6 +3620,8 @@
   var gamesMode   = 'regular'; // 'regular' | 'playoffs'
   var gamesSeason = 'all';
   var gamesSort   = 'latest'; // 'latest' | 'oldest' | 'best' | 'worst'
+  var gamesPage   = 0;        // zero-based current page index
+  var PERF_PER_PAGE = 30;
 
   /* ── Game Score formula ── */
   function calcGameScore(g) {
@@ -3477,9 +3791,15 @@
       return;
     }
 
+    // ── Pagination ──
+    var totalPages = Math.max(1, Math.ceil(sorted.length / PERF_PER_PAGE));
+    if (gamesPage >= totalPages) gamesPage = totalPages - 1;
+    var pageStart = gamesPage * PERF_PER_PAGE;
+    var pageSlice = sorted.slice(pageStart, pageStart + PERF_PER_PAGE);
+
     html += '<div class="game-log-list">';
 
-    sorted.forEach(function(g) {
+    pageSlice.forEach(function(g) {
       // ── Team lookup from season ──
       var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
       var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
@@ -3524,8 +3844,7 @@
       var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
       var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
 
-      var fireClass = gs >= 54 ? ' fire-blue' : gs >= 45 ? ' fire-orange' : '';
-      html += '<div class="game-log-card'+fireClass+'">';
+      html += '<div class="game-log-card">';
 
       // ── CLICKABLE SUMMARY ROW ──
       html += '<div class="glc-summary">';
@@ -3606,13 +3925,7 @@
       html += '<div class="glc-bottom">'
         + '<div class="glc-bottom-emojis">'
         + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
-        + '<span style="position:relative;">'
-        + '<button class="glc-reaction-add" title="Add reaction">+</button>'
-        + '<div class="glc-emoji-picker">'
-        + '<input class="glc-emoji-input" maxlength="8" placeholder="😀" type="text" inputmode="text" autocomplete="off" spellcheck="false">'
-        + '<button class="glc-emoji-submit">Add</button>'
-        + '</div>'
-        + '</span>'
+        + '<button class="glc-reaction-add" data-rkey="'+gameReactionKey+'" title="Add reaction">+</button>'
         + '</div>'
         + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
         + '</div>';
@@ -3687,6 +4000,35 @@
     });
 
     html += '</div>'; // .game-log-list
+
+    // ── Pagination controls ──
+    if (totalPages > 1) {
+      html += '<div class="perf-pagination" id="perf-pagination">';
+      html += '<button class="perf-page-btn" id="perf-prev"' + (gamesPage === 0 ? ' disabled' : '') + '>← Prev</button>';
+
+      // Build page number buttons with ellipsis compression
+      var pages = [];
+      for (var pi = 0; pi < totalPages; pi++) {
+        var showBtn = pi === 0 || pi === totalPages - 1 || Math.abs(pi - gamesPage) <= 2;
+        if (showBtn) {
+          pages.push(pi);
+        } else if (pages[pages.length - 1] !== '…') {
+          pages.push('…');
+        }
+      }
+      pages.forEach(function(p) {
+        if (p === '…') {
+          html += '<span class="perf-page-ellipsis">…</span>';
+        } else {
+          html += '<button class="perf-page-btn' + (p === gamesPage ? ' active' : '') + '" data-page="' + p + '">' + (p + 1) + '</button>';
+        }
+      });
+
+      html += '<button class="perf-page-btn" id="perf-next"' + (gamesPage >= totalPages - 1 ? ' disabled' : '') + '>Next →</button>';
+      html += '<span class="perf-page-info">' + (pageStart + 1) + '–' + Math.min(pageStart + PERF_PER_PAGE, sorted.length) + ' of ' + sorted.length + '</span>';
+      html += '</div>';
+    }
+
     panel.innerHTML = html;
     wirePerformancesControls(panel, key, games);
   }
@@ -3696,6 +4038,7 @@
     if (seasonSel) {
       seasonSel.addEventListener('change', function(){
         gamesSeason = this.value;
+        gamesPage = 0;
         renderPerformancesTable(key, games);
       });
     }
@@ -3703,6 +4046,7 @@
     if (sortSel) {
       sortSel.addEventListener('change', function(){
         gamesSort = this.value;
+        gamesPage = 0;
         renderPerformancesTable(key, games);
       });
     }
@@ -3710,15 +4054,41 @@
     if (typeSel) {
       typeSel.addEventListener('change', function(){
         gamesMode = this.value;
+        gamesPage = 0;
         renderPerformancesTable(key, games);
       });
+    }
+
+    // ── Pagination wiring ──
+    var prevBtn = document.getElementById('perf-prev');
+    var nextBtn = document.getElementById('perf-next');
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function(){
+        if (gamesPage > 0) { gamesPage--; renderPerformancesTable(key, games); _scrollToPerf(); }
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function(){
+        gamesPage++; renderPerformancesTable(key, games); _scrollToPerf();
+      });
+    }
+    panel.querySelectorAll('.perf-page-btn[data-page]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        gamesPage = parseInt(this.dataset.page, 10);
+        renderPerformancesTable(key, games);
+        _scrollToPerf();
+      });
+    });
+    function _scrollToPerf() {
+      var perfPanel = document.getElementById('panel-performances');
+      if (perfPanel) perfPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // Wire card expand/collapse
     panel.querySelectorAll('.glc-summary').forEach(function(summary){
       summary.addEventListener('click', function(e){
         // Don't toggle if clicking inside reaction area
-        if (e.target.closest('.glc-reactions') || e.target.closest('.glc-reaction-add') || e.target.closest('.glc-emoji-picker')) return;
+        if (e.target.closest('.glc-reactions') || e.target.closest('.glc-reaction-add')) return;
         var card = summary.closest('.game-log-card');
         if (!card) return;
         var isOpen = card.classList.contains('is-open');
@@ -3863,42 +4233,19 @@
       }).catch(function(err){ console.warn('Reaction remove failed:', err); });
     }
 
-    // Wire picker open/close and emoji selection
+    // Wire "+" buttons to open the shared emoji modal
     panel.querySelectorAll('.glc-reaction-add').forEach(function(btn){
-      var picker = btn.nextElementSibling;
-      var bottomRow = btn.closest('.glc-bottom');
-      var rkey = bottomRow ? (bottomRow.querySelector('.glc-reactions')||{}).dataset.rkey : null;
-      if (!picker || !rkey) return;
-
-      var input  = picker.querySelector('.glc-emoji-input');
-      var submit = picker.querySelector('.glc-emoji-submit');
-
       btn.addEventListener('click', function(e){
         e.stopPropagation();
-        panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ if(p!==picker) p.classList.remove('open'); });
-        picker.classList.toggle('open');
-        if (picker.classList.contains('open') && input) {
-          setTimeout(function(){ input.focus(); }, 50);
-        }
+        openEmojiModal(btn.dataset.rkey);
       });
-
-      function doSubmit() {
-        if (input && input.value.trim()) {
-          submitReaction(rkey, input.value.trim());
-          input.value = '';
-          picker.classList.remove('open');
-        }
-      }
-      if (submit) submit.addEventListener('click', function(e){ e.stopPropagation(); doSubmit(); });
-      if (input)  input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.stopPropagation(); doSubmit(); } });
-      picker.addEventListener('click', function(e){ e.stopPropagation(); });
     });
 
-    // Close pickers when clicking outside — attach once per panel, not per render
-    if (!panel._emojiClickListenerAttached) {
-      panel._emojiClickListenerAttached = true;
-      document.addEventListener('click', function(){
-        panel.querySelectorAll('.glc-emoji-picker.open').forEach(function(p){ p.classList.remove('open'); });
+    // Listen for confirmed reactions from the shared modal
+    if (!panel._emojiReactListenerAttached) {
+      panel._emojiReactListenerAttached = true;
+      document.addEventListener('ege:react', function(e){
+        submitReaction(e.detail.rkey, e.detail.emoji);
       });
     }
 
@@ -3906,11 +4253,75 @@
     loadAllReactions();
   }
 
+  /* ── SHARED EMOJI MODAL ── */
+  document.addEventListener('DOMContentLoaded', function() {
+    var backdrop = document.getElementById('emoji-modal-backdrop');
+    var input    = document.getElementById('emoji-modal-input');
+    var confirm  = document.getElementById('emoji-modal-confirm');
+    var cancel   = document.getElementById('emoji-modal-cancel');
+    var activeRkey = null;
+
+    function openEmojiModal(rkey) {
+      activeRkey = rkey;
+      input.value = '';
+      input.classList.remove('invalid');
+      backdrop.classList.add('open');
+      setTimeout(function(){ input.focus(); }, 60);
+    }
+
+    function closeModal() {
+      backdrop.classList.remove('open');
+      activeRkey = null;
+    }
+
+    function extractEmoji(str) {
+      var m = str.match(/\p{Emoji_Presentation}[\u{FE00}-\u{FE0F}\u{1F3FB}-\u{1F3FF}\u{200D}\p{Emoji_Presentation}]*/u)
+             || str.match(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}\u00A9\u00AE]/u);
+      return m ? m[0] : null;
+    }
+
+    input.addEventListener('input', function() {
+      var emoji = extractEmoji(input.value);
+      if (emoji) {
+        input.value = emoji;
+        input.classList.remove('invalid');
+      } else if (input.value.length > 0) {
+        input.classList.add('invalid');
+      }
+    });
+
+    function doConfirm() {
+      var emoji = extractEmoji(input.value);
+      if (!emoji) {
+        input.classList.add('invalid');
+        input.focus();
+        return;
+      }
+      if (activeRkey) {
+        document.dispatchEvent(new CustomEvent('ege:react', { detail: { rkey: activeRkey, emoji: emoji } }));
+      }
+      closeModal();
+    }
+
+    confirm.addEventListener('click', function(e){ e.stopPropagation(); doConfirm(); });
+    cancel.addEventListener('click',  function(e){ e.stopPropagation(); closeModal(); });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { e.stopPropagation(); doConfirm(); }
+      if (e.key === 'Escape') { e.stopPropagation(); closeModal(); }
+    });
+    backdrop.addEventListener('click', function(e){
+      if (e.target === backdrop) closeModal();
+    });
+
+    window.openEmojiModal = openEmojiModal;
+  });
+
   function renderPerformances(key) {
     var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[key]) || [];
     gamesMode   = 'all';
     gamesSeason = 'all';
     gamesSort   = 'latest';
+    gamesPage   = 0;
     renderPerformancesTable(key, games);
   }
 
@@ -4028,9 +4439,9 @@
         var k = card.dataset.player;
         if (k && PLAYERS[k]) showProfile(k, 'bio');
       });
-      // Inject current team logo chip
+      // Inject current team logo chip (skip for retired players)
       var k = card.dataset.player;
-      if (k && PLAYER_STATS[k]) {
+      if (k && PLAYER_STATS[k] && PLAYERS[k] && PLAYERS[k].team !== 'Retired') {
         var rows = (PLAYER_STATS[k].regular||[]).filter(isProRow);
         var latestTeam = rows.length ? rows[rows.length-1].team : null;
         if (latestTeam && TEAM_LOGOS[latestTeam]) {
@@ -4081,5 +4492,18 @@
   });
 
   </script>
+  <!-- EMOJI REACTION MODAL -->
+  <div id="emoji-modal-backdrop">
+    <div id="emoji-modal" role="dialog" aria-modal="true" aria-labelledby="emoji-modal-title">
+      <span id="emoji-modal-title">// add reaction</span>
+      <input id="emoji-modal-input" type="text" inputmode="emoji" autocomplete="off" spellcheck="false" placeholder="😀" maxlength="8" />
+      <span class="emoji-modal-hint">Type or paste a single emoji</span>
+      <div class="emoji-modal-actions">
+        <button class="emoji-modal-cancel" id="emoji-modal-cancel">Cancel</button>
+        <button class="emoji-modal-confirm" id="emoji-modal-confirm" title="Confirm">✓</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

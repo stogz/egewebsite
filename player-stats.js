@@ -72,6 +72,7 @@ var PLAYER_STATS = {
       { season:'2031-32', age:33, team:'IND', ppg:21.9, rpg:1.6, apg:9.3,  spg:1.2, bpg:0.0, topg:1.8, fgp:'54.7%', tpp:'43.8%', ftp:'96.5%', tpa:7.1, gs:18, gp:18, mpg:31.1, dnq:false },
       { season:'2032-33', age:34, team:'IND', ppg:16.0, rpg:1.0, apg:9.2, spg:1.0, bpg:0.0, topg:2.0, fgp:'67.4%', tpp:'59.3%', ftp:'92.3%', tpa:5.0, gs:5, gp:5, mpg:29.6, dnq:false },
       { season:'2033-34', age:35, team:'SAS', ppg:23.6, rpg:2.8, apg:9.9, spg:1.2, bpg:0.0, topg:3.1, fgp:'56.4%', tpp:'52.7%', ftp:'95.9%', tpa:7.4, gs:10, gp:10, mpg:34.7, dnq:false },
+      { season:'2034-35', age:36, team:'SAS', ppg:16.3, rpg:1.9, apg:8.6, spg:1.9, bpg:0.0, topg:3.2, fgp:'42.1%', tpp:'38.1%', ftp:'89.3%', tpa:7.6, gs:11, gp:11, mpg:35.5, dnq:false },
     ],
     totals: [
       { season:'2018-19', age:20, team:'LAC', pts:722,  reb:83,  ast:445, stl:78,  blk:0, tov:155, fgm:267, fga:690,  tpm:65,  tpa:222, ftm:123, fta:165, min:1928, gs:31, gp:82, dd:4,  td:0 },
@@ -406,6 +407,7 @@ var PLAYER_STATS = {
       { season:'2031-32', age:34, team:'HOU', ppg:9.3,  rpg:8.6,  apg:8.4, spg:0.6, bpg:1.1, topg:0.6, fgp:'43.5%', tpp:'37.5%', ftp:'75.0%', tpa:2.0, gs:9,  gp:12, mpg:28.0, dnq:false },
       { season:'2032-33', age:35, team:'HOU', ppg:7.0, rpg:7.5, apg:5.8, spg:0.5, bpg:1.0, topg:2.8, fgp:'32.0%', tpp:'25.0%', ftp:'100.0%', tpa:2.0, gs:4, gp:4, mpg:27.3, dnq:false },
       { season:'2033-34', age:36, team:'MEX', ppg:8.8, rpg:7.8, apg:8.1, spg:0.6, bpg:1.5, topg:2.0, fgp:'47.1%', tpp:'36.0%', ftp:'72.0%', tpa:1.6, gs:16, gp:16, mpg:27.6, dnq:false },
+      { season:'2034-35', age:37, team:'MEX', ppg:5.9, rpg:8.0, apg:8.5, spg:0.7, bpg:0.8, topg:0.7, fgp:'43.7%', tpp:'38.1%', ftp:'66.7%', tpa:0.9, gs:24, gp:24, mpg:25.0, champ:true, dnq:false },
     ],
     totals: [
       { season:'2018-19', age:21, team:'WAS', pts:397,  reb:391, ast:446, stl:36,  blk:66,  tov:55,  fgm:159, fga:453, tpm:0,  tpa:0,   ftm:79,  fta:116, min:1617, gs:64, gp:64, dd:6,  td:1 },
@@ -482,6 +484,7 @@ var PLAYER_STATS = {
     },
     awards: {
       nba: [
+        { title:'NBA Champion',            years:[2035],                                    icon:'🏆' },
         { title:'All-NBA Third Team',    years:[2027], icon:'🥉' },
         { title:'NBA All-Star',          years:[2028], icon:'⭐' },
         { title:'All-Rookie First Team', years:[2019], icon:'🌟' },
@@ -560,6 +563,7 @@ var PLAYER_STATS = {
       { season:'2031-32', age:33, team:'CHI', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
       { season:'2032-33', age:34, team:'VAN', ppg:10.8, rpg:3.5, apg:6.3, spg:1.0, bpg:1.3, topg:1.8, fgp:'43.2%', tpp:'40.0%', ftp:'100.0%', tpa:4.0, gs:4, gp:4, mpg:29.3, DNQ: false },
       { season:'2033-34', age:35, team:'VAN', ppg:4.8, rpg:1.6, apg:3.8, spg:2.2, bpg:1.0, topg:1.6, fgp:'34.8%', tpp:'36.4%', ftp:'100.0%', tpa:2.2, gs:0, gp:5, mpg:19.2, DNQ: false },
+      { season:'2034-35', age:36, team:'BKN', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not play, coaches decision.' },
     ],
     totals: [
       { season:'2018-19', age:20, team:'MIL', pts:815,  reb:374, ast:370, stl:93,  blk:40,  tov:129, fgm:316, fga:609,  tpm:60,  tpa:186, ftm:123, fta:159, min:1936, gs:5,  gp:80, dd:5,  td:0 },

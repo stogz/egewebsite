@@ -696,7 +696,7 @@ window.EGE_SEASON_STATS = {
     stlouisspirit:         { record: "18-64", pct: ".220", rank: "16th", playoffs: "Did not qualify" },
 
     /* WEST */
-    mexicocityflight:      { record: "64-18", pct: ".780", rank: "1st",  playoffs: "N/A", players: ["Sam Stogsdill"] },
+    mexicocityflight:      { record: "64-18", pct: ".780", rank: "1st",  playoffs: "Champions", finals_mvp: "Darius Lyttle", players: ["Sam Stogsdill"] },
     utahjazz:              { record: "53-29", pct: ".646", rank: "2nd",  playoffs: "N/A" },
     sanantoniospurs:       { record: "52-30", pct: ".634", rank: "3rd",  playoffs: "N/A", players: ["Cooper Clark"] },
     houstonrockets:        { record: "52-30", pct: ".634", rank: "4th",  playoffs: "N/A" },
@@ -5787,6 +5787,44 @@ window.EGE_BRACKETS = {
       ],
     },
     finals: { top: "philadelphia76ers", topW: 4, bot: "oklahomacitythunder", botW: 1 },
+  },
+  "2034-35": {
+    east: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      // e.g. if the 9-seed beat the 7-seed in play-in, put the 9-seed at position 7
+      playoff_seeds: { 7: "brooklynnets", 8: "miamiheat" },
+      r1: [
+        { top: "charlottehornets",  topW: 4, bot: "miamiheat",     botW: 0 },  /* 1 vs 8 */
+        { top: "brooklynnets",     topW: 2, bot: "chicagobulls",    botW: 4 },  /* 4 vs 5 */
+        { top: "torontoraptors",     topW: 1, bot: "detroitpistons",     botW: 4 },  /* 3 vs 6 */
+        { top: "philadelphia76ers",   topW: 4, bot: "indianapacers",        botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "charlottehornets",  topW: 4, bot: "chicagobulls",   botW: 3 },  /* 1/8 vs 4/5 */
+        { top: "philadelphia76ers",     topW: 4, bot: "indianapacers", botW: 1 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "philadelphia76ers",  topW: 4, bot: "detroitpistons",   botW: 1 },
+      ],
+    },
+    west: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      playoff_seeds: { 7: "utahjazz", 8: "neworleanspelicans" },
+      r1: [
+        { top: "mexicocityflight",   topW: 4, bot: "vancouvergrizzlies",  botW: 0 },  /* 1 vs 8 */
+        { top: "houstonrockets",topW: 4, bot: "oklahomacitythunder",botW: 3 },  /* 4 vs 5 */
+        { top: "sanantoniospurs",topW: 4, bot: "goldenstatewarriors",  botW: 3 },  /* 3 vs 6 */
+        { top: "utahjazz", topW: 4, bot: "dallasmavericks",         botW: 2 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "mexicocityflight",   topW: 4, bot: "houstonrockets",botW: 2 }, /* 1/8 vs 4/5 */
+        { top: "utahjazz",topW: 4, bot: "sanantoniospurs",botW: 0 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "mexicocityflight",   topW: 4, bot: "utahjazz",botW: 3 },
+      ],
+    },
+    finals: { top: "mexicocityflight", topW: 4, bot: "philadelphia76ers", botW: 3 },
   },
 
 };
