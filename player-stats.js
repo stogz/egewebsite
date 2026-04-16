@@ -74,6 +74,7 @@ var PLAYER_STATS = {
       { season:'2032-33', age:34, team:'IND', ppg:16.0, rpg:1.0, apg:9.2, spg:1.0, bpg:0.0, topg:2.0, fgp:'67.4%', tpp:'59.3%', ftp:'92.3%', tpa:5.0, gs:5, gp:5, mpg:29.6, dnq:false },
       { season:'2033-34', age:35, team:'SAS', ppg:23.6, rpg:2.8, apg:9.9, spg:1.2, bpg:0.0, topg:3.1, fgp:'56.4%', tpp:'52.7%', ftp:'95.9%', tpa:7.4, gs:10, gp:10, mpg:34.7, dnq:false },
       { season:'2034-35', age:36, team:'SAS', ppg:16.3, rpg:1.9, apg:8.6, spg:1.9, bpg:0.0, topg:3.2, fgp:'42.1%', tpp:'38.1%', ftp:'89.3%', tpa:7.6, gs:11, gp:11, mpg:35.5, dnq:false },
+      { season:'2035-36', age:37, team:'SAS', ppg:12.0, rpg:1.0, apg:6.3, spg:1.2, bpg:0.0, topg:2.7, fgp:'33.3%', tpp:'38.2%', ftp:'81.0%', tpa:5.7, gs:5, gp:6, mpg:28.7, dnq:false },
     ],
     totals: [
       { season:'2018-19', age:20, team:'LAC', pts:722,  reb:83,  ast:445, stl:78,  blk:0, tov:155, fgm:267, fga:690,  tpm:65,  tpa:222, ftm:123, fta:165, min:1928, gs:31, gp:82, dd:4,  td:0 },
