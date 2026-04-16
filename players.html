@@ -1687,16 +1687,16 @@
     clark:     { name:'Cooper Clark',   initials:'CC', number:'#5', position:'Point Guard',    team:'TBD',
       bio:[{key:'Height',val:'6\'1\"'},{key:'Weight',val:'155 lbs'},{key:'Age',val:'—'},{key:'College',val:'Arizona'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Thirteenth Pick'},{key:'Nickname',val:'\"Clutch Clark\"\, \"Cswag\"'}]
     },
-    hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward',  team:'TBD',
+    hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward',  team:'Retired',
       bio:[{key:'Height',val:'6\'7\"'},{key:'Weight',val:'228 lbs'},{key:'Age',val:'—'},{key:'College',val:'UCLA'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Second Pick'},{key:'Nickname',val:'\"Pax\"'}]
     },
-    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',         team:'TBD',
+    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',         team:'Retired',
       bio:[{key:'Height',val:'6\'9\"'},{key:'Weight',val:'253 lbs'},{key:'Age',val:'—'},{key:'College',val:'Louisville'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Seventeenth Pick'},{key:'Nickname',val:'\"Uncle Sam\"'}]
     },
-    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#11', position:'Point Guard',    team:'TBD',
+    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#11', position:'Point Guard',    team:'Retired',
       bio:[{key:'Height',val:'6\'5\"'},{key:'Weight',val:'200 lbs'},{key:'Age',val:'—'},{key:'College',val:'Florida State, Duke'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Eleventh Pick'},{key:'Nickname',val:'—'}]
     },
-    vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#8', position:'Shooting Guard', team:'TBD',
+    vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#8', position:'Shooting Guard', team:'Retired',
       bio:[{key:'Height',val:'6\'4\"'},{key:'Weight',val:'203 lbs'},{key:'Age',val:'—'},{key:'College',val:'Kansas'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Sixth Pick'},{key:'Nickname',val:'\"V8\"'}]
     }
   };
@@ -2172,7 +2172,7 @@
       if(isCollege){
         var cIcons='';
         tbody+='<tr class="college-row" data-orig="'+idx+'" data-college="1">';
-        tbody+='<td><span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span></td>';
+        tbody+='<td><span title="Non-NBA season, excluded from career averages." class="college-tag">'+fmtSeason(row.season)+' *</span></td>';
         tbody+='<td>'+row.age+'</td><td>'+row.team+'</td>';
         tbody+='<td>'+fmt1(row.ppg)+'</td><td>'+fmt1(row.rpg)+'</td><td>'+fmt1(row.apg)+'</td>';
         tbody+='<td>'+fmt1(row.spg)+'</td><td>'+fmt1(row.bpg)+'</td><td>'+fmt1(row.topg)+'</td>';
