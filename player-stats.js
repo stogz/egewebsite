@@ -104,6 +104,7 @@ var PLAYER_STATS = {
         { date:'February 24, 2027',  team:'Los Angeles Lakers',   years:4, total:'$252.07M', aav:'$63.02M', note:'Player Option Waived' },
         { date:'July 1, 2030',       team:'Indiana Pacers',       years:3, total:'$131.48M', aav:'$43.83M', note:'' },
         { date:'June 6, 2032',       team:'Indiana Pacers',       years:4, total:'$168.76M', aav:'$42.19M', note:'' },
+        { date:'July 2, 2036',       team:'Los Angeles Lakers',       years:1, total:'$3.66M', aav:'$3.66M', note:'' },
       ],
       trades: [
         {
@@ -157,7 +158,8 @@ var PLAYER_STATS = {
         { season:'2033-34', team:'San Antonio Spurs',       salary:'$34.76M', option:'' },
         { season:'2034-35', team:'San Antonio Spurs',       salary:'$39.82M', option:'' },
         { season:'2035-36', team:'San Antonio Spurs',       salary:'$44.64M', option:'' },
-        { season:'2036-37', team:'San Antonio Spurs',       salary:'$49.54M', option:'' },
+        { season:'2036-37', team:'San Antonio Spurs',       salary:'$49.54M', option:'waived' },
+        { season:'2036-37', team:'Los Angeles Lakers',       salary:'$3.66M', option:'' },
       ]
     },
     awards: {
@@ -221,6 +223,15 @@ var PLAYER_STATS = {
             { name: 'The End',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswag-ii-end_orig.png' },
             { name: 'The Nether',    img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cswag-ii-nether_orig.png' },
           ]
+        },
+        {
+          name: 'CSWAG III',
+          thumbnail: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/default_orig.png',
+          colorways: [
+            { name: 'Born and Raised', img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/laker_orig.png' },
+            { name: 'Blaze of Glory',   img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sun_orig.png' },
+            { name: 'Clean Slate',     img: 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/default_orig.png' },
+          ]
         }
       ]
     },
@@ -231,6 +242,7 @@ var PLAYER_STATS = {
       { team:'Team USA',   name:'Home',  number:'5', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2024–2027', img:'' },
       { team:'Indiana Pacers',   name:'Away',  number:'5', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2024–2027', img:'' },
       { team:'San Antonio Spurs',   name:'Away',  number:'5', bg:'#000000', stroke:'#c2c2c2', num:'#ffffff', seasons:'2024–2027', img:'' },
+      { team:'Los Angeles Lakers', name:'Away',  number:'5', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2018–2024', img:'' },
     ],
   },
 
