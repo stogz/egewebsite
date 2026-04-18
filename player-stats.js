@@ -53,6 +53,7 @@ var PLAYER_STATS = {
       { season:'2033-34', age:35, team:'SAS', ppg:18.4, rpg:1.7, apg:8.7,  spg:1.3, bpg:0.0, topg:2.4, fgp:'46.0%', tpp:'39.4%', ftp:'95.5%', tpa:7.2, gs:82, gp:82, mpg:31.4, star:false, dnq:false },
       { season:'2034-35', age:36, team:'SAS', ppg:15.4, rpg:1.6, apg:8.9,  spg:1.2, bpg:0.0, topg:2.3, fgp:'44.7%', tpp:'41.1%', ftp:'94.3%', tpa:6.3, gs:79, gp:79, mpg:30.4, star:false, dnq:false },
       { season:'2035-36', age:37, team:'SAS', ppg:11.9, rpg:1.0, apg:6.1,  spg:0.6, bpg:0.0, topg:1.6, fgp:'44.7%', tpp:'40.2%', ftp:'92.6%', tpa:4.9, gs:61, gp:82, mpg:30.4, star:false, dnq:false },
+      { season:'2036-37', age:38, team:'LAL', ppg:10.7, rpg:0.7, apg:6.9,  spg:0.7, bpg:0.0, topg:1.9, fgp:'41.9%', tpp:'39.0%', ftp:'93.7%', tpa:4.3, gs:5, gp:72, mpg:24.5, star:false, dnq:false },
     ],
     playoffs: [
       { season:'2016-17', age:18, team:'AU',  ppg:11.3, rpg:1.3, apg:7.0,  spg:0.7, bpg:0.7, topg:3.3, fgp:'40.5%', tpp:'33.3%', ftp:'50.0%', tpa:3.7, gs:3,  gp:3,  mpg:24.0, dnq:false },
@@ -95,6 +96,7 @@ var PLAYER_STATS = {
       { season:'2033-34', age:35, team:'SAS', pts:1510, reb:140, ast:715, stl:109,  blk:0, tov:199, fgm:500, fga:1088, tpm:233, tpa:591, ftm:277, fta:290, min:2574, gs:82, gp:82, dd:22, td:0 },
       { season:'2034-35', age:36, team:'SAS', pts:1220, reb:125, ast:702, stl:92,  blk:0, tov:181, fgm:409, fga:916, tpm:205, tpa:499, ftm:197, fta:209, min:2402, gs:79, gp:79, dd:23, td:0 },
       { season:'2035-36', age:37, team:'SAS', pts:974, reb:81, ast:497, stl:51,  blk:0, tov:129, fgm:326, fga:729, tpm:160, tpa:398, ftm:162, fta:175, min:1992, gs:61, gp:82, dd:5, td:0 },
+      { season:'2036-37', age:38, team:'LAL', pts:773, reb:52, ast:500, stl:52,  blk:0, tov:134, fgm:238, fga:568, tpm:120, tpa:308, ftm:177, fta:189, min:1765, gs:5, gp:72, dd:8, td:0 },
     ],
     contracts: {
       signings: [
