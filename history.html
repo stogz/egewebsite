@@ -5,8 +5,10 @@
   <link rel="icon" type="image/png" href="EGE_Logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>History · EGE NBA Simulation</title>
+  <script>document.addEventListener("DOMContentLoaded",function(){if(window.EGE_SIM&&window.EGE_SIM.id!=="sim-original"){document.title=document.title.replace("EGE NBA Simulation","EGE "+window.EGE_SIM.label+" Simulation");}});</script>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
+  <script src="sim-config.js"></script>
   <style>
     .placeholder-wrap {
       position: relative; z-index: 2;
@@ -109,7 +111,7 @@
       <li><a href="players.html" data-num="02">Players</a></li>
       <li><a href="teams.html" data-num="03">Teams</a></li>
       <li><a href="history.html" data-num="04" class="active">History</a></li>
-      <li><a href="draft.html" data-num="05">Draft</a></li>
+      <li><a href="draft.html" data-num="05">Other</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>

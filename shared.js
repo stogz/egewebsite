@@ -5,6 +5,67 @@
 
 (function () {
 
+  /* ── SIM SWITCHER BUTTON (desktop nav) ── */
+  (function() {
+    if (typeof EGE_SIM === 'undefined') return;
+    var navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+
+    var simBtn = document.createElement('button');
+    simBtn.id = 'sim-toggle';
+    simBtn.title = 'Switch simulation';
+    simBtn.setAttribute('aria-label', 'Switch simulation');
+
+    function updateSimBtn() {
+      simBtn.innerHTML =
+        '<span class="sim-toggle-label">' + window.EGE_SIM.label + '</span>' +
+        '<svg class="sim-toggle-icon" width="10" height="10" viewBox="0 0 10 10" fill="none">' +
+        '<path d="M1.5 3.5L5 7 8.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>';
+    }
+    updateSimBtn();
+
+    simBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var existing = document.getElementById('sim-dropdown');
+      if (existing) { existing.remove(); return; }
+
+      var dropdown = document.createElement('div');
+      dropdown.id = 'sim-dropdown';
+
+      Object.keys(window.EGE_SIM_REGISTRY).forEach(function(key) {
+        var entry = window.EGE_SIM_REGISTRY[key];
+        var item  = document.createElement('button');
+        item.className = 'sim-dropdown-item' + (key === window.EGE_SIM.id ? ' active' : '');
+        item.innerHTML =
+          '<span class="sim-item-label">' + entry.label + '</span>' +
+          '<span class="sim-item-sub">' + entry.subtitle + '</span>';
+        item.addEventListener('click', function() { window.EGE_switchSim(key); });
+        dropdown.appendChild(item);
+      });
+
+      document.body.appendChild(dropdown);
+      var rect = simBtn.getBoundingClientRect();
+      dropdown.style.top   = (rect.bottom + 8) + 'px';
+      dropdown.style.right  = (window.innerWidth - rect.right) + 'px';
+
+      setTimeout(function() {
+        document.addEventListener('click', function close(e2) {
+          if (!dropdown.contains(e2.target) && e2.target !== simBtn) {
+            dropdown.remove();
+            document.removeEventListener('click', close);
+          }
+        });
+      }, 0);
+    });
+
+    var li = document.createElement('li');
+    li.appendChild(simBtn);
+    var lastLi = navLinks.querySelector('li:last-child');
+    navLinks.insertBefore(li, lastLi);
+
+  })();
+
   /* ── MOBILE HAMBURGER NAV ── */
   (function() {
     var nav = document.querySelector('nav');
@@ -41,6 +102,24 @@
     var divEl = document.createElement('div');
     divEl.className = 'nav-menu-divider';
     menu.appendChild(divEl);
+
+    // Sim switcher row in mobile menu
+    if (typeof EGE_SIM !== 'undefined' && typeof EGE_SIM_REGISTRY !== 'undefined') {
+      Object.keys(window.EGE_SIM_REGISTRY).forEach(function(key) {
+        var entry = window.EGE_SIM_REGISTRY[key];
+        var simRow = document.createElement('button');
+        simRow.className = 'nav-menu-sim-btn' + (key === window.EGE_SIM.id ? ' active' : '');
+        simRow.textContent = '⟳  Switch to ' + entry.label + ' · ' + entry.season;
+        if (key === window.EGE_SIM.id) simRow.textContent = '◆  ' + entry.label + ' · Active';
+        simRow.addEventListener('click', function() {
+          if (key !== window.EGE_SIM.id) window.EGE_switchSim(key);
+        });
+        menu.appendChild(simRow);
+      });
+      var div2 = document.createElement('div');
+      div2.className = 'nav-menu-divider';
+      menu.appendChild(div2);
+    }
 
     // Mode toggle row (only visible inside mobile menu)
     var modeRow = document.createElement('button');

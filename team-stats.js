@@ -778,7 +778,7 @@ window.EGE_SEASON_STATS = {
     mexicocityflight:      { record: "50-32", pct: ".610", rank: "5th",  playoffs: "N/A" },
     denvernuggets:         { record: "46-36", pct: ".561", rank: "6th",  playoffs: "N/A" },
     oklahomacitythunder:   { record: "43-39", pct: ".524", rank: "7th",  playoffs: "N/A" },
-    sacramentokings:       { record: "42-40", pct: ".512", rank: "8th",  playoffs: "N/A" },
+    sacramentokings:       { record: "42-40", pct: ".512", rank: "8th",  playoffs: "Champions", finals_mvp: "Darryn Peterson" },
     losangeleslakers:      { record: "36-46", pct: ".439", rank: "9th",  playoffs: "N/A", players: ["Cooper Clark"] },
     portlandtrailblazers:  { record: "34-48", pct: ".415", rank: "10th", playoffs: "N/A" },
     losangelesclippers:    { record: "33-49", pct: ".402", rank: "11th", playoffs: "Did not qualify" },
@@ -7181,5 +7181,42 @@ window.EGE_BRACKETS = {
     },
     finals: { top: "dallasmavericks", topW: 3, bot: "charlottehornets", botW: 4 },
   },
-
+  "2036-37": {
+    east: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      // e.g. if the 9-seed beat the 7-seed in play-in, put the 9-seed at position 7
+      playoff_seeds: { 7: "atlantahawks", 8: "stlouisspirit" },
+      r1: [
+        { top: "washingtonwizards",  topW: 4, bot: "stlouisspirit",     botW: 0 },  /* 1 vs 8 */
+        { top: "torontoraptors",     topW: 4, bot: "brookylnnets",    botW: 2 },  /* 4 vs 5 */
+        { top: "philadelphia76ers",     topW: 4, bot: "chicagobulls",     botW: 0 },  /* 3 vs 6 */
+        { top: "charlottehornets",   topW: 4, bot: "atlantahawks",        botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "washingtonwizards",  topW: 3, bot: "torontoraptors",   botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "philadelphia76ers",     topW: 4, bot: "charlottehornets", botW: 3 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "torontoraptors",  topW: 2, bot: "philadelphia76ers",   botW: 4 },
+      ],
+    },
+    west: {
+      // playoff_seeds: override 7th/8th seeds with play-in winners (1-based)
+      playoff_seeds: { 7: "sacramentokings", 8: "oklahomacitythunder" },
+      r1: [
+        { top: "utahjazz",   topW: 4, bot: "oklahomacitythunder",  botW: 2 },  /* 1 vs 8 */
+        { top: "houstonrockets",topW: 4, bot: "mexicocityflight",botW: 3 },  /* 4 vs 5 */
+        { top: "dallasmavericks",topW: 4, bot: "denvernuggets",  botW: 0 },  /* 3 vs 6 */
+        { top: "minnesotatimberwolves", topW: 3, bot: "sacramentokings",         botW: 4 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "utahjazz",   topW: 4, bot: "houstonrockets",botW: 1 }, /* 1/8 vs 4/5 */
+        { top: "dallasmavericks",topW: 2, bot: "sacramentokings",botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "utahjazz",   topW: 3, bot: "sacramentokings",botW: 4 },
+      ],
+    },
+    finals: { top: "philadelphia76ers", topW: 3, bot: "sacramentokings", botW: 4 },
+  },
 };

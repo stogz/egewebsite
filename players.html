@@ -5,8 +5,10 @@
   <link rel="icon" type="image/png" href="EGE_Logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Players · EGE NBA Simulation</title>
+  <script>document.addEventListener("DOMContentLoaded",function(){if(window.EGE_SIM&&window.EGE_SIM.id!=="sim-original"){document.title=document.title.replace("EGE NBA Simulation","EGE "+window.EGE_SIM.label+" Simulation");}});</script>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
+  <script src="sim-config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     /* ══ PLAYER SELECT ══ */
@@ -1456,7 +1458,7 @@
       <li><a href="players.html" data-num="02" class="active">Players</a></li>
       <li><a href="teams.html" data-num="03">Teams</a></li>
       <li><a href="history.html" data-num="04">History</a></li>
-      <li><a href="draft.html" data-num="05">Draft</a></li>
+      <li><a href="draft.html" data-num="05">Other</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
@@ -1470,32 +1472,8 @@
           <h2 class="section-title">Select a Player</h2>
         </div>
       </div>
-      <div class="player-select-grid">
-        <a class="player-select-card" href="#clark-bio" data-player="clark">
-          <div class="psc-num">#5 · PG</div><div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;"><img src="headshot_clark.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
-          <div class="psc-name">Cooper Clark</div><div class="psc-pos">Point Guard</div>
-          <span class="psc-arrow">View Profile →</span>
-        </a>
-        <a class="player-select-card" href="#hatch-bio" data-player="hatch">
-          <div class="psc-num">#10 · PF</div><div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;"><img src="headshot_hatch.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
-          <div class="psc-name">Paxon Hatch</div><div class="psc-pos">Power Forward</div>
-          <span class="psc-arrow">View Profile →</span>
-        </a>
-        <a class="player-select-card" href="#stogsdill-bio" data-player="stogsdill">
-          <div class="psc-num">#34 · C</div><div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;"><img src="headshot_stogsdill.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
-          <div class="psc-name">Sam Stogsdill</div><div class="psc-pos">Center</div>
-          <span class="psc-arrow">View Profile →</span>
-        </a>
-        <a class="player-select-card" href="#stewart-bio" data-player="stewart">
-          <div class="psc-num">#11 · PG</div><div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;"><img src="headshot_stewart.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
-          <div class="psc-name">Jaykeb Stewart</div><div class="psc-pos">Point Guard</div>
-          <span class="psc-arrow">View Profile →</span>
-        </a>
-        <a class="player-select-card" href="#vitel-bio" data-player="vitel">
-          <div class="psc-num">#8 · SG</div><div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;"><img src="headshot_vitel.png" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display='none'"></div>
-          <div class="psc-name">Isaac Vitel</div><div class="psc-pos">Shooting Guard</div>
-          <span class="psc-arrow">View Profile →</span>
-        </a>
+      <div class="player-select-grid" id="player-select-grid">
+        <!-- Cards injected dynamically by renderRosterGrid() after data loads -->
       </div>
     </div>
   </div>
@@ -1670,36 +1648,118 @@
     <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
     <ul class="footer-links">
       <li><a href="index.html">Home</a></li><li><a href="teams.html">Teams</a></li>
-      <li><a href="history.html">History</a></li><li><a href="draft.html">Draft</a></li>
+      <li><a href="history.html">History</a></li><li><a href="draft.html">Other</a></li>
     </ul>
   </footer>
 
-  <script src="stats.js"></script>
-  <script src="player-stats.js"></script>
-  <script src="player-games.js"></script>
   <script src="shared.js"></script>
+  <script>
+  /* Load correct data files for active sim, then call boot */
+  (function() {
+    var sim = window.EGE_SIM || { playerStatsFile:'player-stats.js', playerGamesFile:'player-games.js' };
+    var loaded = 0;
+    var needed = 2;
+
+    function done() {
+      loaded++;
+      if (loaded < needed) return;
+      // Both data files loaded — boot the page
+      if (typeof window.__EGE_PLAYERS_BOOT === 'function') {
+        window.__EGE_PLAYERS_BOOT();
+      }
+    }
+
+    function loadScript(src) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = done;
+      s.onerror = done; // don't hang if a file is missing
+      document.body.appendChild(s);
+    }
+
+    loadScript(sim.playerStatsFile);
+    loadScript(sim.playerGamesFile);
+  })();
+  </script>
   <script>
   /* ══════════════════════════════════════════
      PLAYER PAGE LOGIC
+     Wrapped in __EGE_PLAYERS_BOOT so it runs
+     only AFTER all data scripts have loaded.
   ══════════════════════════════════════════ */
+  window.__EGE_PLAYERS_BOOT = function() {
 
   var PLAYERS = {
-    clark:     { name:'Cooper Clark',   initials:'CC', number:'#5', position:'Point Guard',    team:'TBD',
-      bio:[{key:'Height',val:'6\'1\"'},{key:'Weight',val:'155 lbs'},{key:'Age',val:'—'},{key:'College',val:'Arizona'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Thirteenth Pick'},{key:'Nickname',val:'\"Clutch Clark\"\, \"Cswag\"'}]
-    },
-    hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward',  team:'Retired',
-      bio:[{key:'Height',val:'6\'7\"'},{key:'Weight',val:'228 lbs'},{key:'Age',val:'—'},{key:'College',val:'UCLA'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Second Pick'},{key:'Nickname',val:'\"Pax\"'}]
-    },
-    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',         team:'Retired',
-      bio:[{key:'Height',val:'6\'9\"'},{key:'Weight',val:'253 lbs'},{key:'Age',val:'—'},{key:'College',val:'Louisville'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Seventeenth Pick'},{key:'Nickname',val:'\"Uncle Sam\"'}]
-    },
-    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#11', position:'Point Guard',    team:'Retired',
-      bio:[{key:'Height',val:'6\'5\"'},{key:'Weight',val:'200 lbs'},{key:'Age',val:'—'},{key:'College',val:'Florida State, Duke'},{key:'Draft Year',val:'2018'},{key:'Draft Pick',val:'First Round, Eleventh Pick'},{key:'Nickname',val:'—'}]
-    },
-    vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#8', position:'Shooting Guard', team:'Retired',
-      bio:[{key:'Height',val:'6\'4\"'},{key:'Weight',val:'203 lbs'},{key:'Age',val:'—'},{key:'College',val:'Kansas'},{key:'Draft Year',val:'2017'},{key:'Draft Pick',val:'First Round, Sixth Pick'},{key:'Nickname',val:'\"V8\"'}]
-    }
+    clark:     { name:'Cooper Clark',   initials:'CC', number:'#5',  position:'Point Guard',   team:'Active', bio:[] },
+    hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward', team:'Retired', bio:[] },
+    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',        team:'Retired', bio:[] },
+    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#11', position:'Point Guard',   team:'Retired', bio:[] },
+    vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#8',  position:'Shooting Guard',team:'Retired', bio:[] },
   };
+
+  /* ── SYNC PLAYERS FROM PLAYER_STATS ──
+     Reads info{} and retired from PLAYER_STATS so the single source of
+     truth for bio data and retirement status is player-stats.js. */
+  // Sync PLAYERS from PLAYER_STATS — runs inside boot after data is loaded
+  (function() {
+    var ps_all = (typeof PLAYER_STATS !== 'undefined') ? PLAYER_STATS
+                 : (window.PLAYER_STATS || null);
+    if (!ps_all) return;
+    Object.keys(PLAYERS).forEach(function(key) {
+      var ps = ps_all[key];
+      if (!ps) return;
+      var info = ps.info || {};
+      // Retirement driven by player-stats.js retired boolean
+      PLAYERS[key].team = ps.retired ? 'Retired' : 'Active';
+      // Build bio rows from info object
+      PLAYERS[key].bio = [
+        { key:'Height',     val: info.height    || '—' },
+        { key:'Weight',     val: info.weight    || '—' },
+        { key:'Age',        val: info.age       || '—' },
+        { key:'College',    val: info.college   || '—' },
+        { key:'Draft Year', val: info.draftYear || '—' },
+        { key:'Draft Pick', val: info.draftPick || '—' },
+        { key:'Nickname',   val: info.nickname  || '—' },
+      ];
+    });
+  })();
+
+  /* ── SIM II PLAYER OVERRIDE ──
+     If Sim II is active, replace PLAYERS with Sim II roster pulled from player-stats-26.js bio data */
+  (function() {
+    var sim = window.EGE_SIM;
+    if (!sim || sim.id === 'sim-original') return;
+    if (!window.PLAYER_STATS) return;
+    // Only override if this sim defines a DIFFERENT roster via EGE_SIM2_PLAYER_NAMES
+    if (!window.EGE_SIM2_PLAYER_NAMES) return;
+    var newPlayers = {};
+    Object.keys(window.PLAYER_STATS).forEach(function(key) {
+      var ps = window.PLAYER_STATS[key];
+      var bio = ps.bio || {};
+      var names = window.EGE_SIM2_PLAYER_NAMES;
+      var fullName = names[key] || key;
+      var initials = fullName.split(' ').map(function(w){ return w[0]; }).join('');
+      newPlayers[key] = {
+        name:     fullName,
+        initials: initials,
+        number:   '#' + (ps.jerseys && ps.jerseys[0] ? ps.jerseys[0].number : '0'),
+        position: bio.position || '—',
+        team:     bio.team || 'Active',
+        bio: [
+          { key:'Height',    val: bio.height   || '—' },
+          { key:'Weight',    val: bio.weight   || '—' },
+          { key:'Born',      val: bio.born     || '—' },
+          { key:'Hometown',  val: bio.hometown || '—' },
+          { key:'College',   val: bio.college  || '—' },
+          { key:'Draft',     val: bio.drafted  || '—' },
+          { key:'Team',      val: bio.team     || '—' },
+        ]
+      };
+    });
+    // Replace PLAYERS entirely for this sim
+    Object.keys(PLAYERS).forEach(function(k){ delete PLAYERS[k]; });
+    Object.assign(PLAYERS, newPlayers);
+  })();
 
   var TABS = ['bio','traditional-splits','awards','contracts','career-high','performances','shoes'];
 
@@ -1908,6 +1968,62 @@
     stewart:   'headshot_stewart.png',
     vitel:     'headshot_vitel.png'
   };
+
+  /* ── ROSTER GRID RENDERER ──
+     Builds player-select-card elements dynamically from PLAYERS{} so
+     both Sim I and Sim II rosters render correctly without hardcoded HTML. */
+  function renderRosterGrid() {
+    var grid = document.getElementById('player-select-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var keys = Object.keys(PLAYERS);
+    keys.forEach(function(k, idx) {
+      var p   = PLAYERS[k];
+      var img = PLAYER_HEADSHOTS[k] || '';
+      // Position abbreviation for the number chip
+      var posAbbr = (p.position||'').replace('Point Guard','PG')
+        .replace('Shooting Guard','SG').replace('Small Forward','SF')
+        .replace('Power Forward','PF').replace('Center','C')
+        .replace(' / ','/');
+      // Number display (strip leading #)
+      var numDisplay = (p.number||'').replace('#','');
+      var card = document.createElement('a');
+      card.className = 'player-select-card';
+      card.href = '#' + k + '-bio';
+      card.dataset.player = k;
+      card.style.animationDelay = (idx * 0.04) + 's';
+      var avatarInner = img
+        ? '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display=\'none\'">'
+        : '<span style="font-family:var(--font-display);font-weight:900;font-size:1.8rem;color:var(--orange);">' + (p.initials||'?') + '</span>';
+      card.innerHTML =
+        '<div class="psc-num">#' + numDisplay + ' · ' + posAbbr + '</div>' +
+        '<div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;">' + avatarInner + '</div>' +
+        '<div class="psc-name">' + p.name + '</div>' +
+        '<div class="psc-pos">' + (p.position||'') + '</div>' +
+        '<span class="psc-arrow">View Profile →</span>';
+      card.addEventListener('click', function(e) {
+        e.preventDefault();
+        showProfile(k, 'bio');
+      });
+      grid.appendChild(card);
+    });
+
+    // Wire team logo chips after cards exist
+    grid.querySelectorAll('.player-select-card').forEach(function(card) {
+      var k = card.dataset.player;
+      if (k && PLAYER_STATS[k] && PLAYERS[k] && PLAYERS[k].team !== 'Retired') {
+        var rows = (PLAYER_STATS[k].regular||[]).filter(isProRow);
+        var latestTeam = rows.length ? rows[rows.length-1].team : null;
+        if (latestTeam && TEAM_LOGOS[latestTeam]) {
+          var chip = document.createElement('div');
+          chip.className = 'psc-team-chip';
+          chip.innerHTML = '<img src="' + TEAM_LOGOS[latestTeam] + '" alt="' + latestTeam + '" title="' + latestTeam + '">';
+          var arrow = card.querySelector('.psc-arrow');
+          if (arrow) card.insertBefore(chip, arrow);
+        }
+      }
+    });
+  }
   var activeCharts = {};
   var pgMode = 'regular';
   var currentKey = null;
@@ -1976,6 +2092,7 @@
   function renderBanner(key) {
     refreshModeLogos();
     var p = PLAYERS[key];
+    if (!p) return; // guard: key not in PLAYERS
     var isRetired = p.team === 'Retired';
     var latest = isRetired ? null : latestSeason(key);
     var teamRaw = latest ? latest.team : (isRetired ? null : p.team);
@@ -2047,6 +2164,7 @@
   /* ── BIO (driven by PLAYER_STATS) ── */
   function renderBio(key) {
     var p = PLAYERS[key];
+    if (!p) return; // guard: key not in PLAYERS
     var avg = careerAvg(key);
     var latest = latestSeason(key);
 
@@ -2062,10 +2180,10 @@
       snap.appendChild(c);
     });
 
-    // Bio info rows — static data from PLAYERS object
+    // Bio info rows — read from PLAYERS (populated by PLAYER_STATS sync)
     var bioEl = document.getElementById('bio-info-rows');
     bioEl.innerHTML='';
-    p.bio.forEach(function(r){
+    (p.bio || []).forEach(function(r){
       var d=document.createElement('div'); d.className='bio-row';
       d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val'+(r.orange?' orange':'')+'">'+r.val+'</span>';
       bioEl.appendChild(d);
@@ -4434,25 +4552,7 @@
       });
     }
 
-    document.querySelectorAll('.player-select-card').forEach(function(card){
-      card.addEventListener('click', function(){
-        var k = card.dataset.player;
-        if (k && PLAYERS[k]) showProfile(k, 'bio');
-      });
-      // Inject current team logo chip (skip for retired players)
-      var k = card.dataset.player;
-      if (k && PLAYER_STATS[k] && PLAYERS[k] && PLAYERS[k].team !== 'Retired') {
-        var rows = (PLAYER_STATS[k].regular||[]).filter(isProRow);
-        var latestTeam = rows.length ? rows[rows.length-1].team : null;
-        if (latestTeam && TEAM_LOGOS[latestTeam]) {
-          var chip = document.createElement('div');
-          chip.className = 'psc-team-chip';
-          chip.innerHTML = '<img src="'+TEAM_LOGOS[latestTeam]+'" alt="'+latestTeam+'" title="'+latestTeam+'">';
-          var arrow = card.querySelector('.psc-arrow');
-          if (arrow) card.insertBefore(chip, arrow);
-        }
-      }
-    });
+    // Cards are built by renderRosterGrid() — just wire back button here
     var backBtn = document.getElementById('back-btn');
     if (backBtn) backBtn.addEventListener('click', showRoster);
     window.addEventListener('popstate', function(){
@@ -4469,6 +4569,7 @@
     });
   }
 
+  renderRosterGrid();
   boot();
 
   // Re-render bio jerseys when dark/light mode toggles (updates sleeve fill)
@@ -4491,6 +4592,7 @@
     }
   });
 
+  }; // end window.__EGE_PLAYERS_BOOT
   </script>
   <!-- EMOJI REACTION MODAL -->
   <div id="emoji-modal-backdrop">

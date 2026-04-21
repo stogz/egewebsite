@@ -471,3 +471,138 @@ section { position: relative; z-index: 2; }
     justify-content: center;
   }
 }
+
+/* ══════════════════════════════════════════
+   SIM SWITCHER — shared styles
+   ══════════════════════════════════════════ */
+
+/* ── SIM TOGGLE BUTTON (nav) ── */
+#sim-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  background: rgba(35, 26, 165, 0.12);
+  border: 1px solid rgba(35, 26, 165, 0.4);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+#sim-toggle:hover {
+  background: rgba(35, 26, 165, 0.22);
+  border-color: var(--blue);
+  transform: scale(1.04);
+}
+.sim-toggle-label {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #8a82e8;
+  font-weight: 700;
+}
+.sim-toggle-icon {
+  color: #8a82e8;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+#sim-toggle:hover .sim-toggle-icon { transform: translateY(2px); }
+
+/* ── SIM DROPDOWN ── */
+#sim-dropdown {
+  position: fixed;
+  z-index: 9999;
+  min-width: 220px;
+  background: var(--bg-nav);
+  border: 1px solid rgba(35, 26, 165, 0.4);
+  border-radius: 6px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.4);
+  overflow: hidden;
+  animation: fadeUp .18s ease both;
+}
+.sim-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  width: 100%;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(35, 26, 165, 0.15);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.sim-dropdown-item:last-child { border-bottom: none; }
+.sim-dropdown-item:hover { background: rgba(35, 26, 165, 0.12); }
+.sim-dropdown-item.active { background: rgba(35, 26, 165, 0.1); cursor: default; }
+.sim-item-label {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #8a82e8;
+  font-weight: 700;
+}
+.sim-dropdown-item.active .sim-item-label::after {
+  content: ' ◆';
+  color: var(--orange);
+  font-size: .5rem;
+}
+.sim-item-sub {
+  font-family: var(--font-body);
+  font-size: .78rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  letter-spacing: .04em;
+}
+
+/* ── SIM BADGE on nav logo ── */
+.sim-nav-badge {
+  font-family: var(--font-mono);
+  font-size: .55rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #8a82e8;
+  background: rgba(35, 26, 165, 0.18);
+  border: 1px solid rgba(35, 26, 165, 0.35);
+  border-radius: 3px;
+  padding: 2px 7px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* ── MOBILE SIM SWITCHER ROWS ── */
+@media (max-width: 768px) {
+  .nav-menu-sim-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #8a82e8;
+    background: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  .nav-menu-sim-btn:hover {
+    color: var(--orange);
+    border-left-color: var(--orange);
+    background: rgba(231,87,25,.05);
+  }
+  .nav-menu-sim-btn.active {
+    color: #8a82e8;
+    border-left-color: rgba(35,26,165,.4);
+    background: rgba(35,26,165,.07);
+    cursor: default;
+  }
+}

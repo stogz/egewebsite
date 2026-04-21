@@ -26,12 +26,26 @@
    College teams excluded from all career/chart stats: AU, KU, LOU, FSU, DUKE, UCLA
    MEX, VAN, and STL count as pro seasons and ARE included in all-time metrics.
    dnq:true    → Did Not Qualify for playoffs (shows as DNQ row in table)
+
+   Each player now also has:
+     info    → { height, weight, age, college, draftYear, draftPick, nickname }
+     retired → true | false  (controls active player count and profile badge)
 ═══════════════════════════════════════════════════════════ */
 
-var PLAYER_STATS = {
+window.PLAYER_STATS = {
 
   /* ─────────────── COOPER CLARK ─────────────── */
   clark: {
+    info: {
+      height:    '6\'1\"',
+      weight:    '155 lbs',
+      age:       '—',
+      college:   'Arizona',
+      draftYear: '2018',
+      draftPick: 'First Round, Thirteenth Pick',
+      nickname:  '\"Clutch Clark\", \"Cswag\"',
+    },
+    retired: true,
     regular: [
       { season:'2016-17', age:18, team:'AU',  ppg:10.1, rpg:1.1, apg:5.9,  spg:1.1, bpg:0.0, topg:2.2, fgp:'47.4%', tpp:'32.9%', ftp:'74.4%', tpa:3.7, gs:34, gp:36, mpg:22.9, star:false, dnq:false },
       { season:'2017-18', age:19, team:'AU',  ppg:15.5, rpg:2.5, apg:7.4,  spg:1.1, bpg:0.0, topg:2.4, fgp:'49.8%', tpp:'40.3%', ftp:'85.2%', tpa:3.6, gs:35, gp:35, mpg:24.4, star:false, dnq:false },
@@ -250,6 +264,16 @@ var PLAYER_STATS = {
 
   /* ─────────────── PAXON HATCH ─────────────── */
   hatch: {
+    info: {
+      height:    '6\'7\"',
+      weight:    '228 lbs',
+      age:       '—',
+      college:   'UCLA',
+      draftYear: '2017',
+      draftPick: 'First Round, Second Pick',
+      nickname:  '\"Pax\"',
+    },
+    retired: true,
     regular: [
       { season:'2016-17', age:18, team:'UCLA',ppg:22.7, rpg:10.2,apg:0.8, spg:0.5, bpg:1.1, topg:1.5, fgp:'51.4%', tpp:'45.9%', ftp:'79.3%', tpa:4.7, gs:36, gp:36, mpg:26.4, star:false, dnq:false },
       { season:'2017-18', age:19, team:'LAL', ppg:17.3, rpg:8.9, apg:0.9, spg:0.5, bpg:1.7, topg:1.8, fgp:'42.6%', tpp:'36.4%', ftp:'70.3%', tpa:6.1, gs:82, gp:82, mpg:37.2, star:false, dnq:false },
@@ -384,6 +408,16 @@ var PLAYER_STATS = {
 
   /* ─────────────── SAM STOGSDILL ─────────────── */
   stogsdill: {
+    info: {
+      height:    '6\'9\"',
+      weight:    '253 lbs',
+      age:       '—',
+      college:   'Louisville',
+      draftYear: '2018',
+      draftPick: 'First Round, Seventeenth Pick',
+      nickname:  '\"Uncle Sam\"',
+    },
+    retired: true,
     regular: [
       { season:'2016-17', age:19, team:'LOU', ppg:5.6,  rpg:7.6,  apg:3.9, spg:0.8, bpg:0.6, topg:0.8, fgp:'35.9%', tpp:'9.6%',  ftp:'76.0%', tpa:1.1, gs:27, gp:27, mpg:20.6, star:false, dnq:false },
       { season:'2017-18', age:20, team:'LOU', ppg:14.7, rpg:10.6, apg:5.6, spg:0.6, bpg:1.2, topg:1.7, fgp:'53.7%', tpp:'0.0%',  ftp:'75.2%', tpa:0,   gs:36, gp:36, mpg:23.6, star:false, dnq:false },
@@ -540,6 +574,16 @@ var PLAYER_STATS = {
 
   /* ─────────────── JAYKEB STEWART ─────────────── */
   stewart: {
+    info: {
+      height:    '6\'5\"',
+      weight:    '200 lbs',
+      age:       '—',
+      college:   'Florida State, Duke',
+      draftYear: '2018',
+      draftPick: 'First Round, Eleventh Pick',
+      nickname:  '—',
+    },
+    retired: true,
     regular: [
       { season:'2016-17', age:18, team:'FSU', ppg:11.5, rpg:5.8, apg:3.8, spg:0.7, bpg:0.7, topg:1.7, fgp:'55.7%', tpp:'39.0%', ftp:'92.9%', tpa:2.6, gs:32, gp:32, mpg:22.0, star:false, dnq:false },
       { season:'2017-18', age:19, team:'DUKE',ppg:16.2, rpg:8.1, apg:6.4, spg:1.4, bpg:0.8, topg:2.7, fgp:'51.3%', tpp:'42.5%', ftp:'95.4%', tpa:3.3, gs:37, gp:37, mpg:27.6, star:false, dnq:false },
@@ -698,6 +742,16 @@ var PLAYER_STATS = {
 
   /* ─────────────── ISAAC VITEL ─────────────── */
   vitel: {
+    info: {
+      height:    '6\'4\"',
+      weight:    '203 lbs',
+      age:       '—',
+      college:   'Kansas',
+      draftYear: '2017',
+      draftPick: 'First Round, Sixth Pick',
+      nickname:  '\"V8\"',
+    },
+    retired: true,
     regular: [
       { season:'2016-17', age:19, team:'KU',  ppg:16.9, rpg:4.5, apg:2.3, spg:1.1, bpg:0.2, topg:1.6, fgp:'54.4%', tpp:'45.3%', ftp:'80.7%', tpa:2.2, gs:16, gp:36, mpg:19.2, star:false, dnq:false },
       { season:'2017-18', age:20, team:'ORL', ppg:15.5, rpg:2.9, apg:2.6, spg:1.2, bpg:0.1, topg:2.5, fgp:'44.0%', tpp:'26.2%', ftp:'75.2%', tpa:2.0, gs:77, gp:77, mpg:29.3, star:false, dnq:false },
