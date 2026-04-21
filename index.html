@@ -494,7 +494,7 @@
       <li><a href="players.html" data-num="02">Players</a></li>
       <li><a href="teams.html" data-num="03">Teams</a></li>
       <li><a href="history.html" data-num="04">History</a></li>
-      <li><a href="draft.html" data-num="05">Other</a></li>
+      <li><a href="other.html" data-num="05">Other</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
@@ -546,6 +546,7 @@
   </div>
 
   <!-- FOOTER -->
+  <script src="shared.js"></script>
   <footer>
     <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
     <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
@@ -553,7 +554,7 @@
       <li><a href="players.html">Players</a></li>
       <li><a href="teams.html">Teams</a></li>
       <li><a href="history.html">History</a></li>
-      <li><a href="draft.html">Other</a></li>
+      <li><a href="other.html">Other</a></li>
     </ul>
   </footer>
 
@@ -720,12 +721,10 @@
       })();
     }
 
-    // Load in order: stats → player-stats → shared → then run init
+    // Load data files, then run init (shared.js already loaded statically above)
     loadScript(sim.statsFile, function() {
       loadScript(sim.playerStatsFile, function() {
-        loadScript('shared.js', function() {
-          initPage();
-        });
+        initPage();
       });
     });
   })();

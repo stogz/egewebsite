@@ -783,6 +783,36 @@
     }
     /* ══ PERFORMANCES PANEL ══ */
     .perf-controls { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+
+    /* Year arrow buttons flanking the season select */
+    .perf-year-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .perf-year-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+      flex-shrink: 0;
+      font-size: .7rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .perf-year-arrow:hover:not(:disabled) {
+      border-color: rgba(231,87,25,.45);
+      color: var(--orange);
+      background: rgba(231,87,25,.06);
+    }
+    .perf-year-arrow:disabled { opacity: .3; cursor: default; }
     .perf-section-label { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.24em; text-transform:uppercase; color:var(--orange); margin-bottom:6px; display:block; }
     .perf-section-title { font-family:var(--font-display); font-weight:900; font-size:1.6rem; text-transform:uppercase; color:var(--heading); line-height:1; transition:color .35s; margin-bottom:0; }
     .perf-season-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -799,6 +829,214 @@
       transition: border-color .22s, background .35s;
     }
     .game-log-card:hover { border-color: rgba(231,87,25,.4); }
+
+    /* ── SERIES GROUP ── */
+    .perf-series-group {
+      margin-bottom: 40px;
+      animation: seriesGroupIn .45s cubic-bezier(.22,1,.36,1) both;
+    }
+    .perf-series-group:nth-child(1) { animation-delay: .05s; }
+    .perf-series-group:nth-child(2) { animation-delay: .12s; }
+    .perf-series-group:nth-child(3) { animation-delay: .19s; }
+    .perf-series-group:nth-child(4) { animation-delay: .26s; }
+    @keyframes seriesGroupIn {
+      from { opacity:0; transform:translateY(18px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* Header card */
+    .perf-series-header {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      background: rgba(8,5,47,.85);
+      border: 1px solid rgba(35,26,165,.35);
+    }
+    /* Animated shimmer sweep */
+    .perf-series-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg,
+        transparent 30%,
+        rgba(231,87,25,.06) 50%,
+        transparent 70%);
+      background-size: 200% 100%;
+      animation: seriesShimmer 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes seriesShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    /* Top accent line — animates in */
+    .perf-series-header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), rgba(35,26,165,.8), var(--orange));
+      background-size: 200% 100%;
+      animation: seriesLineSlide 4s linear infinite;
+    }
+    @keyframes seriesLineSlide {
+      0%   { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .perf-series-header-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Round label */
+    .perf-series-round {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 8px;
+    }
+
+    /* Matchup: team logo + name vs team logo + name */
+    .perf-series-matchup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .perf-series-team {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      transition: opacity .18s;
+    }
+    .perf-series-team:hover { opacity: .75; }
+    .perf-series-team-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.45));
+    }
+    .perf-series-team-name {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      color: var(--heading);
+      transition: color .35s;
+      white-space: nowrap;
+    }
+    .perf-series-team--own .perf-series-team-name { color: var(--orange); }
+    .perf-series-vs {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Result badge */
+    .perf-series-result {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 3px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .perf-series-result--win  {
+      background: rgba(34,197,94,.12);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,.3);
+      box-shadow: 0 0 12px rgba(34,197,94,.08);
+    }
+    .perf-series-result--loss {
+      background: rgba(239,68,68,.1);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,.2);
+    }
+
+    /* ── SERIES AVERAGES FOOTER ── */
+    .perf-series-footer {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 12px 20px;
+      margin-top: 10px;
+      border-radius: 8px;
+      background: rgba(35,26,165,.05);
+      border: 1px solid rgba(35,26,165,.15);
+    }
+    .perf-series-avg-label {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-right: 24px;
+      flex-shrink: 0;
+    }
+    .perf-series-avg-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .perf-series-avg-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .perf-series-avg-val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--heading);
+      transition: color .35s;
+    }
+    .perf-series-avg-val.orange { color: var(--orange); }
+    .perf-series-avg-lbl {
+      font-family: var(--font-mono);
+      font-size: .52rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Regular season section header */
+    .perf-reg-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .perf-reg-header-label {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+
 
     /* Clickable summary row */
     .glc-summary {
@@ -1458,7 +1696,7 @@
       <li><a href="players.html" data-num="02" class="active">Players</a></li>
       <li><a href="teams.html" data-num="03">Teams</a></li>
       <li><a href="history.html" data-num="04">History</a></li>
-      <li><a href="draft.html" data-num="05">Other</a></li>
+      <li><a href="other.html" data-num="05">Other</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
@@ -1648,7 +1886,7 @@
     <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
     <ul class="footer-links">
       <li><a href="index.html">Home</a></li><li><a href="teams.html">Teams</a></li>
-      <li><a href="history.html">History</a></li><li><a href="draft.html">Other</a></li>
+      <li><a href="history.html">History</a></li><li><a href="other.html">Other</a></li>
     </ul>
   </footer>
 
@@ -3839,6 +4077,260 @@
     return [pts, second, third];
   }
 
+  /* ── BUILD SERIES-GROUPED LIST ──────────────────────────────────
+     Called when a specific season is selected with latest/oldest sort.
+     Groups playoff games by opponent (= series), shows a header with
+     series result and a footer with series averages.
+     Regular season games in the same view appear under a simple header.
+  ─────────────────────────────────────────────────────────────── */
+  function buildSeriesGroupedList(sorted, key, p) {
+    var html = '';
+
+    // Separate regular and playoff games
+    var regGames     = sorted.filter(function(g){ return g.type !== 'playoffs'; });
+    var playoffGames = sorted.filter(function(g){ return g.type === 'playoffs'; });
+
+    // Group playoff games by opponent (opp = series identifier)
+    var seriesOrder = [];
+    var seriesMap   = {};
+    playoffGames.forEach(function(g) {
+      var key2 = g.opp;
+      if (!seriesMap[key2]) {
+        seriesMap[key2] = [];
+        seriesOrder.push(key2);
+      }
+      seriesMap[key2].push(g);
+    });
+
+    // Helper: build one game card HTML (same as main loop)
+    function buildCard(g) {
+      var teamAbbr  = teamForSeason(key, g.season, g.type || 'regular');
+      var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
+      var colors    = TEAM_BANNER_COLORS[teamName] || { primary:'#231aa5', secondary:'#e75719' };
+      var accent    = colors.primary;
+      var logoUrl   = TEAM_LOGOS[teamName] || '';
+      var headshot  = PLAYER_HEADSHOTS[key] || '';
+      var gs        = calcGameScore(g);
+      var gsAbs     = Math.abs(gs).toFixed(1);
+      var gsSign    = gs < 0 ? '−' : '';
+      var ballHtml  = '<img class="glc-ball-icon" src="bballwhite.png" alt="">';
+      var displayStats = pickDisplayStats(g);
+      var isWin     = (g.result||'').toUpperCase() === 'W';
+      var fgpStr    = g.fga > 0 ? (g.fgm/g.fga*100).toFixed(1)+'%' : '—';
+      var tppStr    = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
+      var ftpStr    = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
+      var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
+      var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
+      var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
+      var gameTypeLabel;
+      if (g.type === 'playoffs') {
+        gameTypeLabel = g.game ? 'Game ' + (NUM_WORDS[parseInt(g.game,10)-1] || g.game) : 'Playoffs';
+      } else {
+        gameTypeLabel = 'Regular Season';
+      }
+
+      var cardHtml = '<div class="game-log-card">';
+      cardHtml += '<div class="glc-summary">';
+      cardHtml += '<div class="glc-headshot-wrap">';
+      cardHtml += '<div class="glc-headshot-circle">';
+      cardHtml += '<div class="glc-headshot-circle-bg" style="background:'+accent+';"></div>';
+      if (headshot) {
+        cardHtml += '<img class="glc-headshot-img" src="'+headshot+'" alt="'+p.name+'">';
+      } else {
+        cardHtml += '<div class="glc-headshot-initials">'+p.initials+'</div>';
+      }
+      cardHtml += '</div>';
+      if (logoUrl) cardHtml += '<div class="glc-team-logo"><img src="'+logoUrl+'" alt="'+teamName+'"></div>';
+      cardHtml += '</div>';
+
+      cardHtml += '<div class="glc-main">';
+      cardHtml += '<div class="glc-top">'
+        + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
+        + '<span class="glc-dot-sep">·</span>'
+        + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
+        + '<span class="glc-score-right">'+ballHtml+'<span class="glc-gamescore">'+gsSign+gsAbs+'</span></span>'
+        + '</div>';
+
+      cardHtml += '<div class="glc-stats">';
+      displayStats.forEach(function(s){
+        cardHtml += '<div class="glc-stat-block"><span class="glc-stat-val">'+s.display+'</span><span class="glc-stat-lbl">'+s.lbl+'</span></div>';
+      });
+      cardHtml += '</div>';
+
+      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.type + ':' + g.opp + ':' + (g.game || 'r');
+      var oppLogoHtml = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">' : '';
+
+      var finalScoreHtml = '';
+      if (g.score && g.score.indexOf('-') !== -1) {
+        var fsParts = g.score.split('-');
+        var ourScore = fsParts[0].trim();
+        var theirScore = fsParts[1].trim();
+        var awayLogo, homeLogo, awayScore, homeScore;
+        if (g.home) {
+          awayLogo  = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          homeLogo  = logoUrl    ? '<img src="'+logoUrl+'" alt="'+teamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          awayScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+          homeScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+        } else {
+          awayLogo  = logoUrl    ? '<img src="'+logoUrl+'" alt="'+teamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          homeLogo  = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+          awayScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+          homeScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+        }
+        finalScoreHtml = awayLogo + '<span class="glc-final-score-text">'+awayScore+'-'+homeScore+'</span>' + homeLogo;
+      } else {
+        finalScoreHtml = '<span class="glc-final-score-text">'+(g.score||'')+'</span>';
+      }
+
+      cardHtml += '<div class="glc-bottom">'
+        + '<div class="glc-bottom-emojis"><span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
+        + '<button class="glc-reaction-add" data-rkey="'+gameReactionKey+'" title="Add reaction">+</button></div>'
+        + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
+        + '</div>';
+      cardHtml += '</div>'; // .glc-main
+      cardHtml += '</div>'; // .glc-summary
+
+      // Detail panel
+      var tsPct = (g.fga + 0.44 * g.fta) > 0
+        ? (g.pts / (2 * (g.fga + 0.44 * g.fta)) * 100).toFixed(1) + '%' : '—';
+      function detStat(val, lbl) {
+        return '<div class="glc-detail-stat"><span class="glc-detail-stat-val">'+val+'</span><span class="glc-detail-stat-lbl">'+lbl+'</span></div>';
+      }
+      cardHtml += '<div class="glc-detail"><div class="glc-detail-inner">';
+      cardHtml += '<div class="glc-detail-header"><span class="glc-detail-title">Final Stats</span>'
+        + '<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.7;">'+(g.season||'')+'</span>'
+        + '</div>';
+      cardHtml += '<div class="glc-detail-stat-row">';
+      cardHtml += detStat(g.min,'MIN') + detStat(g.pts,'PTS') + detStat(g.reb,'REB')
+        + detStat(g.ast,'AST') + detStat(g.stl,'STL') + detStat(g.blk,'BLK')
+        + detStat(fgpStr,'FG%') + detStat(g.fgm+'/'+g.fga,'FG')
+        + detStat(g.tpm+'/'+g.tpa,'3FG') + detStat(g.ftm+'/'+g.fta,'FTS')
+        + detStat(g.tov,'TO') + detStat(tsPct,'TS%') + detStat(gsSign+gsAbs,'HOOP SCORE');
+      cardHtml += '</div></div></div>'; // stat-row / detail-inner / detail
+      cardHtml += '</div>'; // .game-log-card
+      return cardHtml;
+    }
+
+    // Helper: series averages footer
+    function buildSeriesFooter(games) {
+      var n = games.length;
+      if (!n) return '';
+      var totals = { pts:0, reb:0, ast:0, stl:0, blk:0, tov:0 };
+      games.forEach(function(g){
+        totals.pts += g.pts||0; totals.reb += g.reb||0; totals.ast += g.ast||0;
+        totals.stl += g.stl||0; totals.blk += g.blk||0; totals.tov += g.tov||0;
+      });
+      function avg(v){ return (v/n).toFixed(1); }
+      var footerHtml = '<div class="perf-series-footer">'
+        + '<span class="perf-series-avg-label">Series Avg</span>'
+        + '<div class="perf-series-avg-stats">';
+      [
+        { val: avg(totals.pts), lbl:'PTS', orange:true },
+        { val: avg(totals.reb), lbl:'REB' },
+        { val: avg(totals.ast), lbl:'AST' },
+        { val: avg(totals.stl), lbl:'STL' },
+        { val: avg(totals.blk), lbl:'BLK' },
+        { val: avg(totals.tov), lbl:'TO'  },
+      ].forEach(function(s){
+        footerHtml += '<div class="perf-series-avg-stat">'
+          + '<span class="perf-series-avg-val'+(s.orange?' orange':'')+'">'+s.val+'</span>'
+          + '<span class="perf-series-avg-lbl">'+s.lbl+'</span>'
+          + '</div>';
+      });
+      footerHtml += '</div></div>';
+      return footerHtml;
+    }
+
+    // ── Round names — ordered First Round → NBA Finals ──
+    var ROUND_NAMES = ['FIRST ROUND', 'CONFERENCE SEMI-FINALS', 'CONFERENCE FINALS', 'NBA FINALS'];
+
+    // ── Render playoff series ──
+    // For 'latest': reverse so NBA Finals (deepest run) appears at top.
+    // For 'oldest': keep as-entered order (First Round first).
+    var orderedSeries = gamesSort === 'latest' ? seriesOrder.slice().reverse() : seriesOrder;
+    // Round index is always based on original position (entry order = chronological round)
+    var totalSeries = seriesOrder.length;
+
+    if (orderedSeries.length) {
+      orderedSeries.forEach(function(oppAbbr) {
+        // Get the original index to determine the correct round name
+        var seriesIdx = seriesOrder.indexOf(oppAbbr);
+        var seriesGames = seriesMap[oppAbbr];
+        var oppName     = TEAM_ABBR[oppAbbr] || oppAbbr;
+        var season      = gamesSeason; // set by the controls before grouping runs
+
+        // Round label — fallback gracefully beyond 4 rounds
+        var roundLabel  = ROUND_NAMES[seriesIdx] || ('ROUND ' + (seriesIdx + 1));
+
+        // W/L record
+        var seriesWins   = seriesGames.filter(function(g){ return (g.result||'').toUpperCase()==='W'; }).length;
+        var seriesLosses = seriesGames.length - seriesWins;
+        var wonSeries    = seriesWins > seriesLosses;
+        var resultText   = seriesWins + '–' + seriesLosses + ' ' + (wonSeries ? 'Win' : 'Loss');
+        var resultClass  = wonSeries ? 'perf-series-result--win' : 'perf-series-result--loss';
+
+        // Player's own team for this season
+        var ownAbbr   = teamForSeason(key, season, 'playoffs');
+        var ownName   = TEAM_ABBR[ownAbbr] || ownAbbr;
+        var ownLogo   = TEAM_LOGOS[ownName]  || '';
+        var oppLogo   = TEAM_LOGOS[oppName]  || '';
+
+        // Build team slugs for links
+        var yy      = seasonSuffix(season);
+        var ownSlug = ABBR_TO_SLUG[ownAbbr] || '';
+        var oppSlug = ABBR_TO_SLUG[oppAbbr] || '';
+        var ownHref = ownSlug && yy ? 'teams.html#' + ownSlug + yy : '';
+        var oppHref = oppSlug && yy ? 'teams.html#' + oppSlug + yy : '';
+
+        // Team chip helper
+        function teamChip(name, logo, href, isOwn) {
+          var inner = (logo ? '<img class="perf-series-team-logo" src="'+logo+'" alt="'+name+'">' : '')
+            + '<span class="perf-series-team-name">'+name+'</span>';
+          var cls = 'perf-series-team' + (isOwn ? ' perf-series-team--own' : '');
+          if (href) {
+            return '<a class="'+cls+'" href="'+href+'">'+inner+'</a>';
+          }
+          return '<span class="'+cls+'">'+inner+'</span>';
+        }
+
+        html += '<div class="perf-series-group">';
+        html += '<div class="perf-series-header">'
+          + '<div class="perf-series-header-inner">'
+          + '<div>'
+          + '<div class="perf-series-round">// ' + roundLabel + '</div>'
+          + '<div class="perf-series-matchup">'
+          + teamChip(ownName, ownLogo, ownHref, true)
+          + '<span class="perf-series-vs">vs</span>'
+          + teamChip(oppName, oppLogo, oppHref, false)
+          + '</div>'
+          + '</div>'
+          + '<span class="perf-series-result ' + resultClass + '">' + resultText + '</span>'
+          + '</div>'
+          + '</div>';
+
+        html += '<div class="game-log-list">';
+        seriesGames.forEach(function(g){ html += buildCard(g); });
+        html += '</div>';
+        html += buildSeriesFooter(seriesGames);
+        html += '</div>'; // .perf-series-group
+      });
+    }
+
+    // ── Render regular season games (simpler header, no footer) ──
+    if (regGames.length) {
+      html += '<div class="perf-series-group">';
+      html += '<div class="perf-reg-header">'
+        + '<span class="perf-reg-header-label">// regular season</span>'
+        + '</div>';
+      html += '<div class="game-log-list">';
+      regGames.forEach(function(g){ html += buildCard(g); });
+      html += '</div>';
+      html += '</div>';
+    }
+
+    return html;
+  }
+
   function renderPerformancesTable(key, games) {
     var panel = document.getElementById('panel-performances');
     if (!panel) return;
@@ -3882,13 +4374,20 @@
       + '<option value="worst"'   +(gamesSort==='worst'  ?' selected':'')+'> Worst</option>'
       + '</select>';
 
-    // Season dropdown
-    html += '<select class="chart-select" id="perf-season-select">'
+    // Season dropdown with year arrows
+    var curSeasonIdx = gamesSeason === 'all' ? -1 : seasons.indexOf(gamesSeason);
+    var canPrev = curSeasonIdx < seasons.length - 1; // seasons is newest-first, so "prev" = higher index
+    var canNext = curSeasonIdx > 0 && curSeasonIdx !== -1;
+    html += '<div class="perf-year-nav">'
+      + '<button class="perf-year-arrow" id="perf-year-prev"'+(canPrev?'':' disabled')+' title="Previous season">&#8592;</button>'
+      + '<select class="chart-select" id="perf-season-select">'
       + '<option value="all"'+(gamesSeason==='all'?' selected':'')+'>All Seasons</option>';
     seasons.forEach(function(s){
       html += '<option value="'+s+'"'+(gamesSeason===s?' selected':'')+'>'+s+'</option>';
     });
-    html += '</select>';
+    html += '</select>'
+      + '<button class="perf-year-arrow" id="perf-year-next"'+(canNext?'':' disabled')+' title="Next season">&#8594;</button>'
+      + '</div>';
 
     // Type dropdown
     html += '<select class="chart-select" id="perf-type-select">'
@@ -3915,9 +4414,17 @@
     var pageStart = gamesPage * PERF_PER_PAGE;
     var pageSlice = sorted.slice(pageStart, pageStart + PERF_PER_PAGE);
 
-    html += '<div class="game-log-list">';
+    // ── Determine if series grouping applies ──
+    // Series grouping: specific season selected, sort is latest or oldest, includes playoff games
+    var useSeriesGrouping = (gamesSeason !== 'all') && (gamesSort === 'latest' || gamesSort === 'oldest');
 
-    pageSlice.forEach(function(g) {
+    if (useSeriesGrouping) {
+      // Build series groups from ALL filtered+sorted games (no pagination when grouped)
+      html += buildSeriesGroupedList(sorted, key, p);
+    } else {
+      // Standard paginated list
+      html += '<div class="game-log-list">';
+      pageSlice.forEach(function(g) {
       // ── Team lookup from season ──
       var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
       var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
@@ -4115,12 +4622,16 @@
       html += '</div></div>'; // .glc-detail-inner / .glc-detail
 
       html += '</div>'; // .game-log-card
-    });
+    }); // end pageSlice.forEach
+    } // end else (standard paginated list)
 
-    html += '</div>'; // .game-log-list
+    // Close game-log-list div only for standard list
+    if (!useSeriesGrouping) {
+      html += '</div>'; // .game-log-list
+    }
 
     // ── Pagination controls ──
-    if (totalPages > 1) {
+    if (!useSeriesGrouping && totalPages > 1) {
       html += '<div class="perf-pagination" id="perf-pagination">';
       html += '<button class="perf-page-btn" id="perf-prev"' + (gamesPage === 0 ? ' disabled' : '') + '>← Prev</button>';
 
@@ -4145,19 +4656,51 @@
       html += '<button class="perf-page-btn" id="perf-next"' + (gamesPage >= totalPages - 1 ? ' disabled' : '') + '>Next →</button>';
       html += '<span class="perf-page-info">' + (pageStart + 1) + '–' + Math.min(pageStart + PERF_PER_PAGE, sorted.length) + ' of ' + sorted.length + '</span>';
       html += '</div>';
-    }
+    } // end if totalPages > 1
 
     panel.innerHTML = html;
     wirePerformancesControls(panel, key, games);
   }
 
   function wirePerformancesControls(panel, key, games) {
+    // Build sorted season list for arrow navigation (newest-first)
+    var seasonSet2 = {};
+    games.forEach(function(g){ seasonSet2[g.season] = true; });
+    var navSeasons = Object.keys(seasonSet2).sort().reverse(); // newest first
+
     var seasonSel = document.getElementById('perf-season-select');
     if (seasonSel) {
       seasonSel.addEventListener('change', function(){
         gamesSeason = this.value;
         gamesPage = 0;
         renderPerformancesTable(key, games);
+      });
+    }
+
+    // Year arrow wiring
+    var yearPrev = document.getElementById('perf-year-prev');
+    var yearNext = document.getElementById('perf-year-next');
+    if (yearPrev) {
+      yearPrev.addEventListener('click', function(){
+        // navSeasons is newest-first; "prev" means older = higher index
+        var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
+        var nextIdx = idx + 1;
+        if (nextIdx < navSeasons.length) {
+          gamesSeason = navSeasons[nextIdx];
+          gamesPage = 0;
+          renderPerformancesTable(key, games);
+        }
+      });
+    }
+    if (yearNext) {
+      yearNext.addEventListener('click', function(){
+        // "next" means newer = lower index
+        var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
+        if (idx > 0) {
+          gamesSeason = navSeasons[idx - 1];
+          gamesPage = 0;
+          renderPerformancesTable(key, games);
+        }
       });
     }
     var sortSel = document.getElementById('perf-sort-select');
@@ -4436,8 +4979,20 @@
 
   function renderPerformances(key) {
     var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[key]) || [];
+
+    // Default: most recent season that has playoff games, falling back year by year.
+    // If none have playoffs, pick the most recent season with any games.
+    var seasonSet = {};
+    games.forEach(function(g){ seasonSet[g.season] = (seasonSet[g.season] || {}); seasonSet[g.season][g.type] = true; });
+    var allSeasons = Object.keys(seasonSet).sort().reverse();
+    var defaultSeason = 'all';
+    for (var si = 0; si < allSeasons.length; si++) {
+      if (seasonSet[allSeasons[si]].playoffs) { defaultSeason = allSeasons[si]; break; }
+    }
+    if (defaultSeason === 'all' && allSeasons.length) defaultSeason = allSeasons[0];
+
     gamesMode   = 'all';
-    gamesSeason = 'all';
+    gamesSeason = defaultSeason;
     gamesSort   = 'latest';
     gamesPage   = 0;
     renderPerformancesTable(key, games);
@@ -4471,13 +5026,8 @@
       setTimeout(function(){ buildCharts(key); }, 80);
     }
     if(push!==false) history.pushState(null,'','#'+key+'-'+tab);
-    // Scroll to top of player profile on tab switch
-    var banner = document.querySelector('.player-banner');
-    if (banner) {
-      banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Always scroll to the very top of the page on every tab switch
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ── SHOW PROFILE ── */

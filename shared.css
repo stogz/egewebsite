@@ -67,7 +67,12 @@ html.light {
 
 /* ── BASE RESETS ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Always reserve scrollbar gutter space — prevents layout shift when
+     navigating between pages that do/don't need a scrollbar */
+  scrollbar-gutter: stable;
+}
 
 body {
   background: var(--bg);
@@ -121,16 +126,19 @@ html.light #matrix-canvas { opacity: .03; }
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 100;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
   height: 64px;
+  min-height: 64px;
+  max-height: 64px;
   background: var(--bg-nav);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(231, 87, 25, 0.18);
   transition: background 0.35s;
+  overflow: visible;
 }
 
 .nav-logo {
@@ -338,8 +346,11 @@ section { position: relative; z-index: 2; }
   nav {
     padding: 0 18px;
     height: 56px;
+    min-height: 56px;
+    max-height: 56px;
     flex-wrap: nowrap;
-    position: relative;
+    position: fixed;
+    z-index: 9999;
   }
   .nav-logo {
     font-size: 1rem;
@@ -386,13 +397,13 @@ section { position: relative; z-index: 2; }
   /* Mobile dropdown menu */
   #nav-mobile-menu {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 56px;
     left: 0; right: 0;
     background: var(--bg-nav);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(231,87,25,.18);
-    z-index: 200;
+    z-index: 9998;
     flex-direction: column;
     padding: 8px 0 12px;
   }
@@ -605,4 +616,22 @@ section { position: relative; z-index: 2; }
     background: rgba(35,26,165,.07);
     cursor: default;
   }
+}
+
+/* ══════════════════════════════════════════
+   NAV LAYOUT STABILITY
+   ══════════════════════════════════════════ */
+
+/* nav-links must never wrap — prevents height growth when items are injected */
+.nav-links {
+  flex-wrap: nowrap;
+  overflow: visible;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Sim toggle — fixed size, never grows */
+#sim-toggle {
+  flex-shrink: 0;
+  white-space: nowrap;
 }

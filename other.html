@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="EGE_Logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>History · EGE NBA Simulation</title>
+  <title>Other · EGE NBA Simulation</title>
   <script>document.addEventListener("DOMContentLoaded",function(){if(window.EGE_SIM&&window.EGE_SIM.id!=="sim-original"){document.title=document.title.replace("EGE NBA Simulation","EGE "+window.EGE_SIM.label+" Simulation");}});</script>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
@@ -88,6 +88,7 @@
     .deco-line.h { height: 1px; left: 0; right: 0; }
     .deco-line.v { width: 1px; top: 0; bottom: 0; }
 
+    /* MOBILE */
     @media (max-width: 768px) {
       .placeholder-wrap { padding: 90px 24px 60px; }
       .placeholder-title { font-size: clamp(3rem, 16vw, 7rem); }
@@ -110,8 +111,8 @@
       <li><a href="index.html" data-num="01">Home</a></li>
       <li><a href="players.html" data-num="02">Players</a></li>
       <li><a href="teams.html" data-num="03">Teams</a></li>
-      <li><a href="history.html" data-num="04" class="active">History</a></li>
-      <li><a href="other.html" data-num="05">Other</a></li>
+      <li><a href="history.html" data-num="04">History</a></li>
+      <li><a href="other.html" data-num="05" class="active">Other</a></li>
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
@@ -124,16 +125,16 @@
       <div class="deco-line v" style="left:15%"></div>
       <div class="deco-line v" style="right:15%"></div>
     </div>
-    <p class="placeholder-eyebrow">history · seasons · champions</p>
+    <p class="placeholder-eyebrow">other · misc · extras</p>
     <h1 class="placeholder-title">
-      League<br>
-      <span class="ghost">History</span>
+      Other<br>
+      <span class="ghost">Content</span>
     </h1>
     <div class="wip-badge">
       <span class="wip-dot"></span>
       Under Construction · Coming Soon
     </div>
-    <p class="placeholder-sub">Season-by-season records, award winners, championship history, and all-time statistical leaders for the EGE simulation.</p>
+    <p class="placeholder-sub">Additional content, tools, and features for the EGE simulation.</p>
     <a href="index.html" class="back-btn">← Back to Home</a>
   </div>
 

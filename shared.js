@@ -76,7 +76,7 @@
       { href: 'players.html', label: 'Players' },
       { href: 'teams.html',   label: 'Teams' },
       { href: 'history.html', label: 'History' },
-      { href: 'draft.html',   label: 'Draft' },
+      { href: 'other.html',   label: 'Other' },
     ];
 
     // Hamburger button — hidden on desktop via CSS, shown on mobile
@@ -107,12 +107,14 @@
     if (typeof EGE_SIM !== 'undefined' && typeof EGE_SIM_REGISTRY !== 'undefined') {
       Object.keys(window.EGE_SIM_REGISTRY).forEach(function(key) {
         var entry = window.EGE_SIM_REGISTRY[key];
+        var isActive = key === window.EGE_SIM.id;
         var simRow = document.createElement('button');
-        simRow.className = 'nav-menu-sim-btn' + (key === window.EGE_SIM.id ? ' active' : '');
-        simRow.textContent = '⟳  Switch to ' + entry.label + ' · ' + entry.season;
-        if (key === window.EGE_SIM.id) simRow.textContent = '◆  ' + entry.label + ' · Active';
+        simRow.className = 'nav-menu-sim-btn' + (isActive ? ' active' : '');
+        simRow.textContent = isActive
+          ? '◆  ' + entry.label + ' · Active'
+          : '◇  ' + entry.label;
         simRow.addEventListener('click', function() {
-          if (key !== window.EGE_SIM.id) window.EGE_switchSim(key);
+          if (!isActive) window.EGE_switchSim(key);
         });
         menu.appendChild(simRow);
       });
