@@ -19,6 +19,29 @@
                   { team:'Indiana Pacers', name:'City Edition', number:'5',
                     bg:'#041e42', stroke:'#fdbb30', num:'#fdbb30',
                     seasons:'2027–Present', img:'' }
+
+     photos    → array of career photo entries shown in the slideshow on the Bio tab
+                 Each entry:
+                   url     : direct image URL  e.g. 'https://example.com/photo.jpg'
+                   caption : optional caption shown at the bottom of the slide
+                             e.g. '2026 NBA Finals · Los Angeles'
+
+                 Example:
+                   { url:'https://example.com/clark_lakers.jpg', caption:'2026 NBA Finals' },
+                   { url:'https://example.com/clark_draft.jpg',  caption:'2018 NBA Draft' }
+
+     playstyle → array of play-style trait badges shown on the Bio tab
+                 Each entry:
+                   icon  : emoji or symbol shown on the badge  e.g. '🎯'
+                   label : short trait name  e.g. 'Elite Shooter'
+                   desc  : longer description shown when the badge is clicked
+                           e.g. 'One of the most accurate 3-point shooters...'
+
+                 Example:
+                   { icon:'🎯', label:'Elite Shooter',
+                     desc:'One of the most accurate long-range shooters in league history,
+                           capable of pulling up off the dribble or spotting up from anywhere.' }
+
      regular  → array of per-game season rows
      playoffs → array of per-game playoff rows
      totals   → array of season totals rows
@@ -45,7 +68,19 @@ window.PLAYER_STATS = {
       draftPick: 'First Round, Thirteenth Pick',
       nickname:  '\"Clutch Clark\", \"Cswag\"',
     },
-    retired: true,
+    retired: false,
+    photos: [
+      { url:'clark-one.png', caption:'Cooper\'s Final Season in LA' },
+      { url:'clark-two.png', caption:'2018 NBA Draft Night' },
+      { url:'', caption:'2028-29 Season · Los Angeles Lakers' },
+    ],
+    playstyle: [
+      { icon: '🎯', label: 'Elite Shooter',    desc: 'One of the most reliable 3-point shooters of his era, Clark can create his own shot off the dribble or spot up from anywhere on the arc. His quick release and consistent mechanics make him a constant off-ball threat.' },
+      { icon: '🧠', label: 'Floor General',    desc: 'Clark reads the floor at an elite level, consistently making the right pass under pressure. His court vision and ability to run a half-court offense set him apart as one of the best point guards of his generation.' },
+      { icon: '⚡', label: 'Clutch Performer', desc: 'Nicknamed "Clutch Clark" for a reason — he thrives in late-game situations, posting some of his best shooting percentages in the final minutes of close games.' },
+      { icon: '🛡️', label: 'Perimeter Defender', desc: 'An underrated defender who uses his quick hands and anticipation to generate steals. Consistently ranks among the league leaders in steals per game throughout his career.' },
+      { icon: '🏃', label: 'Pick & Roll Maestro', desc: 'Devastating in pick-and-roll situations, Clark can shoot off the screen, attack the big in a switch, or thread a pass to the rolling big with equal precision.' },
+    ],
     regular: [
       { season:'2016-17', age:18, team:'AU',  ppg:10.1, rpg:1.1, apg:5.9,  spg:1.1, bpg:0.0, topg:2.2, fgp:'47.4%', tpp:'32.9%', ftp:'74.4%', tpa:3.7, gs:34, gp:36, mpg:22.9, star:false, dnq:false },
       { season:'2017-18', age:19, team:'AU',  ppg:15.5, rpg:2.5, apg:7.4,  spg:1.1, bpg:0.0, topg:2.4, fgp:'49.8%', tpp:'40.3%', ftp:'85.2%', tpa:3.6, gs:35, gp:35, mpg:24.4, star:false, dnq:false },
@@ -274,6 +309,16 @@ window.PLAYER_STATS = {
       nickname:  '\"Pax\"',
     },
     retired: true,
+    photos: [
+      { url:'', caption:'Career Highlights · Paxon Hatch' },
+      { url:'', caption:'2017 NBA Draft Night' },
+    ],
+    playstyle: [
+      { icon: '💪', label: 'Power Forward',      desc: 'Hatch is a prototypical modern power forward — big enough to overpower smaller defenders on the block, yet skilled enough to step out and knock down mid-range jumpers and 3s consistently.' },
+      { icon: '🎯', label: 'Volume Shooter',      desc: 'Never shy about pulling the trigger, Hatch led his teams in shot attempts for much of his career. His ability to create his own shot off the dribble off the wing made him nearly impossible to game-plan against.' },
+      { icon: '🧱', label: 'Glass Eater',          desc: 'One of the best rebounders of his generation. Hatch consistently ranked in the top five in rebounds per game, using his imposing frame and relentless motor to dominate the boards on both ends.' },
+      { icon: '🚧', label: 'Interior Presence',   desc: 'A legitimate shot-blocker who altered countless attempts inside. His length and timing made driving the paint a risky proposition for opposing offenses throughout his prime.' },
+    ],
     regular: [
       { season:'2016-17', age:18, team:'UCLA',ppg:22.7, rpg:10.2,apg:0.8, spg:0.5, bpg:1.1, topg:1.5, fgp:'51.4%', tpp:'45.9%', ftp:'79.3%', tpa:4.7, gs:36, gp:36, mpg:26.4, star:false, dnq:false },
       { season:'2017-18', age:19, team:'LAL', ppg:17.3, rpg:8.9, apg:0.9, spg:0.5, bpg:1.7, topg:1.8, fgp:'42.6%', tpp:'36.4%', ftp:'70.3%', tpa:6.1, gs:82, gp:82, mpg:37.2, star:false, dnq:false },
@@ -418,6 +463,16 @@ window.PLAYER_STATS = {
       nickname:  '\"Uncle Sam\"',
     },
     retired: true,
+    photos: [
+      { url:'', caption:'Career Highlights · Sam Stogsdill' },
+      { url:'', caption:'2018 NBA Draft Night' },
+    ],
+    playstyle: [
+      { icon: '🎩', label: 'Playmaking Big',     desc: 'Stogsdill was a rare unicorn — a center who could genuinely run an offense. His ability to operate as a point-center made him one of the most unique and versatile big men of his era.' },
+      { icon: '🛡️', label: 'Defensive Anchor',   desc: 'The backbone of every defense he was part of, Stogsdill protected the rim at an elite level while also being trusted to guard mobile bigs and help in pick-and-roll situations.' },
+      { icon: '🏀', label: 'Post Scorer',         desc: 'Extremely difficult to move out of the post, Stogsdill used his powerful frame and footwork to score efficiently in the paint. He was one of the most efficient mid-range scorers among big men of his generation.' },
+      { icon: '🧠', label: 'High IQ',             desc: "A cerebral player who always made the simple play. Stogsdill's basketball instincts allowed him to rack up assists at a rate almost unheard of for a traditional center." },
+    ],
     regular: [
       { season:'2016-17', age:19, team:'LOU', ppg:5.6,  rpg:7.6,  apg:3.9, spg:0.8, bpg:0.6, topg:0.8, fgp:'35.9%', tpp:'9.6%',  ftp:'76.0%', tpa:1.1, gs:27, gp:27, mpg:20.6, star:false, dnq:false },
       { season:'2017-18', age:20, team:'LOU', ppg:14.7, rpg:10.6, apg:5.6, spg:0.6, bpg:1.2, topg:1.7, fgp:'53.7%', tpp:'0.0%',  ftp:'75.2%', tpa:0,   gs:36, gp:36, mpg:23.6, star:false, dnq:false },
@@ -584,6 +639,16 @@ window.PLAYER_STATS = {
       nickname:  '—',
     },
     retired: true,
+    photos: [
+      { url:'', caption:'Career Highlights · Jaykeb Stewart' },
+      { url:'', caption:'2018 NBA Draft Night' },
+    ],
+    playstyle: [
+      { icon: '⚡', label: 'Two-Way Guard',       desc: 'Stewart was one of the most complete guards of his time, excelling on both ends of the floor. His ability to lock down opposing guards defensively while producing offensively made him one of the most valuable players on any roster.' },
+      { icon: '🎯', label: 'Mid-Range Assassin',  desc: "Perhaps the most lethal mid-range shooter of his draft class. Stewart's pull-up jumper off pick-and-roll was nearly unguardable, and he shot above 50% from the mid-range zone for most of his career." },
+      { icon: '🏃', label: 'Transition Threat',   desc: 'Exceptional in the open floor, Stewart used his speed and motor to turn defensive stops into easy buckets. He led his teams in fast-break points multiple times throughout his career.' },
+      { icon: '🛡️', label: 'Lockdown Defender',   desc: "Widely regarded as one of the premier perimeter defenders of his era. Stewart's combination of lateral quickness, length, and anticipation allowed him to suffocate top scoring guards night in and night out." },
+    ],
     regular: [
       { season:'2016-17', age:18, team:'FSU', ppg:11.5, rpg:5.8, apg:3.8, spg:0.7, bpg:0.7, topg:1.7, fgp:'55.7%', tpp:'39.0%', ftp:'92.9%', tpa:2.6, gs:32, gp:32, mpg:22.0, star:false, dnq:false },
       { season:'2017-18', age:19, team:'DUKE',ppg:16.2, rpg:8.1, apg:6.4, spg:1.4, bpg:0.8, topg:2.7, fgp:'51.3%', tpp:'42.5%', ftp:'95.4%', tpa:3.3, gs:37, gp:37, mpg:27.6, star:false, dnq:false },
@@ -752,6 +817,16 @@ window.PLAYER_STATS = {
       nickname:  '\"V8\"',
     },
     retired: true,
+    photos: [
+      { url:'', caption:'Career Highlights · Isaac Vitel' },
+      { url:'', caption:'2017 NBA Draft Night' },
+    ],
+    playstyle: [
+      { icon: '🔥', label: 'Explosive Scorer',    desc: 'Vitel had one of the most dynamic scoring arsenals of any shooting guard of his era. He could get buckets from all three levels and was a constant threat to put up big numbers on any given night.' },
+      { icon: '🎯', label: 'Elite 3-Point Shot',  desc: 'Nicknamed "V8" for his ability to fill up the stat sheet, Vitel developed into one of the most dangerous 3-point shooters in the league, ranking among the top in 3-pointers made for multiple consecutive seasons.' },
+      { icon: '🏃', label: 'Attacking Off Dribble', desc: 'Relentless at getting to the rim, Vitel used his speed and hesitation dribble to break down defenses consistently. Once he turned the corner, very few defenders could recover in time.' },
+      { icon: '💼', label: 'Veteran Leader',       desc: 'Known in locker rooms as a consummate professional. Vitel mentored younger players throughout his career and was trusted by coaches to bring veteran poise during high-pressure playoff moments.' },
+    ],
     regular: [
       { season:'2016-17', age:19, team:'KU',  ppg:16.9, rpg:4.5, apg:2.3, spg:1.1, bpg:0.2, topg:1.6, fgp:'54.4%', tpp:'45.3%', ftp:'80.7%', tpa:2.2, gs:16, gp:36, mpg:19.2, star:false, dnq:false },
       { season:'2017-18', age:20, team:'ORL', ppg:15.5, rpg:2.9, apg:2.6, spg:1.2, bpg:0.1, topg:2.5, fgp:'44.0%', tpp:'26.2%', ftp:'75.2%', tpa:2.0, gs:77, gp:77, mpg:29.3, star:false, dnq:false },

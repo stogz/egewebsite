@@ -203,6 +203,16 @@ td.star::after{content:' ★';color:var(--yellow);font-size:.65rem}
 .mb{padding:20px;display:flex;flex-direction:column;gap:12px}
 .mf{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border)}
 
+.player-hs-corner{
+  position:absolute;top:8px;right:12px;
+  width:72px;height:72px;border-radius:50%;
+  object-fit:cover;object-position:top center;
+  border:2px solid rgba(231,87,25,.4);
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  opacity:.9;
+  pointer-events:none;
+}
+.fsec-head{position:relative;}
 /* Row in table that's being edited */
 .edit-row-highlight{background:rgba(231,87,25,.15) !important}
 </style>
@@ -314,209 +324,202 @@ td.star::after{content:' ★';color:var(--yellow);font-size:.65rem}
 
 <script>
 // ══════════════════════════════════════════════════════
-//  STATE
+//  EGE DATA EDITOR — MAIN SCRIPT
 // ══════════════════════════════════════════════════════
-const S = {
-  files: {},       // name → { content, dirty, type }
-  active: null,    // active filename
-  entry: null,     // active entry key
-  view: 'form',    // 'form'|'table'|'code'
-};
 
-// ══════════════════════════════════════════════════════
-//  FILE TYPE DETECTION
-// ══════════════════════════════════════════════════════
+const S = { files:{}, active:null, entry:null, view:'form' };
+
+// ── STRING HELPERS ──
+function unescapeJS(s) {
+  return (s||'').replace(/\\'/g,"'").replace(/\\"/g,'"').replace(/\\\\/g,'\\');
+}
+function escapeJS(s) {
+  return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function capitalize(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// ── FIELD VALUE HELPERS ──
+function ext(content, field) {
+  var p1 = new RegExp(field+":\\s*'((?:[^'\\\\]|\\\\.)*)'");
+  var p2 = new RegExp(field+':\\s*"((?:[^"\\\\]|\\\\.)*)"');
+  var m = content.match(p1) || content.match(p2);
+  return m ? unescapeJS(m[1]) : '';
+}
+function extNum(content, field) {
+  var m = content.match(new RegExp('[\\s,{]'+field+':\\s*([\\d.]+)'));
+  return m ? m[1] : '';
+}
+function extBool(content, field) {
+  var m = content.match(new RegExp('[\\s,{]'+field+':\\s*(true|false)'));
+  return m ? m[1]==='true' : false;
+}
+function extVal(r, field) { return esc(ext(r, field)); }
+function v(id) { var e=document.getElementById(id); return e?e.value:''; }
+function vc(id) { var e=document.getElementById(id); return e?e.checked:false; }
+
+// ── FILE TYPE DETECTION ──
 function detectType(name, content) {
-  if (name === 'player-stats.js' || content.includes('window.PLAYER_STATS')) return 'player-stats';
-  if (name === 'team-stats.js'   || content.includes('window.EGE_SEASON_STATS')) return 'team-stats';
-  if (name === 'league-history.js'|| content.includes('window.EGE_LEAGUE_HISTORY')) return 'league-history';
-  if (name === 'player-games.js' || content.includes('window.PLAYER_GAMES')) return 'player-games';
+  if (name==='player-stats.js'   || content.includes('window.PLAYER_STATS'))        return 'player-stats';
+  if (name==='team-stats.js'     || content.includes('window.EGE_SEASON_STATS'))    return 'team-stats';
+  if (name==='league-history.js' || content.includes('window.EGE_LEAGUE_HISTORY')) return 'league-history';
+  if (name==='player-games.js'   || content.includes('window.PLAYER_GAMES'))        return 'player-games';
   return 'unknown';
 }
 
-// ══════════════════════════════════════════════════════
-//  FILE LOADING
-// ══════════════════════════════════════════════════════
+// ── FILE LOADING ──
 function initFileInputs() {
-  ['file-input','file-input2'].forEach(id => {
-    document.getElementById(id).onchange = e => loadFileList(Array.from(e.target.files));
-  });
+  document.getElementById('file-input').onchange  = function(e){ loadFileList(Array.from(e.target.files)); };
+  document.getElementById('file-input2').onchange = function(e){ loadFileList(Array.from(e.target.files)); };
 }
 
 function loadFileList(files) {
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const content = e.target.result;
-      const type = detectType(file.name, content);
-      S.files[file.name] = { content, dirty: false, type, origName: file.name };
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var content = e.target.result;
+      var type = detectType(file.name, content);
+      S.files[file.name] = { content:content, dirty:false, type:type };
       refreshChips();
-      if (!S.active || S.active === file.name) switchFile(file.name);
-      toast('Loaded: ' + file.name, true);
+      if (!S.active || S.active===file.name) switchFile(file.name);
+      toast('Loaded: '+file.name, true);
     };
     reader.readAsText(file);
   });
-  // Show app
   document.getElementById('drop-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
 }
 
-// ══════════════════════════════════════════════════════
-//  DRAG & DROP
-// ══════════════════════════════════════════════════════
+// ── DRAG & DROP ──
 function initDrop() {
-  const ds = document.getElementById('drop-screen');
-  const dz = document.getElementById('drop-zone');
-  document.body.addEventListener('dragover', e => { e.preventDefault(); ds.classList.add('drag-over'); });
-  document.body.addEventListener('dragleave', e => { if (!e.relatedTarget) ds.classList.remove('drag-over'); });
-  document.body.addEventListener('drop', e => {
+  var ds = document.getElementById('drop-screen');
+  document.body.addEventListener('dragover', function(e) { e.preventDefault(); ds.classList.add('drag-over'); });
+  document.body.addEventListener('dragleave', function(e) { if (!e.relatedTarget) ds.classList.remove('drag-over'); });
+  document.body.addEventListener('drop', function(e) {
     e.preventDefault();
     ds.classList.remove('drag-over');
     loadFileList(Array.from(e.dataTransfer.files));
   });
 }
 
-// ══════════════════════════════════════════════════════
-//  FILE CHIPS
-// ══════════════════════════════════════════════════════
+// ── FILE CHIPS ──
 function refreshChips() {
-  const el = document.getElementById('file-chips');
+  var el = document.getElementById('file-chips');
   el.innerHTML = '';
-  Object.keys(S.files).forEach(name => {
-    const f = S.files[name];
-    const c = document.createElement('button');
-    c.className = 'file-chip' + (S.active === name ? ' active' : '') + (f.dirty ? ' dirty' : '');
+  Object.keys(S.files).forEach(function(name) {
+    var f = S.files[name];
+    var c = document.createElement('button');
+    c.className = 'file-chip'+(S.active===name?' active':'')+(f.dirty?' dirty':'');
     c.dataset.name = name;
-    c.innerHTML = name.replace('.js','') + '<span class="dot"></span>';
-    c.onclick = () => switchFile(name);
+    c.innerHTML = name.replace('.js','')+'<span class="dot"></span>';
+    c.onclick = function(){ switchFile(name); };
     el.appendChild(c);
   });
 }
 
-// ══════════════════════════════════════════════════════
-//  SWITCH FILE
-// ══════════════════════════════════════════════════════
+// ── SWITCH FILE ──
 function switchFile(name) {
   if (!S.files[name]) return;
-  S.active = name;
-  S.entry = null;
-  refreshChips();
-  buildSidebar();
-  showEmpty();
-  setStatus('Loaded: ' + name + ' [' + S.files[name].type + ']', 'ok');
-  setStatusExtras(name);
+  S.active = name; S.entry = null;
+  refreshChips(); buildSidebar(); showEmpty();
+  setStatus('Loaded: '+name+' ['+S.files[name].type+']','ok');
+  var f = S.files[name];
+  document.getElementById('st-type').textContent  = '// '+f.type;
+  document.getElementById('st-count').textContent = (f.content.match(/\n/g)||[]).length+' lines';
+  document.getElementById('st-size').textContent  = (f.content.length/1024).toFixed(1)+' KB';
 }
 
-function setStatusExtras(name) {
-  const f = S.files[name];
-  document.getElementById('st-type').textContent = '// ' + f.type;
-  document.getElementById('st-count').textContent = (f.content.match(/\n/g)||[]).length + ' lines';
-  document.getElementById('st-size').textContent = (f.content.length/1024).toFixed(1) + ' KB';
-}
-
-// ══════════════════════════════════════════════════════
-//  SIDEBAR
-// ══════════════════════════════════════════════════════
+// ── SIDEBAR ──
 function buildSidebar() {
-  const f = S.files[S.active];
-  const type = f.type;
-  const list = document.getElementById('sb-list');
-  const head = document.getElementById('sb-label');
+  var f = S.files[S.active];
+  var list = document.getElementById('sb-list');
+  var head = document.getElementById('sb-label');
   list.innerHTML = '';
-  const entries = getEntries(f.content, type);
-  head.textContent = type === 'player-stats' ? 'Players' : type === 'player-games' ? 'Players' : 'Seasons';
+  var type = f.type;
+  head.textContent = (type==='player-stats'||type==='player-games') ? 'Players' : 'Seasons';
+  var entries = getEntries(f.content, type);
   if (!entries.length) {
     list.innerHTML = '<div style="padding:16px;font-size:.7rem;color:var(--muted);text-align:center">No entries found</div>';
     return;
   }
-  entries.forEach(e => {
-    const d = document.createElement('div');
-    d.className = 'sb-item' + (S.entry === e.key ? ' active' : '');
+  entries.forEach(function(e) {
+    var d = document.createElement('div');
+    d.className = 'sb-item'+(S.entry===e.key?' active':'');
     d.dataset.key = e.key;
-    d.innerHTML = e.label + (e.tag ? `<span class="tag">${e.tag}</span>` : '');
-    d.onclick = () => selectEntry(e.key, e.label);
+    d.textContent = e.label;
+    d.onclick = function(){ selectEntry(e.key, e.label); };
     list.appendChild(d);
   });
 }
 
 function getEntries(content, type) {
-  const entries = [];
-  if (type === 'player-stats') {
-    // Get player keys from window.PLAYER_STATS = { key: {
-    const m = content.matchAll(/\n  ([\w]+):\s*\{/g);
-    for (const r of m) entries.push({ key: r[1], label: capitalize(r[1]) });
-  } else if (type === 'player-games') {
-    const m = content.matchAll(/\n  ([\w]+):\s*\[/g);
-    for (const r of m) entries.push({ key: r[1], label: capitalize(r[1]) });
-  } else if (type === 'team-stats') {
-    const m = content.matchAll(/"(\d{4}-\d{2,4})":/g);
-    const seen = new Set();
-    for (const r of m) { if (!seen.has(r[1])) { seen.add(r[1]); entries.push({ key: r[1], label: r[1] }); } }
-  } else if (type === 'league-history') {
-    const m = content.matchAll(/season:\s+'(\d{4}-\d{2,4})'/g);
-    for (const r of m) entries.push({ key: r[1], label: r[1] });
+  var entries = [], m, r;
+  if (type==='player-stats') {
+    // find keys inside window.PLAYER_STATS = { ... }
+    var statsBlock = content.match(/window\.PLAYER_STATS\s*=\s*\{([\s\S]*)/);
+    var block = statsBlock ? statsBlock[1] : content;
+    var re = /\n  (\w+):\s*\{/g;
+    while ((m=re.exec(block))!==null) entries.push({key:m[1],label:capitalize(m[1])});
+  } else if (type==='player-games') {
+    var re2 = /\n  (\w+):\s*\[/g;
+    while ((m=re2.exec(content))!==null) entries.push({key:m[1],label:capitalize(m[1])});
+  } else if (type==='team-stats') {
+    var re3 = /"(\d{4}-\d{2,4})":/g;
+    var seen = {};
+    while ((m=re3.exec(content))!==null) { if (!seen[m[1]]) { seen[m[1]]=1; entries.push({key:m[1],label:m[1]}); } }
+  } else if (type==='league-history') {
+    var re4 = /season:\s*'(\d{4}-\d{2,4})'/g;
+    while ((m=re4.exec(content))!==null) entries.push({key:m[1],label:m[1]});
   }
   return entries;
 }
 
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
 function filterSB(q) {
-  document.querySelectorAll('.sb-item').forEach(el => {
+  document.querySelectorAll('.sb-item').forEach(function(el) {
     el.style.display = el.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
   });
 }
 
-// ══════════════════════════════════════════════════════
-//  SELECT ENTRY
-// ══════════════════════════════════════════════════════
+// ── SELECT ENTRY ──
 function selectEntry(key, label) {
   S.entry = key;
-  document.querySelectorAll('.sb-item').forEach(el => el.classList.toggle('active', el.dataset.key === key));
+  document.querySelectorAll('.sb-item').forEach(function(el){ el.classList.toggle('active',el.dataset.key===key); });
   document.getElementById('view-pills').style.display = '';
   document.getElementById('del-btn').style.display = '';
   document.getElementById('empty-state').style.display = 'none';
-  setToolTitle(S.active, label);
-  renderCurrentView();
-}
-
-function setToolTitle(file, entry) {
   document.getElementById('tool-title').innerHTML =
-    `<span style="color:var(--orange)">${file}</span> <span class="dim">→ ${entry}</span>`;
+    '<span style="color:var(--orange)">'+S.active+'</span> <span class="dim">&rarr; '+esc(label)+'</span>';
+  renderView();
 }
 
-function renderCurrentView() {
-  const f = S.files[S.active];
+function renderView() {
   hideAllPanels();
-  if (S.view === 'code') {
+  var f = S.files[S.active];
+  if (S.view==='code') {
     document.getElementById('code-panel').classList.add('on');
     document.getElementById('code-ta').value = extractRaw(f.content, f.type, S.entry);
-    syncVP();
-  } else if (S.view === 'table') {
+  } else if (S.view==='table') {
     document.getElementById('table-panel').classList.add('on');
     buildTablePanel(f.content, f.type, S.entry);
-    syncVP();
   } else {
     document.getElementById('form-panel').classList.add('on');
     buildFormPanel(f.content, f.type, S.entry);
-    syncVP();
   }
+  syncVP();
 }
 
-function setView(v) {
-  S.view = v;
-  renderCurrentView();
-}
-
+function setView(v2) { S.view=v2; renderView(); }
 function syncVP() {
-  ['form','table','code'].forEach(v => document.getElementById('vp-'+v).classList.toggle('on', S.view === v));
+  ['form','table','code'].forEach(function(v2){
+    document.getElementById('vp-'+v2).classList.toggle('on',S.view===v2);
+  });
 }
-
 function hideAllPanels() {
-  ['form-panel','table-panel','code-panel'].forEach(id => document.getElementById(id).classList.remove('on'));
+  ['form-panel','table-panel','code-panel'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
   document.getElementById('empty-state').style.display = 'none';
 }
-
 function showEmpty() {
   hideAllPanels();
   document.getElementById('empty-state').style.display = '';
@@ -525,483 +528,1073 @@ function showEmpty() {
   document.getElementById('tool-title').innerHTML = '<span class="dim">Select an entry from the sidebar</span>';
 }
 
-// ══════════════════════════════════════════════════════
-//  RAW EXTRACT
-// ══════════════════════════════════════════════════════
+// ── RAW EXTRACT ──
 function extractRaw(content, type, key) {
-  if (type === 'player-stats') {
-    const re = new RegExp('\\n  ' + key + ':\\s*\\{');
-    const idx = content.search(re);
-    if (idx < 0) return '';
-    const end = findBlockEnd(content, idx + content.slice(idx).search(/\{/));
+  var idx, end;
+  if (type==='player-stats') {
+    idx = content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+    if (idx<0) return '';
+    var ob = idx+content.slice(idx).search(/\{/);
+    end = findBlockEnd(content, ob);
     return content.slice(idx+1, end+1).trimEnd();
   }
-  if (type === 'player-games') {
-    const re = new RegExp('\\n  ' + key + ':\\s*\\[');
-    const idx = content.search(re);
-    if (idx < 0) return '';
-    const end = findArrayEnd(content, idx + content.slice(idx).search(/\[/));
+  if (type==='player-games') {
+    idx = content.search(new RegExp('\\n  '+key+':\\s*\\['));
+    if (idx<0) return '';
+    var ob2 = idx+content.slice(idx).search(/\[/);
+    end = findArrayEnd(content, ob2);
     return content.slice(idx+1, end+1).trimEnd();
   }
-  if (type === 'team-stats') {
-    const idx = content.indexOf(`"${key}":`);
-    if (idx < 0) return '';
-    const end = findBlockEnd(content, content.indexOf('{', idx));
+  if (type==='team-stats') {
+    idx = content.indexOf('"'+key+'":');
+    if (idx<0) return '';
+    end = findBlockEnd(content, content.indexOf('{',idx));
     return content.slice(idx, end+1).trimEnd();
   }
-  if (type === 'league-history') {
-    const idx = content.indexOf(`season: '${key}'`);
-    if (idx < 0) return '';
-    const bs = content.lastIndexOf('{', idx);
-    const end = content.indexOf('},', idx);
+  if (type==='league-history') {
+    idx = content.indexOf("season: '"+key+"'");
+    if (idx<0) return '';
+    var bs = content.lastIndexOf('{',idx);
+    end = content.indexOf('},',idx);
     return content.slice(bs, end+2).trimEnd();
   }
   return '';
 }
 
 function findBlockEnd(str, openIdx) {
-  let depth = 0, i = openIdx;
-  while (i < str.length) {
-    if (str[i] === '{') depth++;
-    else if (str[i] === '}') { depth--; if (depth === 0) return i; }
-    i++;
-  }
-  return str.length - 1;
+  var depth=0, i=openIdx;
+  while (i<str.length) { if (str[i]==='{') depth++; else if (str[i]==='}') { depth--; if (depth===0) return i; } i++; }
+  return str.length-1;
 }
-
 function findArrayEnd(str, openIdx) {
-  let depth = 0, i = openIdx;
-  while (i < str.length) {
-    if (str[i] === '[') depth++;
-    else if (str[i] === ']') { depth--; if (depth === 0) return i; }
-    i++;
+  var depth=0, i=openIdx;
+  while (i<str.length) { if (str[i]==='[') depth++; else if (str[i]===']') { depth--; if (depth===0) return i; } i++; }
+  return str.length-1;
+}
+
+// ── CODE PANEL ──
+function onCodeEdit() { markDirty(); }
+function applyCodeEdit() {
+  var f = S.files[S.active];
+  var newBlock = document.getElementById('code-ta').value;
+  var type = f.type; var key = S.entry;
+  if (type==='player-stats') {
+    var idx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+    if (idx<0) return toast('Entry not found');
+    var ob = idx+f.content.slice(idx).search(/\{/);
+    var end = findBlockEnd(f.content, ob);
+    f.content = f.content.slice(0,idx+1)+newBlock+f.content.slice(end+1);
+  } else if (type==='player-games') {
+    var idx2 = f.content.search(new RegExp('\\n  '+key+':\\s*\\['));
+    if (idx2<0) return toast('Entry not found');
+    var ob2 = idx2+f.content.slice(idx2).search(/\[/);
+    var end2 = findArrayEnd(f.content, ob2);
+    f.content = f.content.slice(0,idx2+1)+newBlock+f.content.slice(end2+1);
+  } else if (type==='team-stats') {
+    var idx3 = f.content.indexOf('"'+key+'":');
+    var end3 = findBlockEnd(f.content, f.content.indexOf('{',idx3));
+    f.content = f.content.slice(0,idx3)+newBlock+f.content.slice(end3+1);
+  } else if (type==='league-history') {
+    var idx4 = f.content.indexOf("season: '"+key+"'");
+    var bs = f.content.lastIndexOf('{',idx4);
+    var end4 = f.content.indexOf('},',idx4);
+    f.content = f.content.slice(0,bs)+newBlock.replace(/},\s*$/,'},\n')+f.content.slice(end4+2);
   }
-  return str.length - 1;
+  markDirty(); toast('Applied \u2713',true);
 }
 
 // ══════════════════════════════════════════════════════
-//  CODE PANEL
+//  FORM BUILDER HELPERS
 // ══════════════════════════════════════════════════════
-function onCodeEdit() { markDirty(); }
+function IS(w) { return 'background:transparent;border:none;border-bottom:1px solid rgba(35,26,165,.3);color:var(--text);font-family:var(--font-mono);font-size:.7rem;width:'+w+'px;outline:none;padding:2px 3px;'; }
+var DS = 'background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:3px;cursor:pointer;padding:2px 7px;font-size:.65rem;';
+var OL = 'font-family:var(--font-mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;';
 
-function applyCodeEdit() {
-  const f = S.files[S.active];
-  const newBlock = document.getElementById('code-ta').value;
-  const type = f.type;
-  const key  = S.entry;
-  if (type === 'player-stats') {
-    const re = new RegExp('\\n  ' + key + ':\\s*\\{');
-    const idx = f.content.search(re);
-    if (idx < 0) return toast('Entry not found');
-    const openBrace = idx + f.content.slice(idx).search(/\{/);
-    const end = findBlockEnd(f.content, openBrace);
-    f.content = f.content.slice(0, idx+1) + newBlock + f.content.slice(end+1);
-  } else if (type === 'player-games') {
-    const re = new RegExp('\\n  ' + key + ':\\s*\\[');
-    const idx = f.content.search(re);
-    if (idx < 0) return toast('Entry not found');
-    const openBracket = idx + f.content.slice(idx).search(/\[/);
-    const end = findArrayEnd(f.content, openBracket);
-    f.content = f.content.slice(0, idx+1) + newBlock + f.content.slice(end+1);
-  } else if (type === 'team-stats') {
-    const idx = f.content.indexOf(`"${key}":`);
-    const end = findBlockEnd(f.content, f.content.indexOf('{', idx));
-    f.content = f.content.slice(0, idx) + newBlock + f.content.slice(end+1);
-  } else if (type === 'league-history') {
-    const idx = f.content.indexOf(`season: '${key}'`);
-    const bs  = f.content.lastIndexOf('{', idx);
-    const end = f.content.indexOf('},', idx);
-    f.content = f.content.slice(0, bs) + newBlock.replace(/},\s*$/, '},') + f.content.slice(end+2);
+function sec(title) {
+  var s = document.createElement('div'); s.className='fsec';
+  var hd = document.createElement('div'); hd.className='fsec-head'; hd.textContent=title;
+  s.appendChild(hd);
+  return s;
+}
+function secBody(s) {
+  var b = document.createElement('div'); b.className='fsec-body'; s.appendChild(b); return b;
+}
+function row(items) {
+  var d = document.createElement('div'); d.className='frow'; items.forEach(function(i){ d.appendChild(i); }); return d;
+}
+function fg(id, label, type, value, placeholder, wide) {
+  var d = document.createElement('div');
+  d.className = 'fg'+(wide===2?' wide':wide==='full'?' full':'');
+  var lab = document.createElement('label'); lab.textContent=label; d.appendChild(lab);
+  var inp;
+  if (type==='select') {
+    inp = value; // already a select element
+  } else if (type==='checkbox') {
+    inp = document.createElement('input'); inp.type='checkbox'; inp.id=id; if (value) inp.checked=true;
+  } else {
+    inp = document.createElement('input'); inp.type='text'; inp.id=id;
+    inp.value=value||''; inp.placeholder=placeholder||'';
   }
-  markDirty();
-  toast('Changes applied ✓', true);
+  if (inp.tagName) d.appendChild(inp);
+  return d;
+}
+function fgSel(id, label, options, selected) {
+  var d = document.createElement('div'); d.className='fg';
+  var lab = document.createElement('label'); lab.textContent=label; d.appendChild(lab);
+  var sel = document.createElement('select'); sel.id=id;
+  options.forEach(function(o){
+    var opt = document.createElement('option'); opt.value=o.v; opt.textContent=o.l;
+    if (o.v===selected) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  d.appendChild(sel); return d;
+}
+function actBtn(label, fn, type) {
+  var b = document.createElement('button');
+  b.className='btn btn-'+(type||'primary'); b.textContent=label; b.onclick=fn; return b;
+}
+function subLabel(text) {
+  var d = document.createElement('div'); d.style.cssText=OL; d.textContent=text; return d;
 }
 
 // ══════════════════════════════════════════════════════
 //  FORM PANEL
 // ══════════════════════════════════════════════════════
 function buildFormPanel(content, type, key) {
-  const pane = document.getElementById('form-panel');
+  var pane = document.getElementById('form-panel');
   pane.innerHTML = '';
-  if (type === 'league-history') buildLHForm(content, key, pane);
-  else if (type === 'player-stats') buildPSForm(content, key, pane);
-  else if (type === 'player-games') buildPGForm(content, key, pane);
-  else if (type === 'team-stats') buildTSForm(content, key, pane);
+  if (type==='league-history') buildLHForm(content, key, pane);
+  else if (type==='player-stats') buildPSForm(content, key, pane);
+  else if (type==='player-games') buildPGForm(content, key, pane);
+  else if (type==='team-stats') buildTSForm(content, key, pane);
 }
 
-// ── Helpers ──
-function ext(content, field) {
-  const patterns = [
-    new RegExp(field + ":\\s*'([^']*)'"),
-    new RegExp(field + ':\\s*"([^"]*)"'),
-  ];
-  for (const p of patterns) { const m = content.match(p); if (m) return m[1]; }
-  return '';
-}
-function extNum(content, field) {
-  const m = content.match(new RegExp('[\\s,{]' + field + ':\\s*([\\d.]+)'));
-  return m ? m[1] : '';
-}
-function extBool(content, field) {
-  const m = content.match(new RegExp('[\\s,{]' + field + ':\\s*(true|false)'));
-  return m ? m[1] === 'true' : false;
-}
-function v(id) { const el = document.getElementById(id); return el ? el.value : ''; }
-function vc(id) { const el = document.getElementById(id); return el ? el.checked : false; }
-
-function sec(title, fieldsHTML) {
-  const s = document.createElement('div');
-  s.className = 'fsec';
-  s.innerHTML = `<div class="fsec-head">${title}</div><div class="fsec-body">${fieldsHTML}</div>`;
-  return s;
-}
-
-function row(...groups) {
-  return `<div class="frow">${groups.join('')}</div>`;
-}
-
-function fg(id, label, type='text', value='', placeholder='', extra='') {
-  const cls = extra.includes('wide') ? 'fg wide' : extra.includes('full') ? 'fg full' : 'fg';
-  if (type === 'checkbox') {
-    return `<div class="${cls}"><label>${label}</label><input type="checkbox" id="${id}" ${value?'checked':''}></div>`;
-  }
-  if (type === 'select') return `<div class="${cls}"><label>${label}</label>${value}</div>`;
-  if (type === 'textarea') {
-    return `<div class="${cls}" style="min-width:100%;"><label>${label}</label><textarea id="${id}" rows="3" placeholder="${placeholder}">${value}</textarea></div>`;
-  }
-  return `<div class="${cls}"><label>${label}</label><input type="text" id="${id}" value="${esc(value)}" placeholder="${placeholder}"></div>`;
-}
-
-function esc(s) { return (s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-// ── LEAGUE HISTORY FORM ──
+// ─────────────────────────────────────────────────────
+//  LEAGUE HISTORY FORM
+// ─────────────────────────────────────────────────────
 function buildLHForm(content, season, pane) {
-  const idx = content.indexOf(`season: '${season}'`);
-  const bs = content.lastIndexOf('{', idx);
-  const be = content.indexOf('},', idx) + 2;
-  const block = content.slice(bs, be);
+  var idx = content.indexOf("season: '"+season+"'");
+  var bs = content.lastIndexOf('{',idx);
+  var be = content.indexOf('},',idx)+2;
+  var block = content.slice(bs,be);
 
-  const awards = [
-    { key:'mvp',      label:'Most Valuable Player'       },
-    { key:'roty',     label:'Rookie of the Year'         },
-    { key:'dpoy',     label:'Defensive Player of Year'   },
-    { key:'mip',      label:'Most Improved Player'       },
-    { key:'sixmoty',  label:'Sixth Man of the Year'      },
-    { key:'finals_mvp', label:'Finals MVP'               },
-  ];
+  var awards = ['mvp','roty','dpoy','mip','sixmoty','finals_mvp'];
+  var labels = {mvp:'MVP',roty:'Rookie of Year',dpoy:'Def POY',mip:'Most Improved',sixmoty:'6th Man',finals_mvp:'Finals MVP'};
 
-  pane.appendChild(sec('Season Info',
-    row(fg('lh_season','Season','text',season,'2024-25'),
-        fg('lh_champion','NBA Champion','text',ext(block,'champion'),'Golden State Warriors','wide'))
-  ));
+  var s0 = sec('Season Info'); var b0 = secBody(s0);
+  b0.appendChild(row([fg('lh_season','Season','text',season,'2024-25'), fg('lh_champion','NBA Champion','text',ext(block,'champion'),'Golden State Warriors',2)]));
+  pane.appendChild(s0);
 
-  awards.forEach(a => {
-    pane.appendChild(sec(a.label,
-      row(fg(`lh_${a.key}`,'Player','text',ext(block,a.key),'Player name','wide')) +
-      row(fg(`lh_${a.key}_team`,'Team','text',ext(block,a.key+'_team'),'Full team name','wide')) +
-      row(fg(`lh_${a.key}_headshot`,'Headshot URL','text',ext(block,a.key+'_headshot'),'https://cdn.nba.com/…','full'))
-    ));
+  awards.forEach(function(a) {
+    var s = sec(labels[a]||a); var b = secBody(s);
+    b.appendChild(row([fg('lh_'+a,'Player','text',ext(block,a),'Player name',2), fg('lh_'+a+'_team','Team','text',ext(block,a+'_team'),'Full team name')]));
+    b.appendChild(row([fg('lh_'+a+'_headshot','Headshot URL','text',ext(block,a+'_headshot'),'https://cdn.nba.com/…','full')]));
+    pane.appendChild(s);
   });
 
-  const btn = actBtn('Apply Changes', () => applyLHForm(season));
-  pane.appendChild(btn);
+  var wrap = document.createElement('div'); wrap.className='form-actions';
+  wrap.appendChild(actBtn('Apply Changes', function(){ applyLHForm(season); }));
+  pane.appendChild(wrap);
 }
 
 function applyLHForm(season) {
-  const f = S.files[S.active];
-  const awards = ['mvp','roty','dpoy','mip','sixmoty','finals_mvp'];
-  let nb = `  {\n    season: '${v('lh_season')}',\n`;
-  awards.forEach(a => {
-    if (a === 'finals_mvp') nb += `    champion:   '${v('lh_champion')}',\n`;
-    nb += `    ${a}: '${v('lh_'+a)}',  ${a}_team: '${v('lh_'+a+'_team')}',  ${a}_headshot: '${v('lh_'+a+'_headshot')}',\n`;
+  var f = S.files[S.active];
+  var awards = ['mvp','roty','dpoy','mip','sixmoty','finals_mvp'];
+  var nb = "  {\n    season: '"+v('lh_season')+"',\n";
+  awards.forEach(function(a) {
+    if (a==='finals_mvp') nb += "    champion:   '"+v('lh_champion')+"',\n";
+    nb += "    "+a+": '"+v('lh_'+a)+"',  "+a+"_team: '"+v('lh_'+a+'_team')+"',  "+a+"_headshot: '"+v('lh_'+a+'_headshot')+"',\n";
   });
-  nb += `  },`;
-
-  const idx = f.content.indexOf(`season: '${season}'`);
-  const bs = f.content.lastIndexOf('{', idx);
-  const be = f.content.indexOf('},', idx) + 2;
-  f.content = f.content.slice(0, bs) + nb + '\n' + f.content.slice(be);
-  markDirty(); toast('Saved ✓', true);
-  document.getElementById('code-ta').value = extractRaw(f.content, 'league-history', v('lh_season'));
+  nb += '  },';
+  var idx = f.content.indexOf("season: '"+season+"'");
+  var bs = f.content.lastIndexOf('{',idx);
+  var be = f.content.indexOf('},',idx)+2;
+  f.content = f.content.slice(0,bs)+nb+'\n'+f.content.slice(be);
+  markDirty(); toast('Saved \u2713',true);
 }
 
-// ── PLAYER STATS FORM ──
-function buildPSForm(content, playerKey, pane) {
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\{');
-  const idx = content.search(re);
-  if (idx < 0) { pane.innerHTML = '<div style="padding:20px;color:var(--muted)">Player not found</div>'; return; }
-  const openBrace = idx + content.slice(idx).search(/\{/);
-  const end = findBlockEnd(content, openBrace);
-  const block = content.slice(openBrace, end+1);
+// ─────────────────────────────────────────────────────
+//  PLAYER STATS FORM
+// ─────────────────────────────────────────────────────
+var PS_HS = { clark:'headshot_clark.png', hatch:'headshot_hatch.png', stogsdill:'headshot_stogsdill.png', stewart:'headshot_stewart.png', vitel:'headshot_vitel.png' };
 
-  pane.appendChild(sec('Player Information',
-    row(fg('ps_height','Height','text',ext(block,'height'),"6'5\""),
-        fg('ps_weight','Weight','text',ext(block,'weight'),'210 lbs'),
-        fg('ps_age','Age','text',ext(block,'age'),'—')) +
-    row(fg('ps_college','College','text',ext(block,'college'),'Duke'),
-        fg('ps_draftYear','Draft Year','text',ext(block,'draftYear'),'2021'),
-        fg('ps_draftPick','Draft Pick','text',ext(block,'draftPick'),'First Round, Fifth Pick')) +
-    row(fg('ps_nickname','Nickname','text',ext(block,'nickname'),'"Flash"'),
-        fg('ps_retired','Retired','checkbox',extBool(block,'retired')))
-  ));
+function getPlayerBlock(content, key) {
+  var idx = content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (idx<0) return null;
+  var ob = idx+content.slice(idx).search(/\{/);
+  var end = findBlockEnd(content, ob);
+  return content.slice(ob, end+1);
+}
 
-  // Seasons table preview
-  const regRows = [...block.matchAll(/\{[^}]*season:'(\d{4}-\d{2,4})'[^}]*team:'([^']+)'[^}]*ppg:([\d.]+)[^}]*\}/g)];
-  if (regRows.length) {
-    const s = document.createElement('div');
-    s.className = 'fsec';
-    s.innerHTML = `<div class="fsec-head">Regular Seasons <span style="color:var(--muted);font-weight:400">(${regRows.length} rows) — use Table view to edit</span></div>
-    <div class="fsec-body"><div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:1.9">
-    ${regRows.slice(0,6).map(r=>`<span style="color:var(--orange)">${r[1]}</span> · <span style="color:var(--head)">${r[3]} PPG</span> · ${r[2]}`).join('<br>')}
-    ${regRows.length > 6 ? `<br><span>…and ${regRows.length-6} more — switch to Table view</span>` : ''}
-    </div></div>`;
-    pane.appendChild(s);
+function buildPSForm(content, key, pane) {
+  var block = getPlayerBlock(content, key);
+  if (!block) { pane.innerHTML='<div style="padding:20px;color:var(--muted)">Player not found</div>'; return; }
+
+  // ── INFO ──
+  var sInfo = sec('Player Information'); var bInfo = secBody(sInfo);
+  var hd = sInfo.querySelector('.fsec-head');
+  hd.style.position = 'relative';
+  if (PS_HS[key]) {
+    var img = document.createElement('img');
+    img.src=PS_HS[key]; img.className='player-hs-corner'; img.alt=key;
+    img.onerror=function(){ this.style.display='none'; };
+    hd.appendChild(img);
+  }
+  bInfo.appendChild(row([fg('ps_height','Height','text',ext(block,'height'),"6'5\""), fg('ps_weight','Weight','text',ext(block,'weight'),'210 lbs'), fg('ps_age','Age','text',ext(block,'age'),'—')]));
+  bInfo.appendChild(row([fg('ps_college','College','text',ext(block,'college'),'Duke'), fg('ps_draftYear','Draft Year','text',ext(block,'draftYear'),'2021'), fg('ps_draftPick','Draft Pick','text',ext(block,'draftPick'),'First Round, Fifth Pick')]));
+  bInfo.appendChild(row([fg('ps_nickname','Nickname','text',ext(block,'nickname'),'"Flash"'), fg('ps_retired','Retired','checkbox',extBool(block,'retired'))]));
+  var bInfo_btns = document.createElement('div'); bInfo_btns.className='form-actions';
+  bInfo_btns.appendChild(actBtn('Apply Info', function(){ applyPSInfo(key); }));
+  bInfo.appendChild(bInfo_btns);
+  pane.appendChild(sInfo);
+
+  // ── REGULAR SEASONS ──
+  pane.appendChild(buildRegularSection(block, key));
+  // ── PLAYOFFS ──
+  pane.appendChild(buildPlayoffsSection(block, key));
+  // ── TOTALS ──
+  pane.appendChild(buildTotalsSection(block, key));
+  // ── CONTRACTS ──
+  pane.appendChild(buildContractsSection(block, key));
+  // ── AWARDS ──
+  pane.appendChild(buildAwardsSection(block, key));
+  // ── CAREER HIGHS ──
+  pane.appendChild(buildCareerHighsSection(block, key));
+  // ── SHOES ──
+  pane.appendChild(buildShoesSection(block, key));
+}
+
+function applyPSInfo(key) {
+  var f = S.files[S.active];
+  var idx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (idx<0) return toast('Player not found');
+  var ob = idx+f.content.slice(idx).search(/\{/);
+  var end = findBlockEnd(f.content, ob);
+  var block = f.content.slice(ob, end+1);
+  var newInfo = "    info: {\n      height:    '"+escapeJS(v('ps_height'))+"',\n      weight:    '"+escapeJS(v('ps_weight'))+"',\n      age:       '"+escapeJS(v('ps_age'))+"',\n      college:   '"+escapeJS(v('ps_college'))+"',\n      draftYear: '"+escapeJS(v('ps_draftYear'))+"',\n      draftPick: '"+escapeJS(v('ps_draftPick'))+"',\n      nickname:  '"+escapeJS(v('ps_nickname'))+"',\n    },\n    retired: "+vc('ps_retired')+",";
+  block = block.replace(/\s*info:\s*\{[\s\S]*?\},\s*\n\s*retired:\s*(true|false),/, '\n'+newInfo);
+  f.content = f.content.slice(0,ob)+block+f.content.slice(end+1);
+  markDirty(); toast('Info updated \u2713',true);
+}
+
+// ── REGULAR SEASONS ──
+function parseRegular(block) {
+  var re = /\{[^}]*season:'(\d{4}-\d{2,4})'[^}]*\}/gs;
+  var rows=[], m;
+  while ((m=re.exec(block))!==null) {
+    if (/type:'playoffs'/.test(m[0])) continue;
+    var r = m[0];
+    rows.push({season:ext(r,'season'),age:extNum(r,'age'),team:ext(r,'team'),gp:extNum(r,'gp'),gs:extNum(r,'gs'),mpg:extNum(r,'mpg'),ppg:extNum(r,'ppg'),rpg:extNum(r,'rpg'),apg:extNum(r,'apg'),spg:extNum(r,'spg'),bpg:extNum(r,'bpg'),topg:extNum(r,'topg'),fgp:ext(r,'fgp'),tpp:ext(r,'tpp'),ftp:ext(r,'ftp'),tpa:extNum(r,'tpa'),star:/star:true/.test(r),dnq:/dnq:true/.test(r)});
+  }
+  return rows;
+}
+
+function buildRegularSection(block, key) {
+  var rows = parseRegular(block);
+  var s = sec('Regular Seasons ('+rows.length+')');
+  var keys = ['season','age','team','gp','gs','mpg','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa'];
+  var widths = [72,38,48,36,36,40,40,40,40,40,40,40,44,44,44,40];
+  var scroll = document.createElement('div'); scroll.style.cssText='overflow-x:auto;';
+  var html = '<table><thead><tr>'+['SEASON','AGE','TEAM','GP','GS','MPG','PPG','RPG','APG','SPG','BPG','TO','FG%','3P%','FT%','3PA','\u2b50','DNQ','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+  rows.forEach(function(r,i) {
+    html += '<tr>';
+    keys.forEach(function(k,ki){ html += '<td><input style="'+IS(widths[ki])+'" id="rr_'+i+'_'+k+'" value="'+(esc(r[k])||'')+'"></td>'; });
+    html += '<td><input type="checkbox" id="rr_'+i+'_star" '+(r.star?'checked':'')+'></td>';
+    html += '<td><input type="checkbox" id="rr_'+i+'_dnq" '+(r.dnq?'checked':'')+'></td>';
+    html += '<td><button onclick="delRegRow('+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td></tr>';
+  });
+  html += '</tbody></table>';
+  scroll.innerHTML = html;
+  s.appendChild(scroll);
+  var b = secBody(s);
+  b.appendChild(subLabel('Add Regular Season Row'));
+  b.appendChild(row([fg('ns_season','Season','text','','2034-35'), fg('ns_age','Age','text','','28'), fg('ns_team','Team','text','','LAL'), fg('ns_gp','GP','text','','82'), fg('ns_gs','GS','text','','79')]));
+  b.appendChild(row([fg('ns_ppg','PPG','text','','22.1'), fg('ns_rpg','RPG','text','','3.4'), fg('ns_apg','APG','text','','5.1'), fg('ns_spg','SPG','text','','1.2'), fg('ns_bpg','BPG','text','','0.2'), fg('ns_topg','TOPG','text','','2.0')]));
+  b.appendChild(row([fg('ns_fgp','FG%','text','','48.5%'), fg('ns_tpp','3P%','text','','37.1%'), fg('ns_ftp','FT%','text','','82.0%'), fg('ns_tpa','3PA','text','','6.2'), fg('ns_mpg','MPG','text','','34.5')]));
+  b.appendChild(row([fg('ns_star','All-Star','checkbox',false), fg('ns_dnq','DNQ','checkbox',false)]));
+  var btns = document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Season Changes', function(){ applyRegular(rows.length, key); }));
+  btns.appendChild(actBtn('+ Add Row', function(){ addPSRow(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
+}
+
+function collectRegRows(count) {
+  var keys = ['season','age','team','gp','gs','mpg','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa'];
+  var sf = ['season','team','fgp','tpp','ftp'];
+  var rows = [];
+  for (var i=0;i<count;i++) {
+    var el = document.getElementById('rr_'+i+'_season'); if (!el) continue;
+    var vals = {}; keys.forEach(function(k){ vals[k]=v('rr_'+i+'_k'.replace('k',k)); });
+    keys.forEach(function(k){ var e=document.getElementById('rr_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var star = vc('rr_'+i+'_star'), dnq = vc('rr_'+i+'_dnq');
+    var s2='      { ';
+    keys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    s2+='star:'+star+', dnq:'+dnq+' },';
+    rows.push(s2);
+  }
+  return rows;
+}
+
+function applyRegular(count, key) { writeRegular(key, collectRegRows(count)); }
+
+function delRegRow(idx, key) {
+  var count = document.querySelectorAll('[id^="rr_"][id$="_season"]').length;
+  var rows = [];
+  for (var i=0;i<count;i++) {
+    if (i===idx) continue;
+    var keys = ['season','age','team','gp','gs','mpg','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa'];
+    var sf = ['season','team','fgp','tpp','ftp'];
+    var vals = {}; keys.forEach(function(k){ var e=document.getElementById('rr_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var star=vc('rr_'+i+'_star'), dnq=vc('rr_'+i+'_dnq');
+    var s2='      { ';
+    keys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    s2+='star:'+star+', dnq:'+dnq+' },';
+    rows.push(s2);
+  }
+  writeRegular(key, rows);
+}
+
+function writeRegular(key, rows) {
+  var f = S.files[S.active];
+  var pidx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var rs = f.content.indexOf('    regular: [', pidx);
+  var re2 = f.content.indexOf('    ],\n    playoffs:', pidx);
+  if (rs<0||re2<0) return toast('Cannot find regular array');
+  f.content = f.content.slice(0,rs)+'    regular: [\n'+rows.join('\n')+'\n'+f.content.slice(re2);
+  markDirty(); toast('Regular seasons updated \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+
+function addPSRow(key) {
+  var f = S.files[S.active];
+  var newRow = "      { season:'"+v('ns_season')+"', age:"+(v('ns_age')||0)+", team:'"+v('ns_team')+"', ppg:"+(v('ns_ppg')||0)+", rpg:"+(v('ns_rpg')||0)+", apg:"+(v('ns_apg')||0)+", spg:"+(v('ns_spg')||0)+", bpg:"+(v('ns_bpg')||0)+", topg:"+(v('ns_topg')||0)+", fgp:'"+v('ns_fgp')+"', tpp:'"+v('ns_tpp')+"', ftp:'"+v('ns_ftp')+"', tpa:"+(v('ns_tpa')||0)+", gs:"+(v('ns_gs')||0)+", gp:"+(v('ns_gp')||0)+", mpg:"+(v('ns_mpg')||0)+", star:"+vc('ns_star')+", dnq:"+vc('ns_dnq')+" },";
+  var pidx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var re2 = f.content.indexOf('    ],\n    playoffs:', pidx);
+  if (re2<0) return toast('Cannot find array end');
+  f.content = f.content.slice(0,re2)+newRow+'\n'+f.content.slice(re2);
+  markDirty(); toast('Row added \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+
+// ── PLAYOFFS ──
+function parsePlayoffs(block) {
+  var re = /\{[^}]*type:'playoffs'[^}]*\}/gs;
+  var rows=[], m;
+  while ((m=re.exec(block))!==null) {
+    var r=m[0];
+    rows.push({season:ext(r,'season'),game:extNum(r,'game'),opp:ext(r,'opp'),result:ext(r,'result'),score:ext(r,'score'),ppg:extNum(r,'ppg'),rpg:extNum(r,'rpg'),apg:extNum(r,'apg'),spg:extNum(r,'spg'),bpg:extNum(r,'bpg'),topg:extNum(r,'topg'),fgp:ext(r,'fgp'),tpp:ext(r,'tpp'),ftp:ext(r,'ftp'),gp:extNum(r,'gp'),star:/star:true/.test(r),dnq:/dnq:true/.test(r)});
+  }
+  return rows;
+}
+
+function buildPlayoffsSection(block, key) {
+  var rows = parsePlayoffs(block);
+  var s = sec('Playoffs ('+rows.length+')');
+  var keys = ['season','game','opp','result','score','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','gp'];
+  var widths = [72,36,44,36,60,40,40,40,40,40,40,44,44,44,36];
+  var scroll = document.createElement('div'); scroll.style.cssText='overflow-x:auto;';
+  var html = '<table><thead><tr>'+['SEASON','GAME','OPP','W/L','SCORE','PPG','RPG','APG','SPG','BPG','TO','FG%','3P%','FT%','GP','\u2b50','DNQ','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+  rows.forEach(function(r,i) {
+    html += '<tr>';
+    keys.forEach(function(k,ki){ html += '<td><input style="'+IS(widths[ki])+'" id="po_'+i+'_'+k+'" value="'+(esc(r[k])||'')+'"></td>'; });
+    html += '<td><input type="checkbox" id="po_'+i+'_star" '+(r.star?'checked':'')+'></td>';
+    html += '<td><input type="checkbox" id="po_'+i+'_dnq" '+(r.dnq?'checked':'')+'></td>';
+    html += '<td><button onclick="delPORow('+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td></tr>';
+  });
+  html += '</tbody></table>';
+  scroll.innerHTML = html;
+  s.appendChild(scroll);
+  var b = secBody(s);
+  b.appendChild(subLabel('Add Playoff Row'));
+  b.appendChild(row([fg('po_season','Season','text','','2034-35'), fg('po_game','Game #','text','','1'), fg('po_opp','Opponent','text','','LAL'), fgSel('po_result','Result',[{v:'W',l:'Win'},{v:'L',l:'Loss'}],'W'), fg('po_score','Score','text','','118-104')]));
+  b.appendChild(row([fg('po_ppg','PPG','text','','22.1'), fg('po_rpg','RPG','text','','3.4'), fg('po_apg','APG','text','','5.1'), fg('po_spg','SPG','text','','1.2'), fg('po_bpg','BPG','text','','0.2'), fg('po_topg','TOPG','text','','2.0')]));
+  b.appendChild(row([fg('po_fgp','FG%','text','','48.5%'), fg('po_tpp','3P%','text','','37.1%'), fg('po_ftp','FT%','text','','82.0%'), fg('po_gp','GP','text','','1'), fg('po_star','All-Star','checkbox',false), fg('po_dnq','DNQ','checkbox',false)]));
+  var btns = document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Playoff Changes', function(){ applyPlayoffs(rows.length, key); }));
+  btns.appendChild(actBtn('+ Add Row', function(){ addPORow(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
+}
+
+function collectPORows(count) {
+  var keys = ['season','game','opp','result','score','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','gp'];
+  var sf = ['season','opp','result','score','fgp','tpp','ftp'];
+  var rows = [];
+  for (var i=0;i<count;i++) {
+    var el=document.getElementById('po_'+i+'_season'); if (!el) continue;
+    var vals={}; keys.forEach(function(k){ var e=document.getElementById('po_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var star=vc('po_'+i+'_star'), dnq=vc('po_'+i+'_dnq');
+    var s2="      { type:'playoffs', ";
+    keys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    s2+='star:'+star+', dnq:'+dnq+' },';
+    rows.push(s2);
+  }
+  return rows;
+}
+function applyPlayoffs(count, key) { writePlayoffs(key, collectPORows(count)); }
+function delPORow(idx, key) {
+  var count = document.querySelectorAll('[id^="po_"][id$="_season"]').length;
+  var rows = [];
+  for (var i=0;i<count;i++) {
+    if (i===idx) continue;
+    var keys=['season','game','opp','result','score','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','gp'];
+    var sf=['season','opp','result','score','fgp','tpp','ftp'];
+    var vals={}; keys.forEach(function(k){ var e=document.getElementById('po_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var star=vc('po_'+i+'_star'), dnq=vc('po_'+i+'_dnq');
+    var s2="      { type:'playoffs', ";
+    keys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    s2+='star:'+star+', dnq:'+dnq+' },';
+    rows.push(s2);
+  }
+  writePlayoffs(key, rows);
+}
+function writePlayoffs(key, rows) {
+  var f = S.files[S.active];
+  var pidx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var ps = f.content.indexOf('    playoffs: [', pidx);
+  var pe = f.content.indexOf('    ],\n    totals:', pidx);
+  if (ps<0||pe<0) return toast('Cannot find playoffs array');
+  f.content = f.content.slice(0,ps)+'    playoffs: [\n'+rows.join('\n')+'\n'+f.content.slice(pe);
+  markDirty(); toast('Playoffs updated \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+function addPORow(key) {
+  var f = S.files[S.active];
+  var nr = "      { type:'playoffs', season:'"+v('po_season')+"', game:"+(v('po_game')||0)+", opp:'"+v('po_opp')+"', result:'"+v('po_result')+"', score:'"+v('po_score')+"', ppg:"+(v('po_ppg')||0)+", rpg:"+(v('po_rpg')||0)+", apg:"+(v('po_apg')||0)+", spg:"+(v('po_spg')||0)+", bpg:"+(v('po_bpg')||0)+", topg:"+(v('po_topg')||0)+", fgp:'"+v('po_fgp')+"', tpp:'"+v('po_tpp')+"', ftp:'"+v('po_ftp')+"', gp:"+(v('po_gp')||0)+", star:"+vc('po_star')+", dnq:"+vc('po_dnq')+" },";
+  var pidx = f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var pe = f.content.indexOf('    ],\n    totals:', pidx);
+  if (pe<0) return toast('Cannot find array end');
+  f.content = f.content.slice(0,pe)+nr+'\n'+f.content.slice(pe);
+  markDirty(); toast('Row added \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+
+// ── TOTALS ──
+function buildTotalsSection(block, key) {
+  var totBlock = block.match(/totals:\s*\[([\s\S]*?)\]/);
+  var totRows = totBlock ? [...totBlock[1].matchAll(/\{([^}]+)\}/g)] : [];
+  var s = sec('Season Totals ('+totRows.length+')');
+  var tkeys = ['season','team','pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','gp'];
+  var twidths = [72,44,40,40,40,40,40,40,40,40,40,40,40,40,36];
+  var scroll = document.createElement('div'); scroll.style.cssText='overflow-x:auto;';
+  var html = '<table><thead><tr>'+['SEASON','TEAM','PTS','REB','AST','STL','BLK','TOV','FGM','FGA','3PM','3PA','FTM','FTA','GP','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+  totRows.forEach(function(m,i) {
+    var r=m[1]; html+='<tr>';
+    tkeys.forEach(function(k,ki){ html+='<td><input style="'+IS(twidths[ki])+'" id="tot_'+i+'_'+k+'" value="'+(esc(k==='season'||k==='team'?ext(r,k):extNum(r,k))||'')+'"></td>'; });
+    html+='<td><button onclick="delTotRow('+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td></tr>';
+  });
+  html+='</tbody></table>';
+  scroll.innerHTML=html; s.appendChild(scroll);
+  var b=secBody(s);
+  b.appendChild(subLabel('Add Totals Row'));
+  b.appendChild(row([fg('tot_season','Season','text','','2034-35'), fg('tot_team','Team','text','','LAL'), fg('tot_gp','GP','text','','82')]));
+  b.appendChild(row([fg('tot_pts','PTS','text','','1820'), fg('tot_reb','REB','text','','280'), fg('tot_ast','AST','text','','415'), fg('tot_stl','STL','text','','98'), fg('tot_blk','BLK','text','','16'), fg('tot_tov','TOV','text','','164')]));
+  b.appendChild(row([fg('tot_fgm','FGM','text','','640'), fg('tot_fga','FGA','text','','1320'), fg('tot_tpm','3PM','text','','180'), fg('tot_tpa','3PA','text','','510'), fg('tot_ftm','FTM','text','','360'), fg('tot_fta','FTA','text','','438')]));
+  var btns=document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Totals', function(){ applyTotals(totRows.length, key); }));
+  btns.appendChild(actBtn('+ Add Row', function(){ addTotRow(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
+}
+
+function collectTotRows(count) {
+  var tkeys=['season','team','pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','gp'];
+  var sf=['season','team'];
+  var rows=[];
+  for (var i=0;i<count;i++) {
+    if (!document.getElementById('tot_'+i+'_season')) continue;
+    var vals={}; tkeys.forEach(function(k){ var e=document.getElementById('tot_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var s2='      { ';
+    tkeys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    rows.push(s2.replace(/,\s*$/,' },'));
+  }
+  return rows;
+}
+function applyTotals(count, key) { writeTotals(key, collectTotRows(count)); }
+function delTotRow(idx, key) {
+  var count = document.querySelectorAll('[id^="tot_"][id$="_season"]').length;
+  var rows=collectTotRows(count); rows.splice(idx,1);
+  // re-collect without idx
+  var count2=count; var rows2=[];
+  for (var i=0;i<count2;i++) {
+    if (i===idx) continue;
+    var tkeys=['season','team','pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','gp'];
+    var sf=['season','team'];
+    var vals={}; tkeys.forEach(function(k){ var e=document.getElementById('tot_'+i+'_'+k); vals[k]=e?e.value:''; });
+    var s2='      { ';
+    tkeys.forEach(function(k){ if (sf.indexOf(k)>=0) s2+=k+":'"+vals[k]+"', "; else s2+=k+':'+(vals[k]||0)+', '; });
+    rows2.push(s2.replace(/,\s*$/,' },'));
+  }
+  writeTotals(key, rows2);
+}
+function writeTotals(key, rows) {
+  var f=S.files[S.active];
+  var pidx=f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var ts=f.content.indexOf('    totals: [',pidx);
+  var te=f.content.indexOf('    ],\n    jerseys:',pidx);
+  if (ts<0||te<0) return toast('Cannot find totals array');
+  f.content=f.content.slice(0,ts)+'    totals: [\n'+rows.join('\n')+'\n'+f.content.slice(te);
+  markDirty(); toast('Totals updated \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+function addTotRow(key) {
+  var f=S.files[S.active];
+  var nr="      { season:'"+v('tot_season')+"', team:'"+v('tot_team')+"', pts:"+(v('tot_pts')||0)+", reb:"+(v('tot_reb')||0)+", ast:"+(v('tot_ast')||0)+", stl:"+(v('tot_stl')||0)+", blk:"+(v('tot_blk')||0)+", tov:"+(v('tot_tov')||0)+", fgm:"+(v('tot_fgm')||0)+", fga:"+(v('tot_fga')||0)+", tpm:"+(v('tot_tpm')||0)+", tpa:"+(v('tot_tpa')||0)+", ftm:"+(v('tot_ftm')||0)+", fta:"+(v('tot_fta')||0)+", gp:"+(v('tot_gp')||0)+" },";
+  var pidx=f.content.search(new RegExp('\\n  '+key+':\\s*\\{'));
+  if (pidx<0) return toast('Player not found');
+  var te=f.content.indexOf('    ],\n    jerseys:',pidx);
+  if (te<0) return toast('Cannot find array end');
+  f.content=f.content.slice(0,te)+nr+'\n'+f.content.slice(te);
+  markDirty(); toast('Row added \u2713',true);
+  buildFormPanel(f.content,'player-stats',key);
+}
+
+// ── CONTRACTS ──
+function buildContractsSection(block, key) {
+  var s = sec('Contracts & Transactions');
+  var b = secBody(s);
+
+  // Signings
+  var sigBlock = block.match(/signings:\s*\[([\s\S]*?)\]/);
+  var sigRows = sigBlock ? sigBlock[1].match(/\{[^}]+\}/g)||[] : [];
+  b.appendChild(subLabel('Signings'));
+  var sigScroll = document.createElement('div'); sigScroll.style.cssText='overflow-x:auto;margin-bottom:10px;';
+  var sigHtml = '<table><thead><tr>'+['DATE','TEAM','YRS','TOTAL','AAV','NOTE','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+  sigRows.forEach(function(r,i) {
+    sigHtml += '<tr>';
+    sigHtml += '<td><input style="'+IS(110)+'" id="sig_'+i+'_date" value="'+extVal(r,'date')+'"></td>';
+    sigHtml += '<td><input style="'+IS(170)+'" id="sig_'+i+'_team" value="'+extVal(r,'team')+'"></td>';
+    sigHtml += '<td><input style="'+IS(32)+'" id="sig_'+i+'_years" value="'+extNum(r,'years')+'"></td>';
+    sigHtml += '<td><input style="'+IS(72)+'" id="sig_'+i+'_total" value="'+extVal(r,'total')+'"></td>';
+    sigHtml += '<td><input style="'+IS(64)+'" id="sig_'+i+'_aav" value="'+extVal(r,'aav')+'"></td>';
+    sigHtml += '<td><input style="'+IS(150)+'" id="sig_'+i+'_note" value="'+extVal(r,'note')+'"></td>';
+    sigHtml += '<td><button onclick="delSig('+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td></tr>';
+  });
+  sigHtml += '</tbody></table>';
+  sigScroll.innerHTML = sigHtml; b.appendChild(sigScroll);
+  b.appendChild(subLabel('Add Signing'));
+  b.appendChild(row([fg('new_sig_date','Date','text','','July 1, 2034'), fg('new_sig_team','Team','text','','Los Angeles Lakers',2), fg('new_sig_years','Years','text','','3'), fg('new_sig_total','Total','text','','$111M'), fg('new_sig_aav','AAV','text','','$37M')]));
+  b.appendChild(row([fg('new_sig_note','Note','text','','','full')]));
+
+  // Trades — each as a card
+  var tradeBlock = block.match(/trades:\s*\[([\s\S]*?)\],\s*seasons:/);
+  var tradeRows = tradeBlock ? tradeBlock[1].match(/\{[\s\S]*?notes:[^}]*\}/g)||[] : [];
+  b.appendChild(subLabel('Trades ('+tradeRows.length+')'));
+  tradeRows.forEach(function(r,i) {
+    var tdate = ext(r,'date'), tfrom = ext(r,'fromTeam'), tto = ext(r,'toTeam');
+    var sentM = r.match(/sent:\s*\[([\s\S]*?)\]/); var recvM = r.match(/received:\s*\[([\s\S]*?)\]/);
+    var sentParts = sentM ? (sentM[1].match(/text:'([^']+)'/g)||[]).map(function(x){ return x.replace(/text:'/,'').replace(/'$/,''); }) : [];
+    var recvParts = recvM ? (recvM[1].match(/text:'([^']+)'/g)||[]).map(function(x){ return x.replace(/text:'/,'').replace(/'$/,''); }) : [];
+    var card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px;';
+    card.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">'
+      +'<input style="'+IS(110)+'" id="tr_'+i+'_date" value="'+esc(tdate)+'" placeholder="Date">'
+      +'<input style="'+IS(170)+'" id="tr_'+i+'_from" value="'+esc(tfrom)+'" placeholder="From Team">'
+      +'<input style="'+IS(170)+'" id="tr_'+i+'_to" value="'+esc(tto)+'" placeholder="To Team">'
+      +'<button onclick="delTrade('+i+',\''+key+'\')" style="'+DS+' margin-left:auto">\u2715 Delete</button>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      +'<span style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);min-width:60px;line-height:28px">Sent:</span>'
+      +'<input style="'+IS(350)+'" id="tr_'+i+'_sent" value="'+esc(sentParts.join(', '))+'" placeholder="Player, Pick (comma sep)">'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'
+      +'<span style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);min-width:60px;line-height:28px">Received:</span>'
+      +'<input style="'+IS(350)+'" id="tr_'+i+'_recv" value="'+esc(recvParts.join(', '))+'" placeholder="Player, Pick (comma sep)">'
+      +'</div>';
+    b.appendChild(card);
+  });
+  b.appendChild(subLabel('Add Trade'));
+  b.appendChild(row([fg('new_tr_date','Date','text','','July 3, 2034'), fg('new_tr_from','From Team','text','','Lakers',2), fg('new_tr_to','To Team','text','','Pacers',2)]));
+  b.appendChild(row([fg('new_tr_sent','Sent (comma separated)','text','','','full')]));
+  b.appendChild(row([fg('new_tr_recv','Received (comma separated)','text','','','full')]));
+
+  // Season salaries
+  var salBlock = block.match(/seasons:\s*\[([\s\S]*?)\],?\s*\}/);
+  var salRows = salBlock ? salBlock[1].match(/\{[^}]+\}/g)||[] : [];
+  b.appendChild(subLabel('Season Salaries'));
+  var salScroll = document.createElement('div'); salScroll.style.cssText='overflow-x:auto;margin-bottom:10px;';
+  var salHtml = '<table><thead><tr>'+['SEASON','TEAM','SALARY','OPTION','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+  salRows.forEach(function(r,i) {
+    salHtml += '<tr>';
+    salHtml += '<td><input style="'+IS(70)+'" id="sal_'+i+'_season" value="'+extVal(r,'season')+'"></td>';
+    salHtml += '<td><input style="'+IS(170)+'" id="sal_'+i+'_team" value="'+extVal(r,'team')+'"></td>';
+    salHtml += '<td><input style="'+IS(75)+'" id="sal_'+i+'_salary" value="'+extVal(r,'salary')+'"></td>';
+    salHtml += '<td><input style="'+IS(75)+'" id="sal_'+i+'_option" value="'+extVal(r,'option')+'"></td>';
+    salHtml += '<td><button onclick="delSal('+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td></tr>';
+  });
+  salHtml += '</tbody></table>';
+  salScroll.innerHTML = salHtml; b.appendChild(salScroll);
+  b.appendChild(subLabel('Add Season Salary'));
+  b.appendChild(row([fg('new_sal_season','Season','text','','2034-35'), fg('new_sal_team','Team','text','','Los Angeles Lakers',2), fg('new_sal_salary','Salary','text','','$37.0M'), fg('new_sal_option','Option','text','','')]));
+
+  var btns = document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Signing Changes', function(){ applySignings(sigRows.length, key); }));
+  btns.appendChild(actBtn('+ Add Signing', function(){ addSigning(key); }, 'success'));
+  btns.appendChild(actBtn('Apply Trade Changes', function(){ applyTrades(tradeRows.length, key); }));
+  btns.appendChild(actBtn('+ Add Trade', function(){ addTrade(key); }, 'success'));
+  btns.appendChild(actBtn('Apply Salary Changes', function(){ applySalaries(salRows.length, key); }));
+  btns.appendChild(actBtn('+ Add Salary', function(){ addSalary(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
+}
+
+function collectSigs(count) {
+  var rows=[];
+  for (var i=0;i<count;i++) {
+    if (!document.getElementById('sig_'+i+'_date')) continue;
+    rows.push("        { date:'"+v('sig_'+i+'_date')+"', team:'"+v('sig_'+i+'_team')+"', years:"+(v('sig_'+i+'_years')||0)+", total:'"+v('sig_'+i+'_total')+"', aav:'"+v('sig_'+i+'_aav')+"', note:'"+v('sig_'+i+'_note')+"' },");
+  }
+  return rows;
+}
+function applySignings(count, key) { writeSigs(key, collectSigs(count)); }
+function delSig(idx, key) {
+  var count=document.querySelectorAll('[id^="sig_"][id$="_date"]').length; var rows=[];
+  for (var i=0;i<count;i++) { if (i===idx||!document.getElementById('sig_'+i+'_date')) continue; rows.push("        { date:'"+v('sig_'+i+'_date')+"', team:'"+v('sig_'+i+'_team')+"', years:"+(v('sig_'+i+'_years')||0)+", total:'"+v('sig_'+i+'_total')+"', aav:'"+v('sig_'+i+'_aav')+"', note:'"+v('sig_'+i+'_note')+"' },"); }
+  writeSigs(key, rows);
+}
+function addSigning(key) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var se=f.content.indexOf('\n      ],\n      trades:',pidx); if (se<0) return toast('Cannot find signings end');
+  f.content=f.content.slice(0,se)+"\n        { date:'"+v('new_sig_date')+"', team:'"+v('new_sig_team')+"', years:"+(v('new_sig_years')||0)+", total:'"+v('new_sig_total')+"', aav:'"+v('new_sig_aav')+"', note:'"+v('new_sig_note')+"' },"+f.content.slice(se);
+  markDirty(); toast('Signing added \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+function writeSigs(key, rows) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var ss=f.content.indexOf('      signings: [',pidx);
+  var se=f.content.indexOf('\n      ],\n      trades:',pidx);
+  if (ss<0||se<0) return toast('Cannot find signings array');
+  f.content=f.content.slice(0,ss)+'      signings: [\n'+rows.join('\n')+'\n'+f.content.slice(se);
+  markDirty(); toast('Signings updated \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+
+function mkTradeBlock(date, from, to, sentStr, recvStr) {
+  var sent = sentStr.split(',').map(function(s){ return s.trim(); }).filter(Boolean).map(function(s){ return "            { type:'Player', text:'"+s+"' }"; }).join(',\n');
+  var recv = recvStr.split(',').map(function(s){ return s.trim(); }).filter(Boolean).map(function(s){ return "            { type:'Player', text:'"+s+"' }"; }).join(',\n');
+  return "        {\n          date:'"+date+"',\n          fromTeam:'"+from+"',\n          toTeam:'"+to+"',\n          sent:[\n"+sent+"\n          ],\n          received:[\n"+recv+"\n          ],\n          notes:''\n        },";
+}
+function collectTrades(count) {
+  var rows=[];
+  for (var i=0;i<count;i++) {
+    if (!document.getElementById('tr_'+i+'_date')) continue;
+    rows.push(mkTradeBlock(v('tr_'+i+'_date'),v('tr_'+i+'_from'),v('tr_'+i+'_to'),v('tr_'+i+'_sent'),v('tr_'+i+'_recv')));
+  }
+  return rows;
+}
+function applyTrades(count, key) { writeTrades(key, collectTrades(count)); }
+function delTrade(idx, key) {
+  var count=document.querySelectorAll('[id^="tr_"][id$="_date"]').length; var rows=[];
+  for (var i=0;i<count;i++) { if (i===idx||!document.getElementById('tr_'+i+'_date')) continue; rows.push(mkTradeBlock(v('tr_'+i+'_date'),v('tr_'+i+'_from'),v('tr_'+i+'_to'),v('tr_'+i+'_sent'),v('tr_'+i+'_recv'))); }
+  writeTrades(key, rows);
+}
+function addTrade(key) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var te=f.content.indexOf('\n      ],\n      seasons:',pidx); if (te<0) return toast('Cannot find trades end');
+  f.content=f.content.slice(0,te)+'\n'+mkTradeBlock(v('new_tr_date'),v('new_tr_from'),v('new_tr_to'),v('new_tr_sent'),v('new_tr_recv'))+f.content.slice(te);
+  markDirty(); toast('Trade added \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+function writeTrades(key, rows) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var ts=f.content.indexOf('      trades: [',pidx);
+  var te=f.content.indexOf('\n      ],\n      seasons:',pidx);
+  if (ts<0||te<0) return toast('Cannot find trades array');
+  f.content=f.content.slice(0,ts)+'      trades: [\n'+rows.join('\n')+'\n'+f.content.slice(te);
+  markDirty(); toast('Trades updated \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+
+function collectSals(count) {
+  var rows=[];
+  for (var i=0;i<count;i++) {
+    if (!document.getElementById('sal_'+i+'_season')) continue;
+    rows.push("        { season:'"+v('sal_'+i+'_season')+"', team:'"+v('sal_'+i+'_team')+"', salary:'"+v('sal_'+i+'_salary')+"', option:'"+v('sal_'+i+'_option')+"' },");
+  }
+  return rows;
+}
+function applySalaries(count, key) { writeSals(key, collectSals(count)); }
+function delSal(idx, key) {
+  var count=document.querySelectorAll('[id^="sal_"][id$="_season"]').length; var rows=[];
+  for (var i=0;i<count;i++) { if (i===idx||!document.getElementById('sal_'+i+'_season')) continue; rows.push("        { season:'"+v('sal_'+i+'_season')+"', team:'"+v('sal_'+i+'_team')+"', salary:'"+v('sal_'+i+'_salary')+"', option:'"+v('sal_'+i+'_option')+"' },"); }
+  writeSals(key, rows);
+}
+function addSalary(key) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var se=f.content.indexOf('\n      ]\n    },',pidx); if (se<0) return toast('Cannot find seasons end');
+  f.content=f.content.slice(0,se)+"\n        { season:'"+v('new_sal_season')+"', team:'"+v('new_sal_team')+"', salary:'"+v('new_sal_salary')+"', option:'"+v('new_sal_option')+"' },"+f.content.slice(se);
+  markDirty(); toast('Salary added \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+function writeSals(key, rows) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var ss=f.content.indexOf('      seasons: [',pidx);
+  var se=f.content.indexOf('\n      ]\n    },',pidx);
+  if (ss<0||se<0) return toast('Cannot find seasons array');
+  f.content=f.content.slice(0,ss)+'      seasons: [\n'+rows.join('\n')+'\n'+f.content.slice(se);
+  markDirty(); toast('Salaries updated \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+
+// ── AWARDS ──
+function buildAwardsSection(block, key) {
+  var s = sec('Awards');
+  var awardsBlock = block.match(/awards:\s*\{([\s\S]*?)\}/);
+  var b = secBody(s);
+  b.innerHTML = '<div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:1.8">'
+    +(awardsBlock ? awardsBlock[0].slice(0,400) : 'No awards data')+'</div>'
+    +'<div style="font-size:.7rem;color:var(--muted);margin-top:8px">Edit awards in Code View (Code tab above).</div>';
+  return s;
+}
+
+// ── CAREER HIGHS ──
+function buildCareerHighsSection(block, key) {
+  var s = sec('Career Highs');
+  var b = secBody(s);
+
+  function chTable(rows, prefix, label) {
+    var div = document.createElement('div');
+    div.appendChild(subLabel(label));
+    var scroll = document.createElement('div'); scroll.style.cssText='overflow-x:auto;margin-bottom:10px;';
+    var html = '<table><thead><tr>'+['STAT KEY','LABEL','VALUE','DATE','OPPONENT','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+    rows.forEach(function(m,i) {
+      var r=m[1]||m;
+      html += '<tr>';
+      html += '<td><input style="'+IS(52)+'" id="'+prefix+'_'+i+'_stat" value="'+extVal(r,'stat')+'"></td>';
+      html += '<td><input style="'+IS(100)+'" id="'+prefix+'_'+i+'_label" value="'+extVal(r,'label')+'"></td>';
+      html += '<td><input style="'+IS(46)+'" id="'+prefix+'_'+i+'_value" value="'+esc(extNum(r,'value'))+'"></td>';
+      html += '<td><input style="'+IS(100)+'" id="'+prefix+'_'+i+'_date" value="'+extVal(r,'date')+'"></td>';
+      html += '<td><input style="'+IS(170)+'" id="'+prefix+'_'+i+'_opp" value="'+extVal(r,'opp')+'"></td>';
+      html += '<td><button onclick="delCH(\''+prefix+'\','+i+',\''+key+'\')" style="'+DS+'">\u2715</button></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    scroll.innerHTML = html; div.appendChild(scroll);
+    return div;
   }
 
-  // Add season form
-  pane.appendChild(sec('Add Regular Season Row',
-    row(fg('ns_season','Season','text','','2034-35'),
-        fg('ns_age','Age','text','','28'),
-        fg('ns_team','Team','text','','LAL'),
-        fg('ns_gp','GP','text','','82'),
-        fg('ns_gs','GS','text','','79')) +
-    row(fg('ns_ppg','PPG','text','','22.1'),
-        fg('ns_rpg','RPG','text','','3.4'),
-        fg('ns_apg','APG','text','','5.1'),
-        fg('ns_spg','SPG','text','','1.2'),
-        fg('ns_bpg','BPG','text','','0.2'),
-        fg('ns_topg','TOPG','text','','2.0')) +
-    row(fg('ns_fgp','FG%','text','','48.5%'),
-        fg('ns_tpp','3P%','text','','37.1%'),
-        fg('ns_ftp','FT%','text','','82.0%'),
-        fg('ns_tpa','3PA','text','','6.2'),
-        fg('ns_mpg','MPG','text','','34.5')) +
-    row(fg('ns_star','All-Star','checkbox',false),
-        fg('ns_dnq','DNQ','checkbox',false))
-  ));
+  var regBlock = block.match(/careerHighs:\s*\[([\s\S]*?)\]/);
+  var regRows = regBlock ? regBlock[1].match(/\{([^}]+)\}/g)||[] : [];
+  b.appendChild(chTable(regRows.map(function(r){ return {1:r}; }), 'ch', 'Regular Season Career Highs'));
 
-  const wrap = document.createElement('div');
-  wrap.className = 'form-actions';
-  wrap.appendChild(actBtn('Apply Info', () => applyPSInfo(playerKey)));
-  wrap.appendChild(actBtn('+ Add Season Row', () => addPSRow(playerKey), 'success'));
-  pane.appendChild(wrap);
+  var poBlock = block.match(/playoffCareerHighs:\s*\[([\s\S]*?)\]/);
+  var poRows = poBlock ? poBlock[1].match(/\{([^}]+)\}/g)||[] : [];
+  b.appendChild(chTable(poRows.map(function(r){ return {1:r}; }), 'pch', 'Playoff Career Highs'));
+
+  b.appendChild(subLabel('Add Career High'));
+  b.appendChild(row([fgSel('new_ch_type','Type',[{v:'regular',l:'Regular'},{v:'playoffs',l:'Playoffs'}],'regular'), fg('new_ch_stat','Stat Key','text','','pts'), fg('new_ch_label','Label','text','','Points'), fg('new_ch_value','Value','text','','52'), fg('new_ch_date','Date','text','','Feb 11, 2029'), fg('new_ch_opp','Opponent','text','','Detroit Pistons',2)]));
+
+  var btns = document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Regular CH', function(){ applyCH('ch', regRows.length, key); }));
+  btns.appendChild(actBtn('Apply Playoff CH', function(){ applyCH('pch', poRows.length, key); }));
+  btns.appendChild(actBtn('+ Add', function(){ addCH(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
 }
 
-function applyPSInfo(playerKey) {
-  const f = S.files[S.active];
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\{');
-  const idx = f.content.search(re);
-  if (idx < 0) return toast('Player not found');
-  const openBrace = idx + f.content.slice(idx).search(/\{/);
-  const end = findBlockEnd(f.content, openBrace);
-  let block = f.content.slice(openBrace, end+1);
-
-  const newInfo = `    info: {\n      height:    '${v('ps_height')}',\n      weight:    '${v('ps_weight')}',\n      age:       '${v('ps_age')}',\n      college:   '${v('ps_college')}',\n      draftYear: '${v('ps_draftYear')}',\n      draftPick: '${v('ps_draftPick')}',\n      nickname:  '${v('ps_nickname')}',\n    },\n    retired: ${vc('ps_retired')},`;
-
-  block = block.replace(/\s*info:\s*\{[\s\S]*?\},\s*\n\s*retired:\s*(true|false),/, '\n' + newInfo);
-  f.content = f.content.slice(0, openBrace) + block + f.content.slice(end+1);
-  markDirty(); toast('Info updated ✓', true);
-  document.getElementById('code-ta').value = extractRaw(f.content, 'player-stats', playerKey);
+function collectCH(prefix, count, type) {
+  var rows=[];
+  for (var i=0;i<count;i++) {
+    if (!document.getElementById(prefix+'_'+i+'_stat')) continue;
+    rows.push("      { stat:'"+v(prefix+'_'+i+'_stat')+"', value:"+(v(prefix+'_'+i+'_value')||0)+", label:'"+v(prefix+'_'+i+'_label')+"', date:'"+v(prefix+'_'+i+'_date')+"', opp:'"+v(prefix+'_'+i+'_opp')+"', type:'"+type+"' },");
+  }
+  return rows;
+}
+function applyCH(prefix, count, key) {
+  var type = prefix==='pch' ? 'playoffs' : 'regular';
+  writeCH(key, collectCH(prefix, count, type), prefix==='pch');
+}
+function delCH(prefix, idx, key) {
+  var count=document.querySelectorAll('[id^="'+prefix+'_"][id$="_stat"]').length;
+  var type=prefix==='pch'?'playoffs':'regular'; var rows=[];
+  for (var i=0;i<count;i++) {
+    if (i===idx||!document.getElementById(prefix+'_'+i+'_stat')) continue;
+    rows.push("      { stat:'"+v(prefix+'_'+i+'_stat')+"', value:"+(v(prefix+'_'+i+'_value')||0)+", label:'"+v(prefix+'_'+i+'_label')+"', date:'"+v(prefix+'_'+i+'_date')+"', opp:'"+v(prefix+'_'+i+'_opp')+"', type:'"+type+"' },");
+  }
+  writeCH(key, rows, prefix==='pch');
+}
+function addCH(key) {
+  var type=v('new_ch_type'); var isPlayoff=type==='playoffs';
+  var nr="      { stat:'"+v('new_ch_stat')+"', value:"+(v('new_ch_value')||0)+", label:'"+v('new_ch_label')+"', date:'"+v('new_ch_date')+"', opp:'"+v('new_ch_opp')+"', type:'"+type+"' },";
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var marker = isPlayoff ? '\n    ],\n    shoes:' : '\n    ],\n    playoffCareerHighs:';
+  var fallback = '\n    ],\n    shoes:';
+  var end = f.content.indexOf(marker, pidx);
+  if (end<0) end = f.content.indexOf(fallback, pidx);
+  if (end<0) return toast('Cannot find array end');
+  f.content=f.content.slice(0,end)+'\n'+nr+f.content.slice(end);
+  markDirty(); toast('Career high added \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+function writeCH(key, rows, isPlayoff) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  if (isPlayoff) {
+    var ps2=f.content.indexOf('    playoffCareerHighs: [',pidx);
+    var pe2=f.content.indexOf('\n    ],\n    shoes:',pidx);
+    if (ps2<0||pe2<0) return toast('Cannot find playoffCareerHighs array');
+    f.content=f.content.slice(0,ps2)+'    playoffCareerHighs: [\n'+rows.join('\n')+'\n'+f.content.slice(pe2);
+  } else {
+    var ps3=f.content.indexOf('    careerHighs: [',pidx);
+    var pe3=f.content.indexOf('\n    ],\n    playoffCareerHighs:',pidx);
+    if (pe3<0) pe3=f.content.indexOf('\n    ],\n    shoes:',pidx);
+    if (ps3<0||pe3<0) return toast('Cannot find careerHighs array');
+    f.content=f.content.slice(0,ps3)+'    careerHighs: [\n'+rows.join('\n')+'\n'+f.content.slice(pe3);
+  }
+  markDirty(); toast('Career highs updated \u2713',true); buildFormPanel(f.content,'player-stats',key);
 }
 
-function addPSRow(playerKey) {
-  const f = S.files[S.active];
-  const row = `      { season:'${v('ns_season')}', age:${v('ns_age')||0}, team:'${v('ns_team')}', ppg:${v('ns_ppg')||0}, rpg:${v('ns_rpg')||0}, apg:${v('ns_apg')||0}, spg:${v('ns_spg')||0}, bpg:${v('ns_bpg')||0}, topg:${v('ns_topg')||0}, fgp:'${v('ns_fgp')}', tpp:'${v('ns_tpp')}', ftp:'${v('ns_ftp')}', tpa:${v('ns_tpa')||0}, gs:${v('ns_gs')||0}, gp:${v('ns_gp')||0}, mpg:${v('ns_mpg')||0}, star:${vc('ns_star')}, dnq:${vc('ns_dnq')} },`;
+// ── SHOES ──
+function buildShoesSection(block, key) {
+  var s = sec('Shoes');
+  var b = secBody(s);
+  var brand = block.match(/brand:\s*'([^']+)'/);
+  b.appendChild(row([fg('shoes_brand','Brand','text',brand?brand[1]:'','Nike',2)]));
 
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\{');
-  const idx = f.content.search(re);
-  if (idx < 0) return toast('Player not found');
-  // Insert before first ], which closes the regular array
-  const regularEnd = f.content.indexOf('    ],\n', idx);
-  if (regularEnd < 0) return toast('Could not find regular array end');
-  f.content = f.content.slice(0, regularEnd) + row + '\n' + f.content.slice(regularEnd);
-  markDirty(); toast('Row added ✓', true);
-  // Refresh
-  buildFormPanel(f.content, f.type, playerKey);
+  var sigsBlock = block.match(/sigs:\s*\[([\s\S]*?)\]\s*\}/);
+  var sigText = sigsBlock ? sigsBlock[1] : '';
+  var sigMatches = sigText.match(/\{\s*name:[^}]*\}/gs)||[];
+
+  sigMatches.forEach(function(sm, si) {
+    var sigName = ext(sm,'name'), sigThumb = ext(sm,'thumbnail');
+    var cwBlock = sm.match(/colorways:\s*\[([\s\S]*?)\]/);
+    var cws = cwBlock ? cwBlock[1].match(/\{[^}]+\}/g)||[] : [];
+
+    var card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden;';
+    var ch = document.createElement('div');
+    ch.style.cssText = 'background:rgba(35,26,165,.08);padding:10px 14px;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;';
+    ch.innerHTML = '<span style="color:var(--orange)">// Shoe Line '+(si+1)+'</span>';
+    var delBtn = document.createElement('button');
+    delBtn.style.cssText = DS; delBtn.textContent = '\u2715 Remove Line';
+    delBtn.onclick = (function(i){ return function(){ delShoeLine(i, key); }; })(si);
+    ch.appendChild(delBtn); card.appendChild(ch);
+
+    var cb = document.createElement('div'); cb.style.cssText = 'padding:12px 14px;display:flex;flex-direction:column;gap:10px;';
+    cb.appendChild(row([fg('shoe_'+si+'_name','Line Name','text',sigName,'CSWAG I',2), fg('shoe_'+si+'_thumb','Thumbnail URL','text',sigThumb,'https://…',2)]));
+    cb.appendChild(subLabel('Colorways'));
+
+    var cwScroll = document.createElement('div'); cwScroll.style.cssText='overflow-x:auto;margin-bottom:8px;';
+    var cwHtml = '<table><thead><tr>'+['NAME','IMAGE URL','DEL'].map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>';
+    cws.forEach(function(cw,ci) {
+      cwHtml += '<tr>';
+      cwHtml += '<td><input style="'+IS(120)+'" id="cw_'+si+'_'+ci+'_name" value="'+extVal(cw,'name')+'"></td>';
+      cwHtml += '<td><input style="'+IS(310)+'" id="cw_'+si+'_'+ci+'_img" value="'+extVal(cw,'img')+'"></td>';
+      cwHtml += '<td><button onclick="delCW('+si+','+ci+',\''+key+'\')" style="'+DS+'">\u2715</button></td>';
+      cwHtml += '</tr>';
+    });
+    cwHtml += '</tbody></table>';
+    cwScroll.innerHTML = cwHtml; cb.appendChild(cwScroll);
+
+    cb.appendChild(subLabel('Add Colorway'));
+    cb.appendChild(row([fg('new_cw_'+si+'_name','Name','text','','Low Tide',2), fg('new_cw_'+si+'_img','Image URL','text','','https://…',2)]));
+
+    var cwBtns = document.createElement('div'); cwBtns.className='form-actions';
+    cwBtns.appendChild(actBtn('Apply Colorways', (function(i,n){ return function(){ applyCWs(i,n,key); }; })(si,cws.length)));
+    cwBtns.appendChild(actBtn('+ Add Colorway', (function(i){ return function(){ addCW(i,key); }; })(si), 'success'));
+    cb.appendChild(cwBtns);
+    card.appendChild(cb); b.appendChild(card);
+  });
+
+  b.appendChild(subLabel('Add Shoe Line'));
+  b.appendChild(row([fg('new_shoe_name','Name','text','','CSWAG IV',2), fg('new_shoe_thumb','Thumbnail','text','','https://…',2)]));
+
+  var btns = document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Apply Brand + Names', function(){ applyBrand(sigMatches.length, key); }));
+  btns.appendChild(actBtn('+ Add Shoe Line', function(){ addShoeLine(key); }, 'success'));
+  b.appendChild(btns);
+  return s;
 }
 
-// ── PLAYER GAMES FORM ──
-function buildPGForm(content, playerKey, pane) {
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\[');
-  const idx = content.search(re);
-  if (idx < 0) { pane.innerHTML='<div style="padding:20px;color:var(--muted)">Player not found</div>'; return; }
-  const openBracket = idx + content.slice(idx).search(/\[/);
-  const end = findArrayEnd(content, openBracket);
-  const block = content.slice(openBracket, end+1);
-  const games = [...block.matchAll(/season:'(\d{4}-\d{2,4})',\s*type:'(regular|playoffs)'/g)];
+function getSigsRange(key) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return null;
+  var ss=f.content.indexOf('        sigs: [',pidx);
+  var se=f.content.indexOf('\n      ]\n    },\n    jerseys:',pidx);
+  if (ss<0||se<0) return null;
+  return {ss:ss,se:se};
+}
+function parseSigsList(key) {
+  var f=S.files[S.active]; var r=getSigsRange(key); if (!r) return [];
+  var block=f.content.slice(r.ss,r.se);
+  return block.match(/\{\s*name:[^}]*\}/gs)||[];
+}
+function rebuildSigs(key, newSigsArr) {
+  var f=S.files[S.active]; var r=getSigsRange(key); if (!r) return toast('Cannot find sigs');
+  f.content=f.content.slice(0,r.ss)+'        sigs: [\n'+newSigsArr.join('\n')+'\n'+f.content.slice(r.se);
+  markDirty(); toast('Shoes updated \u2713',true); buildFormPanel(f.content,'player-stats',key);
+}
+function sigToStr(name, thumb, cws) {
+  var cwLines=cws.map(function(c){ return "            { name: '"+c.n+"', img: '"+c.i+"' }"; }).join(',\n');
+  return "        {\n          name: '"+name+"',\n          thumbnail: '"+thumb+"',\n          colorways: [\n"+cwLines+"\n          ]\n        },";
+}
+function getCWsFromBlock(sm) {
+  var cwBlock=sm.match(/colorways:\s*\[([\s\S]*?)\]/); if (!cwBlock) return [];
+  return (cwBlock[1].match(/\{[^}]+\}/g)||[]).map(function(c){ return {n:ext(c,'name'),i:ext(c,'img')}; });
+}
 
-  const s = document.createElement('div');
-  s.className = 'fsec';
-  s.innerHTML = `<div class="fsec-head">Game Log <span style="color:var(--muted);font-weight:400">(${games.length} games) — use Table view to see all</span></div>
-  <div class="fsec-body"><div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:2">
-  ${games.slice(0,8).map(g=>`<span style="color:var(--orange)">${g[1]}</span> <span style="color:var(--muted)">${g[2]}</span>`).join(' · ')}
-  ${games.length>8?` <span>…+${games.length-8} more</span>`:''}
-  </div></div>`;
+function applyCWs(si, cwCount, key) {
+  var sigs=parseSigsList(key);
+  var newSigs=sigs.map(function(sm,idx) {
+    if (idx!==si) return sm.trim()+',';
+    var cws=[];
+    for (var ci=0;ci<cwCount;ci++) {
+      var ne=document.getElementById('cw_'+si+'_'+ci+'_name'); if (!ne) continue;
+      cws.push({n:ne.value, i:(document.getElementById('cw_'+si+'_'+ci+'_img')||{}).value||''});
+    }
+    return sigToStr(v('shoe_'+si+'_name'),v('shoe_'+si+'_thumb'),cws);
+  });
+  rebuildSigs(key, newSigs);
+}
+function addCW(si, key) {
+  var sigs=parseSigsList(key);
+  var newSigs=sigs.map(function(sm,idx) {
+    if (idx!==si) return sm.trim()+',';
+    var cws=getCWsFromBlock(sm);
+    cws.push({n:v('new_cw_'+si+'_name'), i:v('new_cw_'+si+'_img')});
+    return sigToStr(v('shoe_'+si+'_name'),v('shoe_'+si+'_thumb'),cws);
+  });
+  rebuildSigs(key, newSigs);
+}
+function delCW(si, ci, key) {
+  var sigs=parseSigsList(key);
+  var newSigs=sigs.map(function(sm,idx) {
+    if (idx!==si) return sm.trim()+',';
+    var cws=getCWsFromBlock(sm).filter(function(_,i){ return i!==ci; });
+    return sigToStr(v('shoe_'+si+'_name'),v('shoe_'+si+'_thumb'),cws);
+  });
+  rebuildSigs(key, newSigs);
+}
+function delShoeLine(si, key) {
+  if (!confirm('Remove this shoe line?')) return;
+  var sigs=parseSigsList(key);
+  var newSigs=sigs.filter(function(_,i){ return i!==si; }).map(function(sm){ return sm.trim()+','; });
+  rebuildSigs(key, newSigs);
+}
+function addShoeLine(key) {
+  var sigs=parseSigsList(key);
+  sigs.push(sigToStr(v('new_shoe_name'),v('new_shoe_thumb'),[]));
+  rebuildSigs(key, sigs.map(function(s){ return typeof s==='string'&&!s.endsWith(',') ? s+',' : s; }));
+}
+function applyBrand(sigCount, key) {
+  var f=S.files[S.active]; var re2=new RegExp('\\n  '+key+':\\s*\\{');
+  var pidx=f.content.search(re2); if (pidx<0) return toast('Player not found');
+  var bm=f.content.slice(pidx).match(/brand:\s*'([^']*)'/); if (!bm) return;
+  var abs=pidx+bm.index;
+  f.content=f.content.slice(0,abs)+"brand: '"+v('shoes_brand')+"'"+f.content.slice(abs+bm[0].length);
+  markDirty(); toast('Brand updated \u2713',true);
+}
+
+// ─────────────────────────────────────────────────────
+//  PLAYER GAMES FORM
+// ─────────────────────────────────────────────────────
+function buildPGForm(content, key, pane) {
+  var re2=new RegExp('\\n  '+key+':\\s*\\[');
+  var idx=content.search(re2); if (idx<0) { pane.innerHTML='<div style="padding:20px;color:var(--muted)">Player not found</div>'; return; }
+  var ob=idx+content.slice(idx).search(/\[/);
+  var end=findArrayEnd(content,ob);
+  var block=content.slice(ob,end+1);
+  var games=block.match(/\{[^}]+\}/g)||[];
+
+  var s=sec('Game Log ('+games.length+' games)');
+  var b=secBody(s);
+  b.innerHTML='<div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:2">'
+    +games.slice(0,8).map(function(g){ return '<span style="color:var(--orange)">'+(ext(g,'season')||'?')+'</span> <span>'+(/type:'playoffs'/.test(g)?'PO':'RS')+'</span>'; }).join(' &middot; ')
+    +(games.length>8?' <span>...+'+(games.length-8)+' more</span>':'')
+    +'</div>';
   pane.appendChild(s);
 
-  pane.appendChild(sec('Add Game Entry',
-    row(fg('pg_season','Season','text','','2034-35'),
-        fg('pg_type','Type','select',
-          `<select id="pg_type"><option value="regular">Regular</option><option value="playoffs">Playoffs</option></select>`),
-        fg('pg_game','Game #','text','','(playoffs only)'),
-        fg('pg_opp','Opponent','text','','LAL')) +
-    row(fg('pg_result','Result','select',
-          `<select id="pg_result"><option value="W">Win</option><option value="L">Loss</option></select>`),
-        fg('pg_score','Score','text','','118-104'),
-        fg('pg_home','Home','checkbox',true)) +
-    row(fg('pg_pts','PTS','text','','24'),
-        fg('pg_reb','REB','text','','5'),
-        fg('pg_ast','AST','text','','8'),
-        fg('pg_stl','STL','text','','1'),
-        fg('pg_blk','BLK','text','','0'),
-        fg('pg_tov','TOV','text','','2'),
-        fg('pg_min','MIN','text','','36')) +
-    row(fg('pg_fgm','FGM','text','','9'),
-        fg('pg_fga','FGA','text','','18'),
-        fg('pg_tpm','3PM','text','','3'),
-        fg('pg_tpa','3PA','text','','7'),
-        fg('pg_ftm','FTM','text','','3'),
-        fg('pg_fta','FTA','text','','4'))
-  ));
-
-  const wrap = document.createElement('div');
-  wrap.className = 'form-actions';
-  wrap.appendChild(actBtn('+ Add Game', () => addPGRow(playerKey), 'success'));
-  pane.appendChild(wrap);
+  var s2=sec('Add Game Entry'); var b2=secBody(s2);
+  b2.appendChild(row([fg('pg_season','Season','text','','2034-35'), fgSel('pg_type','Type',[{v:'regular',l:'Regular'},{v:'playoffs',l:'Playoffs'}],'regular'), fg('pg_game','Game #','text','','(playoffs)'), fg('pg_opp','Opponent','text','','LAL'), fgSel('pg_result','Result',[{v:'W',l:'Win'},{v:'L',l:'Loss'}],'W'), fg('pg_score','Score','text','','118-104'), fg('pg_home','Home','checkbox',true)]));
+  b2.appendChild(row([fg('pg_pts','PTS','text','','24'), fg('pg_reb','REB','text','','5'), fg('pg_ast','AST','text','','8'), fg('pg_stl','STL','text','','1'), fg('pg_blk','BLK','text','','0'), fg('pg_tov','TOV','text','','2'), fg('pg_min','MIN','text','','36')]));
+  b2.appendChild(row([fg('pg_fgm','FGM','text','','9'), fg('pg_fga','FGA','text','','18'), fg('pg_tpm','3PM','text','','3'), fg('pg_tpa','3PA','text','','7'), fg('pg_ftm','FTM','text','','3'), fg('pg_fta','FTA','text','','4')]));
+  var btns=document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('+ Add Game', function(){ addPGRow(key); }, 'success'));
+  b2.appendChild(btns);
+  pane.appendChild(s2);
 }
 
-function addPGRow(playerKey) {
-  const f = S.files[S.active];
-  const gameField = v('pg_game') ? `, game:${v('pg_game')}` : '';
-  const row = `{ season:'${v('pg_season')}', type:'${v('pg_type')}'${gameField},\n  opp:'${v('pg_opp')}', result:'${v('pg_result')}', score:'${v('pg_score')}', home:${vc('pg_home')},\n  pts:${v('pg_pts')||0}, reb:${v('pg_reb')||0}, ast:${v('pg_ast')||0}, stl:${v('pg_stl')||0}, blk:${v('pg_blk')||0}, tov:${v('pg_tov')||0},\n  fgm:${v('pg_fgm')||0}, fga:${v('pg_fga')||0}, tpm:${v('pg_tpm')||0}, tpa:${v('pg_tpa')||0}, ftm:${v('pg_ftm')||0}, fta:${v('pg_fta')||0}, min:${v('pg_min')||0},\n},`;
-
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\[');
-  const idx = f.content.search(re);
-  if (idx < 0) return toast('Player not found');
-  const openBracket = idx + f.content.slice(idx).search(/\[/);
-  // Insert right after the opening bracket
-  f.content = f.content.slice(0, openBracket+1) + '\n\n' + row + f.content.slice(openBracket+1);
-  markDirty(); toast('Game added ✓', true);
-  buildFormPanel(f.content, f.type, playerKey);
+function addPGRow(key) {
+  var f=S.files[S.active];
+  var gf=v('pg_game'); var gField=gf?' game:'+(gf||0)+',':'';
+  var nr='{ season:\''+v('pg_season')+'\', type:\''+v('pg_type')+'\''+gField+'\n  opp:\''+v('pg_opp')+'\', result:\''+v('pg_result')+'\', score:\''+v('pg_score')+'\', home:'+vc('pg_home')+',\n  pts:'+(v('pg_pts')||0)+', reb:'+(v('pg_reb')||0)+', ast:'+(v('pg_ast')||0)+', stl:'+(v('pg_stl')||0)+', blk:'+(v('pg_blk')||0)+', tov:'+(v('pg_tov')||0)+',\n  fgm:'+(v('pg_fgm')||0)+', fga:'+(v('pg_fga')||0)+', tpm:'+(v('pg_tpm')||0)+', tpa:'+(v('pg_tpa')||0)+', ftm:'+(v('pg_ftm')||0)+', fta:'+(v('pg_fta')||0)+', min:'+(v('pg_min')||0)+',\n},';
+  var re2=new RegExp('\\n  '+key+':\\s*\\[');
+  var idx=f.content.search(re2); if (idx<0) return toast('Player not found');
+  var ob=idx+f.content.slice(idx).search(/\[/);
+  f.content=f.content.slice(0,ob+1)+'\n\n'+nr+f.content.slice(ob+1);
+  markDirty(); toast('Game added \u2713',true);
+  buildFormPanel(f.content,'player-games',key);
 }
 
-// ── TEAM STATS FORM ──
+// ─────────────────────────────────────────────────────
+//  TEAM STATS FORM
+// ─────────────────────────────────────────────────────
 function buildTSForm(content, season, pane) {
-  pane.appendChild(sec('Team Stats: ' + season,
-    `<div class="frow"><div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:1.9;padding:4px 0">
-    Team stats for this season are best edited in <strong style="color:var(--orange)">Table view</strong> or <strong style="color:var(--orange)">Code view</strong>.<br>
-    Switch using the buttons above. Code view shows the raw JS you can edit directly.
-    </div></div>`
-  ));
-  const wrap = document.createElement('div');
-  wrap.className = 'form-actions';
-  wrap.appendChild(actBtn('Open in Code View', () => setView('code')));
-  wrap.appendChild(actBtn('Open in Table View', () => setView('table')));
-  pane.appendChild(wrap);
-}
-
-function actBtn(label, fn, type='primary') {
-  const b = document.createElement('button');
-  b.className = 'btn btn-' + type;
-  b.textContent = label;
-  b.onclick = fn;
-  return b;
+  var s=sec('Team Stats: '+season); var b=secBody(s);
+  b.innerHTML='<div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);line-height:2">Team stats are best edited in Code View or Table View.<br>Switch using the tabs above.</div>';
+  var btns=document.createElement('div'); btns.className='form-actions';
+  btns.appendChild(actBtn('Open Code View', function(){ setView('code'); }));
+  btns.appendChild(actBtn('Open Table View', function(){ setView('table'); }));
+  b.appendChild(btns);
+  pane.appendChild(s);
 }
 
 // ══════════════════════════════════════════════════════
 //  TABLE PANEL
 // ══════════════════════════════════════════════════════
 function buildTablePanel(content, type, key) {
-  const pane = document.getElementById('table-panel');
-  pane.innerHTML = '';
-  if (type === 'player-stats') buildPSTable(content, key, pane);
-  else if (type === 'player-games') buildPGTable(content, key, pane);
-  else if (type === 'team-stats') buildTSTable(content, key, pane);
-  else if (type === 'league-history') buildLHTable(content, pane);
+  var pane=document.getElementById('table-panel'); pane.innerHTML='';
+  if (type==='player-stats') buildPSTable(content, key, pane);
+  else if (type==='player-games') buildPGTable(content, key, pane);
+  else if (type==='team-stats') buildTSTable(content, key, pane);
+  else if (type==='league-history') buildLHTable(content, pane);
 }
-
-function buildPSTable(content, playerKey, pane) {
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\{');
-  const idx = content.search(re);
-  if (idx < 0) return;
-  const openBrace = idx + content.slice(idx).search(/\{/);
-  const end = findBlockEnd(content, openBrace);
-  const block = content.slice(openBrace, end+1);
-
-  const cols = ['season','age','team','gp','gs','mpg','ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa'];
-  const rows = [...block.matchAll(/\{[^}]*season:'(\d{4}-\d{2,4})'[^}]*\}/gs)].map(m => {
-    const r = {};
-    cols.forEach(c => { r[c] = ext(m[0], c) || extNum(m[0], c); });
-    r._star = /star:true/.test(m[0]);
-    r._raw  = m[0];
-    r._type = /type:'playoffs'/.test(m[0]) ? 'PO' : 'RS';
-    return r;
-  });
-
-  pane.appendChild(makeTable(
-    ['','SEASON','TYPE','GP','GS','MPG','PPG','RPG','APG','SPG','BPG','TO','FG%','3P%','FT%','3PA'],
-    rows.map(r => [`${r._star?'★':''}`, r.season, r._type, r.gp, r.gs, r.mpg,
-      r.ppg, r.rpg, r.apg, r.spg, r.bpg, r.topg, r.fgp, r.tpp, r.ftp, r.tpa])
-  ));
-}
-
-function buildPGTable(content, playerKey, pane) {
-  const re = new RegExp('\\n  ' + playerKey + ':\\s*\\[');
-  const idx = content.search(re);
-  if (idx < 0) return;
-  const openBracket = idx + content.slice(idx).search(/\[/);
-  const end = findArrayEnd(content, openBracket);
-  const block = content.slice(openBracket, end+1);
-
-  const games = [...block.matchAll(/\{[^}]+\}/gs)].map(m => {
-    const g = m[0];
-    const seas = (g.match(/season:'([^']+)'/) || [])[1] || '';
-    const type = (g.match(/type:'([^']+)'/) || [])[1] || '';
-    const opp  = (g.match(/opp:'([^']+)'/) || [])[1] || '';
-    const res  = (g.match(/result:'([^']+)'/) || [])[1] || '';
-    const scr  = (g.match(/score:'([^']+)'/) || [])[1] || '';
-    return [seas, type.slice(0,2).toUpperCase(), opp, res, scr,
-      extNum(g,'pts'), extNum(g,'reb'), extNum(g,'ast'), extNum(g,'stl'),
-      extNum(g,'blk'), extNum(g,'tov'), extNum(g,'fgm')+'/'+extNum(g,'fga'),
-      extNum(g,'tpm')+'/'+extNum(g,'tpa'), extNum(g,'min')];
-  });
-
-  pane.appendChild(makeTable(
-    ['SEASON','TYPE','OPP','W/L','SCORE','PTS','REB','AST','STL','BLK','TOV','FG','3PT','MIN'],
-    games
-  ));
-}
-
-function buildTSTable(content, season, pane) {
-  const idx = content.indexOf(`"${season}":`);
-  if (idx < 0) return;
-  const end = findBlockEnd(content, content.indexOf('{', idx));
-  const block = content.slice(idx, end+1);
-
-  const rows = [...block.matchAll(/(\w+):\s*\{[^}]*record:\s*"([^"]+)"[^}]*pct:\s*"([^"]+)"[^}]*rank:\s*"([^"]+)"[^}]*playoffs:\s*"([^"]+)"/g)]
-    .map(m => [m[1], m[2], m[3], m[4], m[5]]);
-
-  pane.appendChild(makeTable(['TEAM SLUG','RECORD','PCT','RANK','PLAYOFFS'], rows));
-}
-
-function buildLHTable(content, pane) {
-  const entries = [...content.matchAll(/season:\s*'(\d{4}-\d{2,4})'/g)].map(m => {
-    const s = m[1];
-    const idx = content.indexOf(`season: '${s}'`);
-    const block = content.slice(content.lastIndexOf('{', idx), content.indexOf('},',idx)+2);
-    return [s, ext(block,'mvp'), ext(block,'roty'), ext(block,'dpoy'), ext(block,'champion'), ext(block,'finals_mvp')];
-  });
-  pane.appendChild(makeTable(['SEASON','MVP','ROTY','DPOY','CHAMPION','FINALS MVP'], entries));
-}
-
 function makeTable(headers, rows) {
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'overflow:auto;flex:1';
-  const t = document.createElement('table');
-  t.innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===0?'bold':''}">${c??''}</td>`).join('')}</tr>`).join('')}</tbody>`;
-  wrap.appendChild(t);
-  return wrap;
+  var wrap=document.createElement('div'); wrap.style.cssText='overflow:auto;flex:1;';
+  var t=document.createElement('table');
+  t.innerHTML='<thead><tr>'+headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead>'
+    +'<tbody>'+rows.map(function(r){ return '<tr>'+r.map(function(c,i){ return '<td'+(i===0?' class="bold"':'')+'>'+esc(String(c||''))+'</td>'; }).join('')+'</tr>'; }).join('')+'</tbody>';
+  wrap.appendChild(t); return wrap;
+}
+function buildPSTable(content, key, pane) {
+  var block=getPlayerBlock(content,key); if (!block) return;
+  var rows=parseRegular(block);
+  pane.appendChild(makeTable(['SEASON','AGE','TEAM','GP','GS','MPG','PPG','RPG','APG','SPG','BPG','TO','FG%','3P%','FT%','3PA'],
+    rows.map(function(r){ return [r.season,r.age,r.team,r.gp,r.gs,r.mpg,r.ppg,r.rpg,r.apg,r.spg,r.bpg,r.topg,r.fgp,r.tpp,r.ftp,r.tpa]; })));
+}
+function buildPGTable(content, key, pane) {
+  var re2=new RegExp('\\n  '+key+':\\s*\\[');
+  var idx=content.search(re2); if (idx<0) return;
+  var ob=idx+content.slice(idx).search(/\[/);
+  var end=findArrayEnd(content,ob);
+  var block=content.slice(ob,end+1);
+  var games=block.match(/\{[^}]+\}/g)||[];
+  var rows=games.map(function(g){ return [ext(g,'season'),/type:'playoffs'/.test(g)?'PO':'RS',ext(g,'opp'),ext(g,'result'),ext(g,'score'),extNum(g,'pts'),extNum(g,'reb'),extNum(g,'ast'),extNum(g,'stl'),extNum(g,'blk'),extNum(g,'tov'),extNum(g,'min')]; });
+  pane.appendChild(makeTable(['SEASON','TYPE','OPP','W/L','SCORE','PTS','REB','AST','STL','BLK','TOV','MIN'],rows));
+}
+function buildTSTable(content, season, pane) {
+  var idx=content.indexOf('"'+season+'":'); if (idx<0) return;
+  var end=findBlockEnd(content,content.indexOf('{',idx));
+  var block=content.slice(idx,end+1);
+  var rows=[]; var re2=/(\w+):\s*\{[^}]*record:\s*"([^"]+)"[^}]*pct:\s*"([^"]+)"[^}]*rank:\s*"([^"]+)"[^}]*playoffs:\s*"([^"]+)"/g; var m;
+  while ((m=re2.exec(block))!==null) rows.push([m[1],m[2],m[3],m[4],m[5]]);
+  pane.appendChild(makeTable(['TEAM SLUG','RECORD','PCT','RANK','PLAYOFFS'],rows));
+}
+function buildLHTable(content, pane) {
+  var rows=[]; var re2=/season:\s*'(\d{4}-\d{2,4})'/g; var m;
+  while ((m=re2.exec(content))!==null) {
+    var s2=m[1];
+    var idx=content.indexOf("season: '"+s2+"'");
+    var block=content.slice(content.lastIndexOf('{',idx),content.indexOf('},',idx)+2);
+    rows.push([s2,ext(block,'mvp'),ext(block,'roty'),ext(block,'dpoy'),ext(block,'champion'),ext(block,'finals_mvp')]);
+  }
+  pane.appendChild(makeTable(['SEASON','MVP','ROTY','DPOY','CHAMPION','FINALS MVP'],rows));
 }
 
 // ══════════════════════════════════════════════════════
@@ -1009,82 +1602,68 @@ function makeTable(headers, rows) {
 // ══════════════════════════════════════════════════════
 function openAddModal() {
   if (!S.active) return toast('Open a file first');
-  const f = S.files[S.active];
-  const type = f.type;
-  const modal = document.getElementById('add-modal');
-  const body  = document.getElementById('modal-body');
-  const title = document.getElementById('modal-title');
-  body.innerHTML = '';
+  var f=S.files[S.active]; var type=f.type;
+  var modal=document.getElementById('add-modal');
+  var body=document.getElementById('modal-body');
+  var title=document.getElementById('modal-title');
+  body.innerHTML='';
 
-  if (type === 'league-history') {
-    title.textContent = 'Add Season';
-    const awards = ['mvp','roty','dpoy','mip','sixmoty','finals_mvp'];
-    body.innerHTML = row(fg('new_season','Season','text','','2034-35'), fg('new_champion','Champion','text','','Golden State Warriors')) +
-      awards.map(a => row(fg(`new_${a}`,'Player ('+a+')','text','','Name'),fg(`new_${a}_team`,'Team','text','','Team'),fg(`new_${a}_hs`,'Headshot URL','text','','https://…'))).join('');
-  } else if (type === 'player-stats') {
-    title.textContent = 'Add Player';
-    body.innerHTML = row(fg('new_key','Player Key (no spaces)','text','','clark'),fg('new_name','Display Name','text','','Cooper Clark')) +
-      row(fg('new_height','Height','text','',"6'5\""),fg('new_weight','Weight','text','','210 lbs'),fg('new_college','College','text','','Duke')) +
-      row(fg('new_draftYear','Draft Year','text','','2021'),fg('new_draftPick','Draft Pick','text','','First Round, Fifth Pick'));
-  } else if (type === 'player-games') {
-    title.textContent = 'Add Player Log';
-    body.innerHTML = row(fg('new_pgkey','Player Key','text','','clark'));
+  if (type==='league-history') {
+    title.textContent='Add Season';
+    var d1=document.createElement('div'); d1.className='frow';
+    d1.appendChild(fg('new_season','Season','text','','2034-35'));
+    d1.appendChild(fg('new_champion','Champion','text','','Golden State Warriors'));
+    body.appendChild(d1);
+  } else if (type==='player-stats') {
+    title.textContent='Add Player';
+    var d2=document.createElement('div'); d2.className='frow';
+    d2.appendChild(fg('new_key','Player Key (no spaces)','text','','clark'));
+    d2.appendChild(fg('new_height','Height','text','',"6'5\""));
+    d2.appendChild(fg('new_weight','Weight','text','','210 lbs'));
+    body.appendChild(d2);
+  } else if (type==='player-games') {
+    title.textContent='Add Player Log';
+    var d3=document.createElement('div'); d3.className='frow';
+    d3.appendChild(fg('new_pgkey','Player Key','text','','clark'));
+    body.appendChild(d3);
   } else {
-    title.textContent = 'Add Season';
-    body.innerHTML = row(fg('new_ts_season','Season','text','','2037-38'));
+    title.textContent='Add Season';
+    var d4=document.createElement('div'); d4.className='frow';
+    d4.appendChild(fg('new_ts_season','Season','text','','2037-38'));
+    body.appendChild(d4);
   }
   modal.classList.add('on');
 }
-
 function closeModal() { document.getElementById('add-modal').classList.remove('on'); }
-
 function confirmAdd() {
-  const f = S.files[S.active];
-  const type = f.type;
-
-  if (type === 'league-history') {
-    const s = v('new_season');
-    const awards = ['mvp','roty','dpoy','mip','sixmoty','finals_mvp'];
-    let block = `\n  {\n    season: '${s}',\n`;
-    awards.forEach(a => {
-      if (a === 'finals_mvp') block += `    champion:   '${v('new_champion')}',\n`;
-      block += `    ${a}: '${v('new_'+a)}',  ${a}_team: '${v('new_'+a+'_team')}',  ${a}_headshot: '${v('new_'+a+'_hs')}',\n`;
-    });
-    block += `  },`;
-    f.content = f.content.replace(/\];\s*$/, block + '\n\n];');
-  } else if (type === 'player-stats') {
-    const key = v('new_key').trim();
-    const block = `\n\n  /* ─────────────── ${v('new_name').toUpperCase()} ─────────────── */\n  ${key}: {\n    info: {\n      height:    '${v('new_height')}',\n      weight:    '${v('new_weight')}',\n      age:       '—',\n      college:   '${v('new_college')}',\n      draftYear: '${v('new_draftYear')}',\n      draftPick: '${v('new_draftPick')}',\n      nickname:  '—',\n    },\n    retired: false,\n    regular: [],\n    playoffs: [],\n    totals: [],\n    jerseys: [],\n    awards: {},\n    careerHighs: [],\n    shoes: {},\n    contracts: {},\n  },`;
-    f.content = f.content.replace(/\n\};\s*$/, block + '\n\n};');
-  } else if (type === 'player-games') {
-    const key = v('new_pgkey').trim();
-    const block = `\n  ${key}: [\n  ],\n`;
-    f.content = f.content.replace(/\n\};\s*$/, block + '\n};');
-  } else if (type === 'team-stats') {
-    const s = v('new_ts_season');
-    const block = `\n  "${s}": {\n    /* Add teams here */\n  },\n`;
-    f.content = f.content.replace(/\n\};\s*$/, block + '\n};');
+  var f=S.files[S.active]; var type=f.type;
+  if (type==='league-history') {
+    var s2=v('new_season');
+    var nb="\n  {\n    season: '"+s2+"',\n    champion: '"+v('new_champion')+"',\n    mvp: '',  mvp_team: '',  mvp_headshot: '',\n    roty: '',  roty_team: '',  roty_headshot: '',\n    dpoy: '',  dpoy_team: '',  dpoy_headshot: '',\n    mip: '',  mip_team: '',  mip_headshot: '',\n    sixmoty: '',  sixmoty_team: '',  sixmoty_headshot: '',\n    finals_mvp: '',  finals_mvp_team: '',  finals_mvp_headshot: '',\n  },";
+    f.content=f.content.replace(/\];\s*$/,nb+'\n\n];');
+  } else if (type==='player-stats') {
+    var k2=v('new_key').trim();
+    var nb2="\n\n  "+k2+": {\n    info: { height: '"+v('new_height')+"', weight: '"+v('new_weight')+"', age: '-', college: '-', draftYear: '-', draftPick: '-', nickname: '-' },\n    retired: false,\n    regular: [],\n    playoffs: [],\n    totals: [],\n    jerseys: [],\n    awards: {},\n    careerHighs: [],\n    playoffCareerHighs: [],\n    shoes: { brand: '', sigs: [] },\n    contracts: { signings: [], trades: [], seasons: [] },\n  },";
+    f.content=f.content.replace(/\n\};\s*$/,nb2+'\n\n};');
+  } else if (type==='player-games') {
+    var k3=v('new_pgkey').trim();
+    f.content=f.content.replace(/\n\};\s*$/,'\n  '+k3+': [\n  ],\n\n};');
+  } else {
+    var ss=v('new_ts_season');
+    f.content=f.content.replace(/\n\};\s*$/,'\n  "'+ss+'": {\n  },\n\n};');
   }
-
-  markDirty();
-  closeModal();
-  buildSidebar();
-  toast('Entry added ✓', true);
+  markDirty(); closeModal(); buildSidebar(); toast('Entry added \u2713',true);
 }
 
 // ══════════════════════════════════════════════════════
 //  DELETE ENTRY
 // ══════════════════════════════════════════════════════
 function deleteEntry() {
-  if (!S.entry || !confirm(`Delete "${S.entry}"?`)) return;
-  const f = S.files[S.active];
-  const raw = extractRaw(f.content, f.type, S.entry);
-  if (raw) f.content = f.content.replace(raw, '').replace(/\n{3,}/g, '\n\n');
-  markDirty();
-  S.entry = null;
-  buildSidebar();
-  showEmpty();
-  toast('Deleted', true);
+  if (!S.entry||!confirm('Delete "'+S.entry+'"?')) return;
+  var f=S.files[S.active];
+  var raw=extractRaw(f.content,f.type,S.entry);
+  if (raw) f.content=f.content.replace(raw,'').replace(/\n{3,}/g,'\n\n');
+  markDirty(); S.entry=null; buildSidebar(); showEmpty(); toast('Deleted',true);
 }
 
 // ══════════════════════════════════════════════════════
@@ -1092,63 +1671,45 @@ function deleteEntry() {
 // ══════════════════════════════════════════════════════
 function saveFile() {
   if (!S.active) return toast('No file loaded');
-  const f = S.files[S.active];
-  // If code view is active, sync textarea back to content
-  if (S.view === 'code') {
-    f.content = document.getElementById('code-ta').value;
-  }
-  const blob = new Blob([f.content], { type: 'text/javascript' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = S.active;
-  a.click();
+  var f=S.files[S.active];
+  if (S.view==='code') f.content=document.getElementById('code-ta').value;
+  var blob=new Blob([f.content],{type:'text/javascript'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download=S.active; a.click();
   URL.revokeObjectURL(url);
-  f.dirty = false;
-  refreshChips();
-  toast('Downloaded: ' + S.active, true);
+  f.dirty=false; refreshChips(); toast('Downloaded: '+S.active,true);
 }
 
 // ══════════════════════════════════════════════════════
-//  UTILS
+//  UTILITIES
 // ══════════════════════════════════════════════════════
 function markDirty() {
   if (!S.active) return;
-  S.files[S.active].dirty = true;
-  document.querySelectorAll('.file-chip').forEach(c => {
-    if (c.dataset.name === S.active) c.classList.add('dirty');
-  });
-  setStatus('Unsaved changes — click Download to save', 'w');
+  S.files[S.active].dirty=true;
+  document.querySelectorAll('.file-chip').forEach(function(c){ if (c.dataset.name===S.active) c.classList.add('dirty'); });
+  setStatus('Unsaved changes \u2014 click Download to save','w');
 }
-
-let toastTimer;
-function toast(msg, ok=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'on' + (ok ? ' g' : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.className = '', 2400);
+var toastTimer;
+function toast(msg, ok) {
+  var t=document.getElementById('toast'); t.textContent=msg;
+  t.className='on'+(ok?' g':'');
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.className=''; },2400);
 }
-
-function setStatus(msg, type='ok') {
-  const el = document.getElementById('st-msg');
-  el.textContent = msg;
-  el.className = { ok:'st-ok', w:'st-w', e:'st-e' }[type] || 'st-ok';
+function setStatus(msg, type) {
+  var el=document.getElementById('st-msg'); el.textContent=msg;
+  el.className={ok:'st-ok',w:'st-w',e:'st-e'}[type]||'st-ok';
 }
-
 function handleTab(e) {
-  if (e.key === 'Tab') {
+  if (e.key==='Tab') {
     e.preventDefault();
-    const ta = e.target;
-    const s = ta.selectionStart;
-    ta.value = ta.value.slice(0, s) + '  ' + ta.value.slice(ta.selectionEnd);
-    ta.selectionStart = ta.selectionEnd = s + 2;
+    var ta=e.target, s=ta.selectionStart;
+    ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+2;
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+  if ((e.ctrlKey||e.metaKey)&&e.key==='s') { e.preventDefault(); saveFile(); }
 }
-
-// Apply code edits on Ctrl+Enter
-document.getElementById('code-ta').addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); applyCodeEdit(); }
+document.getElementById('code-ta').addEventListener('keydown', function(e) {
+  if ((e.ctrlKey||e.metaKey)&&e.key==='Enter') { e.preventDefault(); applyCodeEdit(); }
 });
 
 // ══════════════════════════════════════════════════════
@@ -1156,7 +1717,7 @@ document.getElementById('code-ta').addEventListener('keydown', e => {
 // ══════════════════════════════════════════════════════
 initFileInputs();
 initDrop();
-document.getElementById('file-input2').onchange = e => loadFileList(Array.from(e.target.files));
+
 </script>
 </body>
 </html>
