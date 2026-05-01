@@ -218,6 +218,11 @@
     .splits-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .splits-card-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:blink 1.8s ease-in-out infinite; }
     .splits-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
+    /* Toggle inside card header — compact sizing, explicit bg to prevent inheritance */
+    .splits-card-header .splits-toggle { border-color:var(--border); }
+    .splits-card-header .splits-toggle-btn { padding:5px 12px; font-size:.58rem; letter-spacing:.08em; background:transparent; }
+    .splits-card-header .splits-toggle-btn.active { background:var(--orange); color:#fff; }
+    .splits-card-header .splits-toggle-btn:hover:not(.active) { background:rgba(231,87,25,.15); }
 
     /* Scroll wrapper */
     .splits-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--orange) transparent; touch-action:pan-x pan-y; }
@@ -267,8 +272,7 @@
     .charts-section { margin-top:52px; }
     .charts-section-header { margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid var(--border); }
     .charts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
-    .chart-card { border:1px solid var(--border); border-radius:0; background:var(--bg-card); overflow:hidden; transition:background .35s, border-color .2s; }
-    .chart-card:hover { border-color:rgba(231,87,25,.25); }
+    .chart-card { border:1px solid var(--border); border-radius:0; background:var(--bg-card); overflow:hidden; transition:background .35s; }
     .chart-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .chart-card-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); }
     .chart-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
@@ -554,6 +558,19 @@
     }
 
     /* ══ END PLAYSTYLE ══ */
+
+    /* ══ PERCENTILE / SCOUTING REPORT ══ */
+    .pct-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid var(--border-soft); }
+    .pct-row:last-child { border-bottom:none; }
+    .pct-stat { font-family:var(--font-mono); font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); width:68px; flex-shrink:0; }
+    .pct-val  { font-family:var(--font-mono); font-size:.62rem; color:var(--text); width:44px; flex-shrink:0; text-align:right; }
+    .pct-bar-wrap { flex:1; height:8px; background:var(--border-soft); position:relative; }
+    .pct-bar  { height:100%; transition:width .5s ease; }
+    .pct-num  { font-family:var(--font-mono); font-size:.6rem; width:28px; flex-shrink:0; text-align:right; font-weight:600; }
+    /* ══ END PERCENTILE ══ */
+    .year-arrow-btn { background:transparent; border:1px solid var(--border); color:var(--text-muted); width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:.7rem; transition:color .2s, border-color .2s; flex-shrink:0; padding:0; }
+    .year-arrow-btn:hover { color:var(--orange); border-color:var(--orange); }
+    .year-arrow-btn:disabled { opacity:.3; cursor:default; }
     .contracts-layout { display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start; }
     /* Grid children must have min-width:0 so overflow-x:auto works inside them */
     .contracts-layout > div { min-width: 0; }
@@ -2041,14 +2058,17 @@
       <div class="content-panel" id="panel-traditional-splits">
 
         <!-- PER GAME -->
-        <div class="splits-controls">
-          <div class="splits-toggle" id="pg-toggle">
-            <button class="splits-toggle-btn active" data-scope="pg" data-mode="regular">Regular Season</button>
-            <button class="splits-toggle-btn" data-scope="pg" data-mode="playoffs">Playoffs</button>
-          </div>
-        </div>
         <div class="splits-card">
-          <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title" id="pg-table-label">Regular Season · Per Game</span></div>
+          <div class="splits-card-header">
+            <div class="splits-card-dot"></div>
+            <span class="splits-card-title" id="pg-table-label">Regular Season · Per Game</span>
+            <div style="margin-left:auto;">
+              <div class="splits-toggle" id="pg-toggle">
+                <button class="splits-toggle-btn active" data-scope="pg" data-mode="regular">Regular Season</button>
+                <button class="splits-toggle-btn" data-scope="pg" data-mode="playoffs">Playoffs</button>
+              </div>
+            </div>
+          </div>
           <div class="splits-scroll"><table class="splits-table" id="pg-table"></table></div>
           <div class="college-footnote" id="pg-footnote" style="padding:8px 16px 10px;display:none;"><span>*</span> Non-NBA season, excluded from career averages.</div>
         </div>
@@ -2068,7 +2088,7 @@
             <div class="chart-card wide">
               <div class="chart-card-header">
                 <div class="chart-card-dot"></div>
-                <span class="chart-card-title">Stat Progression · Regular Season</span>
+                <span class="chart-card-title" id="progression-chart-title">Points Per Game</span>
                 <div style="margin-left:auto;">
                   <select class="chart-select" id="progression-stat-select">
                     <option value="ppg">PPG</option>
@@ -2084,24 +2104,36 @@
                   </select>
                 </div>
               </div>
-              <div class="chart-card-body"><canvas id="chart-progression"></canvas></div>
+              <div class="chart-card-body"><canvas id="chart-progression" style="cursor:crosshair;"></canvas></div>
             </div>
 
-            <!-- CHART 3: Ratio comparison bars -->
-            <div class="chart-card wide" id="compare-card">
-              <div class="chart-card-header" style="flex-wrap:nowrap;gap:8px;overflow-x:auto;min-width:0;">
-                <div class="chart-card-dot" style="flex-shrink:0;"></div>
-                <span class="chart-card-title" style="flex-shrink:0;">Player Comparison</span>
-                <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:nowrap;align-items:center;flex-shrink:0;">
-                  <span id="compare-player-a-label" style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.08em;color:var(--orange);font-weight:700;white-space:nowrap;flex-shrink:0;"></span>
-                  <select class="chart-select" id="compare-year-a" style="min-width:0;flex:1 1 80px;max-width:120px;"></select>
-                  <span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);">vs</span>
-                  <select class="chart-select" id="compare-player-b" style="min-width:0;flex:1 1 100px;max-width:160px;"></select>
-                  <select class="chart-select" id="compare-year-b" style="min-width:0;flex:1 1 80px;max-width:120px;"></select>
+            <!-- CHART 2: Position pie chart (half width) -->
+            <div class="chart-card" id="position-pie-card">
+              <div class="chart-card-header">
+                <div class="chart-card-dot"></div>
+                <span class="chart-card-title">Time at Position</span>
+              </div>
+              <div class="chart-card-body" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:24px 32px;height:auto;min-height:260px;">
+                <div style="position:relative;flex-shrink:0;width:200px;height:200px;">
+                  <canvas id="chart-position-pie" width="200" height="200" style="display:block;cursor:crosshair;width:200px;height:200px;"></canvas>
+                </div>
+                <div id="position-pie-legend" style="display:flex;flex-direction:column;gap:14px;"></div>
+              </div>
+            </div>
+
+            <!-- CHART 3: Scouting / Percentile report -->
+            <div class="chart-card" id="percentile-card">
+              <div class="chart-card-header" style="flex-wrap:wrap;gap:8px;">
+                <div class="chart-card-dot"></div>
+                <span class="chart-card-title">Scouting Report</span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+                  <img id="percentile-team-logo" src="" alt="" style="width:22px;height:22px;object-fit:contain;display:none;flex-shrink:0;">
+                  <button id="percentile-year-prev" class="year-arrow-btn">&#8592;</button>
+                  <select class="chart-select" id="percentile-year-select"></select>
+                  <button id="percentile-year-next" class="year-arrow-btn">&#8594;</button>
                 </div>
               </div>
-              <!-- Custom ratio bar chart — no canvas needed -->
-              <div id="compare-ratio-chart" style="padding:20px 24px 16px;"></div>
+              <div id="percentile-body" style="padding:16px 20px;overflow-y:auto;max-height:420px;"></div>
             </div>
 
           </div>
@@ -2136,6 +2168,9 @@
       <li><a href="history.html">History</a></li><li><a href="other.html">Other</a></li>
     </ul>
   </footer>
+
+  <!-- Global pie tooltip — fixed position so it's never clipped -->
+  <div id="pie-tooltip" style="display:none;position:fixed;pointer-events:none;z-index:9999;"></div>
 
   <script src="shared.js"></script>
   <script>
@@ -2951,7 +2986,7 @@
   function renderTotalsTable(key) {
     var data=(PLAYER_STATS[key]||{}).totals||[];
     var table=document.getElementById('totals-table');
-    var COLS=['SEASON','AGE','TEAM','PTS','REB','AST','STL','BLK','TOV','FGM','FGA','3PM','3PA','FTM','FTA','MIN','GS','GP','DD','TD'];
+    var COLS=['SEASON','AGE','TEAM','POS','PTS','REB','AST','STL','BLK','TOV','FGM','FGA','3PM','3PA','FTM','FTA','MIN','GS','GP','DD','TD'];
     var thead='<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
@@ -2961,9 +2996,10 @@
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
       var teamTd = isCollege ? row.team : teamCell(row.team, row.season);
       var trClass = isCollege ? ' class="college-row"' : '';
+      var posVal = row.pos || '—';
       tbody+='<tr'+trClass+' data-orig="'+idx+'"'+(isCollege?' data-college="1"':'')+'>'+
         '<td>'+(isCollege?'<span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span>':fmtSeason(row.season)+icons)+'</td>'+
-        '<td>'+row.age+'</td><td>'+teamTd+'</td>';
+        '<td>'+row.age+'</td><td>'+teamTd+'</td><td style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;">'+posVal+'</td>';
       tbody+='<td class="hi">'+row.pts+'</td>';
       ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){ tbody+='<td>'+(row[k]||0)+'</td>'; });
       tbody+='</tr>';
@@ -2972,7 +3008,7 @@
     if(valid.length){
       var sums={pts:0,reb:0,ast:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,min:0,gs:0,gp:0,dd:0,td:0};
       valid.forEach(function(r){ Object.keys(sums).forEach(function(k){ sums[k]+=(r[k]||0); }); });
-      tbody+='<tr class="career-row" data-career="1"><td>Career</td><td></td><td></td><td class="hi">'+sums.pts+'</td>';
+      tbody+='<tr class="career-row" data-career="1"><td>Career</td><td></td><td></td><td></td><td class="hi">'+sums.pts+'</td>';
       ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){ tbody+='<td>'+sums[k]+'</td>'; });
       tbody+='</tr>';
     }
@@ -3045,7 +3081,7 @@
   }
 
   function legendOpts(c) {
-    return { labels:{color:c.text,font:{family:"'Share Tech Mono',monospace",size:10},boxWidth:12} };
+    return { display:false }; // hidden — we use the card header title instead
   }
 
   /* ── STAT ROW VALUE GETTER ── */
@@ -3060,6 +3096,12 @@
 
   function statLabel(stat) {
     return {ppg:'PPG',rpg:'RPG',apg:'APG',spg:'SPG',bpg:'BPG',topg:'TOPG',mpg:'MPG',fgp:'FG%',tpp:'3P%',ftp:'FT%'}[stat]||stat.toUpperCase();
+  }
+
+  function statFullName(stat) {
+    return {ppg:'Points Per Game',rpg:'Rebounds Per Game',apg:'Assists Per Game',
+            spg:'Steals Per Game',bpg:'Blocks Per Game',topg:'Turnovers Per Game',
+            mpg:'Minutes Per Game',fgp:'Field Goal %',tpp:'Three Point %',ftp:'Free Throw %'}[stat]||stat.toUpperCase();
   }
 
   /* ── WEIGHTED AVG ROW ── */
@@ -3088,16 +3130,133 @@
     var valid=data.filter(isProRow);
     if(!valid.length) return;
     var c=chartColors();
-    var ctx=document.getElementById('chart-progression').getContext('2d');
-    activeCharts['prog']=new Chart(ctx,{
-      type:'line',
-      data:{ labels:valid.map(function(r){ return fmtSeason(r.season); }),
-        datasets:[{ label:statLabel(stat), data:valid.map(function(r){ return getStatVal(r,stat); }),
-          borderColor:c.orange, backgroundColor:c.orangeFade, tension:.35, fill:true,
-          pointBackgroundColor:c.orange, pointRadius:4, pointHoverRadius:7 }]},
-      options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:legendOpts(c) }, scales:baseScales(c) }
+
+    // Update card header title
+    var titleEl=document.getElementById('progression-chart-title');
+    if(titleEl) titleEl.textContent=statFullName(stat);
+
+    // Build per-point team color arrays
+    var pointColors = valid.map(function(r) {
+      var tn = teamFull(r.team||'');
+      var tc = tn ? TEAM_BANNER_COLORS[tn] : null;
+      return tc ? tc.primary : c.orange;
     });
+    // Per-point fade (for fill) — 30% opacity of primary color
+    var pointFades = valid.map(function(r) {
+      var tn = teamFull(r.team||'');
+      var tc = tn ? TEAM_BANNER_COLORS[tn] : null;
+      var hex = tc ? tc.primary : '#e75719';
+      var ri=parseInt(hex.slice(1,3),16), gi=parseInt(hex.slice(3,5),16), bi=parseInt(hex.slice(5,7),16);
+      return 'rgba('+ri+','+gi+','+bi+',.18)';
+    });
+
+    // Build lookup: season label → row + index
+    var rowByLabel={};
+    valid.forEach(function(r,i){ rowByLabel[fmtSeason(r.season)]={ row:r, idx:i }; });
+
+    // External tooltip element
+    var tooltipEl=document.getElementById('prog-tooltip');
+    if(!tooltipEl){
+      tooltipEl=document.createElement('div');
+      tooltipEl.id='prog-tooltip';
+      tooltipEl.style.cssText=
+        'position:fixed;pointer-events:none;z-index:9999;display:none;'+
+        'padding:8px 12px;min-width:120px;'+
+        'box-shadow:0 4px 18px rgba(0,0,0,.35);';
+      document.body.appendChild(tooltipEl);
+    }
+
+    function externalTooltip(context){
+      var tt=context.tooltip;
+      if(tt.opacity===0){ tooltipEl.style.display='none'; return; }
+
+      var isLightNow=document.documentElement.classList.contains('light');
+      var bg      = isLightNow ? '#ffffff' : '#0e0b2e';
+      var border  = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
+      var textMain= isLightNow ? '#0e0b2e' : '#ffffff';
+      var textMuted=isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+
+      var label = tt.dataPoints&&tt.dataPoints[0]?tt.dataPoints[0].label:'';
+      var entry = rowByLabel[label];
+      var row   = entry ? entry.row : null;
+      var idx   = entry ? entry.idx : 0;
+      var rawVal= tt.dataPoints&&tt.dataPoints[0]?tt.dataPoints[0].raw:0;
+      var isPct =(stat==='fgp'||stat==='tpp'||stat==='ftp');
+      var displayVal=isPct?rawVal.toFixed(1)+'%':rawVal.toFixed(1);
+      var teamRaw=row?row.team:'';
+      var teamName=teamRaw?teamFull(teamRaw):'';
+      var logoUrl=teamName?(TEAM_LOGOS[teamName]||''):'';
+      // Use team primary color for the value
+      var tn = teamName ? TEAM_BANNER_COLORS[teamName] : null;
+      var accentColor = tn ? tn.primary : c.orange;
+
+      tooltipEl.style.background=bg;
+      tooltipEl.style.border='1px solid '+border;
+      tooltipEl.innerHTML=
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+          (logoUrl?'<img src="'+logoUrl+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">':'')+
+          '<div style="flex:1;min-width:0;">'+
+            '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMuted+';">'+label+'</div>'+
+            '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+teamName+'</div>'+
+          '</div>'+
+          '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:'+textMain+';line-height:1;flex-shrink:0;padding-left:8px;">'+displayVal+'</div>'+
+        '</div>';
+
+      tooltipEl.style.display='block';
+      var canvas=context.chart.canvas;
+      var rect=canvas.getBoundingClientRect();
+      var x=rect.left+tt.caretX+14;
+      var y=rect.top+tt.caretY-20;
+      if(x+180>window.innerWidth) x=rect.left+tt.caretX-180-14;
+      tooltipEl.style.left=x+'px';
+      tooltipEl.style.top=y+'px';
+    }
+
+    var ctx2=document.getElementById('chart-progression').getContext('2d');
+    activeCharts['prog']=new Chart(ctx2,{
+      type:'line',
+      data:{
+        labels:valid.map(function(r){ return fmtSeason(r.season); }),
+        datasets:[{
+          label:statLabel(stat),
+          data:valid.map(function(r){ return getStatVal(r,stat); }),
+          // Segment coloring — each segment takes color of the point it arrives at (p1)
+          // so the color change appears to the LEFT of each dot
+          borderColor: function(ctx3) {
+            var i = ctx3.p1DataIndex !== undefined ? ctx3.p1DataIndex : 0;
+            return pointColors[i] || c.orange;
+          },
+          segment:{
+            borderColor: function(ctx3){
+              var i = ctx3.p1DataIndex !== undefined ? ctx3.p1DataIndex : 0;
+              return pointColors[i] || c.orange;
+            },
+            backgroundColor: function(ctx3){
+              var i = ctx3.p1DataIndex !== undefined ? ctx3.p1DataIndex : 0;
+              return pointFades[i] || c.orangeFade;
+            }
+          },
+          backgroundColor: pointFades[0] || c.orangeFade,
+          tension:.35, fill:true,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: pointColors,
+          pointRadius:4, pointHoverRadius:7,
+          pointHitRadius:28
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:legendOpts(c),
+          tooltip:{ enabled:false, external:externalTooltip }
+        },
+        scales:baseScales(c)
+      }
+    });
+
+    var canvasEl=document.getElementById('chart-progression');
+    canvasEl.onmouseleave=function(){ tooltipEl.style.display='none'; };
   }
 
   /* ══ CHART 2: RADAR ══ */
@@ -3154,222 +3313,472 @@
         || null;
   }
 
-  function populateCompareDropdowns(activeKey) {
-    var labelA = document.getElementById('compare-player-a-label');
-    var selYA  = document.getElementById('compare-year-a');
-    var selB   = document.getElementById('compare-player-b');
-    var selYB  = document.getElementById('compare-year-b');
-    if (!labelA||!selYA||!selB||!selYB) return;
 
-    // ── Player A: locked to current page player ──
-    if (labelA) labelA.textContent = PLAYERS[activeKey] ? PLAYERS[activeKey].name : '';
-
-    // ── Year A: populate from active player's seasons ──
-    function fillYears(sel, key) {
-      var prev = sel.value;
-      sel.innerHTML = '<option value="">—</option>';
-      if (!key) return;
-      var data  = (PLAYER_STATS[key]||{}).regular||[];
-      var valid = data.filter(isProRow);
-      valid.forEach(function(r){
-        var o=document.createElement('option'); o.value=r.season; o.textContent=fmtSeason(r.season);
-        sel.appendChild(o);
-      });
-      if (prev && sel.querySelector('option[value="'+prev+'"]')) sel.value=prev;
-    }
-
-    fillYears(selYA, activeKey);
-    selYA.value = '';
-
-    // ── Player B ──
-    selB.innerHTML = '<option value="">—</option>';
-    Object.keys(PLAYERS).forEach(function(k){
-      var o=document.createElement('option');
-      o.value=k; o.textContent=PLAYERS[k].name;
-      selB.appendChild(o);
-    });
-
-    // ── Year B ──
-    selYB.innerHTML = '<option value="">—</option>';
-
-    function enforceNoSameSeason() {
-      var yA=selYA.value, pB=selB.value;
-      Array.from(selYB.options).forEach(function(o){ o.disabled=false; });
-      // Block same player + same year
-      if (pB===activeKey && yA && yA!=='') {
-        var matchOpt = selYB.querySelector('option[value="'+yA+'"]');
-        if (matchOpt) { matchOpt.disabled=true; if(selYB.value===yA) selYB.value=''; }
-      }
-    }
-
-    selYA.onchange = function() {
-      enforceNoSameSeason();
-      buildCompareChart(activeKey);
-    };
-    selB.onchange = function() {
-      fillYears(selYB, selB.value);
-      selYB.value = '';
-      enforceNoSameSeason();
-      buildCompareChart(activeKey);
-    };
-    selYB.onchange = function() {
-      enforceNoSameSeason();
-      buildCompareChart(activeKey);
-    };
-  }
-
-  // Award comparison helpers
-  function getAwardCount(key, awardTitleFragment) {
-    var awards = (PLAYER_STATS[key]||{}).awards||{};
-    var all = (awards.nba||[]).concat(awards.college||[]).concat(awards.misc||[]);
-    for (var i=0; i<all.length; i++) {
-      if ((all[i].title||'').toLowerCase().indexOf(awardTitleFragment.toLowerCase()) !== -1) {
-        return (all[i].years||[]).length || 1;
-      }
-    }
-    return 0;
-  }
-
-  function getAllAwardRows(key) {
-    var awards = (PLAYER_STATS[key]||{}).awards||{};
-    var out = [];
-    ['nba','college','misc'].forEach(function(cat) {
-      (awards[cat]||[]).forEach(function(a){ out.push(a); });
-    });
-    return out;
-  }
-
-  var AWARD_COMPARE = [
-    { key:'champion',        label:'Championships 🏆', higher:true },
-    { key:'most valuable',   label:'MVPs 👑',           higher:true },
-    { key:'finals mvp',      label:'Finals MVPs',       higher:true },
-    { key:'all-nba first',   label:'All-NBA 1st',       higher:true },
-    { key:'all-nba second',  label:'All-NBA 2nd',       higher:true },
-    { key:'all-nba third',   label:'All-NBA 3rd',       higher:true },
-    { key:'all-defense first',label:'All-Def 1st',      higher:true },
-    { key:'all-defense second',label:'All-Def 2nd',     higher:true },
-    { key:'all-star',        label:'All-Star Apps',     higher:true },
-    { key:'hall of fame',    label:'Hall of Fame 🏛️',   higher:true },
-    { key:'gold medal',      label:'Gold Medals 🥇',    higher:true },
-  ];
-
-  function buildCompareChart(activeKey) {
-    var wrap = document.getElementById('compare-ratio-chart');
-    if (!wrap) return;
-
-    var pAkey = activeKey;
-    var yearA = document.getElementById('compare-year-a')&&document.getElementById('compare-year-a').value;
-    var pBkey = document.getElementById('compare-player-b')&&document.getElementById('compare-player-b').value;
-    var yearB = document.getElementById('compare-year-b')&&document.getElementById('compare-year-b').value;
-
-    // Show placeholder if not enough selected
-    if (!pAkey || !yearA || !pBkey || !yearB) {
-      var isLight2 = document.documentElement.classList.contains('light');
-      var mc = isLight2 ? 'rgba(42,33,64,0.35)' : 'rgba(208,208,208,0.35)';
-      wrap.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:'+mc+';">Select a player and year for each side</div>';
-      return;
-    }
-
-    var rowA = getRowForYear(pAkey, yearA);
-    var rowB = getRowForYear(pBkey, yearB);
-
-    var isLight = document.documentElement.classList.contains('light');
-    var textColor  = isLight ? '#2a2140' : '#d0d0d0';
-    var mutedColor = isLight ? 'rgba(42,33,64,0.45)' : 'rgba(208,208,208,0.45)';
-    var borderColor= isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
-    var winBoxA    = isLight ? 'rgba(231,87,25,0.18)' : 'rgba(231,87,25,0.25)';
-    var winBoxB    = isLight ? 'rgba(35,26,165,0.15)'  : 'rgba(35,26,165,0.28)';
-
-    var ORANGE      = '#e75719';
-    var BLUE        = '#231aa5';
-    var ORANGE_FADE = 'rgba(231,87,25,0.80)';
-    var BLUE_FADE   = 'rgba(35,26,165,0.75)';
-
-    var isMobile = window.innerWidth < 600;
-    var nameA = isMobile ? PLAYERS[pAkey].name.split(' ')[0] : PLAYERS[pAkey].name;
-    var nameB = isMobile ? PLAYERS[pBkey].name.split(' ')[0] : PLAYERS[pBkey].name;
-    var labelA = nameA + ' · ' + (yearA==='career' ? 'Career' : fmtSeason(yearA));
-    var labelB = nameB + ' · ' + (yearB==='career' ? 'Career' : fmtSeason(yearB));
-
-    // ── Legend ──
-    var legend = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:0 8px;">'
-      + '<div style="display:flex;align-items:center;gap:8px;">'
-        + '<div style="width:12px;height:12px;border-radius: 0;background:'+ORANGE_FADE+';flex-shrink:0;"></div>'
-        + '<span style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+textColor+';">'+labelA+'</span>'
-      + '</div>'
-      + '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:'+mutedColor+';">vs</div>'
-      + '<div style="display:flex;align-items:center;gap:8px;">'
-        + '<span style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+textColor+';">'+labelB+'</span>'
-        + '<div style="width:12px;height:12px;border-radius: 0;background:'+BLUE_FADE+';flex-shrink:0;"></div>'
-      + '</div>'
-    + '</div>';
-
-    // ── Stat rows ──
-    function statRow(dispA, dispB, label, aWins, bWins, pctA, pctB) {
-      var boxA = aWins ? 'background:'+winBoxA+';border:1px solid rgba(231,87,25,.4);border-radius: 0;padding:1px 5px;' : '';
-      var boxB = bWins ? 'background:'+winBoxB+';border:1px solid rgba(35,26,165,.4);border-radius: 0;padding:1px 5px;' : '';
-      var html = '<div style="display:flex;align-items:center;gap:0;margin-bottom:4px;">';
-      html += '<div style="width:68px;text-align:right;padding-right:8px;flex-shrink:0;">';
-      html += '<span style="font-family:var(--font-display);font-weight:700;font-size:.92rem;color:'+ORANGE+';'+boxA+'">'+dispA+'</span>';
-      html += '</div>';
-      html += '<div style="flex:1;height:26px;display:flex;border-radius: 0;overflow:hidden;">';
-      html += '<div style="width:'+pctA.toFixed(2)+'%;background:'+ORANGE_FADE+';transition:width .4s ease;"></div>';
-      html += '<div style="width:'+pctB.toFixed(2)+'%;background:'+BLUE_FADE+';transition:width .4s ease;"></div>';
-      html += '</div>';
-      html += '<div style="width:68px;text-align:left;padding-left:8px;flex-shrink:0;">';
-      html += '<span style="font-family:var(--font-display);font-weight:700;font-size:.92rem;color:'+BLUE+';'+boxB+'">'+dispB+'</span>';
-      html += '</div>';
-      html += '</div>';
-      html += '<div style="display:flex;margin-bottom:10px;">';
-      html += '<div style="width:68px;"></div>';
-      html += '<div style="flex:1;text-align:center;font-family:var(--font-mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:'+mutedColor+';">'+label+'</div>';
-      html += '<div style="width:68px;"></div>';
-      html += '</div>';
-      return html;
-    }
-
-    var rows = '';
-
-    // ── Stat section header ──
-    rows += '<div style="font-family:var(--font-mono);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:'+mutedColor+';text-align:center;padding:4px 0 12px;border-top:1px solid '+borderColor+';">Per Game Stats</div>';
-
-    COMPARE_STATS.forEach(function(stat, i) {
-      var vA = rowA ? getStatVal(rowA, stat) : 0;
-      var vB = rowB ? getStatVal(rowB, stat) : 0;
-      var total = vA + vB;
-      var pctA = total > 0 ? (vA / total * 100) : 50;
-      var pctB = total > 0 ? (vB / total * 100) : 50;
-      var isPct = (stat==='fgp'||stat==='tpp'||stat==='ftp');
-      var dispA = isPct ? fmt1(vA)+'%' : fmt1(vA);
-      var dispB = isPct ? fmt1(vB)+'%' : fmt1(vB);
-      var aWins = vA > vB, bWins = vB > vA;
-      if (stat==='topg') { aWins=vA<vB; bWins=vB<vA; }
-      rows += statRow(dispA, dispB, COMPARE_LABELS[i], aWins, bWins, pctA, pctB);
-    });
-
-    wrap.innerHTML = legend + '<div style="position:relative;">' + rows + '</div>';
-  }
-
-    /* ── BUILD ALL CHARTS ── */
+  /* ── BUILD ALL CHARTS ── */
   function buildCharts(key) {
     var stat=document.getElementById('progression-stat-select').value||'ppg';
     buildProgressionChart(key, stat);
-    buildCompareChart(key);
+    buildPositionPie(key);
+    populatePercentileYears(key);
+    buildPercentileReport(key, '');
   }
 
   function initChartControls(key) {
-    populateCompareDropdowns(key);
     // Progression stat change
     var progSel=document.getElementById('progression-stat-select');
-    if (progSel) progSel.onchange=function(){ buildProgressionChart(key, progSel.value); };
+    if (progSel) progSel.onchange=function(){
+      buildProgressionChart(key, progSel.value);
+      var titleEl=document.getElementById('progression-chart-title');
+      if(titleEl) titleEl.textContent=statFullName(progSel.value);
+    };
     // Regular Season / Playoffs toggle
     document.querySelectorAll('[data-scope="pg"]').forEach(function(btn) {
       btn.onclick = function() { renderPGTable(key, btn.dataset.mode); };
     });
-    // Compare dropdowns are wired inside populateCompareDropdowns
+    // Percentile year change
+    var pctSel=document.getElementById('percentile-year-select');
+    var pctPrev=document.getElementById('percentile-year-prev');
+    var pctNext=document.getElementById('percentile-year-next');
+    function stepPercentileYear(dir) {
+      if (!pctSel) return;
+      var idx = pctSel.selectedIndex + dir;
+      if (idx < 0 || idx >= pctSel.options.length) return;
+      pctSel.selectedIndex = idx;
+      buildPercentileReport(key, pctSel.value);
+    }
+    if (pctSel) pctSel.onchange = function() { buildPercentileReport(key, pctSel.value); };
+    if (pctPrev) pctPrev.onclick = function() { stepPercentileYear(1); };  // options are newest-first
+    if (pctNext) pctNext.onclick = function() { stepPercentileYear(-1); };
   }
 
-  /* ── AWARDS PANEL ── */
+  /* ── POSITION PIE CHART ── */
+  function buildPositionPie(key) {
+    var totals = (PLAYER_STATS[key]||{}).totals || [];
+    var canvas  = document.getElementById('chart-position-pie');
+    var legend  = document.getElementById('position-pie-legend');
+    var card    = document.getElementById('position-pie-card');
+    var tooltip = document.getElementById('pie-tooltip');
+    if (!canvas || !legend || !card) return;
+
+    // Count games per position from pro seasons only
+    var posMap = {};
+    totals.filter(function(r){ return r.gp > 0 && COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase()) === -1; })
+      .forEach(function(r) {
+        var pos = r.pos || '—';
+        posMap[pos] = (posMap[pos] || 0) + (r.gp || 0);
+      });
+
+    var entries = Object.keys(posMap).map(function(p){ return { pos:p, gp:posMap[p] }; });
+    entries.sort(function(a,b){ return b.gp - a.gp; });
+
+    if (!entries.length || (entries.length === 1 && entries[0].pos === '—')) {
+      card.style.display = 'none'; return;
+    }
+    card.style.display = '';
+
+    var total = entries.reduce(function(s,e){ return s + e.gp; }, 0);
+
+    // Use site palette — orange first, then blue, then muted variants
+    var PALETTE = ['#e75719','#231aa5','#2dd4bf','#f59e0b','#a855f7','#ec4899'];
+
+    // Store slice angles for hit-testing
+    var slices = [];
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;  // 160×160
+    var cx = W/2, cy = H/2;
+    var outerR = Math.min(W,H)/2 - 4;
+    var innerR = outerR * 0.52; // donut hole
+    var GAP    = 0.022;         // radians gap between slices
+
+    function drawPie(hoveredIdx) {
+      var isLight = document.documentElement.classList.contains('light');
+      ctx.clearRect(0, 0, W, H);
+
+      // Draw donut hole background to match card bg
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR + 1, 0, Math.PI * 2);
+      ctx.fillStyle = isLight ? '#f0ede8' : '#08052f';
+      ctx.fill();
+
+      slices = [];
+      var startAngle = -Math.PI / 2;
+      entries.forEach(function(e, i) {
+        var sweep = (e.gp / total) * Math.PI * 2 - GAP;
+        var midAngle = startAngle + sweep / 2;
+        var isHovered = i === hoveredIdx;
+        var rOuter = isHovered ? outerR + 6 : outerR;
+        var rInner = isHovered ? innerR - 4 : innerR;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, rOuter, startAngle, startAngle + sweep);
+        ctx.arc(cx, cy, rInner, startAngle + sweep, startAngle, true);
+        ctx.closePath();
+
+        // Slightly lighter on hover
+        var col = PALETTE[i % PALETTE.length];
+        ctx.fillStyle = isHovered ? col : col + 'cc';
+        ctx.shadowBlur = 0;
+        ctx.fill();
+
+        // Thin separator line in bg color
+        ctx.strokeStyle = isLight ? '#f0ede8' : '#08052f';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        slices.push({ startAngle:startAngle, endAngle:startAngle + sweep, pos:e.pos, gp:e.gp,
+          pct:((e.gp/total)*100).toFixed(1), color:col, mid:midAngle });
+        startAngle += sweep + GAP;
+      });
+
+      // Centre label
+      var isLight2 = document.documentElement.classList.contains('light');
+      ctx.fillStyle = isLight2 ? 'rgba(42,33,64,0.5)' : 'rgba(208,208,208,0.5)';
+      ctx.font = '600 11px "Share Tech Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (hoveredIdx >= 0 && slices[hoveredIdx]) {
+        var s = slices[hoveredIdx];
+        ctx.fillStyle = s.color;
+        ctx.font = 'bold 15px "Barlow Condensed", sans-serif';
+        ctx.fillText(s.pos, cx, cy - 8);
+        ctx.font = '600 10px "Share Tech Mono", monospace';
+        ctx.fillStyle = isLight2 ? 'rgba(42,33,64,0.55)' : 'rgba(208,208,208,0.55)';
+        ctx.fillText(s.pct + '%', cx, cy + 8);
+      } else {
+        ctx.fillText('GP', cx, cy);
+      }
+    }
+
+    // Hit-test: is point inside a slice?
+    function getHoveredSlice(mx, my) {
+      var dx = mx - cx, dy = my - cy;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < innerR || dist > outerR + 6) return -1;
+      var angle = Math.atan2(dy, dx);
+      // Normalize to our start offset
+      for (var i = 0; i < slices.length; i++) {
+        var s = slices[i];
+        // Normalize angle to same range
+        var a = angle;
+        while (a < s.startAngle) a += Math.PI * 2;
+        if (a >= s.startAngle && a <= s.endAngle) return i;
+      }
+      return -1;
+    }
+
+    // Mouse events
+    canvas.onmousemove = function(e) {
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width;
+      var scaleY = canvas.height / rect.height;
+      var mx = (e.clientX - rect.left) * scaleX;
+      var my = (e.clientY - rect.top) * scaleY;
+      var idx = getHoveredSlice(mx, my);
+      drawPie(idx);
+      if (idx >= 0 && tooltip) {
+        var s = slices[idx];
+        var isLightNow = document.documentElement.classList.contains('light');
+        var bg       = isLightNow ? '#ffffff' : '#0e0b2e';
+        var border   = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
+        var textMain = isLightNow ? '#0e0b2e' : '#ffffff';
+        var textMuted= isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+        tooltip.style.background = bg;
+        tooltip.style.border = '1px solid ' + border;
+        tooltip.style.color = textMain;
+        tooltip.innerHTML =
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:' + textMain + ';">' + s.pos + '</div>' +
+              '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:' + textMuted + ';margin-top:1px;">' + s.gp + ' GP</div>' +
+            '</div>' +
+            '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:' + textMain + ';line-height:1;flex-shrink:0;padding-left:8px;">' + s.pct + '%</div>' +
+          '</div>';
+        tooltip.style.display = 'block';
+        tooltip.style.padding = '8px 12px';
+        tooltip.style.boxShadow = '0 4px 18px rgba(0,0,0,.35)';
+        tooltip.style.minWidth = '120px';
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top  = (e.clientY - 12) + 'px';
+      } else if (tooltip) {
+        tooltip.style.display = 'none';
+      }
+    };
+    canvas.onmouseleave = function() {
+      drawPie(-1);
+      if (tooltip) tooltip.style.display = 'none';
+    };
+
+    // Legend — styled like Chart.js legend in the other cards
+    legend.innerHTML = '';
+    entries.forEach(function(e, i) {
+      var pct = ((e.gp / total) * 100).toFixed(1);
+      var col = PALETTE[i % PALETTE.length];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;cursor:default;';
+      row.innerHTML =
+        '<div style="width:3px;height:28px;flex-shrink:0;background:'+col+';"></div>' +
+        '<div style="display:flex;flex-direction:column;gap:2px;">' +
+          '<span style="font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.04em;color:var(--heading);">'+e.pos+'</span>' +
+          '<span style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);">'+e.gp+' GP &nbsp;·&nbsp; '+pct+'%</span>' +
+        '</div>';
+      // Hover on legend also highlights slice
+      row.addEventListener('mouseenter', function() { drawPie(i); });
+      row.addEventListener('mouseleave', function() { drawPie(-1); });
+      legend.appendChild(row);
+    });
+
+    drawPie(-1);
+  }
+
+  /* ── SCOUTING REPORT / PERCENTILE ── */
+
+  // 2024-25 NBA per-game stat distributions by position (approx. league data)
+  // Each entry: [p10, p25, p50, p75, p90] — used to compute percentile via linear interpolation
+  var PCT_BENCHMARKS = {
+    PG: {
+      ppg:  [5.2,  8.8,  13.5, 19.2, 25.0],
+      rpg:  [1.8,  2.6,  3.8,  5.2,  6.8],
+      apg:  [2.8,  4.2,  6.0,  8.2,  10.5],
+      spg:  [0.4,  0.6,  0.9,  1.3,  1.7],
+      bpg:  [0.1,  0.2,  0.3,  0.5,  0.8],
+      topg: [1.2,  1.6,  2.1,  2.8,  3.6],
+      fgp:  [38.0, 42.0, 45.5, 49.0, 52.5],
+      tpp:  [30.0, 34.0, 37.5, 41.0, 44.5],
+      ftp:  [68.0, 74.0, 80.0, 86.0, 91.0],
+      mpg:  [15.0, 20.0, 25.5, 30.5, 34.5],
+    },
+    SG: {
+      ppg:  [4.8,  8.2,  13.0, 18.8, 24.5],
+      rpg:  [1.5,  2.2,  3.2,  4.5,  6.0],
+      apg:  [1.4,  2.2,  3.2,  4.8,  6.5],
+      spg:  [0.4,  0.6,  0.9,  1.2,  1.6],
+      bpg:  [0.1,  0.2,  0.3,  0.5,  0.8],
+      topg: [0.9,  1.3,  1.7,  2.3,  3.0],
+      fgp:  [38.5, 42.5, 46.0, 49.5, 53.0],
+      tpp:  [30.5, 34.5, 37.8, 41.5, 45.0],
+      ftp:  [68.0, 74.0, 80.5, 86.5, 91.5],
+      mpg:  [14.0, 19.0, 24.5, 30.0, 34.0],
+    },
+    SF: {
+      ppg:  [4.5,  7.8,  12.5, 18.0, 23.5],
+      rpg:  [2.0,  3.2,  4.8,  6.5,  8.2],
+      apg:  [1.2,  1.8,  2.8,  4.2,  5.8],
+      spg:  [0.4,  0.6,  0.9,  1.2,  1.6],
+      bpg:  [0.2,  0.3,  0.5,  0.8,  1.2],
+      topg: [0.8,  1.2,  1.7,  2.3,  3.0],
+      fgp:  [39.0, 43.0, 46.5, 50.0, 53.5],
+      tpp:  [29.0, 33.0, 36.5, 40.5, 44.0],
+      ftp:  [66.0, 72.0, 78.5, 85.0, 90.5],
+      mpg:  [13.5, 18.5, 24.0, 29.5, 33.5],
+    },
+    PF: {
+      ppg:  [4.2,  7.5,  12.0, 17.5, 23.0],
+      rpg:  [2.8,  4.2,  6.0,  8.0,  10.0],
+      apg:  [0.8,  1.4,  2.2,  3.4,  4.8],
+      spg:  [0.3,  0.5,  0.7,  1.1,  1.5],
+      bpg:  [0.2,  0.4,  0.7,  1.1,  1.6],
+      topg: [0.8,  1.1,  1.6,  2.2,  2.9],
+      fgp:  [40.0, 44.0, 48.0, 52.0, 55.5],
+      tpp:  [25.0, 30.5, 35.0, 38.5, 42.5],
+      ftp:  [62.0, 68.0, 75.0, 82.0, 88.0],
+      mpg:  [13.0, 18.0, 23.5, 29.0, 33.0],
+    },
+    C: {
+      ppg:  [3.8,  6.5,  11.0, 16.5, 22.0],
+      rpg:  [3.5,  5.5,  8.0,  10.5, 12.8],
+      apg:  [0.6,  1.0,  1.8,  3.0,  4.5],
+      spg:  [0.2,  0.4,  0.6,  0.9,  1.3],
+      bpg:  [0.4,  0.7,  1.1,  1.7,  2.4],
+      topg: [0.7,  1.1,  1.6,  2.2,  2.9],
+      fgp:  [44.0, 49.0, 54.0, 58.5, 63.0],
+      tpp:  [20.0, 27.0, 33.0, 37.5, 41.5],
+      ftp:  [55.0, 62.0, 70.0, 78.0, 85.0],
+      mpg:  [12.0, 17.0, 22.5, 27.5, 31.5],
+    },
+  };
+  // Fallback if position not matched
+  PCT_BENCHMARKS['G']  = PCT_BENCHMARKS['PG'];
+  PCT_BENCHMARKS['F']  = PCT_BENCHMARKS['SF'];
+  PCT_BENCHMARKS['F-G']= PCT_BENCHMARKS['SG'];
+  PCT_BENCHMARKS['F-C']= PCT_BENCHMARKS['PF'];
+  PCT_BENCHMARKS['C-F']= PCT_BENCHMARKS['PF'];
+
+  var PCT_STATS = [
+    { key:'ppg',  label:'PPG',  higher:true  },
+    { key:'rpg',  label:'RPG',  higher:true  },
+    { key:'apg',  label:'APG',  higher:true  },
+    { key:'spg',  label:'SPG',  higher:true  },
+    { key:'bpg',  label:'BPG',  higher:true  },
+    { key:'topg', label:'TOPG', higher:false },
+    { key:'fgp',  label:'FG%',  higher:true  },
+    { key:'tpp',  label:'3P%',  higher:true  },
+    { key:'ftp',  label:'FT%',  higher:true  },
+    { key:'mpg',  label:'MPG',  higher:true  },
+  ];
+
+  function calcPercentile(val, benchmarks, higher) {
+    // benchmarks = [p10, p25, p50, p75, p90]
+    var points = [[0,10],[1,25],[2,50],[3,75],[4,90]];
+    if (val <= benchmarks[0]) return higher ? Math.round((val / benchmarks[0]) * 10) : 90 + Math.round(((benchmarks[0]-val)/benchmarks[0])*10);
+    if (val >= benchmarks[4]) return higher ? Math.min(99, 90 + Math.round(((val-benchmarks[4])/benchmarks[4])*9)) : Math.max(1, 10 - Math.round(((val-benchmarks[4])/benchmarks[4])*9));
+    var pct = 10;
+    for (var i = 0; i < 4; i++) {
+      var lo = benchmarks[i], hi = benchmarks[i+1];
+      var pLo = points[i][1], pHi = points[i+1][1];
+      if (val >= lo && val <= hi) {
+        pct = pLo + ((val - lo) / (hi - lo)) * (pHi - pLo);
+        break;
+      }
+    }
+    return higher ? Math.round(pct) : Math.round(100 - pct);
+  }
+
+  function pctBarColor(pct) {
+    if (pct >= 75) return '#22c55e';        // green
+    if (pct >= 50) return '#84cc16';        // yellow-green
+    if (pct >= 25) return '#e8a838';        // amber
+    return '#b45309';                        // brown-red
+  }
+
+  function populatePercentileYears(key) {
+    var sel = document.getElementById('percentile-year-select');
+    if (!sel) return;
+    var data = (PLAYER_STATS[key]||{}).regular || [];
+    var valid = data.filter(isProRow);
+    sel.innerHTML = '';
+    valid.slice().reverse().forEach(function(r) {
+      var o = document.createElement('option');
+      o.value = r.season;
+      o.textContent = fmtSeason(r.season);
+      sel.appendChild(o);
+    });
+  }
+
+  function buildPercentileReport(key, season) {
+    var card = document.getElementById('percentile-card');
+    var body = document.getElementById('percentile-body');
+    if (!card || !body) return;
+
+    var data  = (PLAYER_STATS[key]||{}).regular || [];
+    var valid = data.filter(isProRow);
+    if (!valid.length) { card.style.display='none'; return; }
+    card.style.display = '';
+
+    // Pick row — default to most recent
+    var sel = document.getElementById('percentile-year-select');
+    var targetSeason = season || (sel && sel.value) || valid[valid.length-1].season;
+    if (sel && targetSeason) sel.value = targetSeason;
+    var row = valid.find(function(r){ return r.season === targetSeason; }) || valid[valid.length-1];
+
+    // Always get position from totals row for THIS season
+    var totals = (PLAYER_STATS[key]||{}).totals || [];
+    var totRow = totals.find(function(r){ return r.season === row.season; });
+    var pos = (totRow && totRow.pos) ? totRow.pos : (PLAYERS[key].position || 'PG');
+    var benchPos = pos.toUpperCase().trim();
+    var bench = PCT_BENCHMARKS[benchPos] || PCT_BENCHMARKS['PG'];
+
+    // Update team logo next to dropdown
+    var logoImg = document.getElementById('percentile-team-logo');
+    if (logoImg) {
+      var teamRaw = row.team || '';
+      var teamName = teamRaw ? teamFull(teamRaw) : '';
+      var logoUrl = teamName ? (TEAM_LOGOS[teamName] || '') : '';
+      if (logoUrl) {
+        logoImg.src = logoUrl;
+        logoImg.alt = teamName;
+        logoImg.style.display = 'block';
+      } else {
+        logoImg.style.display = 'none';
+      }
+    }
+
+    // Get/create tooltip
+    var tooltip = document.getElementById('pct-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = 'pct-tooltip';
+      tooltip.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;display:none;padding:8px 12px;min-width:140px;box-shadow:0 4px 18px rgba(0,0,0,.35);';
+      document.body.appendChild(tooltip);
+    }
+
+    var PCT_STAT_FULL = {
+      ppg:'Points Per Game', rpg:'Rebounds Per Game', apg:'Assists Per Game',
+      spg:'Steals Per Game', bpg:'Blocks Per Game', topg:'Turnovers Per Game',
+      fgp:'Field Goal %', tpp:'Three Point %', ftp:'Free Throw %', mpg:'Minutes Per Game'
+    };
+    var PCT_CONTEXT = {
+      ppg:'Higher is better', rpg:'Higher is better', apg:'Higher is better',
+      spg:'Higher is better', bpg:'Higher is better', topg:'Lower is better',
+      fgp:'Higher is better', tpp:'Higher is better', ftp:'Higher is better', mpg:'Higher is better'
+    };
+
+    body.innerHTML = '';
+    PCT_STATS.forEach(function(s) {
+      var rawVal = parseFloat(String(row[s.key]||'0').replace('%',''));
+      if (isNaN(rawVal)) rawVal = 0;
+      var benchArr = bench[s.key];
+      if (!benchArr) return;
+      var pct = calcPercentile(rawVal, benchArr, s.higher);
+      var barCol = pctBarColor(pct);
+      var pctTxtCol = pct >= 75 ? '#22c55e' : pct >= 50 ? '#84cc16' : pct >= 25 ? '#e8a838' : '#b45309';
+      var displayVal = (s.key==='fgp'||s.key==='tpp'||s.key==='ftp') ? rawVal.toFixed(1)+'%' : rawVal.toFixed(1);
+
+      var rowEl = document.createElement('div');
+      rowEl.className = 'pct-row';
+      rowEl.style.cursor = 'default';
+      rowEl.innerHTML =
+        '<span class="pct-stat">'+s.label+'</span>'+
+        '<span class="pct-val">'+displayVal+'</span>'+
+        '<div class="pct-bar-wrap"><div class="pct-bar" style="width:'+pct+'%;background:'+barCol+';"></div></div>'+
+        '<span class="pct-num" style="color:'+pctTxtCol+';">'+pct+'</span>';
+
+      // Hover tooltip
+      rowEl.addEventListener('mouseenter', function(e) {
+        var isLightNow = document.documentElement.classList.contains('light');
+        var bg       = isLightNow ? '#ffffff' : '#0e0b2e';
+        var border   = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
+        var textMain = isLightNow ? '#0e0b2e' : '#ffffff';
+        var textMuted= isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+        tooltip.style.background = bg;
+        tooltip.style.border = '1px solid ' + border;
+        tooltip.innerHTML =
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMain+';">' + (PCT_STAT_FULL[s.key]||s.label) + '</div>' +
+              '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-top:1px;">vs '+benchPos+' avg · '+PCT_CONTEXT[s.key]+'</div>' +
+            '</div>' +
+            '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:'+pctTxtCol+';line-height:1;flex-shrink:0;padding-left:8px;">'+pct+'<span style="font-size:.6rem;font-family:var(--font-mono);color:'+textMuted+';margin-left:2px;">%ile</span></div>' +
+          '</div>';
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top  = (e.clientY - 16) + 'px';
+      });
+      rowEl.addEventListener('mousemove', function(e) {
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top  = (e.clientY - 16) + 'px';
+      });
+      rowEl.addEventListener('mouseleave', function() {
+        tooltip.style.display = 'none';
+      });
+
+      body.appendChild(rowEl);
+    });
+
+    // Position + season note at bottom
+    var note = document.createElement('div');
+    note.style.cssText = 'font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border-soft);';
+    note.textContent = 'vs ' + benchPos + ' league avg · 2024-25 NBA · ' + fmtSeason(row.season);
+    body.appendChild(note);
+
+    // Update arrow disabled state
+    var pctSel2 = document.getElementById('percentile-year-select');
+    var pctPrev2 = document.getElementById('percentile-year-prev');
+    var pctNext2 = document.getElementById('percentile-year-next');
+    if (pctSel2 && pctPrev2 && pctNext2) {
+      pctPrev2.disabled = pctSel2.selectedIndex >= pctSel2.options.length - 1;
+      pctNext2.disabled = pctSel2.selectedIndex <= 0;
+    }
+  }
   /* Importance rank for sorting: lower = more important */
   var AWARD_RANK = {
     'hall of fame':1,
