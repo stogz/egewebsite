@@ -65,8 +65,8 @@ window.PLAYER_STATS = {
       age:       '—',
       college:   'Arizona',
       draftYear: '2018',
-      draftPick: 'First Round, Thirteenth Pick',
-      nickname:  '\"Clutch Clark\", \"Cswag\"',
+      draftPick: 'First Round, Thirteenth Pick'
+
     },
     retired: true,
     photos: [
@@ -130,35 +130,35 @@ window.PLAYER_STATS = {
       { season:'2035-36', age:37, team:'SAS', ppg:12.0, rpg:1.0, apg:6.3, spg:1.2, bpg:0.0, topg:2.7, fgp:'33.3%', tpp:'38.2%', ftp:'81.0%', tpa:5.7, gs:5, gp:6, mpg:28.7, dnq:false },
     ],
     totals: [
-      { season:'2018-19', age:20, team:'LAC', pos:'PG', pts:722,  reb:83,  ast:445, stl:78,  blk:0, tov:155, fgm:267, fga:690,  tpm:65,  tpa:222, ftm:123, fta:165, min:1928, gs:31, gp:82, dd:4,  td:0 },
-      { season:'2019-20', age:21, team:'LAC', pos:'PG', pts:1219, reb:166, ast:818, stl:122, blk:0, tov:234, fgm:455, fga:1099, tpm:127, tpa:431, ftm:182, fta:232, min:2896, gs:78, gp:78, dd:39, td:0 },
-      { season:'2020-21', age:22, team:'LAC', pos:'PG', pts:1092, reb:217, ast:571, stl:104, blk:0, tov:212, fgm:403, fga:850,  tpm:151, tpa:390, ftm:135, fta:161, min:2283, gs:69, gp:69, dd:21, td:0 },
-      { season:'2021-22', age:23, team:'LAC', pos:'PG', pts:1311, reb:205, ast:661, stl:125, blk:0, tov:263, fgm:464, fga:946,  tpm:184, tpa:451, ftm:199, fta:231, min:2600, gs:79, gp:79, dd:27, td:0 },
-      { season:'2022-23', age:24, team:'LAC', pos:'PG', pts:1795, reb:229, ast:801, stl:146, blk:0, tov:283, fgm:598, fga:1237, tpm:267, tpa:653, ftm:332, fta:393, min:2887, gs:79, gp:79, dd:45, td:0, star:true },
-      { season:'2023-24', age:25, team:'LAC', pos:'PG', pts:1735, reb:165, ast:784, stl:143, blk:0, tov:235, fgm:607, fga:1210, tpm:265, tpa:624, ftm:256, fta:293, min:2607, gs:71, gp:71, dd:42, td:0, star:true },
-      { season:'2024-25', age:26, team:'LAL', pos:'PG', pts:1353, reb:173, ast:668, stl:112, blk:0, tov:182, fgm:465, fga:899,  tpm:207, tpa:504, ftm:216, fta:240, min:2235, gs:69, gp:69, dd:32, td:0, star:true },
-      { season:'2025-26', age:27, team:'LAL', pos:'PG', pts:2093, reb:212, ast:812, stl:142, blk:0, tov:228, fgm:684, fga:1410, tpm:332, tpa:784, ftm:393, fta:444, min:2908, gs:79, gp:79, dd:46, td:0, star:true },
-      { season:'2026-27', age:28, team:'LAL', pos:'PG', pts:1995, reb:256, ast:887, stl:125, blk:0, tov:196, fgm:679, fga:1365, tpm:322, tpa:755, ftm:315, fta:343, min:2824, gs:82, gp:82, dd:53, td:0, star:true },
-      { season:'2027-28', age:29, team:'LAL', pos:'PG', pts:1922, reb:121, ast:752, stl:113, blk:0, tov:234, fgm:634, fga:1310, tpm:307, tpa:728, ftm:347, fta:384, min:2759, gs:76, gp:76, dd:44, td:0, star:true },
-      { season:'2028-29', age:30, team:'LAL', pos:'PG', pts:2244, reb:123, ast:664, stl:122, blk:0, tov:217, fgm:735, fga:1504, tpm:362, tpa:846, ftm:412, fta:440, min:2700, gs:77, gp:77, dd:31, td:0, star:true },
-      { season:'2029-30', age:31, team:'IND', pos:'PG', pts:1256, reb:88,  ast:578, stl:69,  blk:0, tov:149, fgm:406, fga:878,  tpm:189, tpa:467, ftm:255, fta:268, min:2166, gs:72, gp:72, dd:19, td:0 },
-      { season:'2030-31', age:32, team:'IND', pos:'PG', pts:1425, reb:127, ast:625, stl:77,  blk:0, tov:162, fgm:474, fga:1036, tpm:228, tpa:580, ftm:249, fta:270, min:2380, gs:81, gp:81, dd:18, td:0 },
-      { season:'2031-32', age:33, team:'IND', pos:'PG', pts:1759, reb:156, ast:622, stl:85,  blk:0, tov:179, fgm:560, fga:1165, tpm:288, tpa:673, ftm:351, fta:367, min:2501, gs:82, gp:82, dd:16, td:0 },
-      { season:'2032-33', age:34, team:'IND', pos:'PG', pts:1446, reb:155, ast:543, stl:80,  blk:1, tov:155, fgm:459, fga:1014, tpm:221, tpa:587, ftm:307, fta:323, min:2327, gs:80, gp:80, dd:12, td:0 },
-      { season:'2033-34', age:35, team:'SAS', pos:'PG', pts:1510, reb:140, ast:715, stl:109,  blk:0, tov:199, fgm:500, fga:1088, tpm:233, tpa:591, ftm:277, fta:290, min:2574, gs:82, gp:82, dd:22, td:0 },
-      { season:'2034-35', age:36, team:'SAS', pos:'PG', pts:1220, reb:125, ast:702, stl:92,  blk:0, tov:181, fgm:409, fga:916, tpm:205, tpa:499, ftm:197, fta:209, min:2402, gs:79, gp:79, dd:23, td:0 },
-      { season:'2035-36', age:37, team:'SAS', pos:'PG', pts:974, reb:81, ast:497, stl:51,  blk:0, tov:129, fgm:326, fga:729, tpm:160, tpa:398, ftm:162, fta:175, min:1992, gs:61, gp:82, dd:5, td:0 },
-      { season:'2036-37', age:38, team:'LAL', pos:'PG', pts:773, reb:52, ast:500, stl:52,  blk:0, tov:134, fgm:238, fga:568, tpm:120, tpa:308, ftm:177, fta:189, min:1765, gs:5, gp:72, dd:8, td:0 },
+      { pos:'PG',  season:'2018-19', age:20, team:'LAC', pts:722,  reb:83,  ast:445, stl:78,  blk:0, tov:155, fgm:267, fga:690,  tpm:65,  tpa:222, ftm:123, fta:165, min:1928, gs:31, gp:82, dd:4,  td:0 },
+      { pos:'PG',  season:'2019-20', age:21, team:'LAC', pts:1219, reb:166, ast:818, stl:122, blk:0, tov:234, fgm:455, fga:1099, tpm:127, tpa:431, ftm:182, fta:232, min:2896, gs:78, gp:78, dd:39, td:0 },
+      { pos:'PG',  season:'2020-21', age:22, team:'LAC', pts:1092, reb:217, ast:571, stl:104, blk:0, tov:212, fgm:403, fga:850,  tpm:151, tpa:390, ftm:135, fta:161, min:2283, gs:69, gp:69, dd:21, td:0 },
+      { pos:'PG',  season:'2021-22', age:23, team:'LAC', pts:1311, reb:205, ast:661, stl:125, blk:0, tov:263, fgm:464, fga:946,  tpm:184, tpa:451, ftm:199, fta:231, min:2600, gs:79, gp:79, dd:27, td:0 },
+      { pos:'PG',  season:'2022-23', age:24, team:'LAC', pts:1795, reb:229, ast:801, stl:146, blk:0, tov:283, fgm:598, fga:1237, tpm:267, tpa:653, ftm:332, fta:393, min:2887, gs:79, gp:79, dd:45, td:0, star:true },
+      { pos:'PG',  season:'2023-24', age:25, team:'LAC', pts:1735, reb:165, ast:784, stl:143, blk:0, tov:235, fgm:607, fga:1210, tpm:265, tpa:624, ftm:256, fta:293, min:2607, gs:71, gp:71, dd:42, td:0, star:true },
+      { pos:'PG',  season:'2024-25', age:26, team:'LAL', pts:1353, reb:173, ast:668, stl:112, blk:0, tov:182, fgm:465, fga:899,  tpm:207, tpa:504, ftm:216, fta:240, min:2235, gs:69, gp:69, dd:32, td:0, star:true },
+      { pos:'PG',  season:'2025-26', age:27, team:'LAL', pts:2093, reb:212, ast:812, stl:142, blk:0, tov:228, fgm:684, fga:1410, tpm:332, tpa:784, ftm:393, fta:444, min:2908, gs:79, gp:79, dd:46, td:0, star:true },
+      { pos:'PG',  season:'2026-27', age:28, team:'LAL', pts:1995, reb:256, ast:887, stl:125, blk:0, tov:196, fgm:679, fga:1365, tpm:322, tpa:755, ftm:315, fta:343, min:2824, gs:82, gp:82, dd:53, td:0, star:true },
+      { pos:'PG',  season:'2027-28', age:29, team:'LAL', pts:1922, reb:121, ast:752, stl:113, blk:0, tov:234, fgm:634, fga:1310, tpm:307, tpa:728, ftm:347, fta:384, min:2759, gs:76, gp:76, dd:44, td:0, star:true },
+      { pos:'PG',  season:'2028-29', age:30, team:'LAL', pts:2244, reb:123, ast:664, stl:122, blk:0, tov:217, fgm:735, fga:1504, tpm:362, tpa:846, ftm:412, fta:440, min:2700, gs:77, gp:77, dd:31, td:0, star:true },
+      { pos:'PG',  season:'2029-30', age:31, team:'IND', pts:1256, reb:88,  ast:578, stl:69,  blk:0, tov:149, fgm:406, fga:878,  tpm:189, tpa:467, ftm:255, fta:268, min:2166, gs:72, gp:72, dd:19, td:0 },
+      { pos:'PG',  season:'2030-31', age:32, team:'IND', pts:1425, reb:127, ast:625, stl:77,  blk:0, tov:162, fgm:474, fga:1036, tpm:228, tpa:580, ftm:249, fta:270, min:2380, gs:81, gp:81, dd:18, td:0 },
+      { pos:'PG',  season:'2031-32', age:33, team:'IND', pts:1759, reb:156, ast:622, stl:85,  blk:0, tov:179, fgm:560, fga:1165, tpm:288, tpa:673, ftm:351, fta:367, min:2501, gs:82, gp:82, dd:16, td:0 },
+      { pos:'PG',  season:'2032-33', age:34, team:'IND', pts:1446, reb:155, ast:543, stl:80,  blk:1, tov:155, fgm:459, fga:1014, tpm:221, tpa:587, ftm:307, fta:323, min:2327, gs:80, gp:80, dd:12, td:0 },
+      { pos:'PG',  season:'2033-34', age:35, team:'SAS', pts:1510, reb:140, ast:715, stl:109,  blk:0, tov:199, fgm:500, fga:1088, tpm:233, tpa:591, ftm:277, fta:290, min:2574, gs:82, gp:82, dd:22, td:0 },
+      { pos:'PG',  season:'2034-35', age:36, team:'SAS', pts:1220, reb:125, ast:702, stl:92,  blk:0, tov:181, fgm:409, fga:916, tpm:205, tpa:499, ftm:197, fta:209, min:2402, gs:79, gp:79, dd:23, td:0 },
+      { pos:'PG',  season:'2035-36', age:37, team:'SAS', pts:974, reb:81, ast:497, stl:51,  blk:0, tov:129, fgm:326, fga:729, tpm:160, tpa:398, ftm:162, fta:175, min:1992, gs:61, gp:82, dd:5, td:0 },
+      { pos:'PG',  season:'2036-37', age:38, team:'LAL', pts:773, reb:52, ast:500, stl:52,  blk:0, tov:134, fgm:238, fga:568, tpm:120, tpa:308, ftm:177, fta:189, min:1765, gs:5, gp:72, dd:8, td:0 },
     ],
     contracts: {
       signings: [
         { date:'July 1, 2018',       team:'Los Angeles Clippers', years:4, total:'$15.67M',  aav:'$3.92M',  note:'Rookie Contract' },
         { date:'February 22, 2021',  team:'Los Angeles Clippers', years:2, total:'$64.31M',  aav:'$32.15M', note:'Player Option Waived' },
-        { date:'June 30, 2024',      team:'Los Angeles Lakers',   years:3, total:'$111.08M', aav:'$37.03M', note:'' },
+        { date:'June 30, 2024',      team:'Los Angeles Lakers',   years:3, total:'$111.08M', aav:'$37.03M' },
         { date:'February 24, 2027',  team:'Los Angeles Lakers',   years:4, total:'$252.07M', aav:'$63.02M', note:'Player Option Waived' },
-        { date:'July 1, 2030',       team:'Indiana Pacers',       years:3, total:'$131.48M', aav:'$43.83M', note:'' },
-        { date:'June 6, 2032',       team:'Indiana Pacers',       years:4, total:'$168.76M', aav:'$42.19M', note:'' },
-        { date:'July 2, 2036',       team:'Los Angeles Lakers',       years:1, total:'$3.66M', aav:'$3.66M', note:'' },
+        { date:'July 1, 2030',       team:'Indiana Pacers',       years:3, total:'$131.48M', aav:'$43.83M' },
+        { date:'June 6, 2032',       team:'Indiana Pacers',       years:4, total:'$168.76M', aav:'$42.19M' },
+        { date:'July 2, 2036',       team:'Los Angeles Lakers',       years:1, total:'$3.66M', aav:'$3.66M' },
       ],
       trades: [
         {
@@ -166,11 +166,11 @@ window.PLAYER_STATS = {
           fromTeam:'Los Angeles Lakers',
           toTeam:'Indiana Pacers',
           sent:[
-            { type:'Player', text:'Cooper Clark' }
+            { type:'Player', text:'Cooper Clark', pos:'PG', img:'' }
           ],
           received:[
-            { type:'Player', text:'Chris Cenac Jr.' },
-            { type:'Player', text:'Ace Bailey' },
+            { type:'Player', text:'Chris Cenac Jr.', pos:'PF', img:'' },
+            { type:'Player', text:'Ace Bailey', pos:'SF', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1642846.png' },
             { type:'Pick',   text:'2029 1st Round Pick' },
             { type:'Pick',   text:'2030 1st Round Pick' },
             { type:'Pick',   text:'2032 1st Round Pick' },
@@ -183,37 +183,37 @@ window.PLAYER_STATS = {
           fromTeam:'Indiana Pacers',
           toTeam:'San Antonio Spurs',
           sent:[
-            { type:'Player', text:'Cooper Clark' }
+            { type:'Player', text:'Cooper Clark', pos:'PG', img:'' }
           ],
           received:[
-            { type:'Player', text:'Malik Lewis' },
-            { type:'Player', text:'Max Christie' },
+            { type:'Player', text:'Malik Lewis', pos:'SF', img:'' },
+            { type:'Player', text:'Max Christie', pos:'SG', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1631108.png' },
             { type:'Pick',   text:'2037 1st Round Pick Swap' }
           ],
           notes:''
         }
       ],
       seasons: [
-        { season:'2018-19', team:'Los Angeles Clippers', salary:'$2.53M',  option:'' },
-        { season:'2019-20', team:'Los Angeles Clippers', salary:'$2.97M',  option:'' },
-        { season:'2020-21', team:'Los Angeles Clippers', salary:'$4.19M',  option:'' },
-        { season:'2021-22', team:'Los Angeles Clippers', salary:'$5.98M',  option:'' },
-        { season:'2022-23', team:'Los Angeles Clippers', salary:'$30.91M', option:'' },
-        { season:'2023-24', team:'Los Angeles Clippers', salary:'$33.39M', option:'' },
-        { season:'2024-25', team:'Los Angeles Lakers',   salary:'$32.56M', option:'' },
-        { season:'2025-26', team:'Los Angeles Lakers',   salary:'$37.86M', option:'' },
-        { season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.66M', option:'' },
-        { season:'2027-28', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
-        { season:'2028-29', team:'Los Angeles Lakers',   salary:'$60.42M', option:'' },
-        { season:'2029-30', team:'Indiana Pacers',       salary:'$65.26M', option:'' },
-        { season:'2030-31', team:'Indiana Pacers',       salary:'$40.89M', option:'' },
-        { season:'2031-32', team:'Indiana Pacers',       salary:'$43.77M', option:'' },
-        { season:'2032-33', team:'Indiana Pacers',       salary:'$46.82M', option:'' },
-        { season:'2033-34', team:'San Antonio Spurs',       salary:'$34.76M', option:'' },
-        { season:'2034-35', team:'San Antonio Spurs',       salary:'$39.82M', option:'' },
-        { season:'2035-36', team:'San Antonio Spurs',       salary:'$44.64M', option:'' },
-        { season:'2036-37', team:'San Antonio Spurs',       salary:'$49.54M', option:'waived' },
-        { season:'2036-37', team:'Los Angeles Lakers',       salary:'$3.66M', option:'' },
+        { pos:'PG',  season:'2018-19', team:'Los Angeles Clippers', salary:'$2.53M',  option:'' },
+        { pos:'PG',  season:'2019-20', team:'Los Angeles Clippers', salary:'$2.97M',  option:'' },
+        { pos:'PG',  season:'2020-21', team:'Los Angeles Clippers', salary:'$4.19M',  option:'' },
+        { pos:'PG',  season:'2021-22', team:'Los Angeles Clippers', salary:'$5.98M',  option:'' },
+        { pos:'PG',  season:'2022-23', team:'Los Angeles Clippers', salary:'$30.91M', option:'' },
+        { pos:'PG',  season:'2023-24', team:'Los Angeles Clippers', salary:'$33.39M', option:'' },
+        { pos:'PG',  season:'2024-25', team:'Los Angeles Lakers',   salary:'$32.56M', option:'' },
+        { pos:'PG',  season:'2025-26', team:'Los Angeles Lakers',   salary:'$37.86M', option:'' },
+        { pos:'PG',  season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.66M', option:'' },
+        { pos:'PG',  season:'2027-28', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
+        { pos:'PG',  season:'2028-29', team:'Los Angeles Lakers',   salary:'$60.42M', option:'' },
+        { pos:'PG',  season:'2029-30', team:'Indiana Pacers',       salary:'$65.26M', option:'' },
+        { pos:'PG',  season:'2030-31', team:'Indiana Pacers',       salary:'$40.89M', option:'' },
+        { pos:'PG',  season:'2031-32', team:'Indiana Pacers',       salary:'$43.77M', option:'' },
+        { pos:'PG',  season:'2032-33', team:'Indiana Pacers',       salary:'$46.82M', option:'' },
+        { pos:'PG',  season:'2033-34', team:'San Antonio Spurs',       salary:'$34.76M', option:'' },
+        { pos:'PG',  season:'2034-35', team:'San Antonio Spurs',       salary:'$39.82M', option:'' },
+        { pos:'PG',  season:'2035-36', team:'San Antonio Spurs',       salary:'$44.64M', option:'' },
+        { pos:'PG',  season:'2036-37', team:'San Antonio Spurs',       salary:'$49.54M', option:'waived' },
+        { pos:'PG',  season:'2036-37', team:'Los Angeles Lakers',       salary:'$3.66M', option:'' },
       ]
     },
     awards: {
@@ -298,7 +298,7 @@ window.PLAYER_STATS = {
       { team:'Indiana Pacers',   name:'Away',  number:'5', bg:'#000080', stroke:'#ffde30', num:'#ffffff', seasons:'2024–2027', img:'' },
       { team:'San Antonio Spurs',   name:'Away',  number:'5', bg:'#000000', stroke:'#c2c2c2', num:'#ffffff', seasons:'2024–2027', img:'' },
       { team:'Los Angeles Lakers', name:'Away',  number:'5', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2018–2024', img:'' },
-    ],
+    ]
   },
 
   /* ─────────────── PAXON HATCH ─────────────── */
@@ -309,8 +309,8 @@ window.PLAYER_STATS = {
       age:       '—',
       college:   'UCLA',
       draftYear: '2017',
-      draftPick: 'First Round, Second Pick',
-      nickname:  '\"Pax\"',
+      draftPick: 'First Round, Second Pick'
+
     },
     retired: true,
     photos: [
@@ -358,43 +358,43 @@ window.PLAYER_STATS = {
       { season:'2030-31', age:32, team:'LAL', ppg:20.2, rpg:8.7, apg:2.0, spg:0.8, bpg:1.6, topg:2.1, fgp:'49.7%', tpp:'47.9%', ftp:'79.2%', tpa:7.2, gs:13, gp:13, mpg:33.4, dnq:false },
     ],
     totals: [
-      { season:'2017-18', age:19, team:'LAL', pos:'PF', pts:1418, reb:729,  ast:77,  stl:41,  blk:141, tov:150, fgm:530,  fga:1245, tpm:183, tpa:503,  ftm:175, fta:249, min:3054, gs:82, gp:82, dd:33, td:0 },
-      { season:'2018-19', age:20, team:'LAL', pos:'PF', pts:1630, reb:876,  ast:76,  stl:36,  blk:134, tov:132, fgm:596,  fga:1274, tpm:246, tpa:603,  ftm:192, fta:256, min:2826, gs:82, gp:82, dd:47, td:0, star:true },
-      { season:'2019-20', age:21, team:'LAL', pos:'PF', pts:1879, reb:951,  ast:146, stl:64,  blk:141, tov:155, fgm:705,  fga:1340, tpm:262, tpa:618,  ftm:207, fta:283, min:2755, gs:82, gp:82, dd:62, td:0, star:true },
-      { season:'2020-21', age:22, team:'LAL', pos:'PF', pts:2184, reb:1010, ast:190, stl:61,  blk:156, tov:134, fgm:792,  fga:1524, tpm:305, tpa:719,  ftm:295, fta:374, min:2857, gs:79, gp:79, dd:65, td:0, star:true },
-      { season:'2021-22', age:23, team:'LAL', pos:'PF', pts:1788, reb:871,  ast:198, stl:54,  blk:135, tov:109, fgm:620,  fga:1185, tpm:264, tpa:584,  ftm:284, fta:372, min:2435, gs:69, gp:69, dd:51, td:0, star:true },
-      { season:'2022-23', age:24, team:'LAL', pos:'PF', pts:1870, reb:814,  ast:203, stl:54,  blk:128, tov:134, fgm:637,  fga:1267, tpm:263, tpa:622,  ftm:333, fta:416, min:2731, gs:76, gp:76, dd:46, td:0, star:true },
-      { season:'2023-24', age:25, team:'LAL', pos:'PF', pts:2178, reb:1092, ast:169, stl:59,  blk:143, tov:121, fgm:748,  fga:1435, tpm:307, tpa:709,  ftm:375, fta:477, min:2866, gs:76, gp:76, dd:68, td:0, star:true },
-      { season:'2024-25', age:26, team:'LAL', pos:'PF', pts:2071, reb:1083, ast:110, stl:52,  blk:148, tov:110, fgm:677,  fga:1293, tpm:296, tpa:660,  ftm:421, fta:521, min:2704, gs:74, gp:74, dd:67, td:0 },
-      { season:'2025-26', age:27, team:'LAL', pos:'PF', pts:1603, reb:547,  ast:75,  stl:37,  blk:103, tov:105, fgm:520,  fga:1043, tpm:209, tpa:502,  ftm:354, fta:439, min:2133, gs:56, gp:56, dd:29, td:0, star:true },
-      { season:'2026-27', age:28, team:'LAL', pos:'PF', pts:1098, reb:443,  ast:66,  stl:39,  blk:84,  tov:63,  fgm:363,  fga:730,  tpm:170, tpa:386,  ftm:202, fta:263, min:1576, gs:45, gp:45, dd:22, td:0 },
-      { season:'2027-28', age:29, team:'LAL', pos:'PF', pts:1266, reb:554,  ast:85,  stl:41,  blk:97,  tov:77,  fgm:424,  fga:847,  tpm:197, tpa:425,  ftm:221, fta:266, min:1680, gs:58, gp:58, dd:25, td:0 },
-      { season:'2028-29', age:30, team:'LAL', pos:'PF', pts:1149, reb:562,  ast:84,  stl:35,  blk:102, tov:76,  fgm:395,  fga:877,  tpm:173, tpa:455,  ftm:186, fta:242, min:1797, gs:66, gp:66, dd:21, td:0 },
-      { season:'2029-30', age:31, team:'LAL', pos:'PF', pts:1315, reb:495,  ast:122, stl:33,  blk:83,  tov:72,  fgm:458,  fga:926,  tpm:180, tpa:424,  ftm:219, fta:273, min:1802, gs:70, gp:70, dd:14, td:0 },
-      { season:'2030-31', age:32, team:'LAL', pos:'PF', pts:1020, reb:589,  ast:136, stl:39,  blk:113, tov:108, fgm:324,  fga:735,  tpm:147, tpa:360,  ftm:225, fta:293, min:2124, gs:79, gp:79, dd:13, td:0 },
+      { pos:'PF',  season:'2017-18', age:19, team:'LAL', pts:1418, reb:729,  ast:77,  stl:41,  blk:141, tov:150, fgm:530,  fga:1245, tpm:183, tpa:503,  ftm:175, fta:249, min:3054, gs:82, gp:82, dd:33, td:0 },
+      { pos:'PF',  season:'2018-19', age:20, team:'LAL', pts:1630, reb:876,  ast:76,  stl:36,  blk:134, tov:132, fgm:596,  fga:1274, tpm:246, tpa:603,  ftm:192, fta:256, min:2826, gs:82, gp:82, dd:47, td:0, star:true },
+      { pos:'PF',  season:'2019-20', age:21, team:'LAL', pts:1879, reb:951,  ast:146, stl:64,  blk:141, tov:155, fgm:705,  fga:1340, tpm:262, tpa:618,  ftm:207, fta:283, min:2755, gs:82, gp:82, dd:62, td:0, star:true },
+      { pos:'PF',  season:'2020-21', age:22, team:'LAL', pts:2184, reb:1010, ast:190, stl:61,  blk:156, tov:134, fgm:792,  fga:1524, tpm:305, tpa:719,  ftm:295, fta:374, min:2857, gs:79, gp:79, dd:65, td:0, star:true },
+      { pos:'PF',  season:'2021-22', age:23, team:'LAL', pts:1788, reb:871,  ast:198, stl:54,  blk:135, tov:109, fgm:620,  fga:1185, tpm:264, tpa:584,  ftm:284, fta:372, min:2435, gs:69, gp:69, dd:51, td:0, star:true },
+      { pos:'PF',  season:'2022-23', age:24, team:'LAL', pts:1870, reb:814,  ast:203, stl:54,  blk:128, tov:134, fgm:637,  fga:1267, tpm:263, tpa:622,  ftm:333, fta:416, min:2731, gs:76, gp:76, dd:46, td:0, star:true },
+      { pos:'PF',  season:'2023-24', age:25, team:'LAL', pts:2178, reb:1092, ast:169, stl:59,  blk:143, tov:121, fgm:748,  fga:1435, tpm:307, tpa:709,  ftm:375, fta:477, min:2866, gs:76, gp:76, dd:68, td:0, star:true },
+      { pos:'PF',  season:'2024-25', age:26, team:'LAL', pts:2071, reb:1083, ast:110, stl:52,  blk:148, tov:110, fgm:677,  fga:1293, tpm:296, tpa:660,  ftm:421, fta:521, min:2704, gs:74, gp:74, dd:67, td:0 },
+      { pos:'PF',  season:'2025-26', age:27, team:'LAL', pts:1603, reb:547,  ast:75,  stl:37,  blk:103, tov:105, fgm:520,  fga:1043, tpm:209, tpa:502,  ftm:354, fta:439, min:2133, gs:56, gp:56, dd:29, td:0, star:true },
+      { pos:'PF',  season:'2026-27', age:28, team:'LAL', pts:1098, reb:443,  ast:66,  stl:39,  blk:84,  tov:63,  fgm:363,  fga:730,  tpm:170, tpa:386,  ftm:202, fta:263, min:1576, gs:45, gp:45, dd:22, td:0 },
+      { pos:'PF',  season:'2027-28', age:29, team:'LAL', pts:1266, reb:554,  ast:85,  stl:41,  blk:97,  tov:77,  fgm:424,  fga:847,  tpm:197, tpa:425,  ftm:221, fta:266, min:1680, gs:58, gp:58, dd:25, td:0 },
+      { pos:'PF',  season:'2028-29', age:30, team:'LAL', pts:1149, reb:562,  ast:84,  stl:35,  blk:102, tov:76,  fgm:395,  fga:877,  tpm:173, tpa:455,  ftm:186, fta:242, min:1797, gs:66, gp:66, dd:21, td:0 },
+      { pos:'PF',  season:'2029-30', age:31, team:'LAL', pts:1315, reb:495,  ast:122, stl:33,  blk:83,  tov:72,  fgm:458,  fga:926,  tpm:180, tpa:424,  ftm:219, fta:273, min:1802, gs:70, gp:70, dd:14, td:0 },
+      { pos:'PF',  season:'2030-31', age:32, team:'LAL', pts:1020, reb:589,  ast:136, stl:39,  blk:113, tov:108, fgm:324,  fga:735,  tpm:147, tpa:360,  ftm:225, fta:293, min:2124, gs:79, gp:79, dd:13, td:0 },
     ],
     contracts: {
       signings: [
         { date:'July 1, 2017',       team:'Los Angeles Lakers',   years:4, total:'$33.91M',  aav:'$8.48M',  note:'Rookie Contract' },
-        { date:'September 28, 2020', team:'Los Angeles Lakers',   years:5, total:'$162.13M', aav:'$32.43M', note:'' },
-        { date:'July 1, 2025',       team:'Los Angeles Lakers',   years:3, total:'$120.00M', aav:'$40.00M', note:'' },
+        { date:'September 28, 2020', team:'Los Angeles Lakers',   years:5, total:'$162.13M', aav:'$32.43M' },
+        { date:'July 1, 2025',       team:'Los Angeles Lakers',   years:3, total:'$120.00M', aav:'$40.00M' },
         { date:'June 30, 2029',      team:'Los Angeles Lakers',   years:3, total:'$181.28M', aav:'$60.43M', note:'Player Option Exercised' },
       ],
       seasons: [
-        { season:'2017-18', team:'Los Angeles Lakers',   salary:'$5.23M',  option:'' },
-        { season:'2018-19', team:'Los Angeles Lakers',   salary:'$6.21M',  option:'' },
-        { season:'2019-20', team:'Los Angeles Lakers',   salary:'$10.21M', option:'' },
-        { season:'2020-21', team:'Los Angeles Lakers',   salary:'$12.26M', option:'' },
-        { season:'2021-22', team:'Los Angeles Lakers',   salary:'$27.91M', option:'' },
-        { season:'2022-23', team:'Los Angeles Lakers',   salary:'$30.15M', option:'' },
-        { season:'2023-24', team:'Los Angeles Lakers',   salary:'$32.38M', option:'' },
-        { season:'2024-25', team:'Los Angeles Lakers',   salary:'$34.61M', option:'' },
-        { season:'2025-26', team:'Los Angeles Lakers',   salary:'$36.85M', option:'' },
-        { season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
-        { season:'2027-28', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
-        { season:'2028-29', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
-        { season:'2029-30', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
-        { season:'2030-31', team:'Los Angeles Lakers',   salary:'$60.43M', option:'' },
+        { pos:'PF',  season:'2017-18', team:'Los Angeles Lakers',   salary:'$5.23M',  option:'' },
+        { pos:'PF',  season:'2018-19', team:'Los Angeles Lakers',   salary:'$6.21M',  option:'' },
+        { pos:'PF',  season:'2019-20', team:'Los Angeles Lakers',   salary:'$10.21M', option:'' },
+        { pos:'PF',  season:'2020-21', team:'Los Angeles Lakers',   salary:'$12.26M', option:'' },
+        { pos:'PF',  season:'2021-22', team:'Los Angeles Lakers',   salary:'$27.91M', option:'' },
+        { pos:'PF',  season:'2022-23', team:'Los Angeles Lakers',   salary:'$30.15M', option:'' },
+        { pos:'PF',  season:'2023-24', team:'Los Angeles Lakers',   salary:'$32.38M', option:'' },
+        { pos:'PF',  season:'2024-25', team:'Los Angeles Lakers',   salary:'$34.61M', option:'' },
+        { pos:'PF',  season:'2025-26', team:'Los Angeles Lakers',   salary:'$36.85M', option:'' },
+        { pos:'PF',  season:'2026-27', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { pos:'PF',  season:'2027-28', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { pos:'PF',  season:'2028-29', team:'Los Angeles Lakers',   salary:'$40.00M', option:'' },
+        { pos:'PF',  season:'2029-30', team:'Los Angeles Lakers',   salary:'$55.95M', option:'' },
+        { pos:'PF',  season:'2030-31', team:'Los Angeles Lakers',   salary:'$60.43M', option:'' },
       ]
     },
     awards: {
@@ -452,7 +452,7 @@ window.PLAYER_STATS = {
     jerseys: [
       { team:'UCLA', name:'Home',         number:'42', bg:'#0001ff', stroke:'#ffdf35', num:'#ffffff', seasons:'2017–Present', img:'' },
       { team:'Los Angeles Lakers', name:'Away',         number:'10', bg:'#552583', stroke:'#fdb927', num:'#ffffff', seasons:'2017–Present', img:'' },
-    ],
+    ]
   },
 
   /* ─────────────── SAM STOGSDILL ─────────────── */
@@ -463,8 +463,8 @@ window.PLAYER_STATS = {
       age:       '—',
       college:   'Louisville',
       draftYear: '2018',
-      draftPick: 'First Round, Seventeenth Pick',
-      nickname:  '\"Uncle Sam\"',
+      draftPick: 'First Round, Seventeenth Pick'
+
     },
     retired: true,
     photos: [
@@ -520,30 +520,30 @@ window.PLAYER_STATS = {
       { season:'2034-35', age:37, team:'MEX', ppg:5.9, rpg:8.0, apg:8.5, spg:0.7, bpg:0.8, topg:0.7, fgp:'43.7%', tpp:'38.1%', ftp:'66.7%', tpa:0.9, gs:24, gp:24, mpg:25.0, champ:true, dnq:false },
     ],
     totals: [
-      { season:'2018-19', age:21, team:'WAS', pos:'PF', pts:397,  reb:391, ast:446, stl:36,  blk:66,  tov:55,  fgm:159, fga:453, tpm:0,  tpa:0,   ftm:79,  fta:116, min:1617, gs:64, gp:64, dd:6,  td:1 },
-      { season:'2019-20', age:22, team:'WAS', pos:'PF', pts:671,  reb:664, ast:551, stl:53,  blk:129, tov:100, fgm:290, fga:677, tpm:0,  tpa:0,   ftm:91,  fta:161, min:2167, gs:82, gp:82, dd:11, td:0 },
-      { season:'2020-21', age:23, team:'WAS', pos:'C', pts:803,  reb:732, ast:557, stl:42,  blk:120, tov:109, fgm:351, fga:709, tpm:0,  tpa:0,   ftm:101, fta:158, min:2166, gs:60, gp:82, dd:27, td:2 },
-      { season:'2021-22', age:24, team:'WAS', pos:'C', pts:752,  reb:679, ast:530, stl:60,  blk:86,  tov:101, fgm:324, fga:688, tpm:0,  tpa:0,   ftm:104, fta:158, min:2092, gs:61, gp:82, dd:16, td:0 },
-      { season:'2022-23', age:25, team:'WAS', pos:'C', pts:735,  reb:756, ast:611, stl:52,  blk:110, tov:103, fgm:306, fga:691, tpm:1,  tpa:22,  ftm:122, fta:172, min:2165, gs:82, gp:82, dd:28, td:8 },
-      { season:'2023-24', age:26, team:'WAS', pos:'C', pts:808,  reb:740, ast:550, stl:69,  blk:102, tov:95,  fgm:347, fga:733, tpm:1,  tpa:21,  ftm:113, fta:165, min:2082, gs:82, gp:82, dd:21, td:2 },
-      { season:'2024-25', age:27, team:'WAS', pos:'C', pts:839,  reb:772, ast:590, stl:57,  blk:102, tov:104, fgm:355, fga:726, tpm:3,  tpa:43,  ftm:126, fta:179, min:2054, gs:80, gp:80, dd:32, td:6 },
-      { season:'2025-26', age:28, team:'WAS', pos:'C', pts:876,  reb:949, ast:698, stl:68,  blk:133, tov:120, fgm:369, fga:775, tpm:5,  tpa:34,  ftm:133, fta:188, min:2421, gs:82, gp:82, dd:45, td:13 },
-      { season:'2026-27', age:29, team:'WAS', pos:'C', pts:1229, reb:903, ast:596, stl:43,  blk:111, tov:128, fgm:519, fga:1116,tpm:11, tpa:65,  ftm:180, fta:248, min:2138, gs:74, gp:74, dd:56, td:17 },
-      { season:'2027-28', age:30, team:'HOU', pos:'C', pts:960,  reb:662, ast:572, stl:58,  blk:83,  tov:115, fgm:393, fga:809, tpm:23, tpa:108, ftm:151, fta:207, min:2023, gs:76, gp:76, dd:32, td:6,  star:true },
-      { season:'2028-29', age:31, team:'HOU', pos:'C', pts:925,  reb:694, ast:653, stl:72,  blk:91,  tov:123, fgm:388, fga:832, tpm:43, tpa:131, ftm:106, fta:143, min:2198, gs:81, gp:81, dd:27, td:2 },
-      { season:'2029-30', age:32, team:'HOU', pos:'C', pts:857,  reb:600, ast:560, stl:40,  blk:88,  tov:104, fgm:347, fga:734, tpm:58, tpa:157, ftm:105, fta:142, min:2000, gs:79, gp:79, dd:19, td:2 },
-      { season:'2030-31', age:33, team:'HOU', pos:'C', pts:604,  reb:540, ast:509, stl:68,  blk:67,  tov:88,  fgm:245, fga:546, tpm:35, tpa:109, ftm:79,  fta:110, min:1883, gs:64, gp:71, dd:14, td:3 },
-      { season:'2031-32', age:34, team:'HOU', pos:'C', pts:536,  reb:426, ast:407, stl:55,  blk:73,  tov:105, fgm:211, fga:449, tpm:28, tpa:105, ftm:86,  fta:103, min:1535, gs:53, gp:64, dd:5,  td:0 },
-      { season:'2032-33', age:35, team:'HOU', pos:'C', pts:611,  reb:558, ast:548, stl:54,  blk:97,  tov:115, fgm:241, fga:546, tpm:37, tpa:113, ftm:92,  fta:116, min:2072, gs:76, gp:82, dd:6,  td:2 },
-      { season:'2033-34', age:36, team:'MEX', pos:'PF', pts:568,  reb:599, ast:551, stl:62,  blk:79,  tov:122, fgm:225, fga:485, tpm:26, tpa:88, ftm:92,  fta:109, min:2031, gs:81, gp:81, dd:10,  td:1 },
-      { season:'2034-35', age:37, team:'MEX', pos:'SF', pts:542,  reb:596, ast:569, stl:56,  blk:88,  tov:109, fgm:204, fga:473, tpm:29, tpa:88, ftm:87,  fta:111, min:1919, gs:82, gp:82, dd:7,  td:2 },
+      { pos:'PF',  season:'2018-19', age:21, team:'WAS', pts:397,  reb:391, ast:446, stl:36,  blk:66,  tov:55,  fgm:159, fga:453, tpm:0,  tpa:0,   ftm:79,  fta:116, min:1617, gs:64, gp:64, dd:6,  td:1 },
+      { pos:'PF',  season:'2019-20', age:22, team:'WAS', pts:671,  reb:664, ast:551, stl:53,  blk:129, tov:100, fgm:290, fga:677, tpm:0,  tpa:0,   ftm:91,  fta:161, min:2167, gs:82, gp:82, dd:11, td:0 },
+      { pos:'C',  season:'2020-21', age:23, team:'WAS', pts:803,  reb:732, ast:557, stl:42,  blk:120, tov:109, fgm:351, fga:709, tpm:0,  tpa:0,   ftm:101, fta:158, min:2166, gs:60, gp:82, dd:27, td:2 },
+      { pos:'C',  season:'2021-22', age:24, team:'WAS', pts:752,  reb:679, ast:530, stl:60,  blk:86,  tov:101, fgm:324, fga:688, tpm:0,  tpa:0,   ftm:104, fta:158, min:2092, gs:61, gp:82, dd:16, td:0 },
+      { pos:'C',  season:'2022-23', age:25, team:'WAS', pts:735,  reb:756, ast:611, stl:52,  blk:110, tov:103, fgm:306, fga:691, tpm:1,  tpa:22,  ftm:122, fta:172, min:2165, gs:82, gp:82, dd:28, td:8 },
+      { pos:'C',  season:'2023-24', age:26, team:'WAS', pts:808,  reb:740, ast:550, stl:69,  blk:102, tov:95,  fgm:347, fga:733, tpm:1,  tpa:21,  ftm:113, fta:165, min:2082, gs:82, gp:82, dd:21, td:2 },
+      { pos:'C',  season:'2024-25', age:27, team:'WAS', pts:839,  reb:772, ast:590, stl:57,  blk:102, tov:104, fgm:355, fga:726, tpm:3,  tpa:43,  ftm:126, fta:179, min:2054, gs:80, gp:80, dd:32, td:6 },
+      { pos:'C',  season:'2025-26', age:28, team:'WAS', pts:876,  reb:949, ast:698, stl:68,  blk:133, tov:120, fgm:369, fga:775, tpm:5,  tpa:34,  ftm:133, fta:188, min:2421, gs:82, gp:82, dd:45, td:13 },
+      { pos:'C',  season:'2026-27', age:29, team:'WAS', pts:1229, reb:903, ast:596, stl:43,  blk:111, tov:128, fgm:519, fga:1116,tpm:11, tpa:65,  ftm:180, fta:248, min:2138, gs:74, gp:74, dd:56, td:17 },
+      { pos:'C',  season:'2027-28', age:30, team:'HOU', pts:960,  reb:662, ast:572, stl:58,  blk:83,  tov:115, fgm:393, fga:809, tpm:23, tpa:108, ftm:151, fta:207, min:2023, gs:76, gp:76, dd:32, td:6,  star:true },
+      { pos:'C',  season:'2028-29', age:31, team:'HOU', pts:925,  reb:694, ast:653, stl:72,  blk:91,  tov:123, fgm:388, fga:832, tpm:43, tpa:131, ftm:106, fta:143, min:2198, gs:81, gp:81, dd:27, td:2 },
+      { pos:'C',  season:'2029-30', age:32, team:'HOU', pts:857,  reb:600, ast:560, stl:40,  blk:88,  tov:104, fgm:347, fga:734, tpm:58, tpa:157, ftm:105, fta:142, min:2000, gs:79, gp:79, dd:19, td:2 },
+      { pos:'C',  season:'2030-31', age:33, team:'HOU', pts:604,  reb:540, ast:509, stl:68,  blk:67,  tov:88,  fgm:245, fga:546, tpm:35, tpa:109, ftm:79,  fta:110, min:1883, gs:64, gp:71, dd:14, td:3 },
+      { pos:'C',  season:'2031-32', age:34, team:'HOU', pts:536,  reb:426, ast:407, stl:55,  blk:73,  tov:105, fgm:211, fga:449, tpm:28, tpa:105, ftm:86,  fta:103, min:1535, gs:53, gp:64, dd:5,  td:0 },
+      { pos:'C',  season:'2032-33', age:35, team:'HOU', pts:611,  reb:558, ast:548, stl:54,  blk:97,  tov:115, fgm:241, fga:546, tpm:37, tpa:113, ftm:92,  fta:116, min:2072, gs:76, gp:82, dd:6,  td:2 },
+      { pos:'PF',  season:'2033-34', age:36, team:'MEX', pts:568,  reb:599, ast:551, stl:62,  blk:79,  tov:122, fgm:225, fga:485, tpm:26, tpa:88, ftm:92,  fta:109, min:2031, gs:81, gp:81, dd:10,  td:1 },
+      { pos:'SF',  season:'2034-35', age:37, team:'MEX', pts:542,  reb:596, ast:569, stl:56,  blk:88,  tov:109, fgm:204, fga:473, tpm:29, tpa:88, ftm:87,  fta:111, min:1919, gs:82, gp:82, dd:7,  td:2 },
     ],
     contracts: {
       signings: [
         { date:'July 1, 2018',      team:'Washington Wizards', years:4, total:'$13.13M',  aav:'$3.28M',  note:'Rookie Contract' },
-        { date:'June 30, 2022',     team:'Washington Wizards', years:3, total:'$40.31M',  aav:'$13.44M', note:'' },
-        { date:'June 30, 2025',     team:'Washington Wizards', years:5, total:'$173.19M', aav:'$34.63M', note:'' },
-        { date:'June 30, 2030',     team:'Houston Rockets',    years:5, total:'$222.21M', aav:'$44.44M', note:'' },
+        { date:'June 30, 2022',     team:'Washington Wizards', years:3, total:'$40.31M',  aav:'$13.44M' },
+        { date:'June 30, 2025',     team:'Washington Wizards', years:5, total:'$173.19M', aav:'$34.63M' },
+        { date:'June 30, 2030',     team:'Houston Rockets',    years:5, total:'$222.21M', aav:'$44.44M' },
       ],
       trades: [
         {
@@ -551,10 +551,10 @@ window.PLAYER_STATS = {
           fromTeam:'Washington Wizards',
           toTeam:'Houston Rockets',
           sent:[
-            { type:'Player', text:'Sam Stogsdill' }
+            { type:'Player', text:'Sam Stogsdill', pos:'C', img:'' }
           ],
           received:[
-            { type:'Player', text:'Alex Costanza' }
+            { type:'Player', text:'Alex Costanza', pos:'SG', img:'' }
           ],
           notes:''
         },
@@ -563,33 +563,33 @@ window.PLAYER_STATS = {
           fromTeam:'Houston Rockets',
           toTeam:'Mexico City Flight',
           sent:[
-            { type:'Player', text:'Sam Stogsdill' },
+            { type:'Player', text:'Sam Stogsdill', pos:'C', img:'' },
             { type:'Pick',   text:'2036 2nd Round Pick' },
           ],
           received:[
-            { type:'Player', text:'Nolan Traore' }
+            { type:'Player', text:'Nolan Traore', pos:'PG', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1642849.png' }
           ],
           notes:''
         }
       ],
       seasons: [
-        { season:'2018-19', team:'Washington Wizards', salary:'$2.06M',  option:'' },
-        { season:'2019-20', team:'Washington Wizards', salary:'$2.42M',  option:'' },
-        { season:'2020-21', team:'Washington Wizards', salary:'$3.41M',  option:'' },
-        { season:'2021-22', team:'Washington Wizards', salary:'$5.24M',  option:'' },
-        { season:'2022-23', team:'Washington Wizards', salary:'$12.44M', option:'' },
-        { season:'2023-24', team:'Washington Wizards', salary:'$13.44M', option:'' },
-        { season:'2024-25', team:'Washington Wizards', salary:'$14.43M', option:'' },
-        { season:'2025-26', team:'Washington Wizards', salary:'$31.25M', option:'' },
-        { season:'2026-27', team:'Washington Wizards', salary:'$32.81M', option:'' },
-        { season:'2027-28', team:'Houston Rockets',    salary:'$34.45M', option:'' },
-        { season:'2028-29', team:'Houston Rockets',    salary:'$36.17M', option:'' },
-        { season:'2029-30', team:'Houston Rockets',    salary:'$37.98M', option:'' },
-        { season:'2030-31', team:'Houston Rockets',    salary:'$38.31M', option:'' },
-        { season:'2031-32', team:'Houston Rockets',    salary:'$41.38M', option:'' },
-        { season:'2032-33', team:'Houston Rockets',    salary:'$44.44M', option:'' },
-        { season:'2033-34', team:'Mexico City Flight',    salary:'$47.51M', option:'' },
-        { season:'2034-35', team:'Mexico City Flight',    salary:'$50.57M', option:'' },
+        { pos:'C',  season:'2018-19', team:'Washington Wizards', salary:'$2.06M',  option:'' },
+        { pos:'C',  season:'2019-20', team:'Washington Wizards', salary:'$2.42M',  option:'' },
+        { pos:'C',  season:'2020-21', team:'Washington Wizards', salary:'$3.41M',  option:'' },
+        { pos:'C',  season:'2021-22', team:'Washington Wizards', salary:'$5.24M',  option:'' },
+        { pos:'C',  season:'2022-23', team:'Washington Wizards', salary:'$12.44M', option:'' },
+        { pos:'C',  season:'2023-24', team:'Washington Wizards', salary:'$13.44M', option:'' },
+        { pos:'C',  season:'2024-25', team:'Washington Wizards', salary:'$14.43M', option:'' },
+        { pos:'C',  season:'2025-26', team:'Washington Wizards', salary:'$31.25M', option:'' },
+        { pos:'C',  season:'2026-27', team:'Washington Wizards', salary:'$32.81M', option:'' },
+        { pos:'C',  season:'2027-28', team:'Houston Rockets',    salary:'$34.45M', option:'' },
+        { pos:'C',  season:'2028-29', team:'Houston Rockets',    salary:'$36.17M', option:'' },
+        { pos:'C',  season:'2029-30', team:'Houston Rockets',    salary:'$37.98M', option:'' },
+        { pos:'C',  season:'2030-31', team:'Houston Rockets',    salary:'$38.31M', option:'' },
+        { pos:'C',  season:'2031-32', team:'Houston Rockets',    salary:'$41.38M', option:'' },
+        { pos:'C',  season:'2032-33', team:'Houston Rockets',    salary:'$44.44M', option:'' },
+        { pos:'C',  season:'2033-34', team:'Mexico City Flight',    salary:'$47.51M', option:'' },
+        { pos:'C',  season:'2034-35', team:'Mexico City Flight',    salary:'$50.57M', option:'' },
       ]
     },
     awards: {
@@ -628,7 +628,7 @@ window.PLAYER_STATS = {
       { team:'Team USA', name:'Away',  number:'13', bg:'#14325e', stroke:'#ff0000', num:'#ffffff', seasons:'2018–2027', img:'' },
       { team:'Houston Rockets',    name:'Away',  number:'33', bg:'#ff0000', stroke:'#FFFFFF', num:'#ffffff', seasons:'2027–Present', img:'' },
       { team:'Mexico City Flight',    name:'Away',  number:'34', bg:'#07b4c0', stroke:'#e54c19', num:'#ffffff', seasons:'2027–Present', img:'' },
-    ],
+    ]
   },
 
   /* ─────────────── JAYKEB STEWART ─────────────── */
@@ -639,8 +639,8 @@ window.PLAYER_STATS = {
       age:       '—',
       college:   'Florida State, Duke',
       draftYear: '2018',
-      draftPick: 'First Round, Eleventh Pick',
-      nickname:  '—',
+      draftPick: 'First Round, Eleventh Pick'
+
     },
     retired: true,
     photos: [
@@ -697,31 +697,31 @@ window.PLAYER_STATS = {
       { season:'2034-35', age:36, team:'BKN', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not play, coaches decision.' },
     ],
     totals: [
-      { season:'2018-19', age:20, team:'MIL', pos:'SF', pts:815,  reb:374, ast:370, stl:93,  blk:40,  tov:129, fgm:316, fga:609,  tpm:60,  tpa:186, ftm:123, fta:159, min:1936, gs:5,  gp:80, dd:5,  td:0 },
-      { season:'2019-20', age:21, team:'MIL', pos:'SF', pts:827,  reb:386, ast:427, stl:105, blk:37,  tov:123, fgm:311, fga:616,  tpm:81,  tpa:256, ftm:124, fta:151, min:1884, gs:12, gp:76, dd:4,  td:1 },
-      { season:'2020-21', age:22, team:'MIL', pos:'PG', pts:1055, reb:566, ast:529, stl:118, blk:44,  tov:154, fgm:394, fga:773,  tpm:131, tpa:344, ftm:136, fta:150, min:2425, gs:75, gp:82, dd:18, td:3 },
-      { season:'2021-22', age:23, team:'MIL', pos:'PG', pts:974,  reb:472, ast:470, stl:105, blk:34,  tov:130, fgm:321, fga:664,  tpm:121, tpa:320, ftm:211, fta:237, min:2002, gs:61, gp:65, dd:13, td:3 },
-      { season:'2022-23', age:24, team:'MIL', pos:'PG', pts:1288, reb:550, ast:530, stl:121, blk:57,  tov:172, fgm:414, fga:829,  tpm:185, tpa:450, ftm:275, fta:299, min:2308, gs:73, gp:76, dd:23, td:6 },
-      { season:'2023-24', age:25, team:'MIL', pos:'PG', pts:1572, reb:561, ast:590, stl:156, blk:46,  tov:166, fgm:520, fga:989,  tpm:225, tpa:520, ftm:307, fta:334, min:2423, gs:74, gp:77, dd:26, td:1 },
-      { season:'2024-25', age:26, team:'MIL', pos:'PG', pts:1471, reb:522, ast:604, stl:140, blk:53,  tov:141, fgm:492, fga:943,  tpm:220, tpa:509, ftm:267, fta:291, min:2434, gs:79, gp:79, dd:22, td:3 },
-      { season:'2025-26', age:27, team:'MIL', pos:'PG', pts:1349, reb:573, ast:681, stl:118, blk:48,  tov:205, fgm:484, fga:940,  tpm:190, tpa:463, ftm:191, fta:212, min:2344, gs:75, gp:75, dd:36, td:7,  star:true },
-      { season:'2026-27', age:28, team:'NYK', pos:'PG', pts:2280, reb:627, ast:827, stl:181, blk:108, tov:256, fgm:838, fga:1588, tpm:348, tpa:797, ftm:256, fta:265, min:2810, gs:82, gp:82, dd:52, td:10, champ:true },
-      { season:'2027-28', age:29, team:'CHI', pos:'PG', pts:1905, reb:508, ast:727, stl:160, blk:71,  tov:198, fgm:692, fga:1335, tpm:263, tpa:638, ftm:258, fta:270, min:2520, gs:82, gp:82, dd:33, td:3,  star:true },
-      { season:'2028-29', age:30, team:'CHI', pos:'PG', pts:1721, reb:493, ast:638, stl:151, blk:85,  tov:185, fgm:629, fga:1218, tpm:259, tpa:631, ftm:204, fta:214, min:2395, gs:77, gp:77, dd:29, td:5,  star:true },
-      { season:'2029-30', age:31, team:'CHI', pos:'PG', pts:1416, reb:393, ast:597, stl:103, blk:64,  tov:163, fgm:521, fga:1045, tpm:181, tpa:484, ftm:193, fta:213, min:1991, gs:65, gp:65, dd:34, td:3 },
-      { season:'2030-31', age:32, team:'CHI', pos:'PG', pts:1497, reb:446, ast:617, stl:157, blk:84,  tov:191, fgm:535, fga:1169, tpm:212, tpa:575, ftm:215, fta:226, min:2421, gs:82, gp:82, dd:21, td:1 },
-      { season:'2031-32', age:33, team:'CHI', pos:'PG', pts:652,  reb:192, ast:274, stl:53,  blk:48,  tov:79,  fgm:230, fga:485,  tpm:107, tpa:269, ftm:85,  fta:91,  min:1128, gs:39, gp:39, dd:4,  td:0 },
-      { season:'2032-33', age:34, team:'VAN', pos:'PG', pts:992,  reb:333, ast:506, stl:122,  blk:61,  tov:139,  fgm:335, fga:723,  tpm:164, tpa:407, ftm:158,  fta:166,  min:2171, gs:70, gp:82, dd:5,  td:0 },
-      { season:'2033-34', age:35, team:'VAN', pos:'SG', pts:582,  reb:208, ast:372, stl:72,  blk:53,  tov:97,  fgm:196, fga:465,  tpm:83, tpa:229, ftm:107,  fta:121,  min:1441, gs:8, gp:75, dd:1,  td:0 },
-      { season:'2034-35', age:36, team:'BKN', pos:'SF', pts:364,  reb:155, ast:218, stl:51,  blk:47,  tov:71,  fgm:121, fga:316,  tpm:61, tpa:169, ftm:61,  fta:64,  min:978, gs:5, gp:82, dd:1,  td:0 },
+      { pos:'SF',  season:'2018-19', age:20, team:'MIL', pts:815,  reb:374, ast:370, stl:93,  blk:40,  tov:129, fgm:316, fga:609,  tpm:60,  tpa:186, ftm:123, fta:159, min:1936, gs:5,  gp:80, dd:5,  td:0 },
+      { pos:'SF',  season:'2019-20', age:21, team:'MIL', pts:827,  reb:386, ast:427, stl:105, blk:37,  tov:123, fgm:311, fga:616,  tpm:81,  tpa:256, ftm:124, fta:151, min:1884, gs:12, gp:76, dd:4,  td:1 },
+      { pos:'PG',  season:'2020-21', age:22, team:'MIL', pts:1055, reb:566, ast:529, stl:118, blk:44,  tov:154, fgm:394, fga:773,  tpm:131, tpa:344, ftm:136, fta:150, min:2425, gs:75, gp:82, dd:18, td:3 },
+      { pos:'PG',  season:'2021-22', age:23, team:'MIL', pts:974,  reb:472, ast:470, stl:105, blk:34,  tov:130, fgm:321, fga:664,  tpm:121, tpa:320, ftm:211, fta:237, min:2002, gs:61, gp:65, dd:13, td:3 },
+      { pos:'PG',  season:'2022-23', age:24, team:'MIL', pts:1288, reb:550, ast:530, stl:121, blk:57,  tov:172, fgm:414, fga:829,  tpm:185, tpa:450, ftm:275, fta:299, min:2308, gs:73, gp:76, dd:23, td:6 },
+      { pos:'PG',  season:'2023-24', age:25, team:'MIL', pts:1572, reb:561, ast:590, stl:156, blk:46,  tov:166, fgm:520, fga:989,  tpm:225, tpa:520, ftm:307, fta:334, min:2423, gs:74, gp:77, dd:26, td:1 },
+      { pos:'PG',  season:'2024-25', age:26, team:'MIL', pts:1471, reb:522, ast:604, stl:140, blk:53,  tov:141, fgm:492, fga:943,  tpm:220, tpa:509, ftm:267, fta:291, min:2434, gs:79, gp:79, dd:22, td:3 },
+      { pos:'PG',  season:'2025-26', age:27, team:'MIL', pts:1349, reb:573, ast:681, stl:118, blk:48,  tov:205, fgm:484, fga:940,  tpm:190, tpa:463, ftm:191, fta:212, min:2344, gs:75, gp:75, dd:36, td:7,  star:true },
+      { pos:'PG',  season:'2026-27', age:28, team:'NYK', pts:2280, reb:627, ast:827, stl:181, blk:108, tov:256, fgm:838, fga:1588, tpm:348, tpa:797, ftm:256, fta:265, min:2810, gs:82, gp:82, dd:52, td:10, champ:true },
+      { pos:'PG',  season:'2027-28', age:29, team:'CHI', pts:1905, reb:508, ast:727, stl:160, blk:71,  tov:198, fgm:692, fga:1335, tpm:263, tpa:638, ftm:258, fta:270, min:2520, gs:82, gp:82, dd:33, td:3,  star:true },
+      { pos:'PG',  season:'2028-29', age:30, team:'CHI', pts:1721, reb:493, ast:638, stl:151, blk:85,  tov:185, fgm:629, fga:1218, tpm:259, tpa:631, ftm:204, fta:214, min:2395, gs:77, gp:77, dd:29, td:5,  star:true },
+      { pos:'PG',  season:'2029-30', age:31, team:'CHI', pts:1416, reb:393, ast:597, stl:103, blk:64,  tov:163, fgm:521, fga:1045, tpm:181, tpa:484, ftm:193, fta:213, min:1991, gs:65, gp:65, dd:34, td:3 },
+      { pos:'PG',  season:'2030-31', age:32, team:'CHI', pts:1497, reb:446, ast:617, stl:157, blk:84,  tov:191, fgm:535, fga:1169, tpm:212, tpa:575, ftm:215, fta:226, min:2421, gs:82, gp:82, dd:21, td:1 },
+      { pos:'PG',  season:'2031-32', age:33, team:'CHI', pts:652,  reb:192, ast:274, stl:53,  blk:48,  tov:79,  fgm:230, fga:485,  tpm:107, tpa:269, ftm:85,  fta:91,  min:1128, gs:39, gp:39, dd:4,  td:0 },
+      { pos:'PG',  season:'2032-33', age:34, team:'VAN', pts:992,  reb:333, ast:506, stl:122,  blk:61,  tov:139,  fgm:335, fga:723,  tpm:164, tpa:407, ftm:158,  fta:166,  min:2171, gs:70, gp:82, dd:5,  td:0 },
+      { pos:'SG',  season:'2033-34', age:35, team:'VAN', pts:582,  reb:208, ast:372, stl:72,  blk:53,  tov:97,  fgm:196, fga:465,  tpm:83, tpa:229, ftm:107,  fta:121,  min:1441, gs:8, gp:75, dd:1,  td:0 },
+      { pos:'SF',  season:'2034-35', age:36, team:'BKN', pts:364,  reb:155, ast:218, stl:51,  blk:47,  tov:71,  fgm:121, fga:316,  tpm:61, tpa:169, ftm:61,  fta:64,  min:978, gs:5, gp:82, dd:1,  td:0 },
     ],
     contracts: {
       signings: [
         { date:'July 1, 2018',      team:'Milwaukee Bucks',     years:4, total:'$16.91M',  aav:'$4.23M',  note:'Rookie Contract' },
-        { date:'July 2, 2022',      team:'Milwaukee Bucks',     years:5, total:'$176.51M', aav:'$35.30M', note:'' },
-        { date:'July 4, 2027',      team:'Chicago Bulls',       years:5, total:'$326.56M', aav:'$65.31M', note:'' },
-        { date:'June 30, 2032',     team:'Vancouver Grizzlies', years:2, total:'$32.65M',  aav:'$16.33M', note:'' },
-        { date:'July 7, 2034',     team:'Brooklyn Nets', years:1, total:'$2.30M',  aav:'$2.30M', note:'' },
+        { date:'July 2, 2022',      team:'Milwaukee Bucks',     years:5, total:'$176.51M', aav:'$35.30M' },
+        { date:'July 4, 2027',      team:'Chicago Bulls',       years:5, total:'$326.56M', aav:'$65.31M' },
+        { date:'June 30, 2032',     team:'Vancouver Grizzlies', years:2, total:'$32.65M',  aav:'$16.33M' },
+        { date:'July 7, 2034',     team:'Brooklyn Nets', years:1, total:'$2.30M',  aav:'$2.30M' },
       ],
       trades: [
         {
@@ -729,11 +729,11 @@ window.PLAYER_STATS = {
           fromTeam:'Milwaukee Bucks',
           toTeam:'New York Knicks',
           sent:[
-            { type:'Player', text:'Jaykeb Stewart' }
+            { type:'Player', text:'Jaykeb Stewart', pos:'SG', img:'' }
           ],
           received:[
-            { type:'Player', text:'DeAaron Fox' },
-            { type:'Player', text:'Wendell Carter Jr.' },
+            { type:'Player', text:'DeAaron Fox', pos:'PG', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1628368.png' },
+            { type:'Player', text:'Wendell Carter Jr.', pos:'C', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1628976.png' },
             { type:'Pick',   text:'2029 1st Round Pick' },
             { type:'Pick',   text:'2030 1st Round Pick' }
           ],
@@ -741,23 +741,23 @@ window.PLAYER_STATS = {
         }
       ],
       seasons: [
-        { season:'2018-19', team:'Milwaukee Bucks',     salary:'$2.82M',  option:'' },
-        { season:'2019-20', team:'Milwaukee Bucks',     salary:'$3.29M',  option:'' },
-        { season:'2020-21', team:'Milwaukee Bucks',     salary:'$4.64M',  option:'' },
-        { season:'2021-22', team:'Milwaukee Bucks',     salary:'$6.16M',  option:'' },
-        { season:'2022-23', team:'Milwaukee Bucks',     salary:'$30.43M', option:'' },
-        { season:'2023-24', team:'Milwaukee Bucks',     salary:'$32.87M', option:'' },
-        { season:'2024-25', team:'Milwaukee Bucks',     salary:'$35.30M', option:'' },
-        { season:'2025-26', team:'Milwaukee Bucks',     salary:'$37.74M', option:'' },
-        { season:'2026-27', team:'New York Knicks',     salary:'$40.17M', option:'' },
-        { season:'2027-28', team:'Chicago Bulls',       salary:'$55.67M', option:'' },
-        { season:'2028-29', team:'Chicago Bulls',       salary:'$60.12M', option:'' },
-        { season:'2029-30', team:'Chicago Bulls',       salary:'$64.92M', option:'' },
-        { season:'2030-31', team:'Chicago Bulls',       salary:'$70.12M', option:'' },
-        { season:'2031-32', team:'Chicago Bulls',       salary:'$75.73M', option:'' },
-        { season:'2032-33', team:'Vancouver Grizzlies', salary:'$13.75M', option:'' },
-        { season:'2033-34', team:'Vancouver Grizzlies', salary:'$18.90M', option:'' },
-        { season:'2034-35', team:'Brooklyn Nets', salary:'$2.30M', option:'' },
+        { pos:'SG',  season:'2018-19', team:'Milwaukee Bucks',     salary:'$2.82M',  option:'' },
+        { pos:'SG',  season:'2019-20', team:'Milwaukee Bucks',     salary:'$3.29M',  option:'' },
+        { pos:'SG',  season:'2020-21', team:'Milwaukee Bucks',     salary:'$4.64M',  option:'' },
+        { pos:'SG',  season:'2021-22', team:'Milwaukee Bucks',     salary:'$6.16M',  option:'' },
+        { pos:'SG',  season:'2022-23', team:'Milwaukee Bucks',     salary:'$30.43M', option:'' },
+        { pos:'SG',  season:'2023-24', team:'Milwaukee Bucks',     salary:'$32.87M', option:'' },
+        { pos:'SG',  season:'2024-25', team:'Milwaukee Bucks',     salary:'$35.30M', option:'' },
+        { pos:'SG',  season:'2025-26', team:'Milwaukee Bucks',     salary:'$37.74M', option:'' },
+        { pos:'SG',  season:'2026-27', team:'New York Knicks',     salary:'$40.17M', option:'' },
+        { pos:'SG',  season:'2027-28', team:'Chicago Bulls',       salary:'$55.67M', option:'' },
+        { pos:'SG',  season:'2028-29', team:'Chicago Bulls',       salary:'$60.12M', option:'' },
+        { pos:'SG',  season:'2029-30', team:'Chicago Bulls',       salary:'$64.92M', option:'' },
+        { pos:'SG',  season:'2030-31', team:'Chicago Bulls',       salary:'$70.12M', option:'' },
+        { pos:'SG',  season:'2031-32', team:'Chicago Bulls',       salary:'$75.73M', option:'' },
+        { pos:'SG',  season:'2032-33', team:'Vancouver Grizzlies', salary:'$13.75M', option:'' },
+        { pos:'SG',  season:'2033-34', team:'Vancouver Grizzlies', salary:'$18.90M', option:'' },
+        { pos:'SG',  season:'2034-35', team:'Brooklyn Nets', salary:'$2.30M', option:'' },
       ]
     },
     awards: {
@@ -807,7 +807,7 @@ window.PLAYER_STATS = {
       { team:'Chicago Bulls',       name:'Away',  number:'2', bg:'#ff0000', stroke:'#110201', num:'#ffffff', seasons:'2027–2032', img:'' },
       { team:'Vancouver Grizzlies', name:'Home',  number:'11', bg:'#1a1970', stroke:'#6ca5cc', num:'#ffffff', seasons:'2032–Present', img:'' },
       { team:'Brooklyn Nets', name:'Home',  number:'11', bg:'#000000', stroke:'#ffffff', num:'#ffffff', seasons:'2032–Present', img:'' },
-    ],
+    ]
   },
 
   /* ─────────────── ISAAC VITEL ─────────────── */
@@ -818,8 +818,8 @@ window.PLAYER_STATS = {
       age:       '—',
       college:   'Kansas',
       draftYear: '2017',
-      draftPick: 'First Round, Sixth Pick',
-      nickname:  '\"V8\"',
+      draftPick: 'First Round, Sixth Pick'
+
     },
     retired: true,
     photos: [
@@ -875,32 +875,32 @@ window.PLAYER_STATS = {
       { season:'2033-34', age:36, team:'STL', ppg:0, rpg:0, apg:0, spg:0, bpg:0, topg:0, fgp:'', tpp:'', ftp:'', tpa:0, gs:0, gp:0, mpg:0, dnq:true, note:'Did not qualify.' },
     ],
     totals: [
-      { season:'2017-18', age:20, team:'ORL', pos:'PG', pts:1194, reb:224, ast:201, stl:91,  blk:7,  tov:194, fgm:482, fga:1095, tpm:42,  tpa:160, ftm:188, fta:250, min:2258, gs:77, gp:77, dd:0, td:0 },
-      { season:'2018-19', age:21, team:'ORL', pos:'SG', pts:1359, reb:242, ast:271, stl:81,  blk:7,  tov:180, fgm:492, fga:1068, tpm:146, tpa:405, ftm:229, fta:321, min:2325, gs:73, gp:80, dd:0, td:0 },
-      { season:'2019-20', age:22, team:'ORL', pos:'SG', pts:1558, reb:330, ast:328, stl:82,  blk:13, tov:184, fgm:549, fga:1148, tpm:204, tpa:523, ftm:256, fta:344, min:2517, gs:82, gp:82, dd:1, td:0 },
-      { season:'2020-21', age:23, team:'ORL', pos:'SG', pts:1628, reb:404, ast:362, stl:115, blk:27, tov:195, fgm:562, fga:1130, tpm:238, tpa:587, ftm:266, fta:319, min:2554, gs:82, gp:82, dd:3, td:0 },
-      { season:'2021-22', age:24, team:'ORL', pos:'SG', pts:1658, reb:465, ast:356, stl:107, blk:19, tov:196, fgm:573, fga:1143, tpm:243, tpa:590, ftm:269, fta:305, min:2648, gs:81, gp:81, dd:5, td:0, star:true },
-      { season:'2022-23', age:25, team:'ORL', pos:'SG', pts:1397, reb:401, ast:313, stl:100, blk:23, tov:155, fgm:474, fga:979,  tpm:199, tpa:518, ftm:250, fta:286, min:2273, gs:72, gp:72, dd:5, td:0 },
-      { season:'2023-24', age:26, team:'ORL', pos:'SG', pts:1767, reb:408, ast:381, stl:121, blk:18, tov:195, fgm:577, fga:1184, tpm:260, tpa:617, ftm:353, fta:405, min:2577, gs:76, gp:76, dd:4, td:0 },
-      { season:'2024-25', age:27, team:'ORL', pos:'SG', pts:1412, reb:384, ast:347, stl:104, blk:25, tov:181, fgm:494, fga:1037, tpm:213, tpa:544, ftm:211, fta:250, min:2375, gs:74, gp:74, dd:0, td:0 },
-      { season:'2025-26', age:28, team:'DEN', pos:'PG', pts:1696, reb:427, ast:238, stl:103, blk:22, tov:213, fgm:599, fga:1219, tpm:155, tpa:449, ftm:343, fta:380, min:2207, gs:72, gp:72, dd:5, td:0 },
-      { season:'2026-27', age:29, team:'DEN', pos:'PG', pts:1831, reb:450, ast:299, stl:115, blk:15, tov:212, fgm:703, fga:1322, tpm:133, tpa:403, ftm:292, fta:336, min:2432, gs:78, gp:78, dd:3, td:0 },
-      { season:'2027-28', age:30, team:'DEN', pos:'PG', pts:1467, reb:375, ast:317, stl:107, blk:21, tov:168, fgm:532, fga:1027, tpm:63,  tpa:234, ftm:340, fta:380, min:2139, gs:75, gp:75, dd:5, td:0 },
-      { season:'2028-29', age:31, team:'DEN', pos:'PG', pts:1575, reb:393, ast:261, stl:99,  blk:16, tov:164, fgm:644, fga:1245, tpm:73,  tpa:281, ftm:214, fta:242, min:2227, gs:82, gp:82, dd:1, td:0 },
-      { season:'2029-30', age:32, team:'IND', pos:'SG', pts:1222, reb:379, ast:266, stl:104, blk:28, tov:153, fgm:496, fga:966,  tpm:63,  tpa:223, ftm:167, fta:198, min:2159, gs:82, gp:82, dd:0, td:0 },
-      { season:'2030-31', age:33, team:'IND', pos:'SG', pts:958,  reb:275, ast:241, stl:94,  blk:13, tov:133, fgm:385, fga:788,  tpm:57,  tpa:210, ftm:131, fta:153, min:2014, gs:80, gp:81, dd:0, td:0 },
-      { season:'2031-32', age:34, team:'IND', pos:'SF', pts:1057, reb:314, ast:285, stl:102, blk:17, tov:161, fgm:395, fga:834,  tpm:51,  tpa:202, ftm:216, fta:236, min:2091, gs:15, gp:82, dd:1, td:0 },
-      { season:'2032-33', age:35, team:'IND', pos:'SF', pts:991, reb:285, ast:189, stl:77, blk:15, tov:166, fgm:363, fga:784,  tpm:58,  tpa:197, ftm:207, fta:230, min:1941, gs:1, gp:82, dd:0, td:0 },
-      { season:'2033-34', age:36, team:'STL', pos:'SG', pts:442, reb:168, ast:124, stl:67, blk:10, tov:71, fgm:168, fga:410,  tpm:28,  tpa:102, ftm:78, fta:88, min:1194, gs:50, gp:55, dd:0, td:0 },
+      { pos:'PG',  season:'2017-18', age:20, team:'ORL', pts:1194, reb:224, ast:201, stl:91,  blk:7,  tov:194, fgm:482, fga:1095, tpm:42,  tpa:160, ftm:188, fta:250, min:2258, gs:77, gp:77, dd:0, td:0 },
+      { pos:'SG',  season:'2018-19', age:21, team:'ORL', pts:1359, reb:242, ast:271, stl:81,  blk:7,  tov:180, fgm:492, fga:1068, tpm:146, tpa:405, ftm:229, fta:321, min:2325, gs:73, gp:80, dd:0, td:0 },
+      { pos:'SG',  season:'2019-20', age:22, team:'ORL', pts:1558, reb:330, ast:328, stl:82,  blk:13, tov:184, fgm:549, fga:1148, tpm:204, tpa:523, ftm:256, fta:344, min:2517, gs:82, gp:82, dd:1, td:0 },
+      { pos:'SG',  season:'2020-21', age:23, team:'ORL', pts:1628, reb:404, ast:362, stl:115, blk:27, tov:195, fgm:562, fga:1130, tpm:238, tpa:587, ftm:266, fta:319, min:2554, gs:82, gp:82, dd:3, td:0 },
+      { pos:'SG',  season:'2021-22', age:24, team:'ORL', pts:1658, reb:465, ast:356, stl:107, blk:19, tov:196, fgm:573, fga:1143, tpm:243, tpa:590, ftm:269, fta:305, min:2648, gs:81, gp:81, dd:5, td:0, star:true },
+      { pos:'SG',  season:'2022-23', age:25, team:'ORL', pts:1397, reb:401, ast:313, stl:100, blk:23, tov:155, fgm:474, fga:979,  tpm:199, tpa:518, ftm:250, fta:286, min:2273, gs:72, gp:72, dd:5, td:0 },
+      { pos:'SG',  season:'2023-24', age:26, team:'ORL', pts:1767, reb:408, ast:381, stl:121, blk:18, tov:195, fgm:577, fga:1184, tpm:260, tpa:617, ftm:353, fta:405, min:2577, gs:76, gp:76, dd:4, td:0 },
+      { pos:'SG',  season:'2024-25', age:27, team:'ORL', pts:1412, reb:384, ast:347, stl:104, blk:25, tov:181, fgm:494, fga:1037, tpm:213, tpa:544, ftm:211, fta:250, min:2375, gs:74, gp:74, dd:0, td:0 },
+      { pos:'PG',  season:'2025-26', age:28, team:'DEN', pts:1696, reb:427, ast:238, stl:103, blk:22, tov:213, fgm:599, fga:1219, tpm:155, tpa:449, ftm:343, fta:380, min:2207, gs:72, gp:72, dd:5, td:0 },
+      { pos:'PG',  season:'2026-27', age:29, team:'DEN', pts:1831, reb:450, ast:299, stl:115, blk:15, tov:212, fgm:703, fga:1322, tpm:133, tpa:403, ftm:292, fta:336, min:2432, gs:78, gp:78, dd:3, td:0 },
+      { pos:'PG',  season:'2027-28', age:30, team:'DEN', pts:1467, reb:375, ast:317, stl:107, blk:21, tov:168, fgm:532, fga:1027, tpm:63,  tpa:234, ftm:340, fta:380, min:2139, gs:75, gp:75, dd:5, td:0 },
+      { pos:'PG',  season:'2028-29', age:31, team:'DEN', pts:1575, reb:393, ast:261, stl:99,  blk:16, tov:164, fgm:644, fga:1245, tpm:73,  tpa:281, ftm:214, fta:242, min:2227, gs:82, gp:82, dd:1, td:0 },
+      { pos:'SG',  season:'2029-30', age:32, team:'IND', pts:1222, reb:379, ast:266, stl:104, blk:28, tov:153, fgm:496, fga:966,  tpm:63,  tpa:223, ftm:167, fta:198, min:2159, gs:82, gp:82, dd:0, td:0 },
+      { pos:'SG',  season:'2030-31', age:33, team:'IND', pts:958,  reb:275, ast:241, stl:94,  blk:13, tov:133, fgm:385, fga:788,  tpm:57,  tpa:210, ftm:131, fta:153, min:2014, gs:80, gp:81, dd:0, td:0 },
+      { pos:'SF',  season:'2031-32', age:34, team:'IND', pts:1057, reb:314, ast:285, stl:102, blk:17, tov:161, fgm:395, fga:834,  tpm:51,  tpa:202, ftm:216, fta:236, min:2091, gs:15, gp:82, dd:1, td:0 },
+      { pos:'SF',  season:'2032-33', age:35, team:'IND', pts:991, reb:285, ast:189, stl:77, blk:15, tov:166, fgm:363, fga:784,  tpm:58,  tpa:197, ftm:207, fta:230, min:1941, gs:1, gp:82, dd:0, td:0 },
+      { pos:'SG',  season:'2033-34', age:36, team:'STL', pts:442, reb:168, ast:124, stl:67, blk:10, tov:71, fgm:168, fga:410,  tpm:28,  tpa:102, ftm:78, fta:88, min:1194, gs:50, gp:55, dd:0, td:0 },
     ],
     contracts: {
       signings: [
         { date:'June 30, 2017',      team:'Orlando Magic',   years:4, total:'$23.66M',  aav:'$5.92M',  note:'Rookie Contract' },
-        { date:'July 5, 2021',       team:'Orlando Magic',   years:5, total:'$163.01M', aav:'$32.60M', note:'' },
-        { date:'June 15, 2025',      team:'Denver Nuggets',  years:4, total:'$180.55M', aav:'$45.14M', note:'' },
+        { date:'July 5, 2021',       team:'Orlando Magic',   years:5, total:'$163.01M', aav:'$32.60M' },
+        { date:'June 15, 2025',      team:'Denver Nuggets',  years:4, total:'$180.55M', aav:'$45.14M' },
         { date:'July 4, 2029',       team:'Indiana Pacers',  years:2, total:'$12.78M',  aav:'$6.39M',  note:'Player Option Waived' },
-        { date:'July 1, 2030',       team:'Indiana Pacers',  years:3, total:'$37.93M',  aav:'$12.64M', note:'' },
-        { date:'July 2, 2033',       team:'St. Louis Spirit',  years:1, total:'$2.57M',  aav:'$2.57M', note:'' },
+        { date:'July 1, 2030',       team:'Indiana Pacers',  years:3, total:'$37.93M',  aav:'$12.64M' },
+        { date:'July 2, 2033',       team:'St. Louis Spirit',  years:1, total:'$2.57M',  aav:'$2.57M' },
       ],
       trades: [
         {
@@ -908,10 +908,10 @@ window.PLAYER_STATS = {
           fromTeam:'Orlando Magic',
           toTeam:'Denver Nuggets',
           sent:[
-            { type:'Player', text:'Isaac Vitel' }
+            { type:'Player', text:'Isaac Vitel', pos:'SG', img:'' }
           ],
           received:[
-            { type:'Player', text:'Markelle Fultz' },
+            { type:'Player', text:'Markelle Fultz', pos:'PG', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1628365.png' },
             { type:'Pick',   text:'2027 1st Round Pick' },
             { type:'Pick',   text:'2028 1st Round Pick' }
           ],
@@ -922,34 +922,34 @@ window.PLAYER_STATS = {
           fromTeam:'Denver Nuggets',
           toTeam:'Utah Jazz',
           sent:[
-            { type:'Player', text:'Isaac Vitel' },
+            { type:'Player', text:'Isaac Vitel', pos:'SG', img:'' },
             { type:'Pick',   text:'2033 1st Round Pick' }
           ],
           received:[
-            { type:'Player', text:'Kobe Bufkin' }
+            { type:'Player', text:'Kobe Bufkin', pos:'SG', img:'https://cdn.nba.com/headshots/nba/latest/1040x760/1641723.png' }
           ],
           notes:''
         }
       ],
       seasons: [
-        { season:'2017-18', team:'Orlando Magic',   salary:'$3.48M',  option:'' },
-        { season:'2018-19', team:'Orlando Magic',   salary:'$4.14M',  option:'' },
-        { season:'2019-20', team:'Orlando Magic',   salary:'$7.84M',  option:'' },
-        { season:'2020-21', team:'Orlando Magic',   salary:'$8.20M',  option:'' },
-        { season:'2021-22', team:'Orlando Magic',   salary:'$28.11M', option:'' },
-        { season:'2022-23', team:'Orlando Magic',   salary:'$30.35M', option:'' },
-        { season:'2023-24', team:'Orlando Magic',   salary:'$32.60M', option:'' },
-        { season:'2024-25', team:'Orlando Magic',   salary:'$34.85M', option:'' },
-        { season:'2025-26', team:'Denver Nuggets',  salary:'$37.10M', option:'' },
-        { season:'2026-27', team:'Denver Nuggets',  salary:'$40.07M', option:'' },
-        { season:'2027-28', team:'Denver Nuggets',  salary:'$43.27M', option:'' },
-        { season:'2028-29', team:'Denver Nuggets',  salary:'$46.74M', option:'' },
-        { season:'2029-30', team:'Utah Jazz',        salary:'$50.47M', option:'waived' },
-        { season:'2029-30', team:'Indiana Pacers',  salary:'$6.07M',  option:'' },
-        { season:'2030-31', team:'Indiana Pacers',  salary:'$14.74M', option:'' },
-        { season:'2031-32', team:'Indiana Pacers',  salary:'$12.98M', option:'' },
-        { season:'2032-33', team:'Indiana Pacers',  salary:'$10.21M', option:'' },
-        { season:'2033-34', team:'St. Louis Spirit',  salary:'$2.57M', option:'' },
+        { pos:'SG',  season:'2017-18', team:'Orlando Magic',   salary:'$3.48M',  option:'' },
+        { pos:'SG',  season:'2018-19', team:'Orlando Magic',   salary:'$4.14M',  option:'' },
+        { pos:'SG',  season:'2019-20', team:'Orlando Magic',   salary:'$7.84M',  option:'' },
+        { pos:'SG',  season:'2020-21', team:'Orlando Magic',   salary:'$8.20M',  option:'' },
+        { pos:'SG',  season:'2021-22', team:'Orlando Magic',   salary:'$28.11M', option:'' },
+        { pos:'SG',  season:'2022-23', team:'Orlando Magic',   salary:'$30.35M', option:'' },
+        { pos:'SG',  season:'2023-24', team:'Orlando Magic',   salary:'$32.60M', option:'' },
+        { pos:'SG',  season:'2024-25', team:'Orlando Magic',   salary:'$34.85M', option:'' },
+        { pos:'SG',  season:'2025-26', team:'Denver Nuggets',  salary:'$37.10M', option:'' },
+        { pos:'SG',  season:'2026-27', team:'Denver Nuggets',  salary:'$40.07M', option:'' },
+        { pos:'SG',  season:'2027-28', team:'Denver Nuggets',  salary:'$43.27M', option:'' },
+        { pos:'SG',  season:'2028-29', team:'Denver Nuggets',  salary:'$46.74M', option:'' },
+        { pos:'SG',  season:'2029-30', team:'Utah Jazz',        salary:'$50.47M', option:'waived' },
+        { pos:'SG',  season:'2029-30', team:'Indiana Pacers',  salary:'$6.07M',  option:'' },
+        { pos:'SG',  season:'2030-31', team:'Indiana Pacers',  salary:'$14.74M', option:'' },
+        { pos:'SG',  season:'2031-32', team:'Indiana Pacers',  salary:'$12.98M', option:'' },
+        { pos:'SG',  season:'2032-33', team:'Indiana Pacers',  salary:'$10.21M', option:'' },
+        { pos:'SG',  season:'2033-34', team:'St. Louis Spirit',  salary:'$2.57M', option:'' },
 
       ]
     },
