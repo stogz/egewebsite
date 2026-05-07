@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="EGE_Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey · EGE NBA Simulation</title>
+  <script>document.addEventListener("DOMContentLoaded",function(){if(window.EGE_SIM&&window.EGE_SIM.id!=="sim-original"){document.title=document.title.replace("EGE NBA Simulation","EGE "+window.EGE_SIM.label+" Simulation");}});</script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <script src="sim-config.js"></script>
+  <style>
+    /* ── BASE ── */
+    :root{--gold:#c9a84c;--gold-fade:rgba(201,168,76,.07);--gold-border:rgba(201,168,76,.28);}
+    body{display:flex;flex-direction:column;min-height:100vh;}
+    body>footer{margin-top:auto;}
+
+    /* ── PAGE HERO ── */
+    .survey-hero{position:relative;z-index:2;padding:96px 60px 48px;border-bottom:1px solid var(--border);background:var(--bg-section);}
+    .survey-hero-inner{max-width:900px;margin:0 auto;}
+    .survey-eyebrow{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
+    .survey-eyebrow::before{content:'';}
+    .survey-title{font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,6vw,5rem);text-transform:uppercase;letter-spacing:-.02em;color:var(--heading);line-height:.95;margin-bottom:16px;transition:color .35s;}
+    .survey-sub{font-family:var(--font-body);font-size:1.05rem;font-weight:300;color:var(--text-muted);line-height:1.6;max-width:560px;}
+    .survey-hero-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap;}
+    .survey-hero-chip{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--border);padding:5px 12px;display:flex;align-items:center;gap:6px;}
+    .survey-hero-chip-dot{width:5px;height:5px;border-radius:50%;background:var(--text-muted);}
+
+    /* ── MAIN WRAP ── */
+    .survey-wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:40px 60px 160px;width:100%;box-sizing:border-box;flex:1;}
+
+    /* ── SUBMITTED BANNER ── */
+    .survey-banner{display:none;align-items:center;gap:12px;padding:14px 20px;border:1px solid rgba(231,87,25,.3);background:rgba(231,87,25,.06);margin-bottom:40px;}
+    .survey-banner.visible{display:flex;}
+    .survey-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;animation:blink 1.8s ease-in-out infinite;}
+    .survey-banner-text{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);}
+
+    /* ── IDENTITY BOX ── */
+    .survey-identity{margin-bottom:40px;}
+    .survey-identity-label{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:block;}
+    .survey-select-wrap{position:relative;}
+    .survey-select{width:100%;appearance:none;-webkit-appearance:none;background:var(--bg-card);border:1px solid var(--border);color:var(--text);font-family:var(--font-display);font-weight:600;font-size:1.1rem;letter-spacing:.04em;text-transform:uppercase;padding:14px 44px 14px 18px;outline:none;cursor:pointer;transition:border-color .2s,background .2s;}
+    .survey-select:focus,.survey-select.chosen{border-color:var(--text-muted);background:var(--bg-section);}
+    .survey-select-arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:.8rem;}
+    .survey-select option{background:var(--bg);color:var(--text);}
+
+    /* ── SECTION DIVIDER ── */
+    .survey-section-header{margin:56px 0 32px;padding-bottom:16px;border-bottom:2px solid rgba(231,87,25,.3);display:flex;align-items:flex-end;justify-content:space-between;}
+    .survey-section-eyebrow{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+    .survey-section-eyebrow::before{content:'';}
+    .survey-section-title{font-family:var(--font-display);font-weight:900;font-size:clamp(1.6rem,3.5vw,2.6rem);text-transform:uppercase;color:var(--heading);line-height:1;transition:color .35s;}
+
+    /* ── QUESTION CARD ── */
+    .survey-q{margin-bottom:36px;position:relative;overflow:visible;}
+    
+
+    /* Question box */
+    .survey-q{margin-bottom:36px;position:relative;overflow:visible;border:1px solid var(--border);background:var(--bg-card);transition:background .35s;}
+
+    /* ── AWARD TITLE PLAQUE ── */
+    .survey-q-plaque{
+      padding:24px 160px 0 24px;
+      position:relative;
+    }
+    /* Divider line below plaque */
+    .survey-q-divider{
+      height:1px;
+      background:var(--border);
+      margin:14px 0 0;
+      position:relative;
+      z-index:2;
+    }
+    .survey-q-sub{padding:4px 24px 8px;font-family:var(--font-body);font-size:.88rem;font-weight:300;color:var(--text-muted);line-height:1.5;position:relative;z-index:1;}
+    /* Trophy anchored to divider — 90% above, 10% below */
+    .survey-q::before{ content:none; }
+    .survey-q-divider::after{
+      content:'🏆';
+      position:absolute;
+      bottom:-28px;    /* shifts trophy so top overflows ~14px above card, base ~28px below divider */
+      right:40px;
+      font-size:9rem;  /* ~140px tall: 126px above divider, 14px below */
+      line-height:1;
+      transform:rotate(12deg);
+      opacity:.85;
+      pointer-events:none;
+      filter:drop-shadow(0 6px 20px rgba(0,0,0,.6));
+      transition:opacity .3s, transform .3s;
+      z-index:0;
+    }
+    .survey-q:hover .survey-q-divider::after{
+      opacity:1;
+      transform:rotate(7deg) scale(1.05);
+    }
+    /* Award name is now the BIG line */
+    .survey-q-name{
+      display:block;
+      font-family:var(--font-mono);font-size:.62rem;
+      text-transform:uppercase;letter-spacing:.22em;
+      color:var(--orange);margin-bottom:4px;
+    }
+    /* Award descriptor is now the LARGE headline */
+    .survey-q-award{
+      display:block;
+      font-family:var(--font-display);font-weight:900;font-size:1.9rem;
+      text-transform:uppercase;letter-spacing:.03em;line-height:1;
+      color:var(--heading);
+    }
+
+    /* Reset btn turns red on hover */
+
+
+    /* ── TEXTAREA ── */
+    .survey-textarea{width:100%;background:rgba(35,26,165,.04);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:.95rem;line-height:1.6;padding:14px 16px;resize:vertical;min-height:100px;box-sizing:border-box;outline:none;transition:border-color .2s,background .2s;}
+    .survey-textarea:focus{border-color:rgba(35,26,165,.5);background:rgba(35,26,165,.03);}
+    .survey-textarea::placeholder{color:var(--text-muted);opacity:.5;}
+
+    /* ── SUBMIT AREA ── */
+    .survey-submit-area{padding:32px 24px 36px;border-top:1px solid var(--border);display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+    .survey-submit{display:inline-flex;align-items:center;gap:10px;padding:14px 40px;background:var(--orange);border:none;color:#fff;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;font-weight:700;transition:opacity .2s,box-shadow .2s,transform .15s;}
+    .survey-submit:hover{opacity:.88;box-shadow:0 4px 22px rgba(231,87,25,.35);transform:translateY(-1px);}
+    .survey-submit:active{transform:translateY(0);}
+    .survey-submit:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+    .survey-status{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);}
+    .survey-status.ok{color:#22c55e;}
+    .survey-status.err{color:#ef4444;}
+
+    /* ── RANKING WIDGET ── */
+    .rank-pool-label,.rank-list-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+    .rank-pool{display:flex;flex-wrap:nowrap;flex-direction:column;padding:8px 6px;border:1px dashed var(--border);background:var(--bg-section);transition:border-color .2s,background .2s;gap:8px;align-items:center;}
+    .rank-pool.drag-over{border-color:var(--orange);background:rgba(231,87,25,.06);}
+    .rank-list{display:flex;flex-direction:column;gap:6px;}
+    .rank-slot{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid var(--border);background:var(--bg-section);min-height:72px;transition:border-color .15s,background .15s;}
+    .rank-slot.drag-over{border-color:var(--orange);background:rgba(231,87,25,.06);}
+    .rank-slot-num{font-family:var(--font-display);font-weight:900;font-size:1.8rem;color:var(--border);line-height:1;width:32px;flex-shrink:0;transition:color .2s;}
+    .rank-slot.filled .rank-slot-num{color:var(--orange);}
+    .rank-slot-placeholder{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);opacity:.28;}
+    .rank-card{position:relative;cursor:grab;user-select:none;transition:opacity .15s,transform .1s;flex-shrink:0;}
+    .rank-card:hover{transform:translateY(-2px);}
+    .rank-slot .rank-card:hover,.rank-pool.sticky-active .rank-card:hover{transform:none;}
+    .rank-card:active{cursor:grabbing;}
+    .rank-card.dragging{opacity:.25;}
+    .rank-card-box{position:relative;width:80px;height:80px;flex-shrink:0;}
+    .rank-card-box-inner{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:2px solid transparent;background:rgba(35,26,165,.12);}
+    .rank-card-box-inner img.rank-headshot{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;border-radius:50%;}
+    .rank-card-team-logo{position:absolute;bottom:-6px;right:-6px;width:30px;height:30px;z-index:30;pointer-events:none;}
+    .rank-card-team-logo img{width:30px;height:30px;object-fit:contain;display:block;}
+    .rank-card-name{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-top:10px;text-align:center;white-space:nowrap;}
+    .rank-slot .rank-card{display:flex;align-items:center;gap:12px;}
+    .rank-slot .rank-card-box{width:52px;height:52px;}
+    .rank-slot .rank-card-name{margin-top:0;text-align:left;font-size:.6rem;color:var(--text);}
+    .rank-slot .rank-card-team-logo{width:20px;height:20px;bottom:-4px;right:-4px;}
+    .rank-slot .rank-card-team-logo img{width:20px;height:20px;}
+    .rank-card-year{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);text-align:center;margin-top:3px;white-space:nowrap;}
+    .rank-slot .rank-card-year{margin-top:0;text-align:left;font-size:.54rem;}
+    .rank-card-trophy{position:absolute;bottom:-8px;left:-10px;width:32px;height:40px;z-index:31;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));object-fit:contain;}
+    .rank-slot .rank-card-trophy{width:24px;height:30px;bottom:-6px;left:-8px;}
+
+    /* Reset + Pin button */
+    .rank-reset-btn{background:transparent;border:none;color:var(--text-muted);cursor:pointer;transition:color .15s;padding:2px 4px;font-size:1rem;line-height:1;display:flex;align-items:center;}
+    .rank-reset-btn:hover{color:#ef4444 !important;}
+
+    /* ── STICKY POOL ── */
+    .pool-sticky-dock{
+      display:none;
+      position:fixed;bottom:0;left:0;right:0;z-index:500;
+      background:var(--bg-nav);backdrop-filter:blur(16px);
+      border-top:2px solid var(--orange);
+      padding:10px 24px 12px;
+      box-shadow:0 -4px 24px rgba(0,0,0,.35);
+    }
+    .pool-sticky-dock.visible{display:block;}
+    .pool-sticky-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .pool-sticky-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);}
+    .pool-sticky-actions{display:flex;align-items:center;gap:6px;}
+    .pool-sticky-pool{display:flex;flex-wrap:nowrap;gap:12px;overflow-x:auto;padding-bottom:4px;min-height:80px;align-items:center;}
+    .pool-sticky-pool::-webkit-scrollbar{height:3px;}
+    .pool-sticky-pool::-webkit-scrollbar-track{background:transparent;}
+    .pool-sticky-pool::-webkit-scrollbar-thumb{background:rgba(231,87,25,.4);border-radius:2px;}
+    .pool-sticky-pool .rank-card{flex-shrink:0;}
+    .pool-sticky-pool .tweet-card{flex-shrink:0;}
+
+    /* ── STAT TOOLTIP ── */
+    .rank-stat-tooltip{position:fixed;z-index:9999;pointer-events:none;display:none;padding:10px 14px;min-width:200px;border:2px solid #fff;box-shadow:0 4px 24px rgba(0,0,0,.5);}
+    @keyframes rankTtIn{0%{opacity:0;transform:translateY(6px) scale(.97);}100%{opacity:1;transform:translateY(0) scale(1);}}
+    .rank-stat-tooltip.visible{animation:rankTtIn .18s cubic-bezier(.22,.68,0,1.2) both;}
+    .rank-tt-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.12);}
+    html.light .rank-tt-header{border-bottom-color:rgba(0,0,0,.1);}
+    .rank-tt-name{font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.02em;text-transform:uppercase;}
+    .rank-tt-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+    .rank-tt-logo{width:22px;height:22px;object-fit:contain;}
+    .rank-tt-year{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;opacity:.7;}
+    .rank-tt-row{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+    html.light .rank-tt-row{border-bottom-color:rgba(0,0,0,.07);}
+    .rank-tt-row:last-child{border-bottom:none;}
+    .rank-tt-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;opacity:.55;}
+    .rank-tt-val{font-family:var(--font-display);font-weight:400;font-size:.95rem;}
+    .rank-tt-compare{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid rgba(201,168,76,.1);}
+    .rank-tt-compare:last-child{border-bottom:none;}
+    .rank-tt-cmp-label{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;flex-shrink:0;min-width:28px;}
+    .rank-tt-cmp-vals{display:flex;align-items:center;gap:6px;}
+    .rank-tt-cmp-rs{font-family:var(--font-display);font-weight:400;font-size:.88rem;}
+    .rank-tt-cmp-arrow{font-size:.7rem;flex-shrink:0;}
+    .rank-tt-cmp-po{font-family:var(--font-display);font-weight:700;font-size:.95rem;}
+
+    /* ── TIERLIST ── */
+    .tierlist{display:flex;flex-direction:column;gap:4px;}
+    .tier-row{display:flex;align-items:stretch;min-height:80px;border:1px solid var(--border);overflow:visible;transition:border-color .15s;}
+    .tier-label{width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:1.9rem;letter-spacing:-.02em;border-right:1px solid var(--border);}
+    .tier-drop{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:var(--bg-card);min-height:80px;align-items:flex-start;align-content:flex-start;transition:background .15s;}
+    .tier-drop.drag-over{background:rgba(35,26,165,.08);}
+    .tier-row[data-tier="S"] .tier-label{background:rgba(147,51,234,.18);color:#9333ea;}
+    .tier-row[data-tier="A"] .tier-label{background:rgba(239,68,68,.15);color:#ef4444;}
+    .tier-row[data-tier="B"] .tier-label{background:rgba(234,179,8,.15);color:#eab308;}
+    .tier-row[data-tier="C"] .tier-label{background:rgba(34,197,94,.12);color:#22c55e;}
+    .tier-row[data-tier="D"] .tier-label{background:rgba(59,130,246,.15);color:#3b82f6;}
+    .tier-drop .rank-card-box{width:60px;height:60px;}
+    .tier-drop .rank-card-box-inner{border-width:2px;}
+    .tier-drop .rank-card-team-logo{width:20px;height:20px;bottom:-4px;right:-4px;}
+    .tier-drop .rank-card-team-logo img{width:20px;height:20px;}
+    .tier-drop .rank-card-name{font-size:.44rem;margin-top:4px;}
+
+    /* ── DUO CARDS ── */
+    .duo-card{ position:relative; cursor:grab; user-select:none; flex-shrink:0; transition:transform .1s; width:136px; }
+    .duo-card:hover{ transform:translateY(-2px); }
+    .duo-card:active{ cursor:grabbing; }
+    .duo-card.dragging{ opacity:.25; }
+    .duo-card-box{
+      border-radius:8px;
+      padding:0; overflow:visible; position:relative;
+      display:flex; height:74px; width:136px;
+      border:3px solid #fff; /* overridden per card */
+      transition:border-color .15s;
+    }
+    /* left half clips to rounded box */
+    .duo-card-half{
+      flex:1; overflow:hidden; position:relative;
+    }
+    .duo-card-half:first-child{
+      border-radius:6px 0 0 6px;
+      z-index:2; /* left player on top */
+      margin-right:-10px; /* overlap right by 10px */
+    }
+    .duo-card-half:last-child{
+      border-radius:0 6px 6px 0;
+      z-index:1;
+    }
+    .duo-card-half img{ width:100%; height:100%; object-fit:cover; object-position:20% 15%; display:block; transform:scale(1.25); transform-origin:50% 20%; }
+    /* Team logo overflows outside box, above everything */
+    .duo-card-team-logo{ position:absolute; bottom:-6px; right:-6px; width:24px; height:24px; z-index:30; pointer-events:none; }
+    .duo-card-team-logo img{ width:24px; height:24px; object-fit:contain; display:block; }
+    .duo-card-label{ font-family:var(--font-mono); font-size:.48rem; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-top:6px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:136px; }
+    /* In tier drop — smaller */
+    .tier-drop .duo-card{ width:100px; }
+    .tier-drop .duo-card-box{ height:56px; width:100px; }
+    .tier-drop .duo-card-half:first-child{ margin-right:-10px; }
+    .tier-drop .duo-card-label{ font-size:.42rem; width:100px; }
+    .tier-drop .duo-card-team-logo{ width:18px; height:18px; bottom:-4px; right:-4px; }
+    .tier-drop .duo-card-team-logo img{ width:18px; height:18px; }
+    .tweet-card{position:relative;cursor:grab;user-select:none;width:120px;flex-shrink:0;transition:transform .1s;}
+    .tweet-card:hover{transform:translateY(-2px);}
+    .tweet-card:active{cursor:grabbing;}
+    .tweet-card.dragging{opacity:.25;}
+    .tweet-card-box{border:1px dashed rgba(29,161,242,.4);border-radius:8px;background:rgba(29,161,242,.05);padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:52px;transition:border-color .15s,background .15s;}
+    .tweet-card:hover .tweet-card-box{border-color:#1da1f2;background:rgba(29,161,242,.1);}
+    .tweet-card-logo{width:14px;height:14px;flex-shrink:0;opacity:.7;}
+    .tweet-card-label{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);text-align:center;line-height:1.4;word-break:break-word;}
+    .tier-drop .tweet-card{width:90px;}
+    .tier-drop .tweet-card-box{min-height:40px;padding:6px 5px 5px;gap:3px;}
+    .tier-drop .tweet-card-logo{width:11px;height:11px;}
+    .tier-drop .tweet-card-label{font-size:.44rem;}
+
+    /* ── TWEET PREVIEW ── */
+    .tweet-preview{position:fixed;z-index:10000;pointer-events:none;display:none;max-width:380px;border:2px solid #1da1f2;box-shadow:0 8px 40px rgba(0,0,0,.6),0 0 16px rgba(29,161,242,.2);border-radius:4px;overflow:hidden;}
+    .tweet-preview img{display:block;width:100%;height:auto;max-height:70vh;object-fit:contain;background:#000;}
+    .tweet-preview.visible{display:block;animation:rankTtIn .15s cubic-bezier(.22,.68,0,1.2) both;}
+
+    /* Question body padding */
+    .survey-q-body{padding:0 24px 24px;}
+    /* Side-by-side: list left, pool right */
+    /* ── RANK WIDGET LAYOUT ── */
+    .rank-widget{ display:flex; flex-direction:column; padding:16px 24px 24px; position:relative; z-index:3; background:rgb(14,10,58); }
+    html.light .rank-widget{ background:rgb(244,244,248); }
+    /* Shared header row: "Your Ranking" left, "Unranked · Reset" right */
+    .rank-widget-header{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:6px;
+    }
+    .rank-widget-header-left{ display:flex; align-items:center; gap:0; }
+    .rank-widget-header-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .rank-pool-label,.rank-list-label{ margin-bottom:0; }
+    /* Body: list left, pool right, same height */
+    .rank-widget-body{
+      display:flex; gap:12px; align-items:stretch; overflow:hidden; position:relative;
+    }
+    .rank-widget-list{ flex:1; min-width:0; display:flex; flex-direction:column; }
+    .rank-widget-list .rank-list{ flex:1; }
+    .rank-widget-pool{
+      flex-shrink:0;
+      width:160px; /* fits 2 × 68px cards + gap + padding */
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      min-height:0;
+    }
+    /* Pool scrolls internally — height locked to column height */
+    .rank-widget-pool .rank-pool{
+      flex:1;
+      min-height:0;
+      flex-direction:row;
+      flex-wrap:wrap;
+      padding:10px;
+      gap:8px;
+      align-items:flex-start;
+      align-content:flex-start;
+      overflow-y:auto;
+      overflow-x:hidden;
+      scrollbar-width:thin;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+    }
+    html.light .rank-widget-pool .rank-pool{
+      background:rgba(0,0,0,.04);
+    }
+    .rank-widget-pool .rank-pool::-webkit-scrollbar{ width:3px; }
+    .rank-widget-pool .rank-pool::-webkit-scrollbar-track{ background:transparent; }
+    .rank-widget-pool .rank-pool::-webkit-scrollbar-thumb{ background:rgba(231,87,25,.4); border-radius:2px; }
+    .survey-q .tierlist{margin:0 24px 16px;}
+    /* Tierlist ungraded pool — horizontal rows */
+    .survey-q[data-type="duo-tierlist"] .rank-pool,
+        .survey-q[data-type="tierlist"] .rank-pool,
+    .survey-q[data-type="duo-tierlist"] .rank-pool,
+    .survey-q[data-type="rivalry-tierlist"] .rank-pool,
+    .survey-q[data-type="phil-tierlist"] .rank-pool,
+    .survey-q[data-type="tweet-tierlist"] .rank-pool{
+      flex-direction:row;
+      flex-wrap:wrap;
+      gap:12px;
+      padding:14px 16px;
+      align-items:flex-start;
+      align-content:flex-start;
+      min-height:80px;
+      margin:0 24px 24px;
+    }
+    .survey-q[data-type="tierlist"] .rank-pool-label,
+    .survey-q[data-type="tweet-tierlist"] .rank-pool-label,
+    .survey-q[data-type="duo-tierlist"] .rank-pool-label,
+    .survey-q[data-type="rivalry-tierlist"] .rank-pool-label,
+    .survey-q[data-type="phil-tierlist"] .rank-pool-label{
+      padding:0 24px;
+      margin-bottom:6px;
+    }
+
+    .rank-widget-pool .rank-card-box{width:64px;height:64px;}
+    .rank-widget-pool .rank-card-box-inner{border-width:2px;}
+    .rank-widget-pool .rank-card-team-logo{width:20px;height:20px;bottom:-3px;right:-3px;}
+    .rank-widget-pool .rank-card-team-logo img{width:20px;height:20px;}
+    .rank-widget-pool .rank-card-name{display:block;font-size:.52rem;margin-top:5px;text-align:center;color:var(--text);letter-spacing:.06em;}
+    .rank-widget-pool .rank-card-year{display:block;font-size:.48rem;margin-top:1px;text-align:center;color:var(--orange);letter-spacing:.08em;}
+    .rank-widget-pool .rank-card-trophy{width:22px;height:28px;}
+    @media(max-width:768px){
+      .survey-hero{padding:88px 20px 36px;}
+      .survey-wrap{padding:32px 20px 160px;}
+      .survey-q-text{font-size:1.2rem;}
+      .rank-card-box{width:68px;height:68px;}
+      .rank-slot .rank-card-box{width:48px;height:48px;}
+      .survey-title{font-size:clamp(2.2rem,10vw,3.5rem);}
+      .pool-sticky-dock{padding:8px 16px 10px;}
+    }
+</style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="scanline"></div>
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="EGE_Logo.png" alt="EGE Logo" class="logo-img"/><span>EGE <span class="accent">NBA</span> Simulation</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-num="01">Home</a></li>
+      <li><a href="players.html" data-num="02">Players</a></li>
+      <li><a href="teams.html" data-num="03">Teams</a></li>
+      <li><a href="history.html" data-num="04">History</a></li>
+      <li><a href="other.html" data-num="05" class="active">Other</a></li>
+      <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
+    </ul>
+  </nav>
+</div>
+        <div class="survey-hero-chip"><span class="survey-hero-chip-dot"></span>Auto-saves to Supabase</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="survey-wrap">
+    <div class="survey-banner" id="survey-banner">
+      <span class="survey-banner-dot"></span>
+      <span class="survey-banner-text">You've already submitted — your previous answers are loaded. Update and resubmit to edit.</span>
+    </div>
+
+    <div class="survey-identity">
+      <label class="survey-identity-label" for="survey-identity">Who are you?</label>
+      <div class="survey-select-wrap">
+        <select class="survey-select" id="survey-identity">
+          <option value="">— Select your name —</option>
+          <option value="Cooper Clark">Cooper Clark</option>
+          <option value="Paxon Hatch">Paxon Hatch</option>
+          <option value="Jaykeb Stewart">Jaykeb Stewart</option>
+          <option value="Isaac Vitel">Isaac Vitel</option>
+          <option value="Sam Stogsdill">Sam Stogsdill</option>
+        </select>
+        <span class="survey-select-arrow">▾</span>
+      </div>
+    </div>
+
+    <div class="survey-q" data-key="career_ranking" data-type="ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Michael Jordan</span><span class="survey-q-award">Greatest Career Award</span></div></div>
+      <div class="survey-q-sub">Rank the following careers from greatest to least based on overall greatness.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="offensive_ranking" data-type="offensive-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The LeBron James</span><span class="survey-q-award">Greatest Offensive Player Award</span></div></div>
+      <div class="survey-q-sub">Rank the following careers from greatest offensive player to least. Hover for career stats.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="offensive-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="offensive-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="offensive-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="defensive_ranking" data-type="defensive-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Hakeem Olajuwon</span><span class="survey-q-award">Greatest Defensive Player Award</span></div></div>
+      <div class="survey-q-sub">Rank the following careers from greatest defensive player to least. Hover for defensive grades.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="defensive-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="defensive-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="defensive-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="best_season" data-type="season-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Stephen Curry</span><span class="survey-q-award">Greatest Individual Regular Season Award</span></div></div>
+      <div class="survey-q-sub">Rank the following individual regular seasons from greatest to least.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="season-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="season-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="season-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="playoff_ranking" data-type="playoff-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Kawhi Leonard</span><span class="survey-q-award">Greatest Playoff Run Award</span></div></div>
+      <div class="survey-q-sub">Rank the following playoff runs from greatest to least. Minimum: one won series.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="playoff-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="playoff-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="6"><span class="rank-slot-num">6</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="7"><span class="rank-slot-num">7</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="playoff-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="riser_ranking" data-type="riser-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Jimmy Butler</span><span class="survey-q-award">Greatest Playoff Riser Award</span></div></div>
+      <div class="survey-q-sub">Who elevated their game the most come playoff time? Rank from biggest riser to least.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="riser-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="riser-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="riser-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="clutch_ranking" data-type="clutch-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Reggie Miller</span><span class="survey-q-award">Clutch Performer Award</span></div></div>
+      <div class="survey-q-sub">Who performed best when it mattered most? Rank by playoff & elimination game performance. Hover for stats.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="clutch-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="clutch-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div>
+      </div></div><div class="rank-widget-pool"><div class="rank-pool" id="clutch-rank-pool"></div></div></div></div>
+    </div>
+
+    <div class="survey-q" data-key="roleplayer_ranking" data-type="roleplayer-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Ron Harper</span><span class="survey-q-award">Greatest Roleplayer Season Award</span></div></div>
+      <div class="survey-q-sub">Rank the following roleplayer seasons from best to worst.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="roleplayer-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="roleplayer-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div></div></div><div class="rank-widget-pool"><div class="rank-pool" id="roleplayer-rank-pool"></div></div></div></div>
+    </div>
+    <div class="survey-q" data-key="perf_ranking" data-type="perf-ranking">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Bam Adebayo</span><span class="survey-q-award">Greatest Performance Award</span></div></div>
+      <div class="survey-q-sub">Rank the greatest individual game performances in EGE history. Hover for full stat line.</div>
+      <div class="survey-q-divider"></div>
+      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="perf-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="perf-rank-list">
+        <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="4"><span class="rank-slot-num">4</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="5"><span class="rank-slot-num">5</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="6"><span class="rank-slot-num">6</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="7"><span class="rank-slot-num">7</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="8"><span class="rank-slot-num">8</span><span class="rank-slot-placeholder">Drop here</span></div>
+        <div class="rank-slot" data-pos="9"><span class="rank-slot-num">9</span><span class="rank-slot-placeholder">Drop here</span></div>
+      </div></div><div class="rank-widget-pool"><div class="rank-pool" id="perf-rank-pool"></div></div></div></div>
+    </div>
+
+
+    <div class="survey-q" data-key="pippen_tierlist" data-type="tierlist">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Scottie Pippen</span><span class="survey-q-award">Greatest Teammate Award</span></div></div>
+      <div class="survey-q-sub">Grade each player on their value as a teammate. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="tierlist" id="pippen-tierlist">
+        <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="pippen-tier-S"></div></div>
+        <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="pippen-tier-A"></div></div>
+        <div class="tier-row" data-tier="B"><div class="tier-label">B</div><div class="tier-drop" id="pippen-tier-B"></div></div>
+        <div class="tier-row" data-tier="C"><div class="tier-label">C</div><div class="tier-drop" id="pippen-tier-C"></div></div>
+        <div class="tier-row" data-tier="D"><div class="tier-label">D</div><div class="tier-drop" id="pippen-tier-D"></div></div>
+      </div>
+      <div class="rank-pool-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Ungraded</span>
+        <button id="pippen-tier-reset" class="rank-reset-btn">🗑</button>
+      </div>
+      <div class="rank-pool" id="pippen-tier-pool"></div>
+    </div>
+
+    <div class="survey-q" data-key="tweet_tierlist" data-type="tweet-tierlist">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Terry Rozier</span><span class="survey-q-award">Greatest Tweet Award</span></div></div>
+      <div class="survey-q-sub">Grade each tweet. Hover over a card to preview the image.</div>
+      <div class="tierlist" id="tweet-tierlist">
+        <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="tweet-tier-S"></div></div>
+        <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="tweet-tier-A"></div></div>
+        <div class="tier-row" data-tier="B"><div class="tier-label">B</div><div class="tier-drop" id="tweet-tier-B"></div></div>
+        <div class="tier-row" data-tier="C"><div class="tier-label">C</div><div class="tier-drop" id="tweet-tier-C"></div></div>
+        <div class="tier-row" data-tier="D"><div class="tier-label">D</div><div class="tier-drop" id="tweet-tier-D"></div></div>
+      </div>
+      <div class="rank-pool-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Ungraded</span>
+        <button id="tweet-tier-reset" class="rank-reset-btn">🗑</button>
+      </div>
+      <div class="rank-pool" id="tweet-tier-pool"></div>
+    </div>
+
+    <div class="survey-q" data-key="duo_tierlist" data-type="duo-tierlist">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Shaquille O'Neal &amp; Kobe Bryant</span><span class="survey-q-award">Greatest Duo Award</span></div></div>
+      <div class="survey-q-sub">Grade each duo based on their combined impact. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="tierlist" id="duo-tierlist">
+        <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="duo-tier-S"></div></div>
+        <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="duo-tier-A"></div></div>
+        <div class="tier-row" data-tier="B"><div class="tier-label">B</div><div class="tier-drop" id="duo-tier-B"></div></div>
+        <div class="tier-row" data-tier="C"><div class="tier-label">C</div><div class="tier-drop" id="duo-tier-C"></div></div>
+        <div class="tier-row" data-tier="D"><div class="tier-label">D</div><div class="tier-drop" id="duo-tier-D"></div></div>
+      </div>
+      <div class="rank-pool-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Ungraded</span>
+        <button id="duo-tier-reset" class="rank-reset-btn">🗑</button>
+      </div>
+      <div class="rank-pool" id="duo-tier-pool"></div>
+    </div>
+
+    <div class="survey-q" data-key="rivalry_tierlist" data-type="rivalry-tierlist">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Magic Johnson &amp; Larry Bird</span><span class="survey-q-award">Greatest Rivalry Award</span></div></div>
+      <div class="survey-q-sub">Grade each player or team logo based on the greatest rivalries in EGE history. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="tierlist" id="rivalry-tierlist">
+        <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="rivalry-tier-S"></div></div>
+        <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="rivalry-tier-A"></div></div>
+        <div class="tier-row" data-tier="B"><div class="tier-label">B</div><div class="tier-drop" id="rivalry-tier-B"></div></div>
+        <div class="tier-row" data-tier="C"><div class="tier-label">C</div><div class="tier-drop" id="rivalry-tier-C"></div></div>
+        <div class="tier-row" data-tier="D"><div class="tier-label">D</div><div class="tier-drop" id="rivalry-tier-D"></div></div>
+      </div>
+      <div class="rank-pool-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Ungraded</span>
+        <button id="rivalry-tier-reset" class="rank-reset-btn">🗑</button>
+      </div>
+      <div class="rank-pool" id="rivalry-tier-pool"></div>
+    </div>
+    <div class="survey-q" data-key="phil_jackson_tierlist" data-type="phil-tierlist">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Phil Jackson</span><span class="survey-q-award">Greatest Team Award</span></div></div>
+      <div class="survey-q-sub">Grade each team on their overall greatness. Hover for the starting five. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="tierlist" id="phil-tierlist">
+        <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="phil-tier-S"></div></div>
+        <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="phil-tier-A"></div></div>
+        <div class="tier-row" data-tier="B"><div class="tier-label">B</div><div class="tier-drop" id="phil-tier-B"></div></div>
+        <div class="tier-row" data-tier="C"><div class="tier-label">C</div><div class="tier-drop" id="phil-tier-C"></div></div>
+        <div class="tier-row" data-tier="D"><div class="tier-label">D</div><div class="tier-drop" id="phil-tier-D"></div></div>
+      </div>
+      <div class="rank-pool-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Ungraded</span>
+        <button id="phil-tier-reset" class="rank-reset-btn">🗑</button>
+      </div>
+      <div class="rank-pool" id="phil-tier-pool"></div>
+    </div>
+
+    <div class="survey-q" data-key="comments" data-type="textarea">
+      <div class="survey-q-text" style="padding:0 24px;font-family:var(--font-display);font-weight:700;font-size:1.4rem;text-transform:uppercase;letter-spacing:.01em;color:var(--heading);line-height:1.05;margin-bottom:6px;">Any other thoughts?</div>
+      <div style="padding:0 24px 24px;">
+        <textarea class="survey-textarea" name="comments" placeholder="Optional — share anything on your mind about the league, the survey, or life in general..."></textarea>
+      </div>
+    </div>
+
+    <div class="survey-submit-area">
+      <button class="survey-submit" id="survey-submit">Submit Response →</button>
+      <span class="survey-status" id="survey-status"></span>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
+    <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
+  </footer>
+  <script src="player-stats.js"></script>
+  <script src="player-games.js"></script>
+  <script src="shared.js"></script>
+  <script>
+  (function(){
+    var SUPABASE_URL = 'https://wspmprjqqhtxekzyensq.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
+    var TABLE = 'survey_responses';
+    var LS_NAME_KEY = 'ege_survey_name';
+
+    function sbHeaders(extra){
+      return Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},extra||{});
+    }
+
+    var identityEl = document.getElementById('survey-identity');
+    var statusEl   = document.getElementById('survey-status');
+    var submitBtn  = document.getElementById('survey-submit');
+    function setStatus(msg,cls){statusEl.textContent=msg;statusEl.className='survey-status '+(cls||'');}
+
+    // Restore previously selected name from localStorage
+    var savedName = localStorage.getItem(LS_NAME_KEY);
+    if (savedName) {
+      identityEl.value = savedName;
+      if (identityEl.value) identityEl.classList.add('chosen');
+    }
+
+    identityEl.addEventListener('change', function(){
+      identityEl.classList.toggle('chosen', !!identityEl.value);
+      // If name changed, load that person's existing response
+      if (identityEl.value) loadExisting(identityEl.value);
+      else {
+        document.getElementById('survey-banner').classList.remove('visible');
+        clearForm();
+      }
+    });
+
+    function clearForm(){
+      document.querySelectorAll('.survey-q input[type=radio]').forEach(function(r){
+        r.checked=false; r.closest('.survey-opt').classList.remove('checked');
+      });
+      document.querySelectorAll('.survey-q textarea').forEach(function(ta){ ta.value=''; });
+    }
+
+    function collectAnswers(){
+      var a={};
+      document.querySelectorAll('.survey-q').forEach(function(q){
+        var key=q.dataset.key,type=q.dataset.type;
+        if(type==='radio'){var c=q.querySelector('input[type=radio]:checked');a[key]=c?c.value:null;}
+        else if(type==='textarea'){var ta=q.querySelector('textarea');a[key]=ta?ta.value.trim():'';}
+        else if(type==='tierlist'||type==='tweet-tierlist'||type==='duo-tierlist'||type==='rivalry-tierlist'||type==='phil-tierlist'){
+          var dropPrefix = type==='tweet-tierlist' ? 'tweet-tier-' : type==='duo-tierlist' ? 'duo-tier-' : type==='rivalry-tierlist' ? 'rivalry-tier-' : type==='phil-tierlist' ? 'phil-tier-' : 'pippen-tier-';
+          var tierResult={};
+          ['S','A','B','C','D'].forEach(function(t){
+            var dropEl=document.getElementById(dropPrefix+t);
+            if(!dropEl)return;
+            dropEl.querySelectorAll('[data-player]').forEach(function(card){
+              tierResult[card.dataset.player]=t;
+            });
+          });
+          a[key]=tierResult;
+        }
+        else if(type==='ranking'||type==='season-ranking'||type==='playoff-ranking'||type==='scorer-ranking'||type==='riser-ranking'||type==='media-ranking'||type==='roleplayer-ranking'||type==='offensive-ranking'||type==='defensive-ranking'||type==='clutch-ranking'||type==='perf-ranking'){
+          var listId = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : '#clutch-rank-list';
+          var ranking=[];
+          document.querySelectorAll(listId+' .rank-slot').forEach(function(slot){
+            var card=slot.querySelector('.rank-card');
+            if(card) ranking.push(card.dataset.player);
+            else ranking.push(null);
+          });
+          a[key]=ranking;
+        }
+      });
+      return a;
+    }
+
+    function prefill(answers){
+      document.querySelectorAll('.survey-q').forEach(function(q){
+        var key=q.dataset.key,type=q.dataset.type,val=answers[key];
+        if(!val)return;
+        if(type==='radio'){
+          q.querySelectorAll('input[type=radio]').forEach(function(r){
+            if(r.value===val){r.checked=true;r.closest('.survey-opt').classList.add('checked');}
+          });
+        }else if(type==='textarea'){var ta=q.querySelector('textarea');if(ta)ta.value=val;}
+        else if((type==='tierlist'||type==='tweet-tierlist'||type==='duo-tierlist'||type==='rivalry-tierlist'||type==='phil-tierlist')&&val&&typeof val==='object'){
+          var dropPrefix2 = type==='tweet-tierlist' ? 'tweet-tier-' : type==='duo-tierlist' ? 'duo-tier-' : type==='rivalry-tierlist' ? 'rivalry-tier-' : type==='phil-tierlist' ? 'phil-tier-' : 'pippen-tier-';
+          Object.keys(val).forEach(function(playerName){
+            var tier=val[playerName];
+            var card=document.querySelector('[data-player="'+playerName+'"]');
+            var dropEl=document.getElementById(dropPrefix2+tier);
+            if(card&&dropEl){var pool=card.parentElement;if(pool)pool.removeChild(card);dropEl.appendChild(card);}
+          });
+        }
+        else if((type==='ranking'||type==='season-ranking'||type==='playoff-ranking'||type==='scorer-ranking'||type==='riser-ranking'||type==='media-ranking')&&Array.isArray(val)){
+          var listId2 = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : '#clutch-rank-list';
+          val.forEach(function(playerName,i){
+            if(!playerName)return;
+            var card=document.querySelector('.rank-card[data-player="'+playerName+'"]');
+            var slot=document.querySelector(listId2+' .rank-slot[data-pos="'+(i+1)+'"]');
+            if(card&&slot) placeCardInSlot(card,slot);
+          });
+        }
+      });
+    }
+
+    document.querySelectorAll('.survey-opt input[type=radio]').forEach(function(radio){
+      radio.addEventListener('change',function(){
+        document.querySelectorAll('input[name="'+radio.name+'"]').forEach(function(r){
+          r.closest('.survey-opt').classList.toggle('checked',r.checked);
+        });
+      });
+    });
+
+    function loadExisting(name){
+      clearForm();
+      fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?token=eq.'+encodeURIComponent(name)+'&select=answers',{headers:sbHeaders()})
+        .then(function(r){return r.json();})
+        .then(function(rows){
+          if(rows&&rows.length&&rows[0].answers){
+            document.getElementById('survey-banner').classList.add('visible');
+            prefill(rows[0].answers);
+          } else {
+            document.getElementById('survey-banner').classList.remove('visible');
+          }
+        }).catch(function(){});
+    }
+
+    // Load on page open if name already saved
+    if (savedName && identityEl.value === savedName) loadExisting(savedName);
+
+    submitBtn.addEventListener('click',function(){
+      var name = identityEl.value;
+      if (!name) {
+        setStatus('Please select your name first.','err');
+        identityEl.style.borderColor='#ef4444';
+        setTimeout(function(){ identityEl.style.borderColor=''; },2000);
+        return;
+      }
+      localStorage.setItem(LS_NAME_KEY, name);
+      var answers = collectAnswers();
+      submitBtn.disabled=true;
+      setStatus('Saving...','');
+      fetch(SUPABASE_URL+'/rest/v1/'+TABLE,{
+        method:'POST',
+        headers:sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
+        body:JSON.stringify({token:name, name:name, answers:answers, updated_at:new Date().toISOString()})
+      }).then(function(r){
+        if(r.ok||r.status===201||r.status===200){
+          setStatus('✓  Response saved','ok');
+          document.getElementById('survey-banner').classList.add('visible');
+        }else{return r.text().then(function(t){throw new Error(t);});}
+      }).catch(function(err){
+        console.error(err);
+        setStatus('Error saving — try again.','err');
+      }).finally(function(){submitBtn.disabled=false;});
+    });
+
+  })();
+  </script>
+
+  <script>
+    // ── SHARED CONSTANTS ──
+    var WBY    = 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/';
+    var NBA_HS2= 'https://cdn.nba.com/headshots/nba/latest/1040x760/';
+    var LAL_LOGO = WBY + 'lal_orig.png';
+    var NYK_LOGO = WBY + 'nyk_orig.png';
+
+    // ── RANKING WIDGET ──
+    var RANK_PLAYERS = [
+      { name:'Cooper Clark',   img:'headshot_clark.png',     color:'#552583', logo:LAL_LOGO },
+      { name:'Paxon Hatch',    img:'headshot_hatch.png',     color:'#552583', logo:LAL_LOGO },
+      { name:'Jaykeb Stewart', img:'headshot_stewart.png',   color:'#00471B', logo:WBY+'mil_orig.png' },
+      { name:'Isaac Vitel',    img:'headshot_vitel.png',     color:'#0077C0', logo:WBY+'orl_orig.png' },
+      { name:'Sam Stogsdill',  img:'headshot_stogsdill.png', color:'#002B5C', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png' },
+    ];
+
+    function makeCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          // inner circle — clipped, colored border, transparent bg
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.name+'">'
+          +'</div>'
+          // logo outside inner — overflows, never clipped
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.name.split(' ')[1]+'</div>';
+      return card;
+    }
+
+    function getPoolForSlot(slot) {
+      // Find the nearest rank-pool sibling by walking up to the survey-q container
+      var q = slot.closest('.survey-q');
+      if (!q) return document.getElementById('rank-pool');
+      var pool = q.querySelector('.rank-pool');
+      return pool || document.getElementById('rank-pool');
+    }
+
+    function placeCardInSlot(card, slot) {
+      // Reject if card doesn't belong to this slot's question
+      var targetPool = getPoolForSlot(slot);
+      if (targetPool && card.dataset.group && card.dataset.group !== targetPool.id) return;
+
+      // Free the card's old location
+      var oldParent = card.parentElement;
+      if (oldParent && oldParent.classList.contains('rank-slot')) {
+        // Card was in a slot — clear that slot but keep a ref to the card before innerHTML wipe
+        var oldSlot = oldParent;
+        oldSlot.classList.remove('filled');
+        // Remove card from old slot safely (don't use innerHTML yet)
+        oldSlot.removeChild(card);
+        oldSlot.innerHTML = '<span class="rank-slot-num">'+oldSlot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+      } else if (oldParent && oldParent.classList.contains('rank-pool')) {
+        oldParent.removeChild(card);
+      }
+
+      // If target slot already has a card, send it to the correct pool
+      var existing = slot.querySelector('.rank-card');
+      if (existing) {
+        slot.removeChild(existing);
+        targetPool.appendChild(existing);
+      }
+
+      // Clear slot placeholder text then append card
+      slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span>';
+      slot.appendChild(card);
+      slot.classList.add('filled');
+    }
+
+    // Build pool
+    var pool = document.getElementById('rank-pool');
+    if (pool) {
+      RANK_PLAYERS.forEach(function(p){ var c=makeCard(p); c.dataset.group='rank-pool'; pool.appendChild(c); });
+    }
+
+    // Drag state
+    var dragging = null;
+    var ghostEl  = null;
+    var tweetPreview = null; // initialized in tweet tierlist block
+
+    // Check if dragging card belongs to a given pool group
+    function canDrop(poolId) {
+      if (!dragging) return false;
+      var g = dragging._group || dragging.dataset.group || '';
+      return g === poolId || g === '';
+    }
+
+    document.addEventListener('dragstart', function(e){
+      var card = e.target.closest('.rank-card') || e.target.closest('.tweet-card') || e.target.closest('.duo-card');
+      if (!card) return;
+      dragging = card;
+      // Store which group (pool) this card belongs to
+      dragging._group = card.dataset.group || '';
+
+      // Hide the name and year label while dragging
+      var nameEl = card.querySelector('.rank-card-name');
+      if (nameEl) nameEl.style.visibility = 'hidden';
+      var yearEl = card.querySelector('.rank-card-year');
+      if (yearEl) yearEl.style.visibility = 'hidden';
+      // Hide tooltips while dragging
+      if (seasonTT) { seasonTT.classList.remove('visible'); seasonTT.style.display = 'none'; }
+      if (tweetPreview) { tweetPreview.classList.remove('visible'); tweetPreview.style.display = 'none'; }
+
+      // Build a full clone as the drag ghost so border + logo render correctly
+      ghostEl = card.cloneNode(true);
+      ghostEl.style.cssText = 'position:fixed;top:-9999px;left:-9999px;pointer-events:none;opacity:1;';
+      // Make sure the ghost is the same size as the original
+      var rect = card.getBoundingClientRect();
+      ghostEl.style.width  = rect.width  + 'px';
+      ghostEl.style.height = rect.height + 'px';
+      document.body.appendChild(ghostEl);
+      e.dataTransfer.setDragImage(ghostEl, rect.width / 2, rect.height / 2);
+
+      setTimeout(function(){ card.classList.add('dragging'); }, 0);
+    });
+
+    document.addEventListener('dragend', function(){
+      if (dragging) {
+        dragging.classList.remove('dragging');
+        var nameEl = dragging.querySelector('.rank-card-name');
+        if (nameEl) nameEl.style.visibility = '';
+        var yearEl = dragging.querySelector('.rank-card-year');
+        if (yearEl) yearEl.style.visibility = '';
+      }
+      if (ghostEl)  { ghostEl.remove(); ghostEl = null; }
+      dragging = null;
+      document.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); });
+    });
+
+    // Reset button — move all cards back to pool
+    var resetBtn = document.getElementById('rank-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('mouseenter', function(){ resetBtn.style.color='var(--orange)'; resetBtn.style.borderColor='var(--orange)'; });
+      resetBtn.addEventListener('mouseleave', function(){ resetBtn.style.color=''; resetBtn.style.borderColor=''; });
+      resetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card');
+          if (!card) return;
+          slot.classList.remove('filled');
+          slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          document.getElementById('rank-pool').appendChild(card);
+        });
+      });
+    }
+
+    // Slots
+    document.querySelectorAll('.rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){
+        e.preventDefault();
+        slot.classList.remove('drag-over');
+        if (dragging) placeCardInSlot(dragging, slot);
+      });
+    });
+
+    // Pool drop (return card)
+    pool.addEventListener('dragover', function(e){ if(!canDrop('rank-pool'))return; e.preventDefault(); pool.classList.add('drag-over'); });
+    pool.addEventListener('dragleave', function(){ pool.classList.remove('drag-over'); });
+    pool.addEventListener('drop', function(e){
+      e.preventDefault();
+      pool.classList.remove('drag-over');
+      if (!dragging) return;
+      var oldParent = dragging.parentElement;
+      if (oldParent && oldParent.classList.contains('rank-slot')) {
+        oldParent.removeChild(dragging);
+        oldParent.classList.remove('filled');
+        oldParent.innerHTML = '<span class="rank-slot-num">'+oldParent.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+      }
+      pool.appendChild(dragging);
+    });
+
+    // Touch support
+    (function(){
+      var touchCard=null, ghost=null;
+      function getTarget(x,y){
+        var el=document.elementFromPoint(x,y);
+        if(!el)return null;
+        return el.closest('.rank-slot')||el.closest('#rank-pool');
+      }
+      document.addEventListener('touchstart',function(e){
+        var card=e.target.closest('.rank-card');
+        if(!card)return;
+        touchCard=card;
+        ghost=card.cloneNode(true);
+        ghost.style.cssText='position:fixed;opacity:.7;pointer-events:none;z-index:9999;width:80px;';
+        document.body.appendChild(ghost);
+      },{passive:true});
+      document.addEventListener('touchmove',function(e){
+        if(!touchCard)return;
+        e.preventDefault();
+        var t=e.touches[0];
+        ghost.style.left=(t.clientX-40)+'px';
+        ghost.style.top=(t.clientY-40)+'px';
+      },{passive:false});
+      document.addEventListener('touchend',function(e){
+        if(!touchCard)return;
+        var t=e.changedTouches[0];
+        var target=getTarget(t.clientX,t.clientY);
+        if(target&&target.classList.contains('rank-slot')) placeCardInSlot(touchCard,target);
+        else if(target&&target.id==='rank-pool'){
+          var op=touchCard.parentElement;
+          if(op&&op.classList.contains('rank-slot')){
+            op.removeChild(touchCard);
+            op.classList.remove('filled');
+            op.innerHTML='<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          }
+          pool.appendChild(touchCard);
+        }
+        if(ghost)ghost.remove();
+        touchCard=null;ghost=null;
+      });
+    })();
+    // ── OFFENSIVE RANKING WIDGET ──
+    var OFFENSIVE_PLAYERS = [
+      { name:'Cooper Clark OF',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:WBY+'lal_orig.png',
+        stats:{ ppg:'18.3', apg:'8.4', fgp:'46.8%', tpp:'39.3%', ftp:'88.7%', tpa:'6.8', topg:'2.5' } },
+      { name:'Paxon Hatch OF',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:WBY+'lal_orig.png',
+        stats:{ ppg:'22.8', apg:'1.7', fgp:'49.4%', tpp:'42.5%', ftp:'77.4%', tpa:'7.5', topg:'1.5' } },
+      { name:'Sam Stogsdill OF',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:WBY+'was_orig.png',
+        stats:{ ppg:'9.6',  apg:'6.9', fgp:'45.6%', tpp:'15.9%', ftp:'72.5%', tpa:'0.8', topg:'1.3' } },
+      { name:'Jaykeb Stewart OF', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:WBY+'mil_orig.png',
+        stats:{ ppg:'15.7', apg:'6.6', fgp:'49.1%', tpp:'38.9%', ftp:'91.2%', tpa:'5.2', topg:'2.1' } },
+      { name:'Isaac Vitel OF',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:WBY+'orl_orig.png',
+        stats:{ ppg:'16.6', apg:'3.3', fgp:'48.0%', tpp:'33.6%', ftp:'83.0%', tpa:'4.3', topg:'2.1' } },
+    ];
+
+    function showOffensiveTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      seasonTT.style.background = bg;
+      var s = p.stats;
+      var rows = [['PPG',s.ppg],['APG',s.apg],['FG%',s.fgp],['3P%',s.tpp],['FT%',s.ftp],['3PA',s.tpa],['TOPG',s.topg]];
+      seasonTT.style.borderColor = p.color;
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year">Career Avg</span>'
+          +'</div>'
+        +'</div>'
+        + rows.map(function(r){
+          return '<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">'+r[0]+'</span><span class="rank-tt-val" style="color:'+textMain+';">'+r[1]+'</span></div>';
+        }).join('');
+      seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
+      seasonTT.style.display='block'; seasonTT.classList.add('visible'); positionTT(e);
+    }
+
+    function makeOffensiveCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card'; card.dataset.player = p.name; card.draggable = true;
+      card.innerHTML = '<div class="rank-card-box"><div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;"><img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'"></div><div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div></div><div class="rank-card-name">'+p.label+'</div>';
+      card.addEventListener('mouseenter', function(e){ showOffensiveTT(p,e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var offensivePool = document.getElementById('offensive-rank-pool');
+    if (offensivePool) { OFFENSIVE_PLAYERS.forEach(function(p){ var c=makeOffensiveCard(p); c.dataset.group='offensive-rank-pool'; offensivePool.appendChild(c); }); }
+    document.querySelectorAll('#offensive-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover',function(e){if(!canDrop('offensive-rank-pool'))return;e.preventDefault();slot.classList.add('drag-over');});
+      slot.addEventListener('dragleave',function(){slot.classList.remove('drag-over');});
+      slot.addEventListener('drop',function(e){e.preventDefault();slot.classList.remove('drag-over');if(dragging)placeCardInSlot(dragging,slot);});
+    });
+    if (offensivePool) {
+      offensivePool.addEventListener('dragover',function(e){if(!canDrop('offensive-rank-pool'))return;e.preventDefault();offensivePool.classList.add('drag-over');});
+      offensivePool.addEventListener('dragleave',function(){offensivePool.classList.remove('drag-over');});
+      offensivePool.addEventListener('drop',function(e){e.preventDefault();offensivePool.classList.remove('drag-over');if(!dragging)return;var op=dragging.parentElement;if(op&&op.classList.contains('rank-slot')){op.removeChild(dragging);op.classList.remove('filled');op.innerHTML='<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';}offensivePool.appendChild(dragging);});
+    }
+    var offResetBtn = document.getElementById('offensive-rank-reset');
+    if (offResetBtn) {
+      offResetBtn.addEventListener('mouseenter',function(){offResetBtn.style.color='#c9a84c';offResetBtn.style.borderColor='#c9a84c';});
+      offResetBtn.addEventListener('mouseleave',function(){offResetBtn.style.color='';offResetBtn.style.borderColor='';});
+      offResetBtn.addEventListener('click',function(){document.querySelectorAll('#offensive-rank-list .rank-slot').forEach(function(slot){var card=slot.querySelector('.rank-card');if(!card)return;slot.removeChild(card);slot.classList.remove('filled');slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';offensivePool.appendChild(card);});});
+    }
+    // ── END OFFENSIVE RANKING ──
+
+    // ── DEFENSIVE RANKING WIDGET ──
+    var DEFENSIVE_PLAYERS = [
+      { name:'Cooper Clark DF',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:WBY+'lal_orig.png',
+        spg:'1.3', bpg:'0.0', interior:'F', perimeter:'C' },
+      { name:'Paxon Hatch DF',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:WBY+'lal_orig.png',
+        spg:'0.7', bpg:'1.7', interior:'A+', perimeter:'B-' },
+      { name:'Sam Stogsdill DF',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:WBY+'was_orig.png',
+        spg:'0.7', bpg:'1.2', interior:'B+', perimeter:'C' },
+      { name:'Jaykeb Stewart DF', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:WBY+'mil_orig.png',
+        spg:'1.5', bpg:'0.7', interior:'B-', perimeter:'A+' },
+      { name:'Isaac Vitel DF',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:WBY+'orl_orig.png',
+        spg:'1.2', bpg:'0.2', interior:'D', perimeter:'A' },
+    ];
+
+    function gradeColor(g) {
+      if (!g) return '#6b7280';
+      var base = g.replace(/[+-]/g,'');
+      if (base==='S'||base==='A') return '#22c55e';
+      if (base==='B') return '#3b82f6';
+      if (base==='C') return '#f59e0b';
+      if (base==='D') return '#ef4444';
+      if (base==='F') return '#dc2626';
+      return '#6b7280';
+    }
+
+    // Map defensive card label → PLAYER_STATS key
+    var DEFENSIVE_STAT_KEY = {
+      'Clark':'clark', 'Hatch':'hatch', 'Stogsdill':'stogsdill',
+      'Stewart':'stewart', 'Vitel':'vitel'
+    };
+
+    function getDefAwards(playerLabel) {
+      var key = DEFENSIVE_STAT_KEY[playerLabel];
+      if (!key || !window.PLAYER_STATS || !window.PLAYER_STATS[key]) return [];
+      var nba = (window.PLAYER_STATS[key].awards || {}).nba || [];
+      return nba.filter(function(a){ return a.title.indexOf('All-Defense') === 0; });
+    }
+
+    function showDefensiveTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      seasonTT.style.background = bg;
+
+      var defAwards = getDefAwards(p.label);
+
+      var awardsHtml = '';
+      if (defAwards.length) {
+        awardsHtml += '<div style="border-top:1px solid rgba(201,168,76,.15);margin:6px 0 4px;"></div>';
+        defAwards.forEach(function(a){
+          var isFirst = a.title.indexOf('First') !== -1;
+          var col = isFirst ? '#c9a84c' : 'rgba(201,168,76,.55)';
+          var label = isFirst ? '1st Team' : '2nd Team';
+          awardsHtml += '<div class="rank-tt-row">'
+            +'<span class="rank-tt-label" style="color:'+textMuted+';">'+label+'</span>'
+            +'<span class="rank-tt-val" style="color:'+col+';font-size:.78rem;">'+a.years.join(', ')+'</span>'
+            +'</div>';
+        });
+      } else {
+        awardsHtml += '<div style="border-top:1px solid rgba(201,168,76,.15);margin:6px 0 4px;"></div>'
+          +'<div style="font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';padding:2px 0;">No All-Defensive selections</div>';
+      }
+
+      seasonTT.style.borderColor = p.color;
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year">Defense</span>'
+          +'</div>'
+        +'</div>'
+        +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">SPG</span><span class="rank-tt-val" style="color:'+textMain+';">'+p.spg+'</span></div>'
+        +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">BPG</span><span class="rank-tt-val" style="color:'+textMain+';">'+p.bpg+'</span></div>'
+        +'<div style="border-top:1px solid rgba(255,255,255,.1);margin:5px 0;"></div>'
+        +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Interior</span><span class="rank-tt-val" style="color:'+gradeColor(p.interior)+';font-weight:700;">'+p.interior+'</span></div>'
+        +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Perimeter</span><span class="rank-tt-val" style="color:'+gradeColor(p.perimeter)+';font-weight:700;">'+p.perimeter+'</span></div>'
+        + awardsHtml;
+
+      seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
+      seasonTT.style.display='block'; seasonTT.classList.add('visible'); positionTT(e);
+    }
+
+    function makeDefensiveCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card'; card.dataset.player = p.name; card.draggable = true;
+      card.innerHTML = '<div class="rank-card-box"><div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;"><img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'"></div><div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div></div><div class="rank-card-name">'+p.label+'</div>';
+      card.addEventListener('mouseenter', function(e){ showDefensiveTT(p,e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var defensivePool = document.getElementById('defensive-rank-pool');
+    if (defensivePool) { DEFENSIVE_PLAYERS.forEach(function(p){ var c=makeDefensiveCard(p); c.dataset.group='defensive-rank-pool'; defensivePool.appendChild(c); }); }
+    document.querySelectorAll('#defensive-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover',function(e){if(!canDrop('defensive-rank-pool'))return;e.preventDefault();slot.classList.add('drag-over');});
+      slot.addEventListener('dragleave',function(){slot.classList.remove('drag-over');});
+      slot.addEventListener('drop',function(e){e.preventDefault();slot.classList.remove('drag-over');if(dragging)placeCardInSlot(dragging,slot);});
+    });
+    if (defensivePool) {
+      defensivePool.addEventListener('dragover',function(e){if(!canDrop('defensive-rank-pool'))return;e.preventDefault();defensivePool.classList.add('drag-over');});
+      defensivePool.addEventListener('dragleave',function(){defensivePool.classList.remove('drag-over');});
+      defensivePool.addEventListener('drop',function(e){e.preventDefault();defensivePool.classList.remove('drag-over');if(!dragging)return;var op=dragging.parentElement;if(op&&op.classList.contains('rank-slot')){op.removeChild(dragging);op.classList.remove('filled');op.innerHTML='<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';}defensivePool.appendChild(dragging);});
+    }
+    var defResetBtn = document.getElementById('defensive-rank-reset');
+    if (defResetBtn) {
+      defResetBtn.addEventListener('mouseenter',function(){defResetBtn.style.color='#c9a84c';defResetBtn.style.borderColor='#c9a84c';});
+      defResetBtn.addEventListener('mouseleave',function(){defResetBtn.style.color='';defResetBtn.style.borderColor='';});
+      defResetBtn.addEventListener('click',function(){document.querySelectorAll('#defensive-rank-list .rank-slot').forEach(function(slot){var card=slot.querySelector('.rank-card');if(!card)return;slot.removeChild(card);slot.classList.remove('filled');slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';defensivePool.appendChild(card);});});
+    }
+    // ── END DEFENSIVE RANKING ──
+
+    // ── SEASON RANKING WIDGET ──
+
+
+
+    var SEASON_PLAYERS = [
+      { name:'Jaykeb Stewart 2026-27', label:'Stewart', year:'2026-27', img:'headshot_stewart.png', color:'#006BB6', logo:NYK_LOGO,
+        stats:{ ppg:27.8, rpg:7.6, apg:10.1, spg:2.2, bpg:1.3, fgp:'52.8%', tpp:'43.7%' } },
+      { name:'Cooper Clark 2025-26',   label:'Clark',   year:'2025-26', img:'headshot_clark.png',   color:'#552583', logo:LAL_LOGO,
+        stats:{ ppg:26.5, rpg:2.7,  apg:10.3, spg:1.8, bpg:0.0, fgp:'48.5%', tpp:'42.3%' } },
+      { name:'Cooper Clark 2028-29',   label:'Clark',   year:'2028-29', img:'headshot_clark.png',   color:'#552583', logo:LAL_LOGO,
+        stats:{ ppg:29.1, rpg:1.6,  apg:8.6,  spg:1.6, bpg:0.0, fgp:'48.9%', tpp:'42.8%' } },
+      { name:'Paxon Hatch 2023-24',    label:'Hatch',   year:'2023-24', img:'headshot_hatch.png',   color:'#552583', logo:LAL_LOGO,
+        stats:{ ppg:28.7, rpg:14.4, apg:2.2,  spg:0.8, bpg:1.9, fgp:'52.1%', tpp:'43.3%' } },
+    ];
+
+    // Create global season tooltip element
+    var seasonTT = document.getElementById('season-stat-tooltip');
+    if (!seasonTT) {
+      seasonTT = document.createElement('div');
+      seasonTT.id = 'season-stat-tooltip';
+      seasonTT.className = 'rank-stat-tooltip';
+      document.body.appendChild(seasonTT);
+    }
+
+    function showSeasonTT(p, e) {
+      if (!p.stats) return;
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      seasonTT.style.background = bg;
+      var s = p.stats;
+      var rows = [
+        ['PPG', s.ppg], ['RPG', s.rpg], ['APG', s.apg],
+        ['SPG', s.spg], ['BPG', s.bpg], ['FG%', s.fgp], ['3P%', s.tpp]
+      ];
+      seasonTT.style.borderColor = p.color;
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year">'+p.year+'</span>'
+          +'</div>'
+        +'</div>'
+        + rows.map(function(r){
+          return '<div class="rank-tt-row">'
+            +'<span class="rank-tt-label" style="color:'+textMuted+';">'+r[0]+'</span>'
+            +'<span class="rank-tt-val" style="color:'+textMain+';">'+r[1]+'</span>'
+            +'</div>';
+        }).join('');
+      seasonTT.classList.remove('visible');
+      void seasonTT.offsetHeight;
+      seasonTT.style.display = 'block';
+      seasonTT.classList.add('visible');
+      positionTT(e);
+    }
+
+    function positionTT(e) {
+      // Use actual rendered size if available, else estimate
+      var w = seasonTT.offsetWidth  || 200;
+      var h = seasonTT.offsetHeight || 220;
+      var pad = 12;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+
+      // Prefer right of cursor, fall back to left
+      var x = e.clientX + 16;
+      if (x + w + pad > vw) x = e.clientX - w - 16;
+      if (x < pad) x = pad;
+
+      // Prefer below cursor, fall back to above
+      var y = e.clientY - 10;
+      if (y + h + pad > vh) y = vh - h - pad;
+      if (y < pad) y = pad;
+
+      seasonTT.style.left = x + 'px';
+      seasonTT.style.top  = y + 'px';
+    }
+
+    function makeSeasonCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>'
+        +'<div class="rank-card-year">'+p.year+'</div>';
+
+      // Tooltip events
+      card.addEventListener('mouseenter', function(e){ showSeasonTT(p, e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var seasonPool = document.getElementById('season-rank-pool');
+    if (seasonPool) {
+      SEASON_PLAYERS.forEach(function(p){ var c=makeSeasonCard(p); c.dataset.group='season-rank-pool'; seasonPool.appendChild(c); });
+    }
+
+    // Wire season slots
+    document.querySelectorAll('#season-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ if(!canDrop('season-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){
+        e.preventDefault(); slot.classList.remove('drag-over');
+        if (dragging) placeCardInSlot(dragging, slot);
+      });
+    });
+
+    // Season pool drop
+    if (seasonPool) {
+      seasonPool.addEventListener('dragover', function(e){ if(!canDrop('season-rank-pool'))return; e.preventDefault(); seasonPool.classList.add('drag-over'); });
+      seasonPool.addEventListener('dragleave', function(){ seasonPool.classList.remove('drag-over'); });
+      seasonPool.addEventListener('drop', function(e){
+        e.preventDefault(); seasonPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging);
+          op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        }
+        seasonPool.appendChild(dragging);
+      });
+    }
+
+    // Season reset button
+    var seasonResetBtn = document.getElementById('season-rank-reset');
+    if (seasonResetBtn) {
+      seasonResetBtn.addEventListener('mouseenter', function(){ seasonResetBtn.style.color='var(--orange)'; seasonResetBtn.style.borderColor='var(--orange)'; });
+      seasonResetBtn.addEventListener('mouseleave', function(){ seasonResetBtn.style.color=''; seasonResetBtn.style.borderColor=''; });
+      seasonResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#season-rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card');
+          if (!card) return;
+          slot.classList.remove('filled');
+          slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          seasonPool.appendChild(card);
+        });
+      });
+    }
+    // ── END SEASON RANKING ──
+
+    // ── PLAYOFF RANKING WIDGET ──
+    var LAL_LOGO2 = LAL_LOGO;
+    var NYK_LOGO2 = NYK_LOGO;
+    var DEN_LOGO  = WBY+'den_orig.png';
+
+    var PLAYOFF_PLAYERS = [
+      { name:'Jaykeb Stewart 2026-27 PO', label:'Stewart', year:'2026-27', img:'headshot_stewart.png', color:'#006BB6', logo:NYK_LOGO2,
+        stats:{ ppg:31.8, rpg:8.1, apg:13.2, spg:2.6, bpg:1.4, fgp:'56.4%', tpp:'46.7%' } },
+      { name:'Cooper Clark 2025-26 PO',   label:'Clark',   year:'2025-26', img:'headshot_clark.png',   color:'#552583', logo:LAL_LOGO2, champ:true,
+        stats:{ ppg:24.0, rpg:2.3, apg:11.8, spg:2.0, bpg:0.0, fgp:'44.3%', tpp:'37.9%' } },
+      { name:'Cooper Clark 2033-34 PO',   label:'Clark',   year:'2033-34', img:'headshot_clark.png',   color:'#1a1a1a', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png',
+        stats:{ ppg:23.6, rpg:2.8, apg:9.9,  spg:1.2, bpg:0.0, fgp:'56.4%', tpp:'52.7%' } },
+      { name:'Paxon Hatch 2021-22 PO',    label:'Hatch',   year:'2021-22', img:'headshot_hatch.png',   color:'#552583', logo:LAL_LOGO2, champ:true,
+        stats:{ ppg:28.4, rpg:13.5, apg:2.6, spg:1.0, bpg:2.1, fgp:'47.4%', tpp:'32.7%' } },
+      { name:'Paxon Hatch 2025-26 PO',    label:'Hatch',   year:'2025-26', img:'headshot_hatch.png',   color:'#552583', logo:LAL_LOGO2, champ:true,
+        stats:{ ppg:28.2, rpg:9.5,  apg:1.7, spg:0.5, bpg:2.5, fgp:'49.6%', tpp:'43.7%' } },
+      { name:'Paxon Hatch 2024-25 PO',    label:'Hatch',   year:'2024-25', img:'headshot_hatch.png',   color:'#552583', logo:LAL_LOGO2,
+        stats:{ ppg:27.1, rpg:13.9, apg:1.3, spg:0.9, bpg:1.9, fgp:'50.3%', tpp:'40.4%' } },
+      { name:'Isaac Vitel 2025-26 PO',    label:'Vitel',   year:'2025-26', img:'headshot_vitel.png',   color:'#0E2240', logo:DEN_LOGO,
+        stats:{ ppg:25.9, rpg:6.6,  apg:3.7, spg:2.1, bpg:0.5, fgp:'47.1%', tpp:'31.9%' } },
+    ];
+
+    // Reuse the same makeSeasonCard factory (tooltip included)
+    function makePlayoffCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+          +(p.champ ? '<img class="rank-card-trophy" src="Award.webp" alt="Champion">' : '')
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>'
+        +'<div class="rank-card-year">'+p.year+'</div>';
+      card.addEventListener('mouseenter', function(e){ showSeasonTT(p, e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){  seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var playoffPool = document.getElementById('playoff-rank-pool');
+    if (playoffPool) {
+      PLAYOFF_PLAYERS.forEach(function(p){ var c=makePlayoffCard(p); c.dataset.group='playoff-rank-pool'; playoffPool.appendChild(c); });
+    }
+
+    document.querySelectorAll('#playoff-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ if(!canDrop('playoff-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){
+        e.preventDefault(); slot.classList.remove('drag-over');
+        if (dragging) placeCardInSlot(dragging, slot);
+      });
+    });
+
+    if (playoffPool) {
+      playoffPool.addEventListener('dragover', function(e){ if(!canDrop('playoff-rank-pool'))return; e.preventDefault(); playoffPool.classList.add('drag-over'); });
+      playoffPool.addEventListener('dragleave', function(){ playoffPool.classList.remove('drag-over'); });
+      playoffPool.addEventListener('drop', function(e){
+        e.preventDefault(); playoffPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging);
+          op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        }
+        playoffPool.appendChild(dragging);
+      });
+    }
+
+    var playoffResetBtn = document.getElementById('playoff-rank-reset');
+    if (playoffResetBtn) {
+      playoffResetBtn.addEventListener('mouseenter', function(){ playoffResetBtn.style.color='#c9a84c'; playoffResetBtn.style.borderColor='#c9a84c'; });
+      playoffResetBtn.addEventListener('mouseleave', function(){ playoffResetBtn.style.color=''; playoffResetBtn.style.borderColor=''; });
+      playoffResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#playoff-rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card');
+          if (!card) return;
+          slot.classList.remove('filled');
+          slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          playoffPool.appendChild(card);
+        });
+      });
+    }
+    // ── END PLAYOFF RANKING ──
+
+    // ── RISER RANKING WIDGET ──
+    var RISER_PLAYERS = [
+      { name:'Cooper Clark RI',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:LAL_LOGO,
+        rs:{ ppg:18.3, rpg:1.9, apg:8.4, fgp:'46.8%', tpp:'39.3%' },
+        po:{ ppg:19.8, rpg:1.9, apg:9.2, fgp:'47.2%', tpp:'42.5%' } },
+      { name:'Paxon Hatch RI',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:LAL_LOGO,
+        rs:{ ppg:22.8, rpg:10.6, apg:1.7, fgp:'49.4%', tpp:'42.5%' },
+        po:{ ppg:23.8, rpg:10.9, apg:1.7, fgp:'46.2%', tpp:'37.9%' } },
+      { name:'Sam Stogsdill RI',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png',
+        rs:{ ppg:9.6,  rpg:8.5,  apg:6.9, fgp:'45.6%', tpp:'15.9%' },
+        po:{ ppg:9.4,  rpg:8.8,  apg:7.5, fgp:'46.4%', tpp:'16.9%' } },
+      { name:'Jaykeb Stewart RI', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png',
+        rs:{ ppg:15.7, rpg:5.6,  apg:6.6, fgp:'49.1%', tpp:'38.9%' },
+        po:{ ppg:16.8, rpg:5.7,  apg:6.9, fgp:'49.6%', tpp:'40.8%' } },
+      { name:'Isaac Vitel RI',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png',
+        rs:{ ppg:16.6, rpg:4.3,  apg:3.3, fgp:'48.0%', tpp:'33.6%' },
+        po:{ ppg:20.4, rpg:4.6,  apg:4.0, fgp:'49.7%', tpp:'38.6%' } },
+    ];
+
+    function showRiserTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      seasonTT.style.background = bg;
+
+      var statKeys   = ['ppg','rpg','apg','fgp','tpp'];
+      var statLabels = ['PPG','RPG','APG','FG%','3P%'];
+
+      function arrowColor(rs, po, key) {
+        var rv = parseFloat(rs[key]), pv = parseFloat(po[key]);
+        if (pv > rv) return '#22c55e';   // green — rose
+        if (pv < rv) return '#ef4444';   // red — dropped
+        return textMuted;                // same
+      }
+      function arrow(rs, po, key) {
+        var rv = parseFloat(rs[key]), pv = parseFloat(po[key]);
+        return pv > rv ? '↑' : pv < rv ? '↓' : '→';
+      }
+
+      seasonTT.style.borderColor = p.color;
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year" style="display:flex;gap:6px;"><span style="opacity:.5;">RS</span><span>→</span><span>PO</span></span>'
+          +'</div>'
+        +'</div>'
+        + statKeys.map(function(k,i){
+          var col = arrowColor(p.rs, p.po, k);
+          var arr = arrow(p.rs, p.po, k);
+          return '<div class="rank-tt-compare">'
+            +'<span class="rank-tt-cmp-label" style="color:'+textMuted+';">'+statLabels[i]+'</span>'
+            +'<div class="rank-tt-cmp-vals">'
+              +'<span class="rank-tt-cmp-rs" style="color:'+textMuted+';">'+p.rs[k]+'</span>'
+              +'<span class="rank-tt-cmp-arrow" style="color:'+col+';">'+arr+'</span>'
+              +'<span class="rank-tt-cmp-po" style="color:'+col+';">'+p.po[k]+'</span>'
+            +'</div>'
+            +'</div>';
+        }).join('');
+
+      seasonTT.classList.remove('visible');
+      void seasonTT.offsetHeight;
+      seasonTT.style.display = 'block';
+      seasonTT.classList.add('visible');
+      positionTT(e);
+    }
+
+    function makeRiserCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>';
+      card.addEventListener('mouseenter', function(e){ showRiserTT(p, e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){  seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var riserPool = document.getElementById('riser-rank-pool');
+    if (riserPool) {
+      RISER_PLAYERS.forEach(function(p){ var c=makeRiserCard(p); c.dataset.group='riser-rank-pool'; riserPool.appendChild(c); });
+    }
+
+    document.querySelectorAll('#riser-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ if(!canDrop('riser-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){
+        e.preventDefault(); slot.classList.remove('drag-over');
+        if (dragging) placeCardInSlot(dragging, slot);
+      });
+    });
+
+    if (riserPool) {
+      riserPool.addEventListener('dragover', function(e){ if(!canDrop('riser-rank-pool'))return; e.preventDefault(); riserPool.classList.add('drag-over'); });
+      riserPool.addEventListener('dragleave', function(){ riserPool.classList.remove('drag-over'); });
+      riserPool.addEventListener('drop', function(e){
+        e.preventDefault(); riserPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging);
+          op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        }
+        riserPool.appendChild(dragging);
+      });
+    }
+
+    var riserResetBtn = document.getElementById('riser-rank-reset');
+    if (riserResetBtn) {
+      riserResetBtn.addEventListener('mouseenter', function(){ riserResetBtn.style.color='#c9a84c'; riserResetBtn.style.borderColor='#c9a84c'; });
+      riserResetBtn.addEventListener('mouseleave', function(){ riserResetBtn.style.color=''; riserResetBtn.style.borderColor=''; });
+      riserResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#riser-rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card');
+          if (!card) return;
+          slot.removeChild(card);
+          slot.classList.remove('filled');
+          slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          riserPool.appendChild(card);
+        });
+      });
+    }
+    // ── END RISER RANKING ──
+
+    // ── ROLEPLAYER RANKING WIDGET ──
+    var ROLEPLAYER_PLAYERS = [
+      { name:'Stogsdill 2020-21 RP', label:'Stogsdill', year:'2020-21', img:'headshot_stogsdill.png', color:'#002B5C', logo:WBY+'was_orig.png',
+        stats:{ ppg:9.8, rpg:8.9, apg:6.8, fgp:'49.5%', tpp:'0.0%', mpg:26.4, wins:54 } },
+      { name:'Stewart 2032-33 RP',   label:'Stewart',   year:'2032-33', img:'headshot_stewart.png',   color:'#5D76A9', logo:WBY+'van_orig.png',
+        stats:{ ppg:12.1, rpg:4.1, apg:6.2, fgp:'46.3%', tpp:'40.3%', mpg:26.5, wins:50 } },
+      { name:'Clark 2036-37 RP',     label:'Clark',     year:'2036-37', img:'headshot_clark.png',     color:'#552583', logo:WBY+'lal_orig.png',
+        stats:{ ppg:10.7, rpg:0.7, apg:6.9, fgp:'41.9%', tpp:'39.0%', mpg:24.5, wins:36 } },
+      { name:'Vitel 2032-33 RP',     label:'Vitel',     year:'2032-33', img:'headshot_vitel.png',     color:'#002D62', logo:WBY+'ind_orig.png',
+        stats:{ ppg:12.1, rpg:3.5, apg:2.3, fgp:'46.3%', tpp:'29.4%', mpg:23.7, wins:45 } },
+      { name:'Stogsdill 2028-29 RP', label:'Stogsdill', year:'2028-29', img:'headshot_stogsdill.png', color:'#CE1141', logo:WBY+'hou_orig.png',
+        stats:{ ppg:11.4, rpg:8.6, apg:8.1, fgp:'46.6%', tpp:'32.8%', mpg:27.1, wins:45 } },
+    ];
+
+    function showRoleplayerTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      seasonTT.style.background = bg;
+      var s = p.stats;
+      var rows = [
+        ['PPG', s.ppg], ['RPG', s.rpg], ['APG', s.apg],
+        ['FG%', s.fgp], ['3P%', s.tpp], ['MPG', s.mpg],
+        ['Wins', s.wins]
+      ];
+      seasonTT.style.borderColor = p.color;
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year">'+p.year+'</span>'
+          +'</div>'
+        +'</div>'
+        + rows.map(function(r){
+          return '<div class="rank-tt-row">'
+            +'<span class="rank-tt-label" style="color:'+textMuted+';">'+r[0]+'</span>'
+            +'<span class="rank-tt-val" style="color:'+textMain+';">'+r[1]+'</span>'
+            +'</div>';
+        }).join('');
+      seasonTT.classList.remove('visible');
+      void seasonTT.offsetHeight;
+      seasonTT.style.display = 'block';
+      seasonTT.classList.add('visible');
+      positionTT(e);
+    }
+
+    function makeRoleplayerCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>'
+        +'<div class="rank-card-year">'+p.year+'</div>';
+      card.addEventListener('mouseenter', function(e){ showRoleplayerTT(p, e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var roleplayerPool = document.getElementById('roleplayer-rank-pool');
+    if (roleplayerPool) {
+      ROLEPLAYER_PLAYERS.forEach(function(p){ var c=makeRoleplayerCard(p); c.dataset.group='roleplayer-rank-pool'; roleplayerPool.appendChild(c); });
+    }
+
+    document.querySelectorAll('#roleplayer-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ if(!canDrop('roleplayer-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){
+        e.preventDefault(); slot.classList.remove('drag-over');
+        if (dragging) placeCardInSlot(dragging, slot);
+      });
+    });
+
+    if (roleplayerPool) {
+      roleplayerPool.addEventListener('dragover', function(e){ if(!canDrop('roleplayer-rank-pool'))return; e.preventDefault(); roleplayerPool.classList.add('drag-over'); });
+      roleplayerPool.addEventListener('dragleave', function(){ roleplayerPool.classList.remove('drag-over'); });
+      roleplayerPool.addEventListener('drop', function(e){
+        e.preventDefault(); roleplayerPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging);
+          op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        }
+        roleplayerPool.appendChild(dragging);
+      });
+    }
+
+    var roleplayerResetBtn = document.getElementById('roleplayer-rank-reset');
+    if (roleplayerResetBtn) {
+      roleplayerResetBtn.addEventListener('mouseenter', function(){ roleplayerResetBtn.style.color='#c9a84c'; roleplayerResetBtn.style.borderColor='#c9a84c'; });
+      roleplayerResetBtn.addEventListener('mouseleave', function(){ roleplayerResetBtn.style.color=''; roleplayerResetBtn.style.borderColor=''; });
+      roleplayerResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#roleplayer-rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card');
+          if (!card) return;
+          slot.removeChild(card);
+          slot.classList.remove('filled');
+          slot.innerHTML = '<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          roleplayerPool.appendChild(card);
+        });
+      });
+    }
+    // ── END ROLEPLAYER RANKING ──
+
+    // ── CLUTCH RANKING WIDGET ──
+    var CLUTCH_PLAYERS = [
+      { name:'Cooper Clark CL',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:WBY+'lal_orig.png',  gameKey:'clark',
+        po:{ ppg:'22.2', rpg:'2.2', apg:'10.1', fgp:'48.0%', tpp:'41.3%' } },
+      { name:'Paxon Hatch CL',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:WBY+'lal_orig.png',  gameKey:'hatch',
+        po:{ ppg:'25.5', rpg:'11.5', apg:'1.9', fgp:'47.7%', tpp:'38.9%' } },
+      { name:'Sam Stogsdill CL',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:WBY+'was_orig.png',  gameKey:'stogsdill',
+        po:{ ppg:'9.3',  rpg:'8.4', apg:'8.0', fgp:'44.7%', tpp:'29.9%' } },
+      { name:'Jaykeb Stewart CL', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:WBY+'mil_orig.png',  gameKey:'stewart',
+        po:{ ppg:'18.2', rpg:'6.0', apg:'7.5', fgp:'49.9%', tpp:'41.9%' } },
+      { name:'Isaac Vitel CL',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:WBY+'orl_orig.png',  gameKey:'vitel',
+        po:{ ppg:'20.2', rpg:'4.8', apg:'4.1', fgp:'48.4%', tpp:'36.7%' } },
+    ];
+
+    function calcElimStats(gameKey) {
+      var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[gameKey]) || [];
+      var eGames = games.filter(function(g){ return g.type==='playoffs' && (g.game===6||g.game===7||g.game==='6'||g.game==='7'); });
+      function avg(fn){ if(!eGames.length) return '—'; return (eGames.reduce(function(s,g){return s+(fn(g)||0);},0)/eGames.length).toFixed(1); }
+      function pct(made,att){ var m=eGames.reduce(function(s,g){return s+(g[made]||0);},0),a=eGames.reduce(function(s,g){return s+(g[att]||0);},0); return a>0?(m/a*100).toFixed(1)+'%':'—'; }
+      return { ppg:avg(function(g){return g.pts;}), rpg:avg(function(g){return g.reb;}), apg:avg(function(g){return g.ast;}), fgp:pct('fgm','fga'), tpp:pct('tpm','tpa'), gp:eGames.length };
+    }
+
+    function showClutchTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.5)';
+      seasonTT.style.background = bg;
+      seasonTT.style.borderColor = p.color;
+      var elim = calcElimStats(p.gameKey);
+      var po   = p.po;
+      function row(label, poVal, elimVal) {
+        var pn=parseFloat(poVal), en=parseFloat(elimVal);
+        var better=!isNaN(pn)&&!isNaN(en)&&en>pn, worse=!isNaN(pn)&&!isNaN(en)&&en<pn;
+        var elimColor = better?'#22c55e':worse?'#ef4444':textMain;
+        return '<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">'+label+'</span>'
+          +'<div style="display:flex;gap:14px;align-items:center;">'
+          +'<span style="color:'+textMuted+';font-size:.82rem;">'+poVal+'</span>'
+          +'<span style="color:'+textMuted+';font-size:.65rem;">→</span>'
+          +'<span class="rank-tt-val" style="color:'+elimColor+';font-weight:700;">'+elimVal+'</span>'
+          +'</div></div>';
+      }
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right"><img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+          +'<span class="rank-tt-year" style="display:flex;gap:4px;"><span style="opacity:.5;">PO</span><span>→</span><span>ELIM</span></span>'
+          +'</div></div>'
+        +'<div style="font-family:var(--font-mono);font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-bottom:5px;">Career Playoffs → Elimination ('+elim.gp+' gm)</div>'
+        +row('PPG',po.ppg,elim.ppg)+row('RPG',po.rpg,elim.rpg)+row('APG',po.apg,elim.apg)
+        +row('FG%',po.fgp,elim.fgp)+row('3P%',po.tpp,elim.tpp);
+      seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
+      seasonTT.style.display='block'; seasonTT.classList.add('visible'); positionTT(e);
+    }
+
+    function makeClutchCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card'; card.dataset.player = p.name; card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>';
+      card.addEventListener('mouseenter', function(e){ showClutchTT(p, e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var clutchPool = document.getElementById('clutch-rank-pool');
+    if (clutchPool) {
+      CLUTCH_PLAYERS.forEach(function(p){ var c=makeClutchCard(p); c.dataset.group='clutch-rank-pool'; clutchPool.appendChild(c); });
+    }
+    document.querySelectorAll('#clutch-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover', function(e){ if(!canDrop('clutch-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop', function(e){ e.preventDefault(); slot.classList.remove('drag-over'); if(dragging)placeCardInSlot(dragging,slot); });
+    });
+    if (clutchPool) {
+      clutchPool.addEventListener('dragover', function(e){ if(!canDrop('clutch-rank-pool'))return; e.preventDefault(); clutchPool.classList.add('drag-over'); });
+      clutchPool.addEventListener('dragleave', function(){ clutchPool.classList.remove('drag-over'); });
+      clutchPool.addEventListener('drop', function(e){ e.preventDefault(); clutchPool.classList.remove('drag-over'); if(!dragging)return; if(!canDrop('clutch-rank-pool'))return; var op=dragging.parentElement; if(op&&op.classList.contains('rank-slot')){op.removeChild(dragging);op.classList.remove('filled');op.innerHTML='<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';} clutchPool.appendChild(dragging); });
+    }
+    var clutchResetBtn = document.getElementById('clutch-rank-reset');
+    if (clutchResetBtn) {
+      clutchResetBtn.addEventListener('mouseenter', function(){ clutchResetBtn.style.color='#ef4444'; });
+      clutchResetBtn.addEventListener('mouseleave', function(){ clutchResetBtn.style.color=''; });
+      clutchResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#clutch-rank-list .rank-slot').forEach(function(slot){
+          var card = slot.querySelector('.rank-card'); if(!card)return;
+          slot.removeChild(card); slot.classList.remove('filled');
+          slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          clutchPool.appendChild(card);
+        });
+      });
+    }
+    // ── END CLUTCH RANKING ──
+
+
+    // ── PIPPEN TIERLIST ──
+
+
+
+    var PIPPEN_PLAYERS = [
+      { name:'Nikola Jokic PT',       label:'Jokic',    img:NBA_HS2+'203999.png',  color:'#0E2240', logo:WBY+'den_orig.png' },
+      { name:'Luka Doncic PT',        label:'Doncic',   img:NBA_HS2+'1629029.png', color:'#0077C0', logo:WBY+'orl_orig.png' },
+      { name:'Giannis PT',            label:'Giannis',  img:NBA_HS2+'203507.png',  color:'#00471B', logo:WBY+'mil_orig.png' },
+      { name:'Donovan Mitchell PT',   label:'Mitchell', img:NBA_HS2+'1628378.png', color:'#00471B', logo:WBY+'mil_orig.png' },
+      { name:'Anthony Edwards PT',    label:'Edwards',  img:NBA_HS2+'1630162.png', color:'#CE1141', logo:WBY+'chi_orig.png' },
+      { name:'Paxon Hatch PT',        label:'Hatch',    img:'headshot_hatch.png',  color:'#552583', logo:WBY+'lal_orig.png' },
+      { name:'Cooper Clark PT',       label:'Clark',    img:'headshot_clark.png',  color:'#552583', logo:WBY+'lal_orig.png' },
+      { name:'Darius Lyttle PT',      label:'Lyttle',   img:'D-Lyttle.png',        color:'#07b4c0', logo:WBY+'mex_orig.png' },
+      { name:'Brandon Miller PT',     label:'Miller',   img:NBA_HS2+'1641706.png', color:'#002D62', logo:WBY+'ind_orig.png' },
+      { name:'Shai PT',               label:'SGA',      img:NBA_HS2+'1628983.png', color:'#5D76A9', logo:WBY+'van_orig.png' },
+      { name:'Jalen Johnson PT',      label:'J.Johnson',img:NBA_HS2+'1630552.png', color:'#002D62', logo:WBY+'ind_orig.png' },
+      { name:'Amen Thompson PT',      label:'Thompson', img:NBA_HS2+'1641708.png', color:'#CE1141', logo:WBY+'hou_orig.png' },
+      { name:'John Wall PT',          label:'Wall',     img:NBA_HS2+'202322.png',  color:'#002B5C', logo:WBY+'was_orig.png' },
+      { name:'Brandon Ingram PT',     label:'Ingram',   img:NBA_HS2+'1627742.png', color:'#552583', logo:WBY+'lal_orig.png' },
+      { name:'Jaden McDaniels PT',    label:'McDaniels',img:NBA_HS2+'1630183.png', color:'#552583', logo:WBY+'lal_orig.png' },
+      { name:'Jared McCain PT',       label:'McCain',   img:NBA_HS2+'1642272.png', color:'#552583', logo:WBY+'lal_orig.png' },
+      { name:'Grayson Allen PT',      label:'Allen',    img:NBA_HS2+'1628960.png', color:'#013088', logo:'duke.png' },
+      { name:'Lonzo Ball PT',         label:'L.Ball',   img:NBA_HS2+'1628366.png', color:'#2968c5', logo:'ucla.png' },
+    ];
+
+    function makeTierCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = p.name;
+      card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>';
+      return card;
+    }
+
+    var pippenPool = document.getElementById('pippen-tier-pool');
+    if (pippenPool) {
+      PIPPEN_PLAYERS.forEach(function(p){ var c=makeTierCard(p); c.dataset.group='pippen-tier-pool'; pippenPool.appendChild(c); });
+    }
+
+    // Wire each tier drop zone
+    var TIERS = ['S','A','B','C','D'];
+    TIERS.forEach(function(t){
+      var drop = document.getElementById('pippen-tier-'+t);
+      if (!drop) return;
+      drop.addEventListener('dragover', function(e){ if(!canDrop('pippen-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop', function(e){
+        e.preventDefault(); drop.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        // Remove from old location cleanly
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging);
+          op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        } else if (op) {
+          op.removeChild(dragging);
+        }
+        drop.appendChild(dragging);
+      });
+    });
+
+    // Pool drop — return to ungraded
+    if (pippenPool) {
+      pippenPool.addEventListener('dragover', function(e){ if(!canDrop('pippen-tier-pool'))return; e.preventDefault(); pippenPool.classList.add('drag-over'); });
+      pippenPool.addEventListener('dragleave', function(){ pippenPool.classList.remove('drag-over'); });
+      pippenPool.addEventListener('drop', function(e){
+        e.preventDefault(); pippenPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op) op.removeChild(dragging);
+        pippenPool.appendChild(dragging);
+      });
+    }
+
+    // Reset button
+    var pippenReset = document.getElementById('pippen-tier-reset');
+    if (pippenReset) {
+      pippenReset.addEventListener('mouseenter', function(){ pippenReset.style.color='#c9a84c'; pippenReset.style.borderColor='#c9a84c'; });
+      pippenReset.addEventListener('mouseleave', function(){ pippenReset.style.color=''; pippenReset.style.borderColor=''; });
+      pippenReset.addEventListener('click', function(){
+        TIERS.forEach(function(t){
+          var drop = document.getElementById('pippen-tier-'+t);
+          if (!drop) return;
+          drop.querySelectorAll('.rank-card').forEach(function(card){
+            drop.removeChild(card);
+            pippenPool.appendChild(card);
+          });
+        });
+      });
+    }
+    // ── END PIPPEN TIERLIST ──
+
+    // ── TWEET TIERLIST ──
+    var TWEET_IMAGES = [
+      'Ballooned','Champions','Chaos in LA','Cone','Cooper LAL','CP Squad Split',
+      'Death, Taxes, and Paxon','Debut Disasterpiece','Finals MVP','FT Merchant',
+      'Game Three','Hatch v. Tatum','Just got my ass kicked','Karl & John','Killian',
+      'LA Riots','Obese','OLD','P Retirement','P. Diddy Party','Practice Shots',
+      'Snack-Court Violation','Tatum is my Bitch','The Chair','The Wall','Waived'
+    ];
+
+    function getTweetExt(name) {
+      return (name === 'Just got my ass kicked' || name === 'The Chair') ? '.jpg' : '.png';
+    }
+
+    // Tweet image preview element
+    var tweetPreview = document.getElementById('tweet-preview-popup');
+    if (!tweetPreview) {
+      tweetPreview = document.createElement('div');
+      tweetPreview.id = 'tweet-preview-popup';
+      tweetPreview.className = 'tweet-preview';
+      tweetPreview.innerHTML = '<img id="tweet-preview-img" src="" alt="">';
+      document.body.appendChild(tweetPreview);
+    }
+    var tweetPreviewImg = document.getElementById('tweet-preview-img');
+
+    function showTweetPreview(name, e) {
+      tweetPreviewImg.src = 'tweets/' + name + getTweetExt(name);
+      tweetPreviewImg.onload = function() { positionTweetPreview(lastTweetMouseEvent || e); };
+      positionTweetPreview(e);
+      tweetPreview.classList.remove('visible');
+      void tweetPreview.offsetHeight;
+      tweetPreview.style.display = 'block';
+      tweetPreview.classList.add('visible');
+    }
+
+    var lastTweetMouseEvent = null;
+
+    function positionTweetPreview(e) {
+      var w = Math.min(tweetPreview.offsetWidth || 380, 380);
+      var h = tweetPreview.offsetHeight || 300;
+      var pad = 12;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+
+      // Prefer right of cursor, fall back to left
+      var x = e.clientX + 20;
+      if (x + w + pad > vw) x = e.clientX - w - 20;
+      if (x < pad) x = pad;
+
+      // Prefer near cursor vertically, clamp to viewport
+      var y = e.clientY - 20;
+      if (y + h + pad > vh) y = vh - h - pad;
+      if (y < pad) y = pad;
+
+      tweetPreview.style.left = x + 'px';
+      tweetPreview.style.top  = y + 'px';
+    }
+
+    var TWITTER_BIRD = '<svg class="tweet-card-logo" viewBox="0 0 24 24" fill="#1da1f2" xmlns="http://www.w3.org/2000/svg"><path d="M23.954 4.569a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723 9.99 9.99 0 0 1-3.127 1.195 4.92 4.92 0 0 0-8.384 4.482C7.691 8.094 4.066 6.13 1.64 3.161a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.061a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.937 4.937 0 0 0 4.604 3.417 9.868 9.868 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 0 0 2.46-2.548l-.047-.02z"/></svg>';
+
+    function makeTweetCard(name) {
+      var card = document.createElement('div');
+      card.className = 'tweet-card';
+      card.dataset.player = 'tweet_' + name;
+      card.draggable = true;
+      card.innerHTML = '<div class="tweet-card-box">'+TWITTER_BIRD+'<div class="tweet-card-label">'+name+'</div></div>';
+      card.addEventListener('mouseenter', function(e){ lastTweetMouseEvent=e; showTweetPreview(name, e); });
+      card.addEventListener('mousemove',  function(e){ lastTweetMouseEvent=e; positionTweetPreview(e); });
+      card.addEventListener('mouseleave', function(){ tweetPreview.classList.remove('visible'); tweetPreview.style.display='none'; });
+      return card;
+    }
+
+    var tweetPool = document.getElementById('tweet-tier-pool');
+    if (tweetPool) {
+      TWEET_IMAGES.forEach(function(name){ var c=makeTweetCard(name); c.dataset.group='tweet-tier-pool'; tweetPool.appendChild(c); });
+    }
+
+    // Wire tweet tier drop zones
+    ['S','A','B','C','D'].forEach(function(t){
+      var drop = document.getElementById('tweet-tier-'+t);
+      if (!drop) return;
+      drop.addEventListener('dragover', function(e){ if(!canDrop('pippen-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop', function(e){
+        e.preventDefault(); drop.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging); op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        } else if (op) { op.removeChild(dragging); }
+        drop.appendChild(dragging);
+        tweetPreview.classList.remove('visible'); tweetPreview.style.display='none';
+      });
+    });
+
+    if (tweetPool) {
+      tweetPool.addEventListener('dragover', function(e){ if(!canDrop('tweet-tier-pool'))return; e.preventDefault(); tweetPool.classList.add('drag-over'); });
+      tweetPool.addEventListener('dragleave', function(){ tweetPool.classList.remove('drag-over'); });
+      tweetPool.addEventListener('drop', function(e){
+        e.preventDefault(); tweetPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op) op.removeChild(dragging);
+        tweetPool.appendChild(dragging);
+      });
+    }
+
+    var tweetResetBtn = document.getElementById('tweet-tier-reset');
+    if (tweetResetBtn) {
+      tweetResetBtn.addEventListener('mouseenter', function(){ tweetResetBtn.style.color='#c9a84c'; tweetResetBtn.style.borderColor='#c9a84c'; });
+      tweetResetBtn.addEventListener('mouseleave', function(){ tweetResetBtn.style.color=''; tweetResetBtn.style.borderColor=''; });
+      tweetResetBtn.addEventListener('click', function(){
+        ['S','A','B','C','D'].forEach(function(t){
+          var drop = document.getElementById('tweet-tier-'+t);
+          if (!drop) return;
+          Array.from(drop.querySelectorAll('.tweet-card')).forEach(function(card){
+            drop.removeChild(card); tweetPool.appendChild(card);
+          });
+        });
+      });
+    }
+
+    // ── END TWEET TIERLIST ──
+
+    // ── DUO TIERLIST ──
+    var EGE_HS = '';
+    var DUO_PLAYERS = [
+      { name:'Clark & Hatch',         label:'Clark & Hatch',       color:'#552583', logo:WBY+'lal_orig.png',
+        p1:{img:EGE_HS+'headshot_clark.png'},   p2:{img:EGE_HS+'headshot_hatch.png'} },
+      { name:'Jokic & Vitel',         label:'Jokic & Vitel',       color:'#0E2240', logo:WBY+'den_orig.png',
+        p1:{img:NBA_HS2+'203999.png'},           p2:{img:EGE_HS+'headshot_vitel.png'} },
+      { name:'Stewart & Edwards',     label:'Stewart & Edwards',   color:'#CE1141', logo:WBY+'chi_orig.png',
+        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'1630162.png'} },
+      { name:'Stewart & Giannis',     label:'Stewart & Giannis',   color:'#00471B', logo:WBY+'mil_orig.png',
+        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'203507.png'} },
+      { name:'Doncic & Vitel',        label:'Doncic & Vitel',      color:'#0077C0', logo:WBY+'orl_orig.png',
+        p1:{img:NBA_HS2+'1629029.png'},           p2:{img:EGE_HS+'headshot_vitel.png'} },
+      { name:'Clark & Ayton',         label:'Clark & Ayton',       color:'#1a1a1a', logo:WBY+'sas_orig.png',
+        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1629028.png'} },
+      { name:'Clark & J.Johnson',     label:'Clark & Johnson',   color:'#002D62', logo:WBY+'ind_orig.png',
+        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1630552.png'} },
+      { name:'Clark & B.Miller',      label:'Clark & Miller',    color:'#002D62', logo:WBY+'ind_orig.png',
+        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1641706.png'} },
+      { name:'Clark & Gafford',       label:'Clark & Gafford',     color:'#C8102E', logo:WBY+'lac_orig.png',
+        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1629655.png'} },
+      { name:'Stewart & Porzingis',   label:'Stewart & Porzingis', color:'#006BB6', logo:WBY+'nyk_orig.png',
+        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'204001.png'} },
+      { name:'Stogsdill & Henderson', label:'Stogsdill & Henderson', color:'#002B5C', logo:WBY+'was_orig.png',
+        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1630703.png'} },
+      { name:'Stogsdill & Wall',       label:'Stogsdill & Wall',       color:'#002B5C', logo:WBY+'was_orig.png',
+        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'202322.png'} },
+      { name:'Hatch & Ingram',         label:'Hatch & Ingram',         color:'#552583', logo:WBY+'lal_orig.png',
+        p1:{img:EGE_HS+'headshot_hatch.png'},    p2:{img:NBA_HS2+'1627742.png'} },
+      { name:'Hatch & McCain',         label:'Hatch & McCain',         color:'#552583', logo:WBY+'lal_orig.png',
+        p1:{img:EGE_HS+'headshot_hatch.png'},    p2:{img:NBA_HS2+'1642272.png'} },
+      { name:'Stogsdill & Mitchell',   label:'Stogsdill & Mitchell',   color:'#ca0019', logo:'lou.png',
+        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1628378.png'} },
+      { name:'Ball & Hatch',           label:'Ball & Hatch',           color:'#2968c5', logo:'ucla.png',
+        p1:{img:NBA_HS2+'1628366.png'},          p2:{img:EGE_HS+'headshot_hatch.png'} },
+      { name:'Stewart & Allen',        label:'Stewart & Allen',        color:'#013088', logo:'duke.png',
+        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'1628960.png'} },
+    ];
+
+    function makeDuoCard(d) {
+      var card = document.createElement('div');
+      card.className = 'duo-card';
+      card.dataset.player = d.name;
+      card.draggable = true;
+      // Last names only
+      var parts = d.label.split(' & ');
+      var lastName1 = parts[0] ? parts[0].split(' ').pop() : parts[0];
+      var lastName2 = parts[1] ? parts[1].split(' ').pop() : (parts[1]||'');
+      var labelText = lastName1 + ' & ' + lastName2;
+      card.innerHTML =
+        '<div class="duo-card-box" style="border:2px solid '+d.color+';background:'+d.color+'22;">'
+          +'<div class="duo-card-half"><img src="'+d.p1.img+'" alt="'+lastName1+'"></div>'
+          +'<div class="duo-card-half"><img src="'+d.p2.img+'" alt="'+lastName2+'"></div>'
+          +'<div class="duo-card-team-logo"><img src="'+d.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="duo-card-label">'+labelText+'</div>';
+      return card;
+    }
+
+    var duoPool = document.getElementById('duo-tier-pool');
+    if (duoPool) {
+      DUO_PLAYERS.forEach(function(d){
+        var c = makeDuoCard(d);
+        c.dataset.group = 'duo-tier-pool';
+        duoPool.appendChild(c);
+      });
+    }
+
+    ['S','A','B','C','D'].forEach(function(t){
+      var drop = document.getElementById('duo-tier-'+t);
+      if (!drop) return;
+      drop.addEventListener('dragover', function(e){ if(!canDrop('duo-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop', function(e){
+        e.preventDefault(); drop.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging); op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        } else if (op) { op.removeChild(dragging); }
+        drop.appendChild(dragging);
+      });
+    });
+
+    if (duoPool) {
+      duoPool.addEventListener('dragover', function(e){ if(!canDrop('duo-tier-pool'))return; e.preventDefault(); duoPool.classList.add('drag-over'); });
+      duoPool.addEventListener('dragleave', function(){ duoPool.classList.remove('drag-over'); });
+      duoPool.addEventListener('drop', function(e){
+        e.preventDefault(); duoPool.classList.remove('drag-over');
+        if (!dragging) return;
+        if (!canDrop('duo-tier-pool')) return;
+        var op = dragging.parentElement;
+        if (op) op.removeChild(dragging);
+        duoPool.appendChild(dragging);
+      });
+    }
+
+    var duoResetBtn = document.getElementById('duo-tier-reset');
+    if (duoResetBtn) {
+      duoResetBtn.addEventListener('mouseenter', function(){ duoResetBtn.style.color='#ef4444'; });
+      duoResetBtn.addEventListener('mouseleave', function(){ duoResetBtn.style.color=''; });
+      duoResetBtn.addEventListener('click', function(){
+        ['S','A','B','C','D'].forEach(function(t){
+          var drop = document.getElementById('duo-tier-'+t);
+          if (!drop) return;
+          Array.from(drop.querySelectorAll('.duo-card')).forEach(function(card){
+            drop.removeChild(card); duoPool.appendChild(card);
+          });
+        });
+      });
+    }
+
+    // Duo cards also need dragstart/dragend handled by global handler
+    // They use duo-card class so extend global dragstart to catch them
+    // (global dragstart already handles .rank-card and .tweet-card — add .duo-card)
+    // ── END DUO TIERLIST ──
+
+    // ── RIVALRY TIERLIST ──
+    var RIVALRY_PLAYERS = [
+      { name:'Jayson Tatum RT',    label:'Tatum',     img:NBA_HS2+'1628369.png', color:'#007A33', logo:WBY+'bos_orig.png', isPlayer:true,
+        rival:{ label:'Hatch', img:'headshot_hatch.png', color:'#552583' },
+        record:{ ege:[4,4], nba:[3,2], matchups:2, winner:'Paxon 2-0' } },
+      { name:'Bam Adebayo RT',     label:'Adebayo',   img:NBA_HS2+'1628389.png', color:'#00538C', logo:WBY+'dal_orig.png', isPlayer:true,
+        rival:{ label:'Stogsdill', img:'headshot_stogsdill.png', color:'#002B5C' },
+        record:{ ege:[3], nba:[4], matchups:1, winner:'Sam 1-0' } },
+      { name:'Cade Cunningham RT', label:'Cunningham',img:NBA_HS2+'1630595.png', color:'#000000', logo:WBY+'bkn_orig.png', isPlayer:true,
+        rival:{ label:'Clark', img:'headshot_clark.png', color:'#552583' },
+        record:{ ege:[0], nba:[4], matchups:1, winner:'Cooper 1-0' } },
+      { name:'Donovan Mitchell RT',label:'Mitchell',  img:NBA_HS2+'1628378.png', color:'#00471B', logo:WBY+'mil_orig.png', isPlayer:true,
+        rival:{ label:'Vitel', img:'headshot_vitel.png', color:'#0077C0' },
+        record:{ ege:[2,4,4,4], nba:[4,3,0,3], matchups:4, winner:'Mitchell 3-1' } },
+      { name:'Heat RT',    label:'Heat',    img:WBY+'mia_orig.png', color:'#98002E', logo:WBY+'mia_orig.png', isTeam:true,
+        rival:{ label:'Stewart', img:'headshot_stewart.png', color:'#00471B' },
+        record:{ ege:[0,3,4,1,4], nba:[4,4,3,4,2], matchups:5, winner:'Jaykeb 3-2' } },
+      { name:'Spurs RT',   label:'Spurs',   img:WBY+'sas_orig.png', color:'#1a1a1a', logo:WBY+'sas_orig.png', isTeam:true,
+        rival:{ label:'Hatch', img:'headshot_hatch.png', color:'#552583' },
+        record:{ ege:[4,4,2,4,4], nba:[0,2,4,3,1], matchups:5, winner:'Spurs 4-1' } },
+      { name:'Warriors RT',label:'Warriors',img:WBY+'gsw_orig.png', color:'#FFC72C', logo:WBY+'gsw_orig.png', isTeam:true,
+        rival:{ label:'Clark', img:'headshot_clark.png', color:'#552583' },
+        record:{ ege:[4,0,3], nba:[3,4,4], matchups:3, winner:'Cooper 2-1' } },
+      { name:'Bucks RT',   label:'Bucks',   img:WBY+'mil_orig.png', color:'#00471B', logo:WBY+'mil_orig.png', isTeam:true,
+        rival:{ label:'Vitel', img:'headshot_vitel.png', color:'#0077C0' },
+        record:{ ege:[2,4,4,4], nba:[4,3,0,3], matchups:4, winner:'Milwaukee 3-1' } },
+    ];
+
+    function showRivalryTT(d, e) {
+      if (!d.rival) return;
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.5)';
+      seasonTT.style.background = bg;
+      seasonTT.style.borderColor = d.color;
+
+      var selfImg = d.isTeam
+        ? '<img src="'+d.img+'" style="width:38px;height:38px;object-fit:contain;display:block;" alt="'+d.label+'">'
+        : '<img src="'+d.img+'" style="width:46px;height:46px;object-fit:cover;object-position:top center;border-radius:50%;border:2px solid '+d.color+';display:block;" alt="'+d.label+'">';
+      var rivalColor = (d.rival.color) || 'var(--orange)';
+      var rivalImg = '<img src="'+d.rival.img+'" style="width:46px;height:46px;object-fit:cover;object-position:top center;border-radius:50%;border:2px solid '+rivalColor+';display:block;" alt="'+d.rival.label+'">';
+
+      // Build series rows if record exists
+      var seriesHtml = '';
+      if (d.record) {
+        var r = d.record;
+        seriesHtml += '<div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.08);padding-top:6px;">';
+        seriesHtml += '<div style="font-family:var(--font-mono);font-size:.44rem;letter-spacing:.12em;text-transform:uppercase;color:'+textMuted+';margin-bottom:4px;">'+r.matchups+' Playoff Series</div>';
+        for (var i=0; i<r.matchups; i++) {
+          var eg = r.ege[i]; var nb = r.nba[i];
+          var egColor = eg === 4 ? 'var(--orange)' : textMain;
+          var nbColor = nb === 4 ? 'var(--orange)' : textMain;
+          seriesHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:2px 0;">'
+            +'<span style="font-family:var(--font-mono);font-size:.52rem;color:'+textMain+';">'+d.label+'</span>'
+            +'<span style="font-family:var(--font-display);font-size:.95rem;color:'+egColor+';font-weight:700;">'+eg+'</span>'
+            +'<span style="font-family:var(--font-mono);font-size:.5rem;color:'+textMuted+';">—</span>'
+            +'<span style="font-family:var(--font-display);font-size:.95rem;color:'+nbColor+';font-weight:700;">'+nb+'</span>'
+            +'<span style="font-family:var(--font-mono);font-size:.52rem;color:'+textMain+';">'+d.rival.label+'</span>'
+            +'</div>';
+        }
+        seriesHtml += '<div style="font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);text-align:center;margin-top:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:4px;">'+r.winner+'</div>';
+        seriesHtml += '</div>';
+      }
+
+      seasonTT.innerHTML =
+        '<div style="display:flex;align-items:center;gap:14px;padding-bottom:8px;">'
+          +'<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;">'
+            +selfImg
+            +'<span style="font-family:var(--font-mono);font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMain+';white-space:nowrap;">'+d.label+'</span>'
+          +'</div>'
+          +'<div style="font-family:var(--font-display);font-size:1.1rem;color:'+textMuted+';font-weight:900;flex:1;text-align:center;">vs</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;">'
+            +rivalImg
+            +'<span style="font-family:var(--font-mono);font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMain+';white-space:nowrap;">'+d.rival.label+'</span>'
+          +'</div>'
+        +'</div>'
+        + seriesHtml;
+
+      seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
+      seasonTT.style.display = 'block'; seasonTT.classList.add('visible'); positionTT(e);
+    }
+
+    function makeRivalryCard(d) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = d.name;
+      card.draggable = true;
+      if (d.isTeam) {
+        card.innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;">'
+            +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;">'
+              +'<img src="'+d.img+'" alt="'+d.label+'" style="width:60px;height:60px;object-fit:contain;display:block;">'
+            +'</div>'
+            +'<div class="rank-card-name" style="margin-top:10px;">'+d.label+'</div>'
+          +'</div>';
+      } else {
+        card.innerHTML =
+          '<div class="rank-card-box">'
+            +'<div class="rank-card-box-inner" style="border-color:'+d.color+';background:'+d.color+'22;">'
+              +'<img class="rank-headshot" src="'+d.img+'" alt="'+d.label+'">'
+            +'</div>'
+            +'<div class="rank-card-team-logo"><img src="'+d.logo+'" alt=""></div>'
+          +'</div>'
+          +'<div class="rank-card-name">'+d.label+'</div>';
+      }
+      return card;
+    }
+
+    var rivalryPool = document.getElementById('rivalry-tier-pool');
+    if (rivalryPool) {
+      RIVALRY_PLAYERS.forEach(function(d){
+        var card = makeRivalryCard(d);
+        card.dataset.group = 'rivalry-tier-pool';
+        if (d.rival) {
+          card.addEventListener('mouseenter', function(e){ showRivalryTT(d,e); });
+          card.addEventListener('mousemove',  function(e){ positionTT(e); });
+          card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+        }
+        rivalryPool.appendChild(card);
+      });
+    }
+
+    ['S','A','B','C','D'].forEach(function(t){
+      var drop = document.getElementById('rivalry-tier-'+t);
+      if (!drop) return;
+      drop.addEventListener('dragover', function(e){ if(!canDrop('rivalry-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop', function(e){
+        e.preventDefault(); drop.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement; if(op) op.removeChild(dragging);
+        drop.appendChild(dragging);
+      });
+    });
+
+    if (rivalryPool) {
+      rivalryPool.addEventListener('dragover', function(e){ if(!canDrop('rivalry-tier-pool'))return; e.preventDefault(); rivalryPool.classList.add('drag-over'); });
+      rivalryPool.addEventListener('dragleave', function(){ rivalryPool.classList.remove('drag-over'); });
+      rivalryPool.addEventListener('drop', function(e){
+        e.preventDefault(); rivalryPool.classList.remove('drag-over');
+        if(!dragging||!canDrop('rivalry-tier-pool'))return;
+        var op=dragging.parentElement; if(op) op.removeChild(dragging);
+        rivalryPool.appendChild(dragging);
+      });
+    }
+
+    var rivalryResetBtn = document.getElementById('rivalry-tier-reset');
+    if (rivalryResetBtn) {
+      rivalryResetBtn.addEventListener('mouseenter', function(){ rivalryResetBtn.style.color='#ef4444'; });
+      rivalryResetBtn.addEventListener('mouseleave', function(){ rivalryResetBtn.style.color=''; });
+      rivalryResetBtn.addEventListener('click', function(){
+        ['S','A','B','C','D'].forEach(function(t){
+          var drop = document.getElementById('rivalry-tier-'+t);
+          if(!drop) return;
+          Array.from(drop.querySelectorAll('.rank-card')).forEach(function(card){
+            var g = card.dataset.group;
+            if(g==='rivalry-tier-pool'){ drop.removeChild(card); rivalryPool.appendChild(card); }
+          });
+        });
+      });
+    }
+    // ── END RIVALRY TIERLIST ──
+
+
+    // ── PHIL JACKSON GREATEST TEAM TIERLIST ──
+    // Card icon = team logo (rivalry-style, no background). Tooltip shows starting five headshots + wins, offRtg, defRtg.
+
+    var PHIL_TEAMS = [
+      {
+        name: 'LAL 2025-26',
+        label: '\'25-26 Lakers',
+        season: '2025-26',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '59-23',
+        offRtg: 119.1,
+        defRtg: 108.3,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Derrick White',      img:NBA_HS2+'1628401.png',  label:'White' },
+          { pos:'SF', name:'Kelly Oubre Jr.',    img:NBA_HS2+'1626162.png',  label:'Oubre' },
+          { pos:'PF', name:'Paxon Hatch',        img:'headshot_hatch.png',   label:'Hatch' },
+          { pos:'C',  name:'Mitchell Robinson',  img:NBA_HS2+'1629011.png',  label:'Robinson' },
+        ],
+      },
+      {
+        name: 'MIL 2023-24',
+        label: '\'23-24 Bucks',
+        season: '2023-24',
+        logo: WBY+'mil_orig.png',
+        color: '#00471B',
+        record: '70-12',
+        offRtg: 122.5,
+        defRtg: 103.0,
+        roster: [
+          { pos:'PG', name:'Jaykeb Stewart',          img:'headshot_stewart.png', label:'Stewart' },
+          { pos:'SG', name:'Donovan Mitchell',         img:NBA_HS2+'1628378.png',  label:'Mitchell' },
+          { pos:'SF', name:'Khris Middleton',          img:NBA_HS2+'203114.png',   label:'Middleton' },
+          { pos:'PF', name:'Giannis Antetokounmpo',    img:NBA_HS2+'203507.png',   label:'Giannis' },
+          { pos:'C',  name:'Jusuf Nurkic',             img:NBA_HS2+'203994.png',   label:'Nurkic' },
+        ],
+      },
+      {
+        name: 'DEN 2027-28',
+        label: '\'27-28 Nuggets',
+        season: '2027-28',
+        logo: WBY+'den_orig.png',
+        color: '#0E2240',
+        record: '55-27',
+        offRtg: 120.3,
+        defRtg: 111.9,
+        roster: [
+          { pos:'PG', name:'Isaac Vitel',       img:'headshot_vitel.png',   label:'Vitel' },
+          { pos:'SG', name:'Malik Beasley',     img:NBA_HS2+'1627736.png',  label:'Beasley' },
+          { pos:'SF', name:'Rui Hachimura',     img:NBA_HS2+'1629060.png',  label:'Hachimura' },
+          { pos:'PF', name:'Taylor Hendricks',  img:NBA_HS2+'1641707.png',  label:'Hendricks' },
+          { pos:'C',  name:'Nikola Jokic',      img:NBA_HS2+'203999.png',   label:'Jokic' },
+        ],
+      },
+      {
+        name: 'CHI 2027-28',
+        label: '\'27-28 Bulls',
+        season: '2027-28',
+        logo: WBY+'chi_orig.png',
+        color: '#CE1141',
+        record: '65-17',
+        offRtg: 125.8,
+        defRtg: 109.3,
+        roster: [
+          { pos:'PG', name:'Jaykeb Stewart',    img:'headshot_stewart.png', label:'Stewart' },
+          { pos:'SG', name:'Anthony Edwards',   img:NBA_HS2+'1630162.png',  label:'Edwards' },
+          { pos:'SF', name:'Ochai Agbaji',      img:NBA_HS2+'1630534.png',  label:'Agbaji' },
+          { pos:'PF', name:'Patrick Williams',  img:NBA_HS2+'1630172.png',  label:'Williams' },
+          { pos:'C',  name:'Onyeka Okongwu',    img:NBA_HS2+'1630168.png',  label:'Okongwu' },
+        ],
+      },
+      {
+        name: 'ORL 2023-24',
+        label: '\'23-24 Magic',
+        season: '2023-24',
+        logo: WBY+'orl_orig.png',
+        color: '#0077C0',
+        record: '60-22',
+        offRtg: 122.6,
+        defRtg: 112.2,
+        roster: [
+          { pos:'PG', name:'Luka Doncic',     img:NBA_HS2+'1629029.png',  label:'Doncic' },
+          { pos:'SG', name:'Isaac Vitel',     img:'headshot_vitel.png',   label:'Vitel' },
+          { pos:'SF', name:'Aaron Gordon',    img:NBA_HS2+'203932.png',   label:'Gordon' },
+          { pos:'PF', name:'Jabari Parker',   img:NBA_HS2+'203953.png',   label:'Parker' },
+          { pos:'C',  name:'Nikola Vucevic',  img:NBA_HS2+'202696.png',   label:'Vucevic' },
+        ],
+      },
+      {
+        name: 'IND 2031-32',
+        label: '\'31-32 Pacers',
+        season: '2031-32',
+        logo: WBY+'ind_orig.png',
+        color: '#002D62',
+        record: '55-27',
+        offRtg: 121.8,
+        defRtg: 116.0,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',              img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Nickeil Alexander-Walker',  img:NBA_HS2+'1629638.png',  label:'NAW' },
+          { pos:'SF', name:'Brandon Miller',            img:NBA_HS2+'1641706.png',  label:'Miller' },
+          { pos:'PF', name:'Jalen Johnson',             img:NBA_HS2+'1630552.png',  label:'J.Johnson' },
+          { pos:'C',  name:'Savion Kieta',              img:'silhouette.png',       label:'Kieta' },
+        ],
+      },
+      {
+        name: 'VAN 2032-33',
+        label: '\'32-33 Grizzlies',
+        season: '2032-33',
+        logo: WBY+'van_orig.png',
+        color: '#5D76A9',
+        record: '50-32',
+        offRtg: 116.4,
+        defRtg: 110.2,
+        roster: [
+          { pos:'PG', name:'Jaykeb Stewart',          img:'headshot_stewart.png', label:'Stewart' },
+          { pos:'SG', name:'Shai Gilgeous-Alexander', img:NBA_HS2+'1628983.png',  label:'SGA' },
+          { pos:'SF', name:'Zaccharie Risacher',      img:NBA_HS2+'1642355.png',  label:'Risacher' },
+          { pos:'PF', name:'Karim Lopez',             img:'silhouette.png',       label:'K.Lopez' },
+          { pos:'C',  name:'Rasheer Fleming',         img:NBA_HS2+'1642853.png',  label:'Fleming' },
+        ],
+      },
+      {
+        name: 'HOU 2029-30',
+        label: '\'29-30 Rockets',
+        season: '2029-30',
+        logo: WBY+'hou_orig.png',
+        color: '#CE1141',
+        record: '61-21',
+        offRtg: 122.2,
+        defRtg: 110.5,
+        roster: [
+          { pos:'PG', name:'LaMelo Ball',    img:NBA_HS2+'1630163.png',  label:'LaMelo' },
+          { pos:'SG', name:'Kon Knueppel',   img:NBA_HS2+'1642851.png',  label:'Knueppel' },
+          { pos:'SF', name:'Drake Powell',   img:NBA_HS2+'1642962.png',  label:'Powell' },
+          { pos:'PF', name:'Evan Mobley',    img:NBA_HS2+'1630596.png',  label:'Mobley' },
+          { pos:'C',  name:'Sam Stogsdill',  img:'headshot_stogsdill.png', label:'Stogsdill' },
+        ],
+      },
+      {
+        name: 'SAS 2033-34',
+        label: '\'33-34 Spurs',
+        season: '2033-34',
+        logo: WBY+'sas_orig.png',
+        color: '#C4CED4',
+        record: '53-29',
+        offRtg: 118.7,
+        defRtg: 109.5,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',   img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Koby Brea',      img:NBA_HS2+'1642886.png',  label:'Brea' },
+          { pos:'SF', name:'Ausar Thompson', img:NBA_HS2+'1641709.png',  label:'A.Thompson' },
+          { pos:'PF', name:'Joan Beringer',  img:NBA_HS2+'1642866.png',  label:'Beringer' },
+          { pos:'C',  name:'De\'Andre Ayton',img:NBA_HS2+'1629028.png',  label:'Ayton' },
+        ],
+      },
+    ];
+
+    // Tooltip for Phil Jackson cards — shows starting five headshots + stats
+    var philTT = document.createElement('div');
+    philTT.id = 'phil-team-tooltip';
+    philTT.className = 'rank-stat-tooltip';
+    philTT.style.cssText = 'min-width:270px;max-width:310px;padding:14px 16px;';
+    document.body.appendChild(philTT);
+
+    function showPhilTT(t, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      philTT.style.background  = bg;
+      philTT.style.borderColor = t.color;
+
+      var header =
+        '<div class="rank-tt-header" style="margin-bottom:10px;padding-bottom:8px;">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';font-size:1.05rem;">'+t.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+t.logo+'" alt="" style="width:28px;height:28px;">'
+          +'</div>'
+        +'</div>';
+
+      var fiveHtml = '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">';
+      t.roster.forEach(function(player) {
+        fiveHtml +=
+          '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">'
+            +'<div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid '+t.color+';background:'+t.color+'22;">'
+              +'<img src="'+player.img+'" alt="'+player.label+'" style="width:100%;height:100%;object-fit:cover;object-position:top center;">'
+            +'</div>'
+            +'<span style="font-family:var(--font-mono);font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';white-space:nowrap;">'+player.pos+'</span>'
+            +'<span style="font-family:var(--font-mono);font-size:.42rem;letter-spacing:.06em;text-transform:uppercase;color:'+textMain+';white-space:nowrap;">'+player.label+'</span>'
+          +'</div>';
+      });
+      fiveHtml += '</div>';
+
+      var statsHtml =
+        '<div style="border-top:1px solid rgba(255,255,255,.09);padding-top:8px;">'
+          +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Record</span><span class="rank-tt-val" style="color:'+textMain+';">'+t.record+'</span></div>'
+          +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Off Rtg</span><span class="rank-tt-val" style="color:#22c55e;">'+t.offRtg.toFixed(1)+'</span></div>'
+          +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Def Rtg</span><span class="rank-tt-val" style="color:#3b82f6;">'+t.defRtg.toFixed(1)+'</span></div>'
+        +'</div>';
+
+      philTT.innerHTML = header + fiveHtml + statsHtml;
+      philTT.classList.remove('visible');
+      void philTT.offsetHeight;
+      philTT.style.display = 'block';
+      philTT.classList.add('visible');
+      positionPhilTT(e);
+    }
+
+    function positionPhilTT(e) {
+      var w = Math.min(philTT.offsetWidth || 310, 310);
+      var h = philTT.offsetHeight || 260;
+      var pad = 12;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var x = e.clientX + 20;
+      if (x + w + pad > vw) x = e.clientX - w - 20;
+      if (x < pad) x = pad;
+      var y = e.clientY - 20;
+      if (y + h + pad > vh) y = vh - h - pad;
+      if (y < pad) y = pad;
+      philTT.style.left = x + 'px';
+      philTT.style.top  = y + 'px';
+    }
+
+    // Rivalry-style card: plain logo, no background box
+    function makePhilTeamCard(t) {
+      var card = document.createElement('div');
+      card.className = 'rank-card';
+      card.dataset.player = t.name;
+      card.dataset.group  = 'phil-tier-pool';
+      card.draggable = true;
+      card.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;">'
+          +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;">'
+            +'<img src="'+t.logo+'" alt="'+t.label+'" style="width:60px;height:60px;object-fit:contain;display:block;">'
+          +'</div>'
+          +'<div class="rank-card-name" style="margin-top:10px;">'+t.label+'</div>'
+        +'</div>';
+      card.addEventListener('mouseenter', function(e){ showPhilTT(t, e); });
+      card.addEventListener('mousemove',  function(e){ positionPhilTT(e); });
+      card.addEventListener('mouseleave', function(){
+        philTT.classList.remove('visible');
+        philTT.style.display = 'none';
+      });
+      return card;
+    }
+
+    var philPool = document.getElementById('phil-tier-pool');
+    if (philPool) {
+      PHIL_TEAMS.forEach(function(t){ philPool.appendChild(makePhilTeamCard(t)); });
+    }
+
+    ['S','A','B','C','D'].forEach(function(tier){
+      var drop = document.getElementById('phil-tier-'+tier);
+      if (!drop) return;
+      drop.addEventListener('dragover', function(e){
+        if (!canDrop('phil-tier-pool')) return;
+        e.preventDefault(); drop.classList.add('drag-over');
+      });
+      drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop', function(e){
+        e.preventDefault(); drop.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op && op.classList.contains('rank-slot')) {
+          op.removeChild(dragging); op.classList.remove('filled');
+          op.innerHTML = '<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+        } else if (op) { op.removeChild(dragging); }
+        drop.appendChild(dragging);
+      });
+    });
+
+    if (philPool) {
+      philPool.addEventListener('dragover', function(e){
+        if (!canDrop('phil-tier-pool')) return;
+        e.preventDefault(); philPool.classList.add('drag-over');
+      });
+      philPool.addEventListener('dragleave', function(){ philPool.classList.remove('drag-over'); });
+      philPool.addEventListener('drop', function(e){
+        e.preventDefault(); philPool.classList.remove('drag-over');
+        if (!dragging) return;
+        var op = dragging.parentElement;
+        if (op) op.removeChild(dragging);
+        philPool.appendChild(dragging);
+      });
+    }
+
+    var philReset = document.getElementById('phil-tier-reset');
+    if (philReset) {
+      philReset.addEventListener('mouseenter', function(){ philReset.style.color='#c9a84c'; });
+      philReset.addEventListener('mouseleave', function(){ philReset.style.color=''; });
+      philReset.addEventListener('click', function(){
+        ['S','A','B','C','D'].forEach(function(tier){
+          var drop = document.getElementById('phil-tier-'+tier);
+          if (!drop) return;
+          Array.from(drop.querySelectorAll('.rank-card')).forEach(function(card){
+            if (card.dataset.group === 'phil-tier-pool') {
+              drop.removeChild(card);
+              philPool.appendChild(card);
+            }
+          });
+        });
+      });
+    }
+    // ── END PHIL JACKSON TIERLIST ──
+
+
+    // ── PERFORMANCE RANKING WIDGET ──
+    var PERF_PLAYERS = [
+      { name:'Stewart BOS 52',    label:'Stewart', sublabel:'52 PTS', year:'2026-27', img:'headshot_stewart.png',   color:'#006BB6', logo:WBY+'nyk_orig.png',   opp:'vs Boston',
+        gameKey:'stewart', filter:function(g){ return g.opp==='BOS' && g.pts===52; } },
+      { name:'Stewart MIA 34',    label:'Stewart', sublabel:'4 x 5',  year:'2026-27', img:'headshot_stewart.png',   color:'#006BB6', logo:WBY+'nyk_orig.png',   opp:'vs Miami (PO)',
+        gameKey:'stewart', filter:function(g){ return g.opp==='MIA' && g.pts===34; } },
+      { name:'Clark PHI 22',      label:'Clark',   sublabel:'26 AST', year:'2025-26', img:'headshot_clark.png',     color:'#C8102E', logo:WBY+'lac_orig.png',   opp:'vs Philadelphia',
+        gameKey:'clark',   filter:function(g){ return g.opp==='PHI' && g.pts===22; } },
+      { name:'Clark GSW 52',      label:'Clark',   sublabel:'52 PTS', year:'2028-29', img:'headshot_clark.png',     color:'#552583', logo:WBY+'lal_orig.png',   opp:'vs Golden State (PO)',
+        gameKey:'clark',   filter:function(g){ return g.opp==='GSW' && g.pts===52; } },
+      { name:'Hatch NOP 60',      label:'Hatch',   sublabel:'60 PTS',  year:'2022-23', img:'headshot_hatch.png',     color:'#552583', logo:WBY+'lal_orig.png',   opp:'vs New Orleans',
+        gameKey:'hatch',   filter:function(g){ return g.opp==='NOP' && g.pts===60; } },
+      { name:'Hatch NOP 49',      label:'Hatch',   sublabel:'49 PTS',  year:'2021-22', img:'headshot_hatch.png',     color:'#552583', logo:WBY+'lal_orig.png',   opp:'vs New Orleans (PO)',
+        gameKey:'hatch',   filter:function(g){ return g.opp==='NOP' && g.pts===49; } },
+      { name:'Stogsdill BOS 24',  label:'Stogsdill',sublabel:'24-21-18', year:'2025-26', img:'headshot_stogsdill.png', color:'#002B5C', logo:WBY+'was_orig.png',   opp:'vs Boston',
+        gameKey:'stogsdill',filter:function(g){ return g.opp==='BOS' && g.pts===24; } },
+      { name:'Vitel SAC 37',      label:'Vitel',   sublabel:'37 PTS',  year:'2027-28', img:'headshot_vitel.png',     color:'#0E2240', logo:WBY+'den_orig.png',   opp:'vs Sacramento (PO)',
+        gameKey:'vitel',   filter:function(g){ return g.opp==='SAC' && g.pts===37; } },
+      { name:'Vitel KAN 42',      label:'Vitel',   sublabel:'42 PTS',  year:'2016-17', img:'headshot_vitel.png',     color:'#0050bb', logo:'kansas.png',          opp:'vs Oregon',
+        gameKey:null,
+        stats:{ pts:42, reb:3, ast:3, stl:0, blk:0, tov:2, fgm:16, fga:28, tpm:9, tpa:20, ftm:1, fta:2, min:33 } },
+    ];
+
+    function getGameStats(p) {
+      if (p.stats) return p.stats;
+      var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[p.gameKey]) || [];
+      for (var i=0; i<games.length; i++) { if (p.filter(games[i])) return games[i]; }
+      return null;
+    }
+
+    function showPerfTT(p, e) {
+      var isLight  = document.documentElement.classList.contains('light');
+      var bg       = isLight ? '#f5f5f8' : '#0d0b1e';
+      var textMain = isLight ? '#0e0b2e' : '#ffffff';
+      var textMuted= isLight ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.5)';
+      seasonTT.style.background = bg;
+      seasonTT.style.borderColor = p.color;
+      var s = getGameStats(p);
+      if (!s) { seasonTT.style.display='none'; return; }
+      var fgPct  = s.fga  > 0 ? (s.fgm /s.fga *100).toFixed(1)+'%' : '—';
+      var tpPct  = s.tpa  > 0 ? (s.tpm /s.tpa *100).toFixed(1)+'%' : '—';
+      var ftPct  = s.fta  > 0 ? (s.ftm /s.fta *100).toFixed(1)+'%' : '—';
+      function row(label, val, pct) {
+        var valHtml = pct
+          ? '<div style="display:flex;align-items:center;gap:8px;">'
+              +'<span style="color:'+textMuted+';font-family:var(--font-mono);font-size:.5rem;letter-spacing:.06em;">'+pct+'</span>'
+              +'<span style="color:'+textMain+';font-family:var(--font-display);font-size:.95rem;">'+val+'</span>'
+            +'</div>'
+          : '<span class="rank-tt-val" style="color:'+textMain+';">'+val+'</span>';
+        return '<div class="rank-tt-row">'
+          +'<span class="rank-tt-label" style="color:'+textMuted+';">'+label+'</span>'
+          +valHtml
+          +'</div>';
+      }
+      seasonTT.innerHTML =
+        '<div class="rank-tt-header">'
+          +'<span class="rank-tt-name" style="color:'+textMain+';">'+p.label+'</span>'
+          +'<div class="rank-tt-right">'
+            +'<img class="rank-tt-logo" src="'+p.logo+'" alt="">'
+            +'<span class="rank-tt-year">'+p.year+' · '+p.opp+'</span>'
+          +'</div>'
+        +'</div>'
+        + row('PTS', s.pts)
+        + row('REB', s.reb)
+        + row('AST', s.ast)
+        + row('STL', s.stl)
+        + row('BLK', s.blk)
+        + row('TOV', s.tov)
+        + row('FG',  s.fgm+'/'+s.fga, fgPct)
+        + row('3P',  s.tpm+'/'+s.tpa, tpPct)
+        + row('FT',  s.ftm+'/'+s.fta, ftPct)
+        + row('MIN', s.min);
+      seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
+      seasonTT.style.display='block'; seasonTT.classList.add('visible'); positionTT(e);
+    }
+
+    function makePerfCard(p) {
+      var card = document.createElement('div');
+      card.className = 'rank-card'; card.dataset.player = p.name; card.draggable = true;
+      card.innerHTML =
+        '<div class="rank-card-box">'
+          +'<div class="rank-card-box-inner" style="border-color:'+p.color+';background:'+p.color+'22;">'
+            +'<img class="rank-headshot" src="'+p.img+'" alt="'+p.label+'">'
+          +'</div>'
+          +'<div class="rank-card-team-logo"><img src="'+p.logo+'" alt=""></div>'
+        +'</div>'
+        +'<div class="rank-card-name">'+p.label+'</div>'
+        +'<div class="rank-card-year">'+p.sublabel+'</div>';
+      card.addEventListener('mouseenter', function(e){ showPerfTT(p,e); });
+      card.addEventListener('mousemove',  function(e){ positionTT(e); });
+      card.addEventListener('mouseleave', function(){ seasonTT.classList.remove('visible'); seasonTT.style.display='none'; });
+      return card;
+    }
+
+    var perfPool = document.getElementById('perf-rank-pool');
+    if (perfPool) {
+      PERF_PLAYERS.forEach(function(p){ var c=makePerfCard(p); c.dataset.group='perf-rank-pool'; perfPool.appendChild(c); });
+    }
+    document.querySelectorAll('#perf-rank-list .rank-slot').forEach(function(slot){
+      slot.addEventListener('dragover',  function(e){ if(!canDrop('perf-rank-pool'))return; e.preventDefault(); slot.classList.add('drag-over'); });
+      slot.addEventListener('dragleave', function(){ slot.classList.remove('drag-over'); });
+      slot.addEventListener('drop',      function(e){ e.preventDefault(); slot.classList.remove('drag-over'); if(dragging)placeCardInSlot(dragging,slot); });
+    });
+    if (perfPool) {
+      perfPool.addEventListener('dragover',  function(e){ if(!canDrop('perf-rank-pool'))return; e.preventDefault(); perfPool.classList.add('drag-over'); });
+      perfPool.addEventListener('dragleave', function(){ perfPool.classList.remove('drag-over'); });
+      perfPool.addEventListener('drop',      function(e){ e.preventDefault(); perfPool.classList.remove('drag-over'); if(!dragging||!canDrop('perf-rank-pool'))return; var op=dragging.parentElement; if(op&&op.classList.contains('rank-slot')){op.removeChild(dragging);op.classList.remove('filled');op.innerHTML='<span class="rank-slot-num">'+op.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';} else if(op){op.removeChild(dragging);} perfPool.appendChild(dragging); });
+    }
+    var perfResetBtn = document.getElementById('perf-rank-reset');
+    if (perfResetBtn) {
+      perfResetBtn.addEventListener('mouseenter', function(){ perfResetBtn.style.color='#ef4444'; });
+      perfResetBtn.addEventListener('mouseleave', function(){ perfResetBtn.style.color=''; });
+      perfResetBtn.addEventListener('click', function(){
+        document.querySelectorAll('#perf-rank-list .rank-slot').forEach(function(slot){
+          var card=slot.querySelector('.rank-card'); if(!card)return;
+          slot.removeChild(card); slot.classList.remove('filled');
+          slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';
+          perfPool.appendChild(card);
+        });
+      });
+    }
+    // ── END PERFORMANCE RANKING ──
+
+
+
+
+    // ── STICKY POOL SYSTEM ──
+    (function(){
+      var dock      = document.getElementById('sticky-dock');
+      var dockLabel = document.getElementById('sticky-dock-label');
+      var resetBtn  = document.getElementById('sticky-reset-btn');
+      if (!dock) return;
+
+      var activePool  = null;
+      var activeLabel = '';
+
+      var POOL_MAP = [
+        { id:'rank-pool',            label:'MJ Greatest Player',   reset:'rank-reset' },
+        { id:'offensive-rank-pool',  label:'LeBron Offensive',     reset:'offensive-rank-reset' },
+        { id:'defensive-rank-pool',  label:'Hakeem Defensive',     reset:'defensive-rank-reset' },
+        { id:'season-rank-pool',     label:'Curry Season',         reset:'season-rank-reset' },
+        { id:'playoff-rank-pool',    label:'Kawhi Playoff',        reset:'playoff-rank-reset' },
+        { id:'riser-rank-pool',      label:'Butler Riser',         reset:'riser-rank-reset' },
+        { id:'roleplayer-rank-pool', label:'Harper Roleplayer',    reset:'roleplayer-rank-reset' },
+        { id:'pippen-tier-pool',     label:'Pippen Teammate',      reset:'pippen-tier-reset' },
+        { id:'tweet-tier-pool',      label:'Rozier Tweets',        reset:'tweet-tier-reset' },
+        { id:'phil-tier-pool',       label:'Phil Jackson Team',    reset:'phil-tier-reset' },
+      ];
+
+      function getEntry(poolEl){ return POOL_MAP.find(function(p){ return p.id === poolEl.id; }); }
+
+      function updateDock(){
+        if (!activePool) return;
+        var count = activePool.children.length;
+        dockLabel.textContent = activeLabel + (count > 0 ? '  (' + count + ')' : '  — all ranked!');
+      }
+
+      function showDock(poolEl, entry){
+        activePool  = poolEl;
+        activeLabel = entry.label + ' · Unranked';
+        updateDock();
+        dock.classList.add('visible');
+      }
+
+      function hideDock(){
+        dock.classList.remove('visible');
+        activePool = null;
+      }
+
+      if (!('IntersectionObserver' in window)) return;
+
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          var pe   = entry.target;
+          var info = getEntry(pe);
+          if (!info) return;
+          if (!entry.isIntersecting) showDock(pe, info);
+          else if (activePool === pe) hideDock();
+        });
+      }, { rootMargin:'0px 0px -80px 0px', threshold:0.05 });
+
+      setTimeout(function(){
+        POOL_MAP.forEach(function(p){
+          var el = document.getElementById(p.id);
+          if (el) io.observe(el);
+        });
+      }, 400);
+
+      resetBtn.addEventListener('click', function(){
+        if (!activePool) return;
+        var info = getEntry(activePool);
+        if (!info) return;
+        var btn = document.getElementById(info.reset);
+        if (btn) { btn.click(); setTimeout(updateDock, 80); }
+      });
+
+      document.addEventListener('drop',    function(){ setTimeout(updateDock, 80); });
+      document.addEventListener('dragend', function(){ setTimeout(updateDock, 80); });
+    })();
+    // ── DRAG EDGE SCROLL ──
+    (function(){
+      var scrolling  = false;
+      var scrollRAF  = null;
+      var ZONE       = 120;   // px from edge to start scrolling
+      var MAX_SPEED  = 18;    // max px per frame
+      var cursorY    = 0;
+
+      document.addEventListener('dragover', function(e){
+        cursorY = e.clientY;
+        if (!scrolling) startScroll();
+      });
+
+      document.addEventListener('dragend', stopScroll);
+      document.addEventListener('drop',    stopScroll);
+
+      function startScroll(){
+        scrolling = true;
+        (function loop(){
+          if (!scrolling) return;
+          var vh = window.innerHeight;
+          var speed = 0;
+
+          if (cursorY < ZONE) {
+            // Near top — scroll up
+            speed = -Math.round(MAX_SPEED * (1 - cursorY / ZONE));
+          } else if (cursorY > vh - ZONE) {
+            // Near bottom — scroll down
+            speed = Math.round(MAX_SPEED * ((cursorY - (vh - ZONE)) / ZONE));
+          }
+
+          if (speed !== 0) window.scrollBy(0, speed);
+          scrollRAF = requestAnimationFrame(loop);
+        })();
+      }
+
+      function stopScroll(){
+        scrolling = false;
+        if (scrollRAF) cancelAnimationFrame(scrollRAF);
+        scrollRAF = null;
+      }
+    })();
+    // ── END DRAG EDGE SCROLL ──
+  </script>
+
+  <!-- Sticky unranked dock -->
+  <div class="pool-sticky-dock" id="sticky-dock">
+    <div class="pool-sticky-header">
+      <span class="pool-sticky-label" id="sticky-dock-label">// Unranked</span>
+      <div class="pool-sticky-actions">
+        <button class="rank-reset-btn" id="sticky-reset-btn" style="font-size:.5rem;padding:3px 10px;">🗑</button>
+      </div>
+    </div>
+    <div class="pool-sticky-pool" id="sticky-pool-content"></div>
+  </div>
+
+</body>
+</html>

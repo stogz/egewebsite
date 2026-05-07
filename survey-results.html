@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="EGE_Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey Results · EGE NBA Simulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <script src="sim-config.js"></script>
+  <style>
+    body{display:flex;flex-direction:column;min-height:100vh;}
+    body>footer{margin-top:auto;}
+
+    /* Password gate */
+    .gate{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+    .gate-box{border:1px solid var(--border);background:var(--bg-card);padding:48px 56px;max-width:420px;width:100%;box-sizing:border-box;text-align:center;}
+    .gate-title{font-family:var(--font-display);font-weight:900;font-size:2rem;text-transform:uppercase;color:var(--heading);margin-bottom:8px;}
+    .gate-sub{font-family:var(--font-body);font-size:.9rem;color:var(--text-muted);margin-bottom:28px;}
+    .gate-input{width:100%;background:transparent;border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.9rem;padding:12px 16px;box-sizing:border-box;outline:none;text-align:center;letter-spacing:.2em;transition:border-color .2s;}
+    .gate-input:focus{border-color:var(--orange);}
+    .gate-btn{margin-top:16px;width:100%;padding:13px;background:var(--orange);border:none;color:#fff;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
+    .gate-btn:hover{opacity:.85;}
+    .gate-err{margin-top:10px;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:#ef4444;display:none;}
+    .gate-err.visible{display:block;}
+
+    /* Results page */
+    .results-wrap{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:100px 60px 80px;width:100%;box-sizing:border-box;flex:1;display:none;}
+    .results-wrap.visible{display:block;}
+    .results-eyebrow{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;}
+    .results-eyebrow::before{content:'// ';opacity:.5;}
+    .results-title{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase;letter-spacing:-.01em;color:var(--heading);margin-bottom:6px;transition:color .35s;}
+    .results-meta{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:48px;}
+
+    /* Question result block */
+    .result-q{margin-bottom:40px;border:1px solid var(--border);background:var(--bg-card);overflow:hidden;transition:background .35s;}
+    .result-q-header{padding:14px 20px;border-bottom:1px solid var(--border-soft);background:rgba(35,26,165,.07);display:flex;align-items:center;gap:10px;}
+    .result-q-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+    .result-q-title{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);}
+    .result-q-body{padding:20px 24px;}
+    .result-q-question{font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--heading);margin-bottom:20px;transition:color .35s;}
+
+    /* Bar chart for radio */
+    .result-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+    .result-bar-label{font-family:var(--font-body);font-size:.88rem;color:var(--text);width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .result-bar-track{flex:1;height:20px;background:var(--border-soft);position:relative;overflow:hidden;}
+    .result-bar-fill{height:100%;background:var(--orange);transition:width .6s ease;min-width:2px;}
+    .result-bar-fill.top{background:var(--orange);}
+    .result-bar-fill.other{background:rgba(35,26,165,.6);}
+    .result-bar-count{font-family:var(--font-mono);font-size:.62rem;color:var(--text-muted);width:60px;text-align:right;flex-shrink:0;}
+    .result-bar-pct{font-family:var(--font-mono);font-size:.62rem;color:var(--orange);width:42px;text-align:right;flex-shrink:0;}
+
+    /* Free text responses */
+    .result-text-list{display:flex;flex-direction:column;gap:10px;}
+    .result-text-item{padding:12px 16px;border:1px solid var(--border-soft);background:rgba(35,26,165,.03);font-family:var(--font-body);font-size:.9rem;color:var(--text);line-height:1.55;}
+    .result-text-empty{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.5;}
+
+    /* Raw table */
+    .results-raw-toggle{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border:1px solid var(--border);padding:8px 16px;background:transparent;margin-top:20px;transition:color .2s,border-color .2s;}
+    .results-raw-toggle:hover{color:var(--orange);border-color:var(--orange);}
+    .results-raw{display:none;margin-top:16px;overflow-x:auto;}
+    .results-raw.visible{display:block;}
+    .results-raw table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.62rem;}
+    .results-raw th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;}
+    .results-raw td{padding:8px 12px;border-bottom:1px solid var(--border-soft);color:var(--text);}
+    .results-raw tr:last-child td{border-bottom:none;}
+
+    .results-raw td .delete-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:.85rem; padding:2px 4px; opacity:.4; transition:opacity .15s, color .15s; vertical-align:middle; }
+    .results-raw td .delete-btn:hover { opacity:1; color:#ef4444; }
+      .results-wrap{padding:80px 20px 60px;}
+      .gate-box{padding:32px 24px;}
+      .result-bar-label{width:120px;font-size:.78rem;}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="scanline"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="EGE_Logo.png" alt="EGE Logo" class="logo-img"/><span>EGE <span class="accent">NBA</span> Simulation</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-num="01">Home</a></li>
+      <li><a href="players.html" data-num="02">Players</a></li>
+      <li><a href="teams.html" data-num="03">Teams</a></li>
+      <li><a href="history.html" data-num="04">History</a></li>
+      <li><a href="other.html" data-num="05">Other</a></li>
+      <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
+    </ul>
+  </nav>
+
+  <!-- Password Gate -->
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <div class="gate-title">Results</div>
+      <div class="gate-sub">Admin access required to view survey results.</div>
+      <input class="gate-input" type="password" id="gate-input" placeholder="••••••••" />
+      <button class="gate-btn" id="gate-btn">Access Results →</button>
+      <div class="gate-err" id="gate-err">Incorrect password.</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-wrap" id="results-wrap">
+    <p class="results-eyebrow">admin · results</p>
+    <h1 class="results-title">Survey Results</h1>
+    <div class="results-meta" id="results-meta">Loading...</div>
+    <div id="results-body"></div>
+    <button class="results-raw-toggle" id="raw-toggle">Show Raw Responses</button>
+    <div class="results-raw" id="results-raw"></div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
+    <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+  (function(){
+    var SUPABASE_URL = 'https://wspmprjqqhtxekzyensq.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
+    var TABLE = 'survey_responses';
+    // ── Set your admin password here ──
+    var ADMIN_PASSWORD = 'ege2025';
+
+    // Question definitions — keep in sync with survey.html
+    var QUESTIONS = [
+      { key:'career_ranking',   type:'ranking',           label:'The Michael Jordan Greatest Player Award' },
+      { key:'offensive_ranking', type:'offensive-ranking',  label:'The LeBron James Greatest Offensive Player Award' },
+      { key:'defensive_ranking', type:'defensive-ranking',  label:'The Hakeem Olajuwon Defensive Player Award' },
+      { key:'best_season',    type:'season-ranking', label:'The Stephen Curry Greatest Individual Regular Season Award' },
+      { key:'playoff_ranking',type:'playoff-ranking', label:'The Kawhi Leonard Greatest Playoff Run Award' },
+      { key:'riser_ranking',  type:'riser-ranking',  label:'The Jimmy Butler Playoff Riser Award' },
+      { key:'roleplayer_ranking', type:'roleplayer-ranking', label:'The Ron Harper Roleplayer Award' },
+      { key:'pippen_tierlist', type:'tierlist',       label:'The Scottie Pippen Greatest Teammate Award' },
+      { key:'tweet_tierlist',  type:'tweet-tierlist', label:'The Terry Rozier Greatest Tweet Award' },
+      { key:'duo_tierlist',    type:'duo-tierlist',   label:'The Shaquille O\'Neal & Kobe Bryant Greatest Duo Award' },
+      { key:'rivalry_tierlist', type:'rivalry-tierlist', label:'The Magic Johnson & Larry Bird Greatest Rivalry Award' },
+      { key:'phil_jackson_tierlist', type:'phil-tierlist', label:'The Phil Jackson Greatest Team Award' },
+      { key:'perf_ranking', type:'perf-ranking', label:'The Bam Adebayo Greatest Performance Award' },
+      { key:'comments',       type:'textarea',       label:'Any other thoughts on the league?' },
+    ];
+
+    // Gate
+    var gateInput = document.getElementById('gate-input');
+    var gateBtn   = document.getElementById('gate-btn');
+    var gateErr   = document.getElementById('gate-err');
+
+    function unlock() {
+      if (gateInput.value === ADMIN_PASSWORD) {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('results-wrap').classList.add('visible');
+        loadResults();
+      } else {
+        gateErr.classList.add('visible');
+        gateInput.value = '';
+        gateInput.focus();
+      }
+    }
+    gateBtn.addEventListener('click', unlock);
+    gateInput.addEventListener('keydown', function(e){ if(e.key==='Enter') unlock(); });
+
+    function sbHeaders(){
+      return {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+    }
+
+    var allRows = [];
+
+    function loadResults(){
+      fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?select=token,name,answers,updated_at&order=updated_at.desc',{headers:sbHeaders()})
+        .then(function(r){return r.json();})
+        .then(function(rows){
+          allRows = rows || [];
+          renderResults(allRows);
+          renderRaw(allRows);
+        })
+        .catch(function(err){
+          document.getElementById('results-meta').textContent = 'Error loading results: '+err.message;
+        });
+    }
+
+    function renderResults(rows){
+      var meta = document.getElementById('results-meta');
+      var body = document.getElementById('results-body');
+      var names = rows.map(function(r){ return r.name || r.token; }).filter(Boolean);
+      meta.textContent = rows.length + ' response' + (rows.length!==1?'s':'') + ' total'
+        + (names.length ? ' · ' + names.join(', ') : '');
+      body.innerHTML = '';
+
+      QUESTIONS.forEach(function(q){
+        var card = document.createElement('div');
+        card.className = 'result-q';
+        card.innerHTML = '<div class="result-q-header"><div class="result-q-dot"></div><span class="result-q-title">'+q.key.replace(/_/g,' ')+'</span></div>'
+          + '<div class="result-q-body"><div class="result-q-question">'+q.label+'</div><div class="result-q-answers" id="ans_'+q.key+'"></div></div>';
+        body.appendChild(card);
+
+        var ansEl = document.getElementById('ans_'+q.key);
+
+        if (q.type === 'tierlist' || q.type === 'tweet-tierlist' || q.type === 'duo-tierlist' || q.type === 'rivalry-tierlist' || q.type === 'phil-tierlist') {
+          var tiers = {S:5,A:3,B:2,C:1,D:0};
+          var tally = {};
+          rows.forEach(function(r){
+            var val = r.answers && r.answers[q.key];
+            if (!val || typeof val !== 'object') return;
+            Object.keys(val).forEach(function(player){
+              var tier = val[player];
+              var pts = tiers[tier] !== undefined ? tiers[tier] : 0;
+              if (!tally[player]) tally[player] = {pts:0,cnt:0,tiers:{}};
+              tally[player].pts += pts; tally[player].cnt++;
+              tally[player].tiers[tier] = (tally[player].tiers[tier]||0)+1;
+            });
+          });
+          var sorted = Object.keys(tally).sort(function(a,b){ return (tally[b].pts/tally[b].cnt)-(tally[a].pts/tally[a].cnt); });
+          if (!sorted.length) { ansEl.innerHTML='<div class="result-text-empty">No responses yet.</div>'; return; }
+          ansEl.innerHTML = sorted.map(function(player,i){
+            var d=tally[player]; var avg=(d.pts/d.cnt).toFixed(1);
+            var tierStr=['S','A','B','C','D'].map(function(t){ return d.tiers[t]?t+'×'+d.tiers[t]:''; }).filter(Boolean).join(' ');
+            var w=(d.pts/d.cnt)/5*100;
+            return '<div class="result-bar-row"><div class="result-bar-label">'+escHtml(player.replace(' PT',''))+'</div><div class="result-bar-track"><div class="result-bar-fill '+(i===0?'top':'other')+'" style="width:'+w+'%"></div></div><div class="result-bar-count">'+tierStr+'</div><div class="result-bar-pct" style="min-width:48px;">'+avg+' pts</div></div>';
+          }).join('');
+        } else if (q.type === 'ranking' || q.type === 'season-ranking' || q.type === 'playoff-ranking' || q.type === 'scorer-ranking' || q.type === 'riser-ranking' || q.type === 'media-ranking' || q.type === 'roleplayer-ranking' || q.type === 'offensive-ranking' || q.type === 'defensive-ranking' || q.type === 'clutch-ranking' || q.type === 'perf-ranking') {
+          // Show average rank for each player
+          var totals = {}, counts = {};
+          rows.forEach(function(r){
+            var arr = r.answers && r.answers[q.key];
+            if (!Array.isArray(arr)) return;
+            arr.forEach(function(name, i){
+              if (!name) return;
+              totals[name] = (totals[name]||0) + (i+1);
+              counts[name] = (counts[name]||0) + 1;
+            });
+          });
+          var players = Object.keys(totals).map(function(name){
+            return { name:name, avg: totals[name]/counts[name] };
+          }).sort(function(a,b){ return a.avg - b.avg; });
+          if (!players.length) { ansEl.innerHTML='<div class="result-text-empty">No responses yet.</div>'; return; }
+          ansEl.innerHTML = players.map(function(p, i){
+            return '<div class="result-bar-row">'
+              + '<div class="result-bar-label">'+(i+1)+'. '+p.name+'</div>'
+              + '<div class="result-bar-track"><div class="result-bar-fill '+(i===0?'top':'other')+'" style="width:'+Math.round((1-(p.avg-1)/4)*100)+'%"></div></div>'
+              + '<div class="result-bar-count" style="color:var(--text-muted);">avg #'+p.avg.toFixed(1)+'</div>'
+              + '</div>';
+          }).join('');
+        } else if (q.type === 'radio') {
+          // Tally votes
+          var tally = {};
+          rows.forEach(function(r){
+            var val = r.answers && r.answers[q.key];
+            if (val) tally[val] = (tally[val]||0) + 1;
+          });
+          var total = Object.values(tally).reduce(function(s,v){return s+v;},0);
+          var sorted = Object.keys(tally).sort(function(a,b){return tally[b]-tally[a];});
+          if (!sorted.length) { ansEl.innerHTML = '<div class="result-text-empty">No responses yet.</div>'; return; }
+          var topVal = sorted[0];
+          ansEl.innerHTML = sorted.map(function(val,i){
+            var count = tally[val];
+            var pct = total ? Math.round(count/total*100) : 0;
+            var w = total ? (count/total*100) : 0;
+            return '<div class="result-bar-row">'
+              + '<div class="result-bar-label" title="'+val+'">'+val+'</div>'
+              + '<div class="result-bar-track"><div class="result-bar-fill '+(i===0?'top':'other')+'" style="width:'+w+'%"></div></div>'
+              + '<div class="result-bar-count">'+count+'</div>'
+              + '<div class="result-bar-pct">'+pct+'%</div>'
+              + '</div>';
+          }).join('');
+        } else {
+          // Free text
+          var texts = rows.map(function(r){return r.answers&&r.answers[q.key];}).filter(Boolean);
+          if (!texts.length) { ansEl.innerHTML = '<div class="result-text-empty">No responses yet.</div>'; return; }
+          ansEl.innerHTML = '<div class="result-text-list">'+texts.map(function(t){
+            return '<div class="result-text-item">'+escHtml(t)+'</div>';
+          }).join('')+'</div>';
+        }
+      });
+    }
+
+    function deleteResponse(token, rowEl) {
+      if (!confirm('Delete response for "' + token + '"? This cannot be undone.')) return;
+      fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?token=eq.'+encodeURIComponent(token), {
+        method: 'DELETE',
+        headers: sbHeaders()
+      }).then(function(r) {
+        if (r.ok || r.status === 204) {
+          // Remove from local array and re-render
+          allRows = allRows.filter(function(row){ return row.token !== token; });
+          renderResults(allRows);
+          renderRaw(allRows);
+        } else {
+          alert('Delete failed. Check console.');
+        }
+      }).catch(function(err){ console.error(err); alert('Delete failed.'); });
+    }
+
+    function renderRaw(rows){
+      var el = document.getElementById('results-raw');
+      if (!rows.length) { el.innerHTML='<div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text-muted);padding:12px;">No responses.</div>'; return; }
+      var keys = QUESTIONS.map(function(q){return q.key;});
+      var thead = '<tr><th></th><th>Name</th><th>Submitted</th>' + keys.map(function(k){return '<th>'+k.replace(/_/g,' ')+'</th>';}).join('') + '</tr>';
+      var tbody = rows.map(function(r){
+        var date = r.updated_at ? new Date(r.updated_at).toLocaleDateString() : '—';
+        var name = escHtml(r.name || r.token || '—');
+        var cells = keys.map(function(k){return '<td>'+escHtml(String((r.answers&&r.answers[k])||'—'))+'</td>';}).join('');
+        var token = escHtml(r.token||'');
+        return '<tr>'
+          + '<td><button class="delete-btn" data-token="'+token+'" title="Delete response">🗑</button></td>'
+          + '<td>'+name+'</td><td>'+date+'</td>'+cells+'</tr>';
+      }).join('');
+      el.innerHTML = '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>';
+
+      // Wire delete buttons
+      el.querySelectorAll('.delete-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var row = btn.closest('tr');
+          deleteResponse(btn.dataset.token, row);
+        });
+      });
+    }
+
+    document.getElementById('raw-toggle').addEventListener('click',function(){
+      var el = document.getElementById('results-raw');
+      var btn = document.getElementById('raw-toggle');
+      var vis = el.classList.toggle('visible');
+      btn.textContent = vis ? 'Hide Raw Responses' : 'Show Raw Responses';
+    });
+
+    function escHtml(s){
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  })();
+  </script>
+</body>
+</html>
