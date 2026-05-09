@@ -64,33 +64,12 @@
     }
     /* Divider line below plaque */
     .survey-q-divider{
-      height:1px;
-      background:var(--border);
-      margin:14px 0 0;
-      position:relative;
-      z-index:2;
+      display:none;
     }
     .survey-q-sub{padding:4px 24px 8px;font-family:var(--font-body);font-size:.88rem;font-weight:300;color:var(--text-muted);line-height:1.5;position:relative;z-index:1;}
-    /* Trophy anchored to divider — 90% above, 10% below */
     .survey-q::before{ content:none; }
-    .survey-q-divider::after{
-      content:'🏆';
-      position:absolute;
-      bottom:-28px;    /* shifts trophy so top overflows ~14px above card, base ~28px below divider */
-      right:40px;
-      font-size:9rem;  /* ~140px tall: 126px above divider, 14px below */
-      line-height:1;
-      transform:rotate(12deg);
-      opacity:.85;
-      pointer-events:none;
-      filter:drop-shadow(0 6px 20px rgba(0,0,0,.6));
-      transition:opacity .3s, transform .3s;
-      z-index:0;
-    }
-    .survey-q:hover .survey-q-divider::after{
-      opacity:1;
-      transform:rotate(7deg) scale(1.05);
-    }
+    .survey-q-divider::after{ content:none; }
+    .survey-q:hover .survey-q-divider::after{ content:none; }
     /* Award name is now the BIG line */
     .survey-q-name{
       display:block;
@@ -126,10 +105,10 @@
 
     /* ── RANKING WIDGET ── */
     .rank-pool-label,.rank-list-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
-    .rank-pool{display:flex;flex-wrap:nowrap;flex-direction:column;padding:8px 6px;border:1px dashed var(--border);background:var(--bg-section);transition:border-color .2s,background .2s;gap:8px;align-items:center;}
+    .rank-pool{display:flex;flex-wrap:nowrap;flex-direction:column;padding:8px 6px;border:1px dashed var(--border);background:rgba(14,12,60,.6);transition:border-color .2s,background .2s;gap:8px;align-items:center;}
     .rank-pool.drag-over{border-color:var(--orange);background:rgba(231,87,25,.06);}
     .rank-list{display:flex;flex-direction:column;gap:6px;}
-    .rank-slot{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid var(--border);background:var(--bg-section);min-height:72px;transition:border-color .15s,background .15s;}
+    .rank-slot{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid var(--border);background:rgba(14,12,60,.6);min-height:72px;transition:border-color .15s,background .15s;}
     .rank-slot.drag-over{border-color:var(--orange);background:rgba(231,87,25,.06);}
     .rank-slot-num{font-family:var(--font-display);font-weight:900;font-size:1.8rem;color:var(--border);line-height:1;width:32px;flex-shrink:0;transition:color .2s;}
     .rank-slot.filled .rank-slot-num{color:var(--orange);}
@@ -156,8 +135,8 @@
     .rank-slot .rank-card-trophy{width:24px;height:30px;bottom:-6px;left:-8px;}
 
     /* Reset + Pin button */
-    .rank-reset-btn{background:transparent;border:none;color:var(--text-muted);cursor:pointer;transition:color .15s;padding:2px 4px;font-size:1rem;line-height:1;display:flex;align-items:center;}
-    .rank-reset-btn:hover{color:#ef4444 !important;}
+    .rank-reset-btn{background:#dc2626;border:none;color:#ffffff;cursor:pointer;transition:background .15s;padding:4px 7px;font-size:.85rem;line-height:1;display:flex;align-items:center;border-radius:4px;}
+    .rank-reset-btn:hover{background:#b91c1c !important;color:#ffffff !important;}
 
     /* ── STICKY POOL ── */
     .pool-sticky-dock{
@@ -206,7 +185,7 @@
     .tierlist{display:flex;flex-direction:column;gap:4px;}
     .tier-row{display:flex;align-items:stretch;min-height:80px;border:1px solid var(--border);overflow:visible;transition:border-color .15s;}
     .tier-label{width:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:1.9rem;letter-spacing:-.02em;border-right:1px solid var(--border);}
-    .tier-drop{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:var(--bg-card);min-height:80px;align-items:flex-start;align-content:flex-start;transition:background .15s;}
+    .tier-drop{flex:1;display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:rgba(14,12,60,.6);min-height:80px;align-items:flex-start;align-content:flex-start;transition:background .15s;}
     .tier-drop.drag-over{background:rgba(35,26,165,.08);}
     .tier-row[data-tier="S"] .tier-label{background:rgba(147,51,234,.18);color:#9333ea;}
     .tier-row[data-tier="A"] .tier-label{background:rgba(239,68,68,.15);color:#ef4444;}
@@ -278,12 +257,16 @@
     .survey-q-body{padding:0 24px 24px;}
     /* Side-by-side: list left, pool right */
     /* ── RANK WIDGET LAYOUT ── */
-    .rank-widget{ display:flex; flex-direction:column; padding:16px 24px 24px; position:relative; z-index:3; background:rgb(14,10,58); }
-    html.light .rank-widget{ background:rgb(244,244,248); }
+    .rank-widget{ display:flex; flex-direction:column; padding:2px 24px 20px; position:relative; z-index:3; background:transparent; }
+    html.light .rank-widget{ background:transparent; }
+    html.light .rank-pool{ background:rgba(160,160,168,.18); }
+    html.light .rank-slot{ background:rgba(160,160,168,.18); }
+    html.light .rank-widget-pool .rank-pool{ background:rgba(160,160,168,.18); }
+    html.light .tier-drop{ background:rgba(160,160,168,.18); }
     /* Shared header row: "Your Ranking" left, "Unranked · Reset" right */
     .rank-widget-header{
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:6px;
+      display:flex; align-items:center; justify-content:flex-end;
+      margin-bottom:0;
     }
     .rank-widget-header-left{ display:flex; align-items:center; gap:0; }
     .rank-widget-header-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
@@ -315,11 +298,11 @@
       overflow-y:auto;
       overflow-x:hidden;
       scrollbar-width:thin;
-      background:rgba(255,255,255,.04);
+      background:rgba(14,12,60,.6);
       border:1px solid var(--border);
     }
     html.light .rank-widget-pool .rank-pool{
-      background:rgba(0,0,0,.04);
+      background:transparent;
     }
     .rank-widget-pool .rank-pool::-webkit-scrollbar{ width:3px; }
     .rank-widget-pool .rank-pool::-webkit-scrollbar-track{ background:transparent; }
@@ -411,10 +394,10 @@
     </div>
 
     <div class="survey-q" data-key="career_ranking" data-type="ranking">
-      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Michael Jordan</span><span class="survey-q-award">Greatest Career Award</span></div></div>
-      <div class="survey-q-sub">Rank the following careers from greatest to least based on overall greatness.</div>
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Michael Jordan</span><span class="survey-q-award">Greatest Player Award</span></div></div>
+      <div class="survey-q-sub">Rank the following players from greatest to worst.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -424,9 +407,9 @@
 
     <div class="survey-q" data-key="offensive_ranking" data-type="offensive-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The LeBron James</span><span class="survey-q-award">Greatest Offensive Player Award</span></div></div>
-      <div class="survey-q-sub">Rank the following careers from greatest offensive player to least. Hover for career stats.</div>
+      <div class="survey-q-sub">Rank the following players from greatest offensive player to the worst offensive player.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="offensive-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="offensive-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="offensive-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -436,9 +419,9 @@
 
     <div class="survey-q" data-key="defensive_ranking" data-type="defensive-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Hakeem Olajuwon</span><span class="survey-q-award">Greatest Defensive Player Award</span></div></div>
-      <div class="survey-q-sub">Rank the following careers from greatest defensive player to least. Hover for defensive grades.</div>
+      <div class="survey-q-sub">Rank the following players from greatest defensive player to the worst defensive player.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="defensive-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="defensive-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="defensive-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -448,9 +431,9 @@
 
     <div class="survey-q" data-key="best_season" data-type="season-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Stephen Curry</span><span class="survey-q-award">Greatest Individual Regular Season Award</span></div></div>
-      <div class="survey-q-sub">Rank the following individual regular seasons from greatest to least.</div>
+      <div class="survey-q-sub">Rank the following individual regular seasons from the greatest to the worst.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="season-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="season-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="season-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -459,9 +442,9 @@
 
     <div class="survey-q" data-key="playoff_ranking" data-type="playoff-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Kawhi Leonard</span><span class="survey-q-award">Greatest Playoff Run Award</span></div></div>
-      <div class="survey-q-sub">Rank the following playoff runs from greatest to least. Minimum: one won series.</div>
+      <div class="survey-q-sub">Rank the following individual playoff runs from the greatest to the worst.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="playoff-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="playoff-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="playoff-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -473,9 +456,9 @@
 
     <div class="survey-q" data-key="riser_ranking" data-type="riser-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Jimmy Butler</span><span class="survey-q-award">Greatest Playoff Riser Award</span></div></div>
-      <div class="survey-q-sub">Who elevated their game the most come playoff time? Rank from biggest riser to least.</div>
+      <div class="survey-q-sub">Rank the following playoff performers from biggest playoff riser to least.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="riser-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="riser-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="riser-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -485,9 +468,9 @@
 
     <div class="survey-q" data-key="clutch_ranking" data-type="clutch-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Reggie Miller</span><span class="survey-q-award">Clutch Performer Award</span></div></div>
-      <div class="survey-q-sub">Who performed best when it mattered most? Rank by playoff & elimination game performance. Hover for stats.</div>
+      <div class="survey-q-sub">Rank the following playoff performers from greatest clutch performer to the worst clutch performer.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="clutch-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="clutch-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="clutch-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -498,9 +481,9 @@
 
     <div class="survey-q" data-key="roleplayer_ranking" data-type="roleplayer-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Ron Harper</span><span class="survey-q-award">Greatest Roleplayer Season Award</span></div></div>
-      <div class="survey-q-sub">Rank the following roleplayer seasons from best to worst.</div>
+      <div class="survey-q-sub">Rank the following role-player seasons from the greatest to the worst.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="roleplayer-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="roleplayer-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="roleplayer-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -509,9 +492,9 @@
     </div>
     <div class="survey-q" data-key="perf_ranking" data-type="perf-ranking">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Bam Adebayo</span><span class="survey-q-award">Greatest Performance Award</span></div></div>
-      <div class="survey-q-sub">Rank the greatest individual game performances in EGE history. Hover for full stat line.</div>
+      <div class="survey-q-sub">Rank the following individual games from the greatest to the worst. Factor in matchups and playoffs/regular season into your decision making.</div>
       <div class="survey-q-divider"></div>
-      <div class="rank-widget"><div class="rank-widget-header"><span class="rank-list-label">Your Ranking</span><div class="rank-widget-header-right"><span class="rank-pool-label">Unranked</span><button id="perf-rank-reset" class="rank-reset-btn">🗑</button></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="perf-rank-list">
+      <div class="rank-widget"><div class="rank-widget-header"><div class="rank-widget-header-right"></div></div><div class="rank-widget-body"><div class="rank-widget-list"><div class="rank-list" id="perf-rank-list">
         <div class="rank-slot" data-pos="1"><span class="rank-slot-num">1</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="2"><span class="rank-slot-num">2</span><span class="rank-slot-placeholder">Drop here</span></div>
         <div class="rank-slot" data-pos="3"><span class="rank-slot-num">3</span><span class="rank-slot-placeholder">Drop here</span></div>
@@ -527,7 +510,7 @@
 
     <div class="survey-q" data-key="pippen_tierlist" data-type="tierlist">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Scottie Pippen</span><span class="survey-q-award">Greatest Teammate Award</span></div></div>
-      <div class="survey-q-sub">Grade each player on their value as a teammate. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="survey-q-sub">Grade all of the following players based on their added value to a team as a teammate.</div>
       <div class="tierlist" id="pippen-tierlist">
         <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="pippen-tier-S"></div></div>
         <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="pippen-tier-A"></div></div>
@@ -544,7 +527,7 @@
 
     <div class="survey-q" data-key="tweet_tierlist" data-type="tweet-tierlist">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Terry Rozier</span><span class="survey-q-award">Greatest Tweet Award</span></div></div>
-      <div class="survey-q-sub">Grade each tweet. Hover over a card to preview the image.</div>
+      <div class="survey-q-sub">Grade each of the following tweets.</div>
       <div class="tierlist" id="tweet-tierlist">
         <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="tweet-tier-S"></div></div>
         <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="tweet-tier-A"></div></div>
@@ -561,7 +544,7 @@
 
     <div class="survey-q" data-key="duo_tierlist" data-type="duo-tierlist">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Shaquille O'Neal &amp; Kobe Bryant</span><span class="survey-q-award">Greatest Duo Award</span></div></div>
-      <div class="survey-q-sub">Grade each duo based on their combined impact. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="survey-q-sub">Grade each duo from the greatest to the worst. Factor in chemistry, playoff success, and regular season success.</div>
       <div class="tierlist" id="duo-tierlist">
         <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="duo-tier-S"></div></div>
         <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="duo-tier-A"></div></div>
@@ -578,7 +561,7 @@
 
     <div class="survey-q" data-key="rivalry_tierlist" data-type="rivalry-tierlist">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Magic Johnson &amp; Larry Bird</span><span class="survey-q-award">Greatest Rivalry Award</span></div></div>
-      <div class="survey-q-sub">Grade each player or team logo based on the greatest rivalries in EGE history. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="survey-q-sub">Grade each of the following rivals from most entertaining to the least entertaining.</div>
       <div class="tierlist" id="rivalry-tierlist">
         <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="rivalry-tier-S"></div></div>
         <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="rivalry-tier-A"></div></div>
@@ -594,7 +577,7 @@
     </div>
     <div class="survey-q" data-key="phil_jackson_tierlist" data-type="phil-tierlist">
       <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Phil Jackson</span><span class="survey-q-award">Greatest Team Award</span></div></div>
-      <div class="survey-q-sub">Grade each team on their overall greatness. Hover for the starting five. S=Elite, A=Great, B=Good, C=Average, D=Below Average.</div>
+      <div class="survey-q-sub">Grade each of the following teams based on their starting lineups, playoff success, talent, chemistry, and dominance as teams.</div>
       <div class="tierlist" id="phil-tierlist">
         <div class="tier-row" data-tier="S"><div class="tier-label">S</div><div class="tier-drop" id="phil-tier-S"></div></div>
         <div class="tier-row" data-tier="A"><div class="tier-label">A</div><div class="tier-drop" id="phil-tier-A"></div></div>
@@ -921,8 +904,8 @@
     // Reset button — move all cards back to pool
     var resetBtn = document.getElementById('rank-reset');
     if (resetBtn) {
-      resetBtn.addEventListener('mouseenter', function(){ resetBtn.style.color='var(--orange)'; resetBtn.style.borderColor='var(--orange)'; });
-      resetBtn.addEventListener('mouseleave', function(){ resetBtn.style.color=''; resetBtn.style.borderColor=''; });
+      
+      
       resetBtn.addEventListener('click', function(){
         document.querySelectorAll('#rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card');
@@ -1064,8 +1047,8 @@
     }
     var offResetBtn = document.getElementById('offensive-rank-reset');
     if (offResetBtn) {
-      offResetBtn.addEventListener('mouseenter',function(){offResetBtn.style.color='#c9a84c';offResetBtn.style.borderColor='#c9a84c';});
-      offResetBtn.addEventListener('mouseleave',function(){offResetBtn.style.color='';offResetBtn.style.borderColor='';});
+      
+      
       offResetBtn.addEventListener('click',function(){document.querySelectorAll('#offensive-rank-list .rank-slot').forEach(function(slot){var card=slot.querySelector('.rank-card');if(!card)return;slot.removeChild(card);slot.classList.remove('filled');slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';offensivePool.appendChild(card);});});
     }
     // ── END OFFENSIVE RANKING ──
@@ -1178,8 +1161,8 @@
     }
     var defResetBtn = document.getElementById('defensive-rank-reset');
     if (defResetBtn) {
-      defResetBtn.addEventListener('mouseenter',function(){defResetBtn.style.color='#c9a84c';defResetBtn.style.borderColor='#c9a84c';});
-      defResetBtn.addEventListener('mouseleave',function(){defResetBtn.style.color='';defResetBtn.style.borderColor='';});
+      
+      
       defResetBtn.addEventListener('click',function(){document.querySelectorAll('#defensive-rank-list .rank-slot').forEach(function(slot){var card=slot.querySelector('.rank-card');if(!card)return;slot.removeChild(card);slot.classList.remove('filled');slot.innerHTML='<span class="rank-slot-num">'+slot.dataset.pos+'</span><span class="rank-slot-placeholder">Drop here</span>';defensivePool.appendChild(card);});});
     }
     // ── END DEFENSIVE RANKING ──
@@ -1321,8 +1304,8 @@
     // Season reset button
     var seasonResetBtn = document.getElementById('season-rank-reset');
     if (seasonResetBtn) {
-      seasonResetBtn.addEventListener('mouseenter', function(){ seasonResetBtn.style.color='var(--orange)'; seasonResetBtn.style.borderColor='var(--orange)'; });
-      seasonResetBtn.addEventListener('mouseleave', function(){ seasonResetBtn.style.color=''; seasonResetBtn.style.borderColor=''; });
+      
+      
       seasonResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#season-rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card');
@@ -1411,8 +1394,8 @@
 
     var playoffResetBtn = document.getElementById('playoff-rank-reset');
     if (playoffResetBtn) {
-      playoffResetBtn.addEventListener('mouseenter', function(){ playoffResetBtn.style.color='#c9a84c'; playoffResetBtn.style.borderColor='#c9a84c'; });
-      playoffResetBtn.addEventListener('mouseleave', function(){ playoffResetBtn.style.color=''; playoffResetBtn.style.borderColor=''; });
+      
+      
       playoffResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#playoff-rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card');
@@ -1545,8 +1528,8 @@
 
     var riserResetBtn = document.getElementById('riser-rank-reset');
     if (riserResetBtn) {
-      riserResetBtn.addEventListener('mouseenter', function(){ riserResetBtn.style.color='#c9a84c'; riserResetBtn.style.borderColor='#c9a84c'; });
-      riserResetBtn.addEventListener('mouseleave', function(){ riserResetBtn.style.color=''; riserResetBtn.style.borderColor=''; });
+      
+      
       riserResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#riser-rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card');
@@ -1660,8 +1643,8 @@
 
     var roleplayerResetBtn = document.getElementById('roleplayer-rank-reset');
     if (roleplayerResetBtn) {
-      roleplayerResetBtn.addEventListener('mouseenter', function(){ roleplayerResetBtn.style.color='#c9a84c'; roleplayerResetBtn.style.borderColor='#c9a84c'; });
-      roleplayerResetBtn.addEventListener('mouseleave', function(){ roleplayerResetBtn.style.color=''; roleplayerResetBtn.style.borderColor=''; });
+      
+      
       roleplayerResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#roleplayer-rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card');
@@ -1763,8 +1746,8 @@
     }
     var clutchResetBtn = document.getElementById('clutch-rank-reset');
     if (clutchResetBtn) {
-      clutchResetBtn.addEventListener('mouseenter', function(){ clutchResetBtn.style.color='#ef4444'; });
-      clutchResetBtn.addEventListener('mouseleave', function(){ clutchResetBtn.style.color=''; });
+      
+      
       clutchResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#clutch-rank-list .rank-slot').forEach(function(slot){
           var card = slot.querySelector('.rank-card'); if(!card)return;
@@ -1862,8 +1845,8 @@
     // Reset button
     var pippenReset = document.getElementById('pippen-tier-reset');
     if (pippenReset) {
-      pippenReset.addEventListener('mouseenter', function(){ pippenReset.style.color='#c9a84c'; pippenReset.style.borderColor='#c9a84c'; });
-      pippenReset.addEventListener('mouseleave', function(){ pippenReset.style.color=''; pippenReset.style.borderColor=''; });
+      
+      
       pippenReset.addEventListener('click', function(){
         TIERS.forEach(function(t){
           var drop = document.getElementById('pippen-tier-'+t);
@@ -1986,8 +1969,8 @@
 
     var tweetResetBtn = document.getElementById('tweet-tier-reset');
     if (tweetResetBtn) {
-      tweetResetBtn.addEventListener('mouseenter', function(){ tweetResetBtn.style.color='#c9a84c'; tweetResetBtn.style.borderColor='#c9a84c'; });
-      tweetResetBtn.addEventListener('mouseleave', function(){ tweetResetBtn.style.color=''; tweetResetBtn.style.borderColor=''; });
+      
+      
       tweetResetBtn.addEventListener('click', function(){
         ['S','A','B','C','D'].forEach(function(t){
           var drop = document.getElementById('tweet-tier-'+t);
@@ -2101,8 +2084,8 @@
 
     var duoResetBtn = document.getElementById('duo-tier-reset');
     if (duoResetBtn) {
-      duoResetBtn.addEventListener('mouseenter', function(){ duoResetBtn.style.color='#ef4444'; });
-      duoResetBtn.addEventListener('mouseleave', function(){ duoResetBtn.style.color=''; });
+      
+      
       duoResetBtn.addEventListener('click', function(){
         ['S','A','B','C','D'].forEach(function(t){
           var drop = document.getElementById('duo-tier-'+t);
@@ -2268,8 +2251,8 @@
 
     var rivalryResetBtn = document.getElementById('rivalry-tier-reset');
     if (rivalryResetBtn) {
-      rivalryResetBtn.addEventListener('mouseenter', function(){ rivalryResetBtn.style.color='#ef4444'; });
-      rivalryResetBtn.addEventListener('mouseleave', function(){ rivalryResetBtn.style.color=''; });
+      
+      
       rivalryResetBtn.addEventListener('click', function(){
         ['S','A','B','C','D'].forEach(function(t){
           var drop = document.getElementById('rivalry-tier-'+t);
@@ -2291,6 +2274,7 @@
       {
         name: 'LAL 2025-26',
         label: '\'25-26 Lakers',
+        champ: true,
         season: '2025-26',
         logo: WBY+'lal_orig.png',
         color: '#552583',
@@ -2308,6 +2292,7 @@
       {
         name: 'MIL 2023-24',
         label: '\'23-24 Bucks',
+        champ: true,
         season: '2023-24',
         logo: WBY+'mil_orig.png',
         color: '#00471B',
@@ -2441,6 +2426,93 @@
           { pos:'C',  name:'De\'Andre Ayton',img:NBA_HS2+'1629028.png',  label:'Ayton' },
         ],
       },
+      {
+        name: 'LAC 2023-24',
+        label: '\'23-24 Clippers',
+        season: '2023-24',
+        logo: WBY+'lac_orig.png',
+        color: '#C8102E',
+        record: '41-41',
+        offRtg: 114.6,
+        defRtg: 118.3,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Aaron Nesmith',      img:NBA_HS2+'1630174.png',  label:'Nesmith' },
+          { pos:'SF', name:'Ziaire Williams',    img:NBA_HS2+'1630533.png',  label:'Williams' },
+          { pos:'PF', name:'Tony Bradley',       img:NBA_HS2+'1628418.png',  label:'Bradley' },
+          { pos:'C',  name:'Daniel Gafford',     img:NBA_HS2+'1629655.png',  label:'Gafford' },
+        ],
+      },
+      {
+        name: 'LAL 2021-22',
+        label: '\'21-22 Lakers',
+        champ: true,
+        season: '2021-22',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '58-24',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'Mike Conley',        img:NBA_HS2+'203504.png',   label:'Conley' },
+          { pos:'SG', name:'Derrick White',       img:NBA_HS2+'1628401.png',  label:'White' },
+          { pos:'SF', name:'Brandon Ingram',      img:NBA_HS2+'1627742.png',  label:'Ingram' },
+          { pos:'PF', name:'Paxon Hatch',         img:'headshot_hatch.png',   label:'Hatch' },
+          { pos:'C',  name:'Isaiah Hartenstein',  img:NBA_HS2+'1629631.png',  label:'Hartenstein' },
+        ],
+      },
+      {
+        name: 'WAS 2021-22',
+        label: '\'21-22 Wizards',
+        season: '2021-22',
+        logo: WBY+'was_orig.png',
+        color: '#002B5C',
+        record: '54-28',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'John Wall',           img:NBA_HS2+'202322.png',   label:'Wall' },
+          { pos:'SG', name:'Bradley Beal',        img:NBA_HS2+'203078.png',   label:'Beal' },
+          { pos:'SF', name:'Otto Porter',         img:NBA_HS2+'203490.png',   label:'Porter' },
+          { pos:'PF', name:'Larry Nance Jr.',     img:NBA_HS2+'1626204.png',  label:'Nance Jr.' },
+          { pos:'C',  name:'Sam Stogsdill',       img:'headshot_stogsdill.png', label:'Stogsdill' },
+        ],
+      },
+      {
+        name: 'LAL 2029-30',
+        label: '\'29-30 Lakers',
+        season: '2029-30',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '51-31',
+        offRtg: 117.3,
+        defRtg: 112.1,
+        roster: [
+          { pos:'PG', name:'Jared McCain',        img:NBA_HS2+'1642370.png',  label:'McCain' },
+          { pos:'SG', name:'Ace Bailey',          img:NBA_HS2+'1642852.png',  label:'Bailey' },
+          { pos:'SF', name:'Jalin Montgomery',    img:'silhouette.png',       label:'Montgomery' },
+          { pos:'PF', name:'Paxon Hatch',         img:'headshot_hatch.png',   label:'Hatch' },
+          { pos:'C',  name:'Chris Cenac Jr.',     img:'silhouette.png',       label:'Cenac Jr.' },
+        ],
+      },
+      {
+        name: 'MEX 2034-35',
+        label: '\'34-35 Flight',
+        champ: true,
+        season: '2034-35',
+        logo: WBY+'mex_orig.png',
+        color: '#006847',
+        record: '64-18',
+        offRtg: 122.0,
+        defRtg: 106.8,
+        roster: [
+          { pos:'PG', name:'Maxime Lefèvre',      img:'silhouette.png',       label:'Lefèvre' },
+          { pos:'SG', name:'Bronny James Jr.',    img:NBA_HS2+'1641717.png',  label:'B.James' },
+          { pos:'SF', name:'Jaiden O\'Bryant',   img:'silhouette.png',       label:'O\'Bryant' },
+          { pos:'PF', name:'Sam Stogsdill',       img:'headshot_stogsdill.png', label:'Stogsdill' },
+          { pos:'C',  name:'Darius Lyttle',       img:'silhouette.png',       label:'Lyttle' },
+        ],
+      },
     ];
 
     // Tooltip for Phil Jackson cards — shows starting five headshots + stats
@@ -2482,8 +2554,8 @@
       var statsHtml =
         '<div style="border-top:1px solid rgba(255,255,255,.09);padding-top:8px;">'
           +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Record</span><span class="rank-tt-val" style="color:'+textMain+';">'+t.record+'</span></div>'
-          +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Off Rtg</span><span class="rank-tt-val" style="color:#22c55e;">'+t.offRtg.toFixed(1)+'</span></div>'
-          +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Def Rtg</span><span class="rank-tt-val" style="color:#3b82f6;">'+t.defRtg.toFixed(1)+'</span></div>'
+          +(t.offRtg!=null?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Off Rtg</span><span class="rank-tt-val" style="color:#22c55e;">'+t.offRtg.toFixed(1)+'</span></div>':'')
+          +(t.defRtg!=null?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Def Rtg</span><span class="rank-tt-val" style="color:#3b82f6;">'+t.defRtg.toFixed(1)+'</span></div>':'')
         +'</div>';
 
       philTT.innerHTML = header + fiveHtml + statsHtml;
@@ -2519,8 +2591,9 @@
       card.draggable = true;
       card.innerHTML =
         '<div style="display:flex;flex-direction:column;align-items:center;">'
-          +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;">'
+          +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;position:relative;">'
             +'<img src="'+t.logo+'" alt="'+t.label+'" style="width:60px;height:60px;object-fit:contain;display:block;">'
+            +(t.champ ? '<img class="rank-card-trophy" src="Award.webp" alt="Champion" style="width:20px;height:25px;bottom:-4px;left:-6px;">' : '')
           +'</div>'
           +'<div class="rank-card-name" style="margin-top:10px;">'+t.label+'</div>'
         +'</div>';
@@ -2575,8 +2648,6 @@
 
     var philReset = document.getElementById('phil-tier-reset');
     if (philReset) {
-      philReset.addEventListener('mouseenter', function(){ philReset.style.color='#c9a84c'; });
-      philReset.addEventListener('mouseleave', function(){ philReset.style.color=''; });
       philReset.addEventListener('click', function(){
         ['S','A','B','C','D'].forEach(function(tier){
           var drop = document.getElementById('phil-tier-'+tier);
@@ -2703,8 +2774,8 @@
     }
     var perfResetBtn = document.getElementById('perf-rank-reset');
     if (perfResetBtn) {
-      perfResetBtn.addEventListener('mouseenter', function(){ perfResetBtn.style.color='#ef4444'; });
-      perfResetBtn.addEventListener('mouseleave', function(){ perfResetBtn.style.color=''; });
+      
+      
       perfResetBtn.addEventListener('click', function(){
         document.querySelectorAll('#perf-rank-list .rank-slot').forEach(function(slot){
           var card=slot.querySelector('.rank-card'); if(!card)return;
