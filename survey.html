@@ -8,6 +8,7 @@
   <script>document.addEventListener("DOMContentLoaded",function(){if(window.EGE_SIM&&window.EGE_SIM.id!=="sim-original"){document.title=document.title.replace("EGE NBA Simulation","EGE "+window.EGE_SIM.label+" Simulation");}});</script>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
+  <script>if('scrollRestoration'in history)history.scrollRestoration='manual';window.scrollTo(0,0);</script>
   <script src="sim-config.js"></script>
   <style>
     /* ── BASE ── */
@@ -15,16 +16,155 @@
     body{display:flex;flex-direction:column;min-height:100vh;}
     body>footer{margin-top:auto;}
 
+
+    /* ── SCROLL LOCK DURING INTRO ── */
+    body.intro-lock{
+      overflow:hidden;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+    }
     /* ── PAGE HERO ── */
-    .survey-hero{position:relative;z-index:2;padding:96px 60px 48px;border-bottom:1px solid var(--border);background:var(--bg-section);}
-    .survey-hero-inner{max-width:900px;margin:0 auto;}
-    .survey-eyebrow{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;}
-    .survey-eyebrow::before{content:'';}
-    .survey-title{font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,6vw,5rem);text-transform:uppercase;letter-spacing:-.02em;color:var(--heading);line-height:.95;margin-bottom:16px;transition:color .35s;}
-    .survey-sub{font-family:var(--font-body);font-size:1.05rem;font-weight:300;color:var(--text-muted);line-height:1.6;max-width:560px;}
-    .survey-hero-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap;}
-    .survey-hero-chip{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--border);padding:5px 12px;display:flex;align-items:center;gap:6px;}
-    .survey-hero-chip-dot{width:5px;height:5px;border-radius:50%;background:var(--text-muted);}
+    .survey-hero{
+      position:relative; z-index:2;
+      border-bottom:1px solid var(--border);
+      overflow:hidden;
+      padding-top:60px; /* clear fixed nav */
+    }
+    .survey-hero-inner{
+      max-width:1600px;
+      margin:0 auto;
+      display:flex; align-items:center;
+      min-height:480px;
+      padding:0 60px;
+      box-sizing:border-box;
+    }
+    /* Left: image panel */
+    .survey-hero-img{
+      flex:0 0 68%;
+      position:relative;
+      display:flex; align-items:center;
+      align-self:stretch;
+    }
+    .survey-hero-img img{
+      width:100%; height:100%;
+      object-fit:contain;
+      object-position:center center;
+      display:block;
+      filter:brightness(.92) contrast(1.06);
+    }
+    /* Fade right edge into background */
+    .survey-hero-img::after{
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(to right, transparent 55%, var(--bg) 100%);
+    }
+    /* Right: text panel */
+    .survey-hero-text{
+      flex:1;
+      display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+      padding:48px 0 48px 0;
+      position:relative;
+      min-width:260px;
+    }
+    /* Scanline texture */
+    .survey-hero-text::before{
+      content:'';
+      position:absolute; inset:0;
+      background:repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(35,26,165,.04) 3px,
+        rgba(35,26,165,.04) 4px
+      );
+      pointer-events:none;
+    }
+    .survey-hero-eyebrow{
+      font-family:var(--font-mono);
+      font-size:.62rem;
+      letter-spacing:.32em;
+      text-transform:uppercase;
+      color:var(--orange);
+      margin-bottom:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .survey-hero-eyebrow::before{
+      content:'';
+      display:inline-block;
+      width:28px; height:1px;
+      background:var(--orange);
+      flex-shrink:0;
+    }
+    .survey-hero-title{
+      font-family:var(--font-display);
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:-.02em;
+      line-height:.92;
+      color:var(--heading);
+      transition:color .35s;
+    }
+    .survey-hero-title .line1{
+      display:block;
+      font-size:clamp(3.6rem,6.5vw,7rem);
+    }
+    .survey-hero-title .line2{
+      display:block;
+      font-size:clamp(2rem,3.8vw,4rem);
+      color:var(--orange);
+      letter-spacing:.04em;
+    }
+    .survey-hero-title .line3{
+      display:block;
+      font-size:clamp(1.1rem,2vw,1.9rem);
+      color:var(--text-muted);
+      font-weight:400;
+      letter-spacing:.18em;
+      margin-top:8px;
+      font-family:var(--font-mono);
+    }
+    .survey-hero-accent{
+      width:60px; height:3px;
+      background:var(--orange);
+      margin:20px 0;
+      position:relative;
+    }
+    .survey-hero-accent::after{
+      content:'';
+      position:absolute;
+      top:-4px; left:12px;
+      width:20px; height:3px;
+      background:rgba(35,26,165,.7);
+    }
+    .survey-hero-chips{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .survey-hero-chip{
+      font-family:var(--font-mono);
+      font-size:.52rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--text-muted);
+      border:1px solid var(--border);
+      padding:4px 10px;
+      display:flex; align-items:center; gap:6px;
+    }
+    .survey-hero-chip-dot{
+      width:5px; height:5px;
+      border-radius:50%;
+      background:var(--orange);
+      animation:blink 1.8s ease-in-out infinite;
+    }
+    @media(max-width:900px){
+      .survey-hero{ padding-top:70px; }
+      .survey-hero-inner{ flex-direction:column; padding:0; min-height:auto; }
+      .survey-hero-img{ flex:0 0 auto; width:100%; max-height:260px; }
+      .survey-hero-img img{ object-fit:cover; object-position:center 20%; }
+      .survey-hero-img::after{ background:linear-gradient(to bottom, transparent 60%, var(--bg) 100%); }
+      .survey-hero-text{ padding:24px 24px 32px; }
+    }
 
     /* ── MAIN WRAP ── */
     .survey-wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:40px 60px 160px;width:100%;box-sizing:border-box;flex:1;}
@@ -40,11 +180,228 @@
     .survey-identity-label{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:block;}
     .survey-select-wrap{position:relative;}
     .survey-select{width:100%;appearance:none;-webkit-appearance:none;background:var(--bg-card);border:1px solid var(--border);color:var(--text);font-family:var(--font-display);font-weight:600;font-size:1.1rem;letter-spacing:.04em;text-transform:uppercase;padding:14px 44px 14px 18px;outline:none;cursor:pointer;transition:border-color .2s,background .2s;}
-    .survey-select:focus,.survey-select.chosen{border-color:var(--text-muted);background:var(--bg-section);}
+    .survey-select:focus,.survey-select.chosen{border-color:var(--border);background:var(--bg-section);}
     .survey-select-arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:.8rem;}
     .survey-select option{background:var(--bg);color:var(--text);}
 
-    /* ── SECTION DIVIDER ── */
+    /* ── CYBER ENTRANCE ANIMATIONS ── */
+
+    /* Hero image: hard-edge data-wipe from left */
+    @keyframes cyberWipe{
+      0%  { clip-path:inset(0 100% 0 0); opacity:.3; }
+      65% { clip-path:inset(0 0% 0 0);   opacity:1; }
+      100%{ clip-path:inset(0 0% 0 0);   opacity:1; }
+    }
+    /* Orange/blue glitch flash over image */
+    @keyframes cyberGlitch{
+      0%,100%{ opacity:0; }
+      8%     { opacity:.22; transform:translateX(-4px); }
+      10%    { opacity:0; }
+      25%    { opacity:.12; transform:translateX(3px); }
+      27%    { opacity:0; }
+    }
+    /* Title lines: terminal-boot flicker */
+    @keyframes cyberFlicker{
+      0%  { opacity:0; transform:translateX(-14px); filter:blur(5px); }
+      28% { opacity:.55; transform:translateX(4px); filter:blur(1px); }
+      42% { opacity:.15; transform:translateX(-2px); filter:blur(3px); }
+      58% { opacity:.9; transform:translateX(1px); filter:blur(0); }
+      72% { opacity:.65; }
+      100%{ opacity:1; transform:translateX(0); filter:blur(0); }
+    }
+    /* Eyebrow/chips: scan-slide up */
+    @keyframes cyberSlideUp{
+      0%  { opacity:0; transform:translateY(18px) scaleY(1.06); }
+      65% { opacity:1; transform:translateY(-2px) scaleY(1); }
+      100%{ opacity:1; transform:translateY(0) scaleY(1); }
+    }
+    /* Cards: clip reveal from top + stamp */
+    @keyframes cyberStamp{
+      0%  { opacity:0; clip-path:inset(0 0 100% 0); transform:translateY(10px); }
+      55% { opacity:1; clip-path:inset(0 0 0% 0);   transform:translateY(-2px); }
+      100%{ opacity:1; clip-path:inset(0 0 0 0);    transform:translateY(0); }
+    }
+
+    /* Apply to hero image */
+    .survey-hero-img{
+      animation:cyberWipe .95s cubic-bezier(.16,1,.3,1) both;
+      animation-delay:.05s;
+    }
+    /* Glitch overlay */
+    .survey-hero-img::before{
+      content:'';
+      position:absolute; inset:0; z-index:10;
+      background:linear-gradient(90deg, rgba(231,87,25,.5), rgba(35,26,165,.4));
+      mix-blend-mode:overlay;
+      animation:cyberGlitch 1.1s ease both;
+      animation-delay:.05s;
+      pointer-events:none;
+    }
+    /* Text elements stagger in after image wipes */
+    .survey-hero-eyebrow{
+      animation:cyberSlideUp .5s cubic-bezier(.16,1,.3,1) both;
+      animation-delay:.75s;
+    }
+    .survey-hero-title .line1{
+      animation:cyberFlicker .72s ease both;
+      animation-delay:.9s;
+    }
+    .survey-hero-title .line2{
+      animation:cyberFlicker .72s ease both;
+      animation-delay:1.05s;
+    }
+    .survey-hero-title .line3{
+      animation:cyberFlicker .6s ease both;
+      animation-delay:1.18s;
+    }
+    .survey-hero-accent{
+      animation:cyberSlideUp .4s ease both;
+      animation-delay:1.28s;
+    }
+    .survey-hero-chips{
+      animation:cyberSlideUp .4s ease both;
+      animation-delay:1.38s;
+    }
+    .survey-identity{
+      animation:cyberStamp .55s cubic-bezier(.16,1,.3,1) both;
+      animation-delay:1.45s;
+    }
+    .survey-q{
+      animation:cyberStamp .48s cubic-bezier(.16,1,.3,1) both;
+      opacity:0;
+      animation-fill-mode:both;
+    }
+    .survey-q[data-type="pick3"]{
+      animation:cyberSlideUp .48s cubic-bezier(.16,1,.3,1) both;
+    }
+    .survey-q:nth-child(1){ animation-delay:1.52s; }
+    .survey-q:nth-child(2){ animation-delay:1.59s; }
+    .survey-q:nth-child(3){ animation-delay:1.66s; }
+    .survey-q:nth-child(4){ animation-delay:1.73s; }
+    .survey-q:nth-child(5){ animation-delay:1.80s; }
+    .survey-q:nth-child(6){ animation-delay:1.87s; }
+    .survey-q:nth-child(7){ animation-delay:1.94s; }
+    .survey-q:nth-child(8){ animation-delay:2.01s; }
+    .survey-q:nth-child(9){ animation-delay:2.08s; }
+    .survey-q:nth-child(10){ animation-delay:2.15s; }
+    .survey-q:nth-child(11){ animation-delay:2.22s; }
+    .survey-q:nth-child(12){ animation-delay:2.29s; }
+    .survey-q:nth-child(13){ animation-delay:2.36s; }
+    .survey-q:nth-child(14){ animation-delay:2.43s; }
+    .survey-q:nth-child(15){ animation-delay:2.50s; }
+    .survey-q:nth-child(16){ animation-delay:2.57s; }
+    .survey-q:nth-child(17){ animation-delay:2.64s; }
+
+
+    /* ── PICK-3 RANKED SELECTOR · CYBER ── */
+    .pick3-list{
+      padding:0 24px 28px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    /* Each option = bar + inner */
+    .pick3-opt{
+      display:flex;
+      align-items:stretch;
+      border:1px solid var(--border);
+      background:rgba(14,12,60,.55);
+      cursor:pointer;
+      user-select:none;
+      transition:border-color .15s, background .15s;
+    }
+    .pick3-bar{
+      width:4px;
+      flex-shrink:0;
+      background:rgba(255,255,255,.09);
+      transition:background .15s, box-shadow .15s;
+    }
+    .pick3-opt-inner{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:11px 16px;
+      flex:1;
+      min-width:0;
+    }
+    /* Hover */
+    .pick3-opt:hover:not([data-rank]){
+      border-color:rgba(231,87,25,.35);
+      background:rgba(231,87,25,.04);
+    }
+    .pick3-opt:hover:not([data-rank]) .pick3-bar{
+      background:rgba(231,87,25,.6);
+    }
+    /* Gold */
+    .pick3-opt[data-rank="1"]{ border-color:#c9a84c; background:rgba(201,168,76,.06); }
+    .pick3-opt[data-rank="1"] .pick3-bar{
+      background:linear-gradient(180deg,#ffe066,#c9a84c,#a07820);
+      box-shadow:2px 0 10px rgba(201,168,76,.55);
+    }
+    /* Silver */
+    .pick3-opt[data-rank="2"]{ border-color:#8a9ab0; background:rgba(138,154,176,.06); }
+    .pick3-opt[data-rank="2"] .pick3-bar{
+      background:linear-gradient(180deg,#d4dde8,#8a9ab0,#5a6a7a);
+      box-shadow:2px 0 10px rgba(138,154,176,.5);
+    }
+    /* Bronze */
+    .pick3-opt[data-rank="3"]{ border-color:#cd7c42; background:rgba(205,124,66,.06); }
+    .pick3-opt[data-rank="3"] .pick3-bar{
+      background:linear-gradient(180deg,#f0a060,#cd7c42,#8b4513);
+      box-shadow:2px 0 10px rgba(205,124,66,.5);
+    }
+    /* Badge */
+    .pick3-badge{
+      width:52px; height:20px;
+      flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-mono);
+      font-size:.48rem; font-weight:700;
+      letter-spacing:.16em; text-transform:uppercase;
+      border:1px solid var(--border);
+      color:var(--text-muted);
+      background:transparent;
+      transition:all .15s;
+      white-space:nowrap;
+    }
+    .pick3-opt[data-rank="1"] .pick3-badge{
+      border-color:#c9a84c; color:#c9a84c;
+      background:rgba(201,168,76,.1);
+      box-shadow:0 0 8px rgba(201,168,76,.3);
+    }
+    .pick3-opt[data-rank="2"] .pick3-badge{
+      border-color:#8a9ab0; color:#8a9ab0;
+      background:rgba(138,154,176,.1);
+      box-shadow:0 0 8px rgba(138,154,176,.25);
+    }
+    .pick3-opt[data-rank="3"] .pick3-badge{
+      border-color:#cd7c42; color:#cd7c42;
+      background:rgba(205,124,66,.1);
+      box-shadow:0 0 8px rgba(205,124,66,.25);
+    }
+    /* Text */
+    .pick3-opt-text{
+      font-family:var(--font-body);
+      font-size:.92rem; font-weight:300;
+      color:var(--text); flex:1; line-height:1.4;
+    }
+    .pick3-opt[data-rank] .pick3-opt-text{ color:var(--heading); font-weight:400; }
+    /* Hint */
+    .pick3-opt-hint{
+      font-family:var(--font-mono);
+      font-size:.46rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--text-muted); opacity:.4;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .pick3-opt[data-rank="1"] .pick3-opt-hint{ color:#c9a84c; opacity:.8; }
+    .pick3-opt[data-rank="2"] .pick3-opt-hint{ color:#8a9ab0; opacity:.8; }
+    .pick3-opt[data-rank="3"] .pick3-opt-hint{ color:#cd7c42; opacity:.8; }
+    html.light .pick3-opt{ background:rgba(160,160,168,.12); }
+    html.light .pick3-opt[data-rank="1"]{ background:rgba(201,168,76,.08); }
+    html.light .pick3-opt[data-rank="2"]{ background:rgba(138,154,176,.08); }
+    html.light .pick3-opt[data-rank="3"]{ background:rgba(205,124,66,.08); }
+
+        /* ── SECTION DIVIDER ── */
     .survey-section-header{margin:56px 0 32px;padding-bottom:16px;border-bottom:2px solid rgba(231,87,25,.3);display:flex;align-items:flex-end;justify-content:space-between;}
     .survey-section-eyebrow{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
     .survey-section-eyebrow::before{content:'';}
@@ -63,9 +420,7 @@
       position:relative;
     }
     /* Divider line below plaque */
-    .survey-q-divider{
-      display:none;
-    }
+    .survey-q-divider{ display:none; }
     .survey-q-sub{padding:4px 24px 8px;font-family:var(--font-body);font-size:.88rem;font-weight:300;color:var(--text-muted);line-height:1.5;position:relative;z-index:1;}
     .survey-q::before{ content:none; }
     .survey-q-divider::after{ content:none; }
@@ -85,7 +440,62 @@
       color:var(--heading);
     }
 
-    /* Reset btn turns red on hover */
+    /* ── SAVE HINT ── */
+    .save-hint{
+      position:fixed;
+      bottom:96px; right:20px;
+      z-index:8998;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:16px 20px;
+      border:2px solid var(--orange);
+      background:var(--bg-nav);
+      backdrop-filter:blur(12px);
+      box-shadow:0 0 0 4px rgba(231,87,25,.15), 0 8px 32px rgba(0,0,0,.5);
+      max-width:340px;
+      transition:opacity .4s, transform .4s;
+      animation:hint-glow 2s ease-in-out infinite;
+    }
+    @keyframes hint-glow{
+      0%,100%{ box-shadow:0 0 0 4px rgba(231,87,25,.15), 0 8px 32px rgba(0,0,0,.5); }
+      50%{ box-shadow:0 0 0 6px rgba(231,87,25,.35), 0 8px 40px rgba(231,87,25,.25); }
+    }
+    .save-hint.dismissed{
+      opacity:0;
+      transform:translateY(12px);
+      pointer-events:none;
+      animation:none;
+    }
+    .save-hint-text{
+      font-family:var(--font-mono);
+      font-size:.66rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#fff;
+      line-height:1.7;
+    }
+    html.light .save-hint-text{ color:var(--heading); }
+    .save-hint-text strong{
+      color:var(--orange);
+      font-weight:700;
+      display:block;
+      font-size:.75rem;
+      margin-bottom:2px;
+    }
+    .save-hint-arrow{
+      font-size:1.8rem;
+      color:var(--orange);
+      animation:hint-bounce 1.2s ease-in-out infinite;
+      flex-shrink:0;
+    }
+    @keyframes hint-bounce{
+      0%,100%{ transform:translate(0,0); }
+      50%{ transform:translate(5px,5px); }
+    }
+    @media(max-width:768px){
+      .save-hint{ bottom:78px; right:12px; max-width:240px; padding:12px 14px; }
+    }
 
 
     /* ── TEXTAREA ── */
@@ -94,7 +504,8 @@
     .survey-textarea::placeholder{color:var(--text-muted);opacity:.5;}
 
     /* ── SUBMIT AREA ── */
-    .survey-submit-area{padding:32px 24px 36px;border-top:1px solid var(--border);display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+    .survey-submit{display:none;}
+    .survey-submit-area{display:none;}
     .survey-submit{display:inline-flex;align-items:center;gap:10px;padding:14px 40px;background:var(--orange);border:none;color:#fff;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;font-weight:700;transition:opacity .2s,box-shadow .2s,transform .15s;}
     .survey-submit:hover{opacity:.88;box-shadow:0 4px 22px rgba(231,87,25,.35);transform:translateY(-1px);}
     .survey-submit:active{transform:translateY(0);}
@@ -349,6 +760,85 @@
       .survey-title{font-size:clamp(2.2rem,10vw,3.5rem);}
       .pool-sticky-dock{padding:8px 16px 10px;}
     }
+
+    /* ── IDENTITY PORTRAIT ── */
+    .survey-identity{ margin-bottom:40px; }
+    .survey-identity-inner{ display:flex; align-items:center; gap:20px; }
+    .survey-identity-portrait{
+      width:72px; height:72px;
+      border-radius:50%; overflow:hidden;
+      border:2px solid var(--border);
+      flex-shrink:0;
+      display:none;
+      transition:border-color .3s;
+      background:var(--bg-card);
+    }
+    .survey-identity-portrait.visible{ display:block; }
+    .survey-identity-portrait img{
+      width:100%; height:100%;
+      object-fit:cover; object-position:top center;
+      display:block;
+    }
+    .survey-select-wrap{ flex:1; }
+
+    /* ── FLOATING SAVE BUTTON ── */
+    #float-save-wrap{
+      position:fixed;
+      bottom:28px; right:28px;
+      z-index:9000;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    #float-save-confirm{
+      font-family:var(--font-mono);
+      font-size:.6rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#22c55e;
+      opacity:0;
+      transform:translateX(8px);
+      transition:opacity .35s, transform .35s;
+      pointer-events:none;
+      white-space:nowrap;
+    }
+    #float-save-confirm.visible{
+      opacity:1;
+      transform:translateX(0);
+    }
+    #float-save{
+      width:52px; height:52px;
+      border-radius:50%;
+      border:none;
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem;
+      line-height:1;
+      transition:background .25s, box-shadow .25s, transform .15s;
+      box-shadow:0 4px 20px rgba(0,0,0,.4);
+      flex-shrink:0;
+    }
+    #float-save.dirty{
+      background:var(--orange);
+      color:#fff;
+      box-shadow:0 4px 28px rgba(231,87,25,.55);
+      animation:float-save-pulse 2s ease-in-out infinite;
+    }
+    #float-save.saved{
+      background:rgba(120,120,135,.45);
+      color:rgba(255,255,255,.4);
+      box-shadow:0 2px 10px rgba(0,0,0,.2);
+    }
+    #float-save:hover{ transform:scale(1.1); }
+    #float-save:active{ transform:scale(.95); }
+    @keyframes float-save-pulse{
+      0%,100%{ box-shadow:0 4px 28px rgba(231,87,25,.55); }
+      50%{ box-shadow:0 6px 40px rgba(231,87,25,.9); }
+    }
+    @media(max-width:768px){
+      #float-save-wrap{ bottom:20px; right:16px; }
+      #float-save{ width:46px; height:46px; font-size:1.3rem; }
+    }
 </style>
 </head>
 <body>
@@ -366,8 +856,23 @@
       <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
     </ul>
   </nav>
-</div>
-        <div class="survey-hero-chip"><span class="survey-hero-chip-dot"></span>Auto-saves to Supabase</div>
+  <div class="survey-hero">
+    <div class="survey-hero-inner">
+      <div class="survey-hero-img">
+        <img src="EGE_SIM.png" alt="EGE Simulation" />
+      </div>
+      <div class="survey-hero-text">
+        <div class="survey-hero-eyebrow">// EGE League · Est. 2025</div>
+        <h1 class="survey-hero-title">
+          <span class="line1">EGE 2K25</span>
+          <span class="line2">Simulation</span>
+          <span class="line3">Survey</span>
+        </h1>
+        <div class="survey-hero-accent"></div>
+        <div class="survey-hero-chips">
+          <div class="survey-hero-chip"><span class="survey-hero-chip-dot"></span>2017-37</div>
+          <div class="survey-hero-chip"><span class="survey-hero-chip-dot" style="background:var(--text-muted);animation:none;"></span>All data fictional</div>
+        </div>
       </div>
     </div>
   </div>
@@ -375,21 +880,26 @@
   <div class="survey-wrap">
     <div class="survey-banner" id="survey-banner">
       <span class="survey-banner-dot"></span>
-      <span class="survey-banner-text">You've already submitted — your previous answers are loaded. Update and resubmit to edit.</span>
+      <span class="survey-banner-text">Your previous answers are loaded. Make changes and save using the button in the bottom right.</span>
     </div>
 
     <div class="survey-identity">
       <label class="survey-identity-label" for="survey-identity">Who are you?</label>
-      <div class="survey-select-wrap">
-        <select class="survey-select" id="survey-identity">
-          <option value="">— Select your name —</option>
-          <option value="Cooper Clark">Cooper Clark</option>
-          <option value="Paxon Hatch">Paxon Hatch</option>
-          <option value="Jaykeb Stewart">Jaykeb Stewart</option>
-          <option value="Isaac Vitel">Isaac Vitel</option>
-          <option value="Sam Stogsdill">Sam Stogsdill</option>
-        </select>
-        <span class="survey-select-arrow">▾</span>
+      <div class="survey-identity-inner">
+        <div class="survey-identity-portrait" id="identity-portrait">
+          <img id="identity-portrait-img" src="" alt="" />
+        </div>
+        <div class="survey-select-wrap">
+          <select class="survey-select" id="survey-identity">
+            <option value="">— Select your name —</option>
+            <option value="Cooper Clark">Cooper Clark</option>
+            <option value="Paxon Hatch">Paxon Hatch</option>
+            <option value="Jaykeb Stewart">Jaykeb Stewart</option>
+            <option value="Isaac Vitel">Isaac Vitel</option>
+            <option value="Sam Stogsdill">Sam Stogsdill</option>
+          </select>
+          <span class="survey-select-arrow">▾</span>
+        </div>
       </div>
     </div>
 
@@ -592,22 +1102,78 @@
       <div class="rank-pool" id="phil-tier-pool"></div>
     </div>
 
-    <div class="survey-q" data-key="comments" data-type="textarea">
-      <div class="survey-q-text" style="padding:0 24px;font-family:var(--font-display);font-weight:700;font-size:1.4rem;text-transform:uppercase;letter-spacing:.01em;color:var(--heading);line-height:1.05;margin-bottom:6px;">Any other thoughts?</div>
-      <div style="padding:0 24px 24px;">
-        <textarea class="survey-textarea" name="comments" placeholder="Optional — share anything on your mind about the league, the survey, or life in general..."></textarea>
+
+
+
+    <div class="survey-q" data-key="best_moment" data-type="pick3">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Ray Allen</span><span class="survey-q-award">Best Moment Award</span></div></div>
+      <div class="survey-q-sub">Please select the best three moments from the entire simulation.</div>
+      <div class="pick3-list" id="best-moment-list">
+        <div class="pick3-opt" data-val="jaykeb_mvp"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Jaykeb winning MVP</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="cooper_paxon_2026"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper and Paxon 2026 NBA Championship</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="paxon_2022"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Paxon 2022 NBA Championship Run</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="jokic_vitel_wcf"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Jokic and Vitel vs. Hatch and Clark Western Conference Finals</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="hatch_clark_finals"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Hatch and Clark vs. Jaykeb NBA Finals</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="hatch_tatum"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Hatch vs. Tatum in First Round Matchup</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="sam_mexico"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Sam's Mexico City Flight Championship</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="clark_retirement"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Clark 2037 Retirement Tour</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="final_post"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">The Final Post</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="ucla_natty"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">UCLA National Championship</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="duke_natty"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Duke National Championship</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="clark_sweep_gsw"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Clark Sweeping Golden State</span><span class="pick3-opt-hint">Click to rank</span></div></div>
+        <div class="pick3-opt" data-val="isaac_42"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Isaac Dropping 42 in March Madness</span><span class="pick3-opt-hint">Click to rank</span></div></div>
       </div>
     </div>
 
-    <div class="survey-submit-area">
-      <button class="survey-submit" id="survey-submit">Submit Response →</button>
-      <span class="survey-status" id="survey-status"></span>
+    <div class="survey-q" data-key="unexpected_moment" data-type="pick3">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Jeremy Lin</span><span class="survey-q-award">Most Unexpected Moment Award</span></div></div>
+      <div class="survey-q-sub">Please select the three most unexpected moments from the entire simulation.</div>
+      <div class="pick3-list" id="unexpected-moment-list">
+        <div class="pick3-opt" data-val="jaykeb_ny_trade"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Jaykeb Traded to New York</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="paxon_retirement"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Paxon's Sudden Retirement</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="isaac_trade_denver"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Isaac Requesting a Trade to Denver</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="jaykeb_chi_sign"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Jaykeb Signing with Chicago Instead of New York</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="paxon_2022_run"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Paxon 2022 NBA Championship Run</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="sam_jumpshot"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Sam Developing a Jumpshot</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="isaac_lost_jumpshot"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Isaac Losing His Jumpshot</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="paxon_115_gsw"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Paxon 1-15 Disasterclass vs. Golden State</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="cooper_lakers_sign"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Signing with the Lakers</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="cooper_spurs_trade"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Traded to the Spurs</span><span class="pick3-opt-hint">Click to select</span></div></div>
+      </div>
     </div>
+
+    <div class="survey-q" data-key="worst_trade" data-type="pick3">
+      <div class="survey-q-plaque"><div class="plaque-content"><span class="survey-q-name">The Paul George</span><span class="survey-q-award">Worst Trade Award</span></div></div>
+      <div class="survey-q-sub">Please select the three worst trades from the entire simulation.</div>
+      <div class="pick3-list" id="worst-trade-list">
+        <div class="pick3-opt" data-val="clark_pacers"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Clark to the Pacers</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="clark_spurs"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Cooper Clark to the Spurs</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="isaac_nuggets"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Isaac Vitel to the Nuggets</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="jaykeb_knicks"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Jaykeb Stewart to the Knicks</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="sam_rockets"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Sam Stogsdill to the Rockets</span><span class="pick3-opt-hint">Click to select</span></div></div>
+        <div class="pick3-opt" data-val="sam_flight"><div class="pick3-bar"></div><div class="pick3-opt-inner"><div class="pick3-badge"></div><span class="pick3-opt-text">Sam Stogsdill to the Flight</span><span class="pick3-opt-hint">Click to select</span></div></div>
+      </div>
+    </div>
+
+        <span class="survey-status" id="survey-status" style="display:none;"></span>
+    <button id="survey-submit" style="display:none;"></button>
   </div>
   <footer>
     <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
     <p class="footer-copy">© 2024 EGE Simulation · All data fictional</p>
   </footer>
+
+  <!-- Save hint tooltip — dismissed after first save -->
+  <div class="save-hint" id="save-hint">
+    <span class="save-hint-text"><strong>Don't forget to save!</strong>Tap the orange ✓ button to submit your responses.</span>
+    <span class="save-hint-arrow">↘</span>
+  </div>
+  <!-- Floating save button — must be in DOM before scripts run -->
+  <div id="float-save-wrap">
+    <span id="float-save-confirm">Response Submitted</span>
+    <button id="float-save" class="saved" title="Save responses">✓</button>
+  </div>
+
   <script src="player-stats.js"></script>
   <script src="player-games.js"></script>
   <script src="shared.js"></script>
@@ -649,13 +1215,19 @@
         r.checked=false; r.closest('.survey-opt').classList.remove('checked');
       });
       document.querySelectorAll('.survey-q textarea').forEach(function(ta){ ta.value=''; });
+      document.querySelectorAll('.pick3-opt[data-rank]').forEach(function(opt){
+        delete opt.dataset.rank;
+        var badge=opt.querySelector('.pick3-badge'); if(badge)badge.textContent='';
+        var hint=opt.querySelector('.pick3-opt-hint'); if(hint)hint.textContent='Click to select';
+      });
     }
 
     function collectAnswers(){
       var a={};
       document.querySelectorAll('.survey-q').forEach(function(q){
         var key=q.dataset.key,type=q.dataset.type;
-        if(type==='radio'){var c=q.querySelector('input[type=radio]:checked');a[key]=c?c.value:null;}
+        if(type==='pick3'){var picks=[];[1,2,3].forEach(function(r){var o=q.querySelector('.pick3-opt[data-rank="'+r+'"]');if(o)picks.push(o.dataset.val);});a[key]=picks;}
+        else if(type==='radio'){var c=q.querySelector('input[type=radio]:checked');a[key]=c?c.value:null;}
         else if(type==='textarea'){var ta=q.querySelector('textarea');a[key]=ta?ta.value.trim():'';}
         else if(type==='tierlist'||type==='tweet-tierlist'||type==='duo-tierlist'||type==='rivalry-tierlist'||type==='phil-tierlist'){
           var dropPrefix = type==='tweet-tierlist' ? 'tweet-tier-' : type==='duo-tierlist' ? 'duo-tier-' : type==='rivalry-tierlist' ? 'rivalry-tier-' : type==='phil-tierlist' ? 'phil-tier-' : 'pippen-tier-';
@@ -670,7 +1242,7 @@
           a[key]=tierResult;
         }
         else if(type==='ranking'||type==='season-ranking'||type==='playoff-ranking'||type==='scorer-ranking'||type==='riser-ranking'||type==='media-ranking'||type==='roleplayer-ranking'||type==='offensive-ranking'||type==='defensive-ranking'||type==='clutch-ranking'||type==='perf-ranking'){
-          var listId = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : '#clutch-rank-list';
+          var listId = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : type==='perf-ranking' ? '#perf-rank-list' : '#clutch-rank-list';
           var ranking=[];
           document.querySelectorAll(listId+' .rank-slot').forEach(function(slot){
             var card=slot.querySelector('.rank-card');
@@ -687,7 +1259,23 @@
       document.querySelectorAll('.survey-q').forEach(function(q){
         var key=q.dataset.key,type=q.dataset.type,val=answers[key];
         if(!val)return;
-        if(type==='radio'){
+        if(type==='pick3'&&Array.isArray(val)){
+          var PICK3_RANKS=['Gold','Silver','Bronze'];
+          val.forEach(function(v,i){
+            var opt=q.querySelector('.pick3-opt[data-val="'+v+'"]');
+            if(!opt)return;
+            opt.dataset.rank=i+1;
+            var badge=opt.querySelector('.pick3-badge');
+            if(badge)badge.textContent=PICK3_RANKS[i];
+            var hint=opt.querySelector('.pick3-opt-hint');
+            if(hint)hint.textContent='× Remove';
+          });
+          // Mark unselected hints as full/available
+          q.querySelectorAll('.pick3-opt:not([data-rank])').forEach(function(opt){
+            var hint=opt.querySelector('.pick3-opt-hint');
+            if(hint)hint.textContent=val.length<3?'Click to select':'Full';
+          });
+        }else if(type==='radio'){
           q.querySelectorAll('input[type=radio]').forEach(function(r){
             if(r.value===val){r.checked=true;r.closest('.survey-opt').classList.add('checked');}
           });
@@ -701,8 +1289,8 @@
             if(card&&dropEl){var pool=card.parentElement;if(pool)pool.removeChild(card);dropEl.appendChild(card);}
           });
         }
-        else if((type==='ranking'||type==='season-ranking'||type==='playoff-ranking'||type==='scorer-ranking'||type==='riser-ranking'||type==='media-ranking')&&Array.isArray(val)){
-          var listId2 = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : '#clutch-rank-list';
+        else if((type==='ranking'||type==='season-ranking'||type==='playoff-ranking'||type==='scorer-ranking'||type==='riser-ranking'||type==='media-ranking'||type==='roleplayer-ranking'||type==='offensive-ranking'||type==='defensive-ranking'||type==='clutch-ranking'||type==='perf-ranking')&&Array.isArray(val)){
+          var listId2 = type==='ranking' ? '#rank-list' : type==='season-ranking' ? '#season-rank-list' : type==='playoff-ranking' ? '#playoff-rank-list' : type==='scorer-ranking' ? '#scorer-rank-list' : type==='riser-ranking' ? '#riser-rank-list' : type==='media-ranking' ? '#media-rank-list' : type==='roleplayer-ranking' ? '#roleplayer-rank-list' : type==='offensive-ranking' ? '#offensive-rank-list' : type==='defensive-ranking' ? '#defensive-rank-list' : type==='perf-ranking' ? '#perf-rank-list' : '#clutch-rank-list';
           val.forEach(function(playerName,i){
             if(!playerName)return;
             var card=document.querySelector('.rank-card[data-player="'+playerName+'"]');
@@ -738,32 +1326,171 @@
     // Load on page open if name already saved
     if (savedName && identityEl.value === savedName) loadExisting(savedName);
 
-    submitBtn.addEventListener('click',function(){
+    // (submit is handled by the floating save button — wired below after doSave is defined)
+
+
+    // ── IDENTITY PORTRAIT ──
+    var PORTRAIT_MAP = {
+      'Cooper Clark':   'headshot_clark.png',
+      'Paxon Hatch':    'headshot_hatch.png',
+      'Jaykeb Stewart': 'headshot_stewart.png',
+      'Isaac Vitel':    'headshot_vitel.png',
+      'Sam Stogsdill':  'headshot_stogsdill.png',
+    };
+    var portraitEl    = document.getElementById('identity-portrait');
+    var portraitImg   = document.getElementById('identity-portrait-img');
+
+    function updatePortrait(name) {
+      var src = PORTRAIT_MAP[name];
+      if (src && name) {
+        portraitImg.src = src;
+        portraitImg.alt = name;
+        portraitEl.classList.add('visible');
+      } else {
+        portraitEl.classList.remove('visible');
+        portraitImg.src = '';
+      }
+    }
+
+    // Show portrait on load if name already saved
+    updatePortrait(identityEl.value);
+
+    // Update portrait on change (wrap existing change handler)
+    identityEl.addEventListener('change', function(){
+      updatePortrait(identityEl.value);
+    });
+
+    // ── FLOATING SAVE BUTTON (primary submit) ──
+    var floatSave    = document.getElementById('float-save');
+    var floatConfirm = document.getElementById('float-save-confirm');
+    var saveHint     = document.getElementById('save-hint');
+    var isDirty      = false;
+    var confirmTimer = null;
+
+    // Dismiss hint immediately if user has saved before
+    if (localStorage.getItem('ege_survey_saved')) {
+      saveHint.classList.add('dismissed');
+    }
+
+    function dismissHint() {
+      if (!saveHint.classList.contains('dismissed')) {
+        saveHint.classList.add('dismissed');
+        localStorage.setItem('ege_survey_saved', '1');
+      }
+    }
+
+    function markDirty() {
+      isDirty = true;
+      floatSave.classList.remove('saved');
+      floatSave.classList.add('dirty');
+      floatSave.textContent = '✓';
+      // Hide any "Response Submitted" text when user makes a new change
+      floatConfirm.classList.remove('visible');
+      if (confirmTimer) { clearTimeout(confirmTimer); confirmTimer = null; }
+    }
+    window._markDirty = markDirty;
+    function markSaved() {
+      isDirty = false;
+      floatSave.classList.remove('dirty');
+      floatSave.classList.add('saved');
+      floatSave.textContent = '✓';
+    }
+    function showConfirm() {
+      floatConfirm.classList.add('visible');
+      if (confirmTimer) clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(function() {
+        floatConfirm.classList.remove('visible');
+        confirmTimer = null;
+      }, 4000);
+    }
+
+    // ── Dirty detection: dragend fires on document after every completed drag ──
+    document.addEventListener('dragend', markDirty);
+
+    // Identity change → load their data, reset to saved state
+    identityEl.addEventListener('change', function() {
+      floatConfirm.classList.remove('visible');
+      markSaved();
+    });
+
+    // Save handler
+    function doSave() {
       var name = identityEl.value;
       if (!name) {
-        setStatus('Please select your name first.','err');
-        identityEl.style.borderColor='#ef4444';
-        setTimeout(function(){ identityEl.style.borderColor=''; },2000);
+        identityEl.style.borderColor = '#ef4444';
+        identityEl.focus();
+        floatSave.textContent = '!';
+        setTimeout(function() {
+          identityEl.style.borderColor = '';
+          floatSave.textContent = '✓';
+        }, 2000);
         return;
       }
       localStorage.setItem(LS_NAME_KEY, name);
       var answers = collectAnswers();
-      submitBtn.disabled=true;
-      setStatus('Saving...','');
-      fetch(SUPABASE_URL+'/rest/v1/'+TABLE,{
-        method:'POST',
-        headers:sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
-        body:JSON.stringify({token:name, name:name, answers:answers, updated_at:new Date().toISOString()})
-      }).then(function(r){
-        if(r.ok||r.status===201||r.status===200){
-          setStatus('✓  Response saved','ok');
+      floatSave.textContent = '…';
+      floatSave.classList.remove('dirty', 'saved');
+      fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+        method: 'POST',
+        headers: sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+        body: JSON.stringify({ token: name, name: name, answers: answers, updated_at: new Date().toISOString() })
+      }).then(function(r) {
+        if (r.ok || r.status === 201 || r.status === 200) {
+          markSaved();
+          showConfirm();
+          dismissHint();
           document.getElementById('survey-banner').classList.add('visible');
-        }else{return r.text().then(function(t){throw new Error(t);});}
-      }).catch(function(err){
-        console.error(err);
-        setStatus('Error saving — try again.','err');
-      }).finally(function(){submitBtn.disabled=false;});
-    });
+        } else {
+          isDirty = true;
+          floatSave.classList.add('dirty');
+          floatSave.textContent = '✓';
+        }
+      }).catch(function() {
+        isDirty = true;
+        floatSave.classList.add('dirty');
+        floatSave.textContent = '✓';
+      });
+    }
+
+    floatSave.addEventListener('click', doSave);
+
+    // After existing answers prefill, mark clean
+    var bannerEl = document.getElementById('survey-banner');
+    new MutationObserver(function() {
+      if (bannerEl.classList.contains('visible')) {
+        setTimeout(markSaved, 400);
+      }
+    }).observe(bannerEl, { attributes: true, attributeFilter: ['class'] });
+
+    // ── INTRO SCROLL LOCK ──
+    (function() {
+      var LOCK_MS = 3000;
+      var body = document.body;
+
+      // Disable browser scroll restoration so it doesn't fight us
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      function lockScroll() {
+        // Force to top before locking
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        body.classList.add('intro-lock');
+      }
+
+      function unlockScroll() {
+        body.classList.remove('intro-lock');
+        // Restore scroll restoration after intro
+        if ('scrollRestoration' in history) {
+          history.scrollRestoration = 'auto';
+        }
+      }
+
+      // Lock immediately — before any other script runs
+      lockScroll();
+      setTimeout(unlockScroll, LOCK_MS);
+    })();
 
   })();
   </script>
@@ -1988,39 +2715,39 @@
     var EGE_HS = '';
     var DUO_PLAYERS = [
       { name:'Clark & Hatch',         label:'Clark & Hatch',       color:'#552583', logo:WBY+'lal_orig.png',
-        p1:{img:EGE_HS+'headshot_clark.png'},   p2:{img:EGE_HS+'headshot_hatch.png'} },
+        p1:{img:'headshot_clark.png'},   p2:{img:'headshot_hatch.png'} },
       { name:'Jokic & Vitel',         label:'Jokic & Vitel',       color:'#0E2240', logo:WBY+'den_orig.png',
-        p1:{img:NBA_HS2+'203999.png'},           p2:{img:EGE_HS+'headshot_vitel.png'} },
+        p1:{img:NBA_HS2+'203999.png'},           p2:{img:'headshot_vitel.png'} },
       { name:'Stewart & Edwards',     label:'Stewart & Edwards',   color:'#CE1141', logo:WBY+'chi_orig.png',
-        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'1630162.png'} },
+        p1:{img:'headshot_stewart.png'},  p2:{img:NBA_HS2+'1630162.png'} },
       { name:'Stewart & Giannis',     label:'Stewart & Giannis',   color:'#00471B', logo:WBY+'mil_orig.png',
-        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'203507.png'} },
+        p1:{img:'headshot_stewart.png'},  p2:{img:NBA_HS2+'203507.png'} },
       { name:'Doncic & Vitel',        label:'Doncic & Vitel',      color:'#0077C0', logo:WBY+'orl_orig.png',
-        p1:{img:NBA_HS2+'1629029.png'},           p2:{img:EGE_HS+'headshot_vitel.png'} },
+        p1:{img:NBA_HS2+'1629029.png'},           p2:{img:'headshot_vitel.png'} },
       { name:'Clark & Ayton',         label:'Clark & Ayton',       color:'#1a1a1a', logo:WBY+'sas_orig.png',
-        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1629028.png'} },
+        p1:{img:'headshot_clark.png'},    p2:{img:NBA_HS2+'1629028.png'} },
       { name:'Clark & J.Johnson',     label:'Clark & Johnson',   color:'#002D62', logo:WBY+'ind_orig.png',
-        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1630552.png'} },
+        p1:{img:'headshot_clark.png'},    p2:{img:NBA_HS2+'1630552.png'} },
       { name:'Clark & B.Miller',      label:'Clark & Miller',    color:'#002D62', logo:WBY+'ind_orig.png',
-        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1641706.png'} },
+        p1:{img:'headshot_clark.png'},    p2:{img:NBA_HS2+'1641706.png'} },
       { name:'Clark & Gafford',       label:'Clark & Gafford',     color:'#C8102E', logo:WBY+'lac_orig.png',
-        p1:{img:EGE_HS+'headshot_clark.png'},    p2:{img:NBA_HS2+'1629655.png'} },
+        p1:{img:'headshot_clark.png'},    p2:{img:NBA_HS2+'1629655.png'} },
       { name:'Stewart & Porzingis',   label:'Stewart & Porzingis', color:'#006BB6', logo:WBY+'nyk_orig.png',
-        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'204001.png'} },
+        p1:{img:'headshot_stewart.png'},  p2:{img:NBA_HS2+'204001.png'} },
       { name:'Stogsdill & Henderson', label:'Stogsdill & Henderson', color:'#002B5C', logo:WBY+'was_orig.png',
-        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1630703.png'} },
+        p1:{img:'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1630703.png'} },
       { name:'Stogsdill & Wall',       label:'Stogsdill & Wall',       color:'#002B5C', logo:WBY+'was_orig.png',
-        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'202322.png'} },
+        p1:{img:'headshot_stogsdill.png'},p2:{img:NBA_HS2+'202322.png'} },
       { name:'Hatch & Ingram',         label:'Hatch & Ingram',         color:'#552583', logo:WBY+'lal_orig.png',
-        p1:{img:EGE_HS+'headshot_hatch.png'},    p2:{img:NBA_HS2+'1627742.png'} },
+        p1:{img:'headshot_hatch.png'},    p2:{img:NBA_HS2+'1627742.png'} },
       { name:'Hatch & McCain',         label:'Hatch & McCain',         color:'#552583', logo:WBY+'lal_orig.png',
-        p1:{img:EGE_HS+'headshot_hatch.png'},    p2:{img:NBA_HS2+'1642272.png'} },
+        p1:{img:'headshot_hatch.png'},    p2:{img:NBA_HS2+'1642272.png'} },
       { name:'Stogsdill & Mitchell',   label:'Stogsdill & Mitchell',   color:'#ca0019', logo:'lou.png',
-        p1:{img:EGE_HS+'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1628378.png'} },
+        p1:{img:'headshot_stogsdill.png'},p2:{img:NBA_HS2+'1628378.png'} },
       { name:'Ball & Hatch',           label:'Ball & Hatch',           color:'#2968c5', logo:'ucla.png',
-        p1:{img:NBA_HS2+'1628366.png'},          p2:{img:EGE_HS+'headshot_hatch.png'} },
+        p1:{img:NBA_HS2+'1628366.png'},          p2:{img:'headshot_hatch.png'} },
       { name:'Stewart & Allen',        label:'Stewart & Allen',        color:'#013088', logo:'duke.png',
-        p1:{img:EGE_HS+'headshot_stewart.png'},  p2:{img:NBA_HS2+'1628960.png'} },
+        p1:{img:'headshot_stewart.png'},  p2:{img:NBA_HS2+'1628960.png'} },
     ];
 
     function makeDuoCard(d) {
@@ -2272,31 +2999,85 @@
 
     var PHIL_TEAMS = [
       {
-        name: 'LAL 2025-26',
-        label: '\'25-26 Lakers',
-        champ: true,
-        season: '2025-26',
+        name: 'LAC 2018-19',
+        label: '\'18-19 Clippers',
+        season: '2018-19',
+        logo: WBY+'lac_orig.png',
+        color: '#C8102E',
+        record: '33-49',
+        playoffs: 'Did not qualify',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png', label:'Clark' },
+          { pos:'SG', name:'Jamal Crawford',    img:NBA_HS2+'2037.png',      label:'Crawford' },
+          { pos:'SF', name:'Kelly Oubre Jr.',   img:NBA_HS2+'1626162.png',   label:'Oubre Jr.' },
+          { pos:'PF', name:'Blake Griffin',     img:NBA_HS2+'201933.png',    label:'Griffin' },
+          { pos:'C',  name:'DeAndre Jordan',    img:NBA_HS2+'201599.png',    label:'Jordan' },
+        ],
+      },
+      {
+        name: 'LAL 2021-22',
+        label: '\'21-22 Lakers',
+        season: '2021-22',
         logo: WBY+'lal_orig.png',
         color: '#552583',
-        record: '59-23',
-        offRtg: 119.1,
-        defRtg: 108.3,
+        record: '58-24',
+        offRtg: null,
+        defRtg: null,
+        champ: true,
         roster: [
-          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png',   label:'Clark' },
+          { pos:'PG', name:'Mike Conley',        img:NBA_HS2+'201144.png',   label:'Conley' },
           { pos:'SG', name:'Derrick White',      img:NBA_HS2+'1628401.png',  label:'White' },
-          { pos:'SF', name:'Kelly Oubre Jr.',    img:NBA_HS2+'1626162.png',  label:'Oubre' },
-          { pos:'PF', name:'Paxon Hatch',        img:'headshot_hatch.png',   label:'Hatch' },
-          { pos:'C',  name:'Mitchell Robinson',  img:NBA_HS2+'1629011.png',  label:'Robinson' },
+          { pos:'SF', name:'Brandon Ingram',     img:NBA_HS2+'1627742.png',  label:'Ingram' },
+          { pos:'PF', name:'Paxon Hatch',        img:'headshot_hatch.png', label:'Hatch' },
+          { pos:'C',  name:'Isaiah Hartenstein', img:NBA_HS2+'1628392.png',  label:'Hartenstein' },
+        ],
+      },
+      {
+        name: 'WAS 2021-22',
+        label: '\'21-22 Wizards',
+        season: '2021-22',
+        logo: WBY+'was_orig.png',
+        color: '#002B5C',
+        record: '54-28',
+        playoffs: 'N/A',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'John Wall',          img:NBA_HS2+'202322.png',   label:'Wall' },
+          { pos:'SG', name:'Bradley Beal',       img:NBA_HS2+'203078.png',   label:'Beal' },
+          { pos:'SF', name:'Otto Porter Jr.',    img:NBA_HS2+'203490.png',   label:'Porter Jr.' },
+          { pos:'PF', name:'Larry Nance Jr.',    img:NBA_HS2+'1626204.png',  label:'Nance Jr.' },
+          { pos:'C',  name:'Sam Stogsdill',      img:'headshot_stogsdill.png', label:'Stogsdill' },
+        ],
+      },
+      {
+        name: 'LAC 2022-23',
+        label: '\'22-23 Clippers',
+        season: '2022-23',
+        logo: WBY+'lac_orig.png',
+        color: '#C8102E',
+        record: '37-45',
+        playoffs: 'N/A',
+        offRtg: 114.6,
+        defRtg: 118.6,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',       img:'headshot_clark.png', label:'Clark' },
+          { pos:'SG', name:'Josh Christopher',   img:NBA_HS2+'1630528.png',   label:'Christopher' },
+          { pos:'SF', name:'Aaron Nesmith',      img:NBA_HS2+'1630174.png',   label:'Nesmith' },
+          { pos:'PF', name:'Tony Bradley',       img:NBA_HS2+'1628396.png',   label:'Bradley' },
+          { pos:'C',  name:'Daniel Gafford',     img:NBA_HS2+'1629655.png',   label:'Gafford' },
         ],
       },
       {
         name: 'MIL 2023-24',
         label: '\'23-24 Bucks',
-        champ: true,
         season: '2023-24',
         logo: WBY+'mil_orig.png',
         color: '#00471B',
         record: '70-12',
+        playoffs: 'Champions',
         offRtg: 122.5,
         defRtg: 103.0,
         roster: [
@@ -2308,12 +3089,67 @@
         ],
       },
       {
+        name: 'ORL 2023-24',
+        label: '\'23-24 Magic',
+        season: '2023-24',
+        logo: WBY+'orl_orig.png',
+        color: '#0077C0',
+        record: '60-22',
+        playoffs: 'N/A',
+        offRtg: 122.6,
+        defRtg: 112.2,
+        roster: [
+          { pos:'PG', name:'Luka Doncic',     img:NBA_HS2+'1629029.png',  label:'Doncic' },
+          { pos:'SG', name:'Isaac Vitel',     img:'headshot_vitel.png',   label:'Vitel' },
+          { pos:'SF', name:'Aaron Gordon',    img:NBA_HS2+'203932.png',   label:'Gordon' },
+          { pos:'PF', name:'Jabari Parker',   img:NBA_HS2+'203953.png',   label:'Parker' },
+          { pos:'C',  name:'Nikola Vucevic',  img:NBA_HS2+'202696.png',   label:'Vucevic' },
+        ],
+      },
+      {
+        name: 'LAL 2025-26',
+        label: '\'25-26 Lakers',
+        season: '2025-26',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '59-23',
+        playoffs: 'Champions',
+        offRtg: 119.1,
+        defRtg: 108.3,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Derrick White',      img:NBA_HS2+'1628401.png',  label:'White' },
+          { pos:'SF', name:'Kelly Oubre Jr.',    img:NBA_HS2+'1626162.png',  label:'Oubre' },
+          { pos:'PF', name:'Paxon Hatch',        img:'headshot_hatch.png',   label:'Hatch' },
+          { pos:'C',  name:'Mitchell Robinson',  img:NBA_HS2+'1629011.png',  label:'Robinson' },
+        ],
+      },
+      {
+        name: 'WAS 2025-26',
+        label: '\'25-26 Wizards',
+        season: '2025-26',
+        logo: WBY+'was_orig.png',
+        color: '#002B5C',
+        record: '36-46',
+        playoffs: 'Did not qualify',
+        offRtg: 115.2,
+        defRtg: 118.0,
+        roster: [
+          { pos:'PG', name:'Scoot Henderson',  img:NBA_HS2+'1630703.png',  label:'Henderson' },
+          { pos:'SG', name:'Tony Snell',        img:NBA_HS2+'203503.png',   label:'Snell' },
+          { pos:'SF', name:'Wes Iwundu',        img:NBA_HS2+'1628411.png',  label:'Iwundu' },
+          { pos:'PF', name:'Larry Nance Jr.',   img:NBA_HS2+'1626204.png',  label:'Nance Jr.' },
+          { pos:'C',  name:'Sam Stogsdill',     img:'headshot_stogsdill.png', label:'Stogsdill' },
+        ],
+      },
+      {
         name: 'DEN 2027-28',
         label: '\'27-28 Nuggets',
         season: '2027-28',
         logo: WBY+'den_orig.png',
         color: '#0E2240',
         record: '55-27',
+        playoffs: 'N/A',
         offRtg: 120.3,
         defRtg: 111.9,
         roster: [
@@ -2331,6 +3167,7 @@
         logo: WBY+'chi_orig.png',
         color: '#CE1141',
         record: '65-17',
+        playoffs: 'Champions',
         offRtg: 125.8,
         defRtg: 109.3,
         roster: [
@@ -2342,63 +3179,13 @@
         ],
       },
       {
-        name: 'ORL 2023-24',
-        label: '\'23-24 Magic',
-        season: '2023-24',
-        logo: WBY+'orl_orig.png',
-        color: '#0077C0',
-        record: '60-22',
-        offRtg: 122.6,
-        defRtg: 112.2,
-        roster: [
-          { pos:'PG', name:'Luka Doncic',     img:NBA_HS2+'1629029.png',  label:'Doncic' },
-          { pos:'SG', name:'Isaac Vitel',     img:'headshot_vitel.png',   label:'Vitel' },
-          { pos:'SF', name:'Aaron Gordon',    img:NBA_HS2+'203932.png',   label:'Gordon' },
-          { pos:'PF', name:'Jabari Parker',   img:NBA_HS2+'203953.png',   label:'Parker' },
-          { pos:'C',  name:'Nikola Vucevic',  img:NBA_HS2+'202696.png',   label:'Vucevic' },
-        ],
-      },
-      {
-        name: 'IND 2031-32',
-        label: '\'31-32 Pacers',
-        season: '2031-32',
-        logo: WBY+'ind_orig.png',
-        color: '#002D62',
-        record: '55-27',
-        offRtg: 121.8,
-        defRtg: 116.0,
-        roster: [
-          { pos:'PG', name:'Cooper Clark',              img:'headshot_clark.png',   label:'Clark' },
-          { pos:'SG', name:'Nickeil Alexander-Walker',  img:NBA_HS2+'1629638.png',  label:'NAW' },
-          { pos:'SF', name:'Brandon Miller',            img:NBA_HS2+'1641706.png',  label:'Miller' },
-          { pos:'PF', name:'Jalen Johnson',             img:NBA_HS2+'1630552.png',  label:'J.Johnson' },
-          { pos:'C',  name:'Savion Kieta',              img:'silhouette.png',       label:'Kieta' },
-        ],
-      },
-      {
-        name: 'VAN 2032-33',
-        label: '\'32-33 Grizzlies',
-        season: '2032-33',
-        logo: WBY+'van_orig.png',
-        color: '#5D76A9',
-        record: '50-32',
-        offRtg: 116.4,
-        defRtg: 110.2,
-        roster: [
-          { pos:'PG', name:'Jaykeb Stewart',          img:'headshot_stewart.png', label:'Stewart' },
-          { pos:'SG', name:'Shai Gilgeous-Alexander', img:NBA_HS2+'1628983.png',  label:'SGA' },
-          { pos:'SF', name:'Zaccharie Risacher',      img:NBA_HS2+'1642355.png',  label:'Risacher' },
-          { pos:'PF', name:'Karim Lopez',             img:'silhouette.png',       label:'K.Lopez' },
-          { pos:'C',  name:'Rasheer Fleming',         img:NBA_HS2+'1642853.png',  label:'Fleming' },
-        ],
-      },
-      {
         name: 'HOU 2029-30',
         label: '\'29-30 Rockets',
         season: '2029-30',
         logo: WBY+'hou_orig.png',
         color: '#CE1141',
         record: '61-21',
+        playoffs: 'N/A',
         offRtg: 122.2,
         defRtg: 110.5,
         roster: [
@@ -2410,12 +3197,67 @@
         ],
       },
       {
+        name: 'LAL 2029-30',
+        label: '\'29-30 Lakers',
+        season: '2029-30',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '51-31',
+        playoffs: 'N/A',
+        offRtg: 117.3,
+        defRtg: 112.1,
+        roster: [
+          { pos:'PG', name:'Jared McCain',      img:NBA_HS2+'1642272.png',  label:'McCain' },
+          { pos:'SG', name:'Ace Bailey',        img:NBA_HS2+'1642846.png',  label:'Bailey' },
+          { pos:'SF', name:'Evan W.-Thomas',    img:NBA_HS2+'202458.png',   label:'W.-Thomas' },
+          { pos:'PF', name:'Paxon Hatch',       img:'headshot_hatch.png', label:'Hatch' },
+          { pos:'C',  name:'Chris Cenac Jr.',   img:NBA_HS2+'202458.png',   label:'Cenac Jr.' },
+        ],
+      },
+      {
+        name: 'IND 2031-32',
+        label: '\'31-32 Pacers',
+        season: '2031-32',
+        logo: WBY+'ind_orig.png',
+        color: '#002D62',
+        record: '55-27',
+        playoffs: 'N/A',
+        offRtg: 121.8,
+        defRtg: 116.0,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',              img:'headshot_clark.png',   label:'Clark' },
+          { pos:'SG', name:'Nickeil Alexander-Walker',  img:NBA_HS2+'1629638.png',  label:'NAW' },
+          { pos:'SF', name:'Brandon Miller',            img:NBA_HS2+'1641706.png',  label:'Miller' },
+          { pos:'PF', name:'Jalen Johnson',             img:NBA_HS2+'1630552.png',  label:'J.Johnson' },
+          { pos:'C',  name:'Savion Kieta',              img:NBA_HS2+'202458.png',       label:'Kieta' },
+        ],
+      },
+      {
+        name: 'VAN 2032-33',
+        label: '\'32-33 Grizzlies',
+        season: '2032-33',
+        logo: WBY+'van_orig.png',
+        color: '#5D76A9',
+        record: '50-32',
+        playoffs: 'N/A',
+        offRtg: 116.4,
+        defRtg: 110.2,
+        roster: [
+          { pos:'PG', name:'Jaykeb Stewart',          img:'headshot_stewart.png', label:'Stewart' },
+          { pos:'SG', name:'Shai Gilgeous-Alexander', img:NBA_HS2+'1628983.png',  label:'SGA' },
+          { pos:'SF', name:'Zaccharie Risacher',      img:NBA_HS2+'1642258.png',  label:'Risacher' },
+          { pos:'PF', name:'Karim Lopez',             img:NBA_HS2+'202458.png',       label:'K.Lopez' },
+          { pos:'C',  name:'Rasheer Fleming',         img:NBA_HS2+'1642853.png',  label:'Fleming' },
+        ],
+      },
+      {
         name: 'SAS 2033-34',
         label: '\'33-34 Spurs',
         season: '2033-34',
         logo: WBY+'sas_orig.png',
         color: '#C4CED4',
         record: '53-29',
+        playoffs: 'N/A',
         offRtg: 118.7,
         defRtg: 109.5,
         roster: [
@@ -2427,90 +3269,74 @@
         ],
       },
       {
-        name: 'LAC 2023-24',
-        label: '\'23-24 Clippers',
-        season: '2023-24',
-        logo: WBY+'lac_orig.png',
-        color: '#C8102E',
-        record: '41-41',
-        offRtg: 114.6,
-        defRtg: 118.3,
-        roster: [
-          { pos:'PG', name:'Cooper Clark',      img:'headshot_clark.png',   label:'Clark' },
-          { pos:'SG', name:'Aaron Nesmith',      img:NBA_HS2+'1630174.png',  label:'Nesmith' },
-          { pos:'SF', name:'Ziaire Williams',    img:NBA_HS2+'1630533.png',  label:'Williams' },
-          { pos:'PF', name:'Tony Bradley',       img:NBA_HS2+'1628418.png',  label:'Bradley' },
-          { pos:'C',  name:'Daniel Gafford',     img:NBA_HS2+'1629655.png',  label:'Gafford' },
-        ],
-      },
-      {
-        name: 'LAL 2021-22',
-        label: '\'21-22 Lakers',
-        champ: true,
-        season: '2021-22',
-        logo: WBY+'lal_orig.png',
-        color: '#552583',
-        record: '58-24',
+        name: 'STL 2033-34',
+        label: '\'33-34 Spirit',
+        season: '2033-34',
+        logo: WBY+'stl_orig.png',
+        color: '#003DA5',
+        record: '24-58',
+        playoffs: 'Did not qualify',
         offRtg: null,
         defRtg: null,
         roster: [
-          { pos:'PG', name:'Mike Conley',        img:NBA_HS2+'203504.png',   label:'Conley' },
-          { pos:'SG', name:'Derrick White',       img:NBA_HS2+'1628401.png',  label:'White' },
-          { pos:'SF', name:'Brandon Ingram',      img:NBA_HS2+'1627742.png',  label:'Ingram' },
-          { pos:'PF', name:'Paxon Hatch',         img:'headshot_hatch.png',   label:'Hatch' },
-          { pos:'C',  name:'Isaiah Hartenstein',  img:NBA_HS2+'1629631.png',  label:'Hartenstein' },
+          { pos:'PG', name:'Bennett Stirtes', img:NBA_HS2+'202458.png',                          label:'Stirtes' },
+          { pos:'SG', name:'Isaac Vitel',     img:'headshot_vitel.png',                    label:'Vitel' },
+          { pos:'SF', name:'Aaron Rahon',     img:NBA_HS2+'202458.png',                          label:'Rahon' },
+          { pos:'PF', name:'Tiontay Carter',  img:NBA_HS2+'202458.png',                          label:'Carter' },
+          { pos:'C',  name:'Payton Rose',     img:NBA_HS2+'202458.png',                          label:'Rose' },
         ],
-      },
-      {
-        name: 'WAS 2021-22',
-        label: '\'21-22 Wizards',
-        season: '2021-22',
-        logo: WBY+'was_orig.png',
-        color: '#002B5C',
-        record: '54-28',
-        offRtg: null,
-        defRtg: null,
-        roster: [
-          { pos:'PG', name:'John Wall',           img:NBA_HS2+'202322.png',   label:'Wall' },
-          { pos:'SG', name:'Bradley Beal',        img:NBA_HS2+'203078.png',   label:'Beal' },
-          { pos:'SF', name:'Otto Porter',         img:NBA_HS2+'203490.png',   label:'Porter' },
-          { pos:'PF', name:'Larry Nance Jr.',     img:NBA_HS2+'1626204.png',  label:'Nance Jr.' },
-          { pos:'C',  name:'Sam Stogsdill',       img:'headshot_stogsdill.png', label:'Stogsdill' },
-        ],
-      },
-      {
-        name: 'LAL 2029-30',
-        label: '\'29-30 Lakers',
-        season: '2029-30',
-        logo: WBY+'lal_orig.png',
-        color: '#552583',
-        record: '51-31',
-        offRtg: 117.3,
-        defRtg: 112.1,
-        roster: [
-          { pos:'PG', name:'Jared McCain',        img:NBA_HS2+'1642370.png',  label:'McCain' },
-          { pos:'SG', name:'Ace Bailey',          img:NBA_HS2+'1642852.png',  label:'Bailey' },
-          { pos:'SF', name:'Jalin Montgomery',    img:'silhouette.png',       label:'Montgomery' },
-          { pos:'PF', name:'Paxon Hatch',         img:'headshot_hatch.png',   label:'Hatch' },
-          { pos:'C',  name:'Chris Cenac Jr.',     img:'silhouette.png',       label:'Cenac Jr.' },
-        ],
-      },
-      {
+      },      {
         name: 'MEX 2034-35',
         label: '\'34-35 Flight',
-        champ: true,
         season: '2034-35',
         logo: WBY+'mex_orig.png',
         color: '#006847',
         record: '64-18',
         offRtg: 122.0,
         defRtg: 106.8,
+        champ: true,
         roster: [
-          { pos:'PG', name:'Maxime Lefèvre',      img:'silhouette.png',       label:'Lefèvre' },
-          { pos:'SG', name:'Bronny James Jr.',    img:NBA_HS2+'1641717.png',  label:'B.James' },
-          { pos:'SF', name:'Jaiden O\'Bryant',   img:'silhouette.png',       label:'O\'Bryant' },
-          { pos:'PF', name:'Sam Stogsdill',       img:'headshot_stogsdill.png', label:'Stogsdill' },
-          { pos:'C',  name:'Darius Lyttle',       img:'silhouette.png',       label:'Lyttle' },
+          { pos:'PG', name:'Maxime Lefèvre',    img:NBA_HS2+'202458.png',                          label:'Lefèvre' },
+          { pos:'SG', name:'Johan Sanon',       img:NBA_HS2+'202458.png',                          label:'Sanon' },
+          { pos:'SF', name:"Jaiden O'Bryant",   img:NBA_HS2+'202458.png',                          label:"O'Bryant" },
+          { pos:'PF', name:'Sam Stogsdill',     img:'headshot_stogsdill.png', label:'Stogsdill' },
+          { pos:'C',  name:'Darius Lyttle',     img:'D-Lyttle.png',           label:'Lyttle' },
+        ],
+      },
+      {
+        name: 'BKN 2034-35',
+        label: '\'34-35 Nets',
+        season: '2034-35',
+        logo: WBY+'bkn_orig.png',
+        color: '#000000',
+        record: '48-34',
+        playoffs: 'N/A',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'Cade Cunningham', img:NBA_HS2+'1630595.png',   label:'Cunningham' },
+          { pos:'SG', name:'Dame Sarr',       img:NBA_HS2+'202458.png',    label:'Sarr' },
+          { pos:'SF', name:'Jayson Tatum',    img:NBA_HS2+'1628369.png',   label:'Tatum' },
+          { pos:'PF', name:'Jabari Smith Jr.',img:NBA_HS2+'1631095.png',   label:'J.Smith Jr.' },
+          { pos:'C',  name:'Prizo Szomory',   img:NBA_HS2+'202458.png',    label:'Szomory' },
+        ],
+      },
+      {
+        name: 'LAL 2036-37',
+        label: '\'36-37 Lakers',
+        season: '2036-37',
+        logo: WBY+'lal_orig.png',
+        color: '#552583',
+        record: '36-46',
+        playoffs: 'Did not qualify',
+        offRtg: null,
+        defRtg: null,
+        roster: [
+          { pos:'PG', name:'Cooper Clark',   img:'headshot_clark.png',  label:'Clark' },
+          { pos:'SG', name:'Cayden Allen',   img:NBA_HS2+'202458.png',       label:'Allen' },
+          { pos:'SF', name:'Ace Bailey',     img:NBA_HS2+'1642846.png',      label:'Bailey' },
+          { pos:'PF', name:'Matt Haye',      img:NBA_HS2+'202458.png',       label:'Haye' },
+          { pos:'C',  name:'Rich Mack',      img:NBA_HS2+'202458.png',       label:'Mack' },
         ],
       },
     ];
@@ -2519,7 +3345,7 @@
     var philTT = document.createElement('div');
     philTT.id = 'phil-team-tooltip';
     philTT.className = 'rank-stat-tooltip';
-    philTT.style.cssText = 'min-width:270px;max-width:310px;padding:14px 16px;';
+    philTT.style.cssText = 'min-width:260px;max-width:320px;padding:14px 16px;';
     document.body.appendChild(philTT);
 
     function showPhilTT(t, e) {
@@ -2538,24 +3364,24 @@
           +'</div>'
         +'</div>';
 
-      var fiveHtml = '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">';
+      var fiveHtml = '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">';
       t.roster.forEach(function(player) {
         fiveHtml +=
-          '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">'
-            +'<div style="width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid '+t.color+';background:'+t.color+'22;">'
+          '<div style="display:flex;align-items:center;gap:10px;">'
+            +'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid '+t.color+';flex-shrink:0;">'
               +'<img src="'+player.img+'" alt="'+player.label+'" style="width:100%;height:100%;object-fit:cover;object-position:top center;">'
             +'</div>'
-            +'<span style="font-family:var(--font-mono);font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';white-space:nowrap;">'+player.pos+'</span>'
-            +'<span style="font-family:var(--font-mono);font-size:.42rem;letter-spacing:.06em;text-transform:uppercase;color:'+textMain+';white-space:nowrap;">'+player.label+'</span>'
+            +'<span style="font-family:var(--font-mono);font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';width:22px;flex-shrink:0;">'+player.pos+'</span>'
+            +'<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:'+textMain+';">'+player.name+'</span>'
           +'</div>';
       });
       fiveHtml += '</div>';
 
+      var playoffColor = t.playoffs==='Champions' ? '#c9a84c' : t.playoffs==='Did not qualify' ? '#ef4444' : '#22c55e';
       var statsHtml =
         '<div style="border-top:1px solid rgba(255,255,255,.09);padding-top:8px;">'
           +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Record</span><span class="rank-tt-val" style="color:'+textMain+';">'+t.record+'</span></div>'
-          +(t.offRtg!=null?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Off Rtg</span><span class="rank-tt-val" style="color:#22c55e;">'+t.offRtg.toFixed(1)+'</span></div>':'')
-          +(t.defRtg!=null?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Def Rtg</span><span class="rank-tt-val" style="color:#3b82f6;">'+t.defRtg.toFixed(1)+'</span></div>':'')
+          +(t.playoffs?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Playoffs</span><span class="rank-tt-val" style="color:'+playoffColor+';">'+t.playoffs+'</span></div>':'')
         +'</div>';
 
       philTT.innerHTML = header + fiveHtml + statsHtml;
@@ -2591,9 +3417,8 @@
       card.draggable = true;
       card.innerHTML =
         '<div style="display:flex;flex-direction:column;align-items:center;">'
-          +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;position:relative;">'
+          +'<div class="rank-card-box" style="display:flex;align-items:center;justify-content:center;">'
             +'<img src="'+t.logo+'" alt="'+t.label+'" style="width:60px;height:60px;object-fit:contain;display:block;">'
-            +(t.champ ? '<img class="rank-card-trophy" src="Award.webp" alt="Champion" style="width:20px;height:25px;bottom:-4px;left:-6px;">' : '')
           +'</div>'
           +'<div class="rank-card-name" style="margin-top:10px;">'+t.label+'</div>'
         +'</div>';
@@ -2789,6 +3614,125 @@
 
 
 
+
+
+    // ── PICK-3 BEST MOMENT ──
+    (function(){
+      var list = document.getElementById('best-moment-list');
+      if (!list) return;
+
+      var RANKS = ['Gold','Silver','Bronze'];
+      var selected  = []; // ordered array of opt elements
+      var slots = []; var slotLabels = [];
+
+      function shortText(opt) {
+        var t = opt.querySelector('.pick3-opt-text').textContent;
+        return t.length > 22 ? t.slice(0,20)+'…' : t;
+      }
+
+      function updateUI() {
+        list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+          var badge = opt.querySelector('.pick3-badge');
+          var hint  = opt.querySelector('.pick3-opt-hint');
+          var idx   = selected.indexOf(opt);
+          if (idx > -1) {
+            opt.dataset.rank = idx + 1;
+            badge.textContent = RANKS[idx];
+            if (hint) hint.textContent = '× Remove';
+          } else {
+            delete opt.dataset.rank;
+            badge.textContent = '';
+            if (hint) hint.textContent = selected.length < 3 ? 'Click to select' : 'Full';
+          }
+        });
+      }
+
+      list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+        opt.addEventListener('click', function() {
+          var idx = selected.indexOf(opt);
+          if (idx > -1) {
+            selected.splice(idx, 1);
+          } else {
+            if (selected.length >= 3) return;
+            selected.push(opt);
+          }
+          updateUI();
+          if (window._markDirty) window._markDirty();
+        });
+      });
+    })();
+    // ── END PICK-3 ──
+    // ── PICK-3 UNEXPECTED MOMENT ──
+    (function(){
+      var list = document.getElementById('unexpected-moment-list');
+      if (!list) return;
+      var RANKS    = ['Gold','Silver','Bronze'];
+      var selected = [];
+
+      function updateUI() {
+        list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+          var badge = opt.querySelector('.pick3-badge');
+          var hint  = opt.querySelector('.pick3-opt-hint');
+          var idx   = selected.indexOf(opt);
+          if (idx > -1) {
+            opt.dataset.rank = idx + 1;
+            badge.textContent = RANKS[idx];
+            if (hint) hint.textContent = '× Remove';
+          } else {
+            delete opt.dataset.rank;
+            badge.textContent = '';
+            if (hint) hint.textContent = selected.length < 3 ? 'Click to select' : 'Full';
+          }
+        });
+      }
+
+      list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+        opt.addEventListener('click', function() {
+          var idx = selected.indexOf(opt);
+          if (idx > -1) { selected.splice(idx, 1); }
+          else { if (selected.length >= 3) return; selected.push(opt); }
+          updateUI();
+          if (window._markDirty) window._markDirty();
+        });
+      });
+    })();
+    // ── END PICK-3 UNEXPECTED ──
+
+    // ── PICK-3 WORST TRADE ──
+    (function(){
+      var list = document.getElementById('worst-trade-list');
+      if (!list) return;
+      var RANKS    = ['Gold','Silver','Bronze'];
+      var selected = [];
+
+      function updateUI() {
+        list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+          var badge = opt.querySelector('.pick3-badge');
+          var hint  = opt.querySelector('.pick3-opt-hint');
+          var idx   = selected.indexOf(opt);
+          if (idx > -1) {
+            opt.dataset.rank = idx + 1;
+            badge.textContent = RANKS[idx];
+            if (hint) hint.textContent = '× Remove';
+          } else {
+            delete opt.dataset.rank;
+            badge.textContent = '';
+            if (hint) hint.textContent = selected.length < 3 ? 'Click to select' : 'Full';
+          }
+        });
+      }
+
+      list.querySelectorAll('.pick3-opt').forEach(function(opt) {
+        opt.addEventListener('click', function() {
+          var idx = selected.indexOf(opt);
+          if (idx > -1) { selected.splice(idx, 1); }
+          else { if (selected.length >= 3) return; selected.push(opt); }
+          updateUI();
+          if (window._markDirty) window._markDirty();
+        });
+      });
+    })();
+    // ── END PICK-3 WORST TRADE ──
 
     // ── STICKY POOL SYSTEM ──
     (function(){

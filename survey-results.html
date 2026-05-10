@@ -67,6 +67,7 @@
 
     .results-raw td .delete-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:.85rem; padding:2px 4px; opacity:.4; transition:opacity .15s, color .15s; vertical-align:middle; }
     .results-raw td .delete-btn:hover { opacity:1; color:#ef4444; }
+    @media(max-width:768px){
       .results-wrap{padding:80px 20px 60px;}
       .gate-box{padding:32px 24px;}
       .result-bar-label{width:120px;font-size:.78rem;}
@@ -138,9 +139,11 @@
       { key:'tweet_tierlist',  type:'tweet-tierlist', label:'The Terry Rozier Greatest Tweet Award' },
       { key:'duo_tierlist',    type:'duo-tierlist',   label:'The Shaquille O\'Neal & Kobe Bryant Greatest Duo Award' },
       { key:'rivalry_tierlist', type:'rivalry-tierlist', label:'The Magic Johnson & Larry Bird Greatest Rivalry Award' },
-      { key:'phil_jackson_tierlist', type:'phil-tierlist', label:'The Phil Jackson Greatest Team Award' },
-      { key:'perf_ranking', type:'perf-ranking', label:'The Bam Adebayo Greatest Performance Award' },
-      { key:'comments',       type:'textarea',       label:'Any other thoughts on the league?' },
+      { key:'perf_ranking',      type:'perf-ranking',    label:'The Bam Adebayo Greatest Performance Award' },
+      { key:'phil_jackson_tierlist', type:'phil-tierlist',  label:'The Phil Jackson Greatest Team Award' },
+      { key:'best_moment',     type:'pick3',           label:'The Ray Allen Best Moment Award' },
+      { key:'unexpected_moment', type:'pick3',         label:'The Jeremy Lin Most Unexpected Moment Award' },
+      { key:'worst_trade',     type:'pick3',           label:'The Paul George Worst Trade Award' },
     ];
 
     // Gate
@@ -265,6 +268,60 @@
               + '<div class="result-bar-pct">'+pct+'%</div>'
               + '</div>';
           }).join('');
+        } else if (q.type === 'pick3') {
+          // Weighted tally: Gold=3pts, Silver=2pts, Bronze=1pt
+          var PICK3_LABELS = {
+            // Ray Allen
+            'jaykeb_mvp':'Jaykeb winning MVP','cooper_paxon_2026':'Cooper and Paxon 2026 Championship',
+            'paxon_2022':'Paxon 2022 Championship Run','jokic_vitel_wcf':'Jokic/Vitel vs Hatch/Clark WCF',
+            'hatch_clark_finals':'Hatch/Clark vs Jaykeb Finals','hatch_tatum':'Hatch vs Tatum R1',
+            'sam_mexico':'Sam\'s Mexico City Championship','clark_retirement':'Clark 2037 Retirement Tour',
+            'final_post':'The Final Post','ucla_natty':'UCLA National Championship',
+            'duke_natty':'Duke National Championship','clark_sweep_gsw':'Clark Sweeping Golden State',
+            'isaac_42':'Isaac 42pts March Madness',
+            // Jeremy Lin
+            'jaykeb_ny_trade':'Jaykeb Traded to New York','paxon_retirement':'Paxon\'s Sudden Retirement',
+            'isaac_trade_denver':'Isaac Trade Request to Denver','jaykeb_chi_sign':'Jaykeb Signs with Chicago',
+            'paxon_2022_run':'Paxon 2022 Championship Run','sam_jumpshot':'Sam Develops a Jumpshot',
+            'isaac_lost_jumpshot':'Isaac Loses His Jumpshot','paxon_115_gsw':'Paxon 1-15 vs Golden State',
+            'cooper_lakers_sign':'Cooper Signs with Lakers','cooper_spurs_trade':'Cooper Traded to Spurs',
+            // Paul George
+            'clark_pacers':'Clark to the Pacers','clark_spurs':'Clark to the Spurs',
+            'isaac_nuggets':'Isaac Vitel to the Nuggets','jaykeb_knicks':'Jaykeb to the Knicks',
+            'sam_rockets':'Sam Stogsdill to the Rockets','sam_flight':'Sam Stogsdill to the Flight',
+          };
+          var PTS = [3, 2, 1]; // gold, silver, bronze
+          var tally = {};
+          rows.forEach(function(r){
+            var arr = r.answers && r.answers[q.key];
+            if (!Array.isArray(arr)) return;
+            arr.forEach(function(val, i){
+              if (!val) return;
+              if (!tally[val]) tally[val] = { pts:0, gold:0, silver:0, bronze:0, cnt:0 };
+              tally[val].pts += PTS[i] || 0;
+              tally[val].cnt++;
+              if (i===0) tally[val].gold++;
+              else if (i===1) tally[val].silver++;
+              else if (i===2) tally[val].bronze++;
+            });
+          });
+          var sorted = Object.keys(tally).sort(function(a,b){ return tally[b].pts - tally[a].pts; });
+          if (!sorted.length) { ansEl.innerHTML='<div class="result-text-empty">No responses yet.</div>'; }
+          else {
+            var maxPts = tally[sorted[0]].pts || 1;
+            ansEl.innerHTML = sorted.map(function(val, i){
+              var d = tally[val];
+              var label = PICK3_LABELS[val] || val;
+              var medals = (d.gold?'🥇×'+d.gold+' ':'')+(d.silver?'🥈×'+d.silver+' ':'')+(d.bronze?'🥉×'+d.bronze:'');
+              var w = (d.pts / maxPts * 100).toFixed(1);
+              return '<div class="result-bar-row">'
+                + '<div class="result-bar-label" title="'+val+'">'+(i+1)+'. '+escHtml(label)+'</div>'
+                + '<div class="result-bar-track"><div class="result-bar-fill '+(i===0?'top':'other')+'" style="width:'+w+'%"></div></div>'
+                + '<div class="result-bar-count" style="font-size:.5rem;letter-spacing:.06em;">'+medals.trim()+'</div>'
+                + '<div class="result-bar-pct">'+d.pts+'pts</div>'
+                + '</div>';
+            }).join('');
+          }
         } else {
           // Free text
           var texts = rows.map(function(r){return r.answers&&r.answers[q.key];}).filter(Boolean);
