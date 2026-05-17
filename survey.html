@@ -2721,7 +2721,7 @@
     ['S','A','B','C','D'].forEach(function(t){
       var drop = document.getElementById('tweet-tier-'+t);
       if (!drop) return;
-      drop.addEventListener('dragover', function(e){ if(!canDrop('pippen-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragover', function(e){ if(!canDrop('tweet-tier-pool'))return; e.preventDefault(); drop.classList.add('drag-over'); });
       drop.addEventListener('dragleave', function(){ drop.classList.remove('drag-over'); });
       drop.addEventListener('drop', function(e){
         e.preventDefault(); drop.classList.remove('drag-over');
