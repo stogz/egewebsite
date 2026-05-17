@@ -2666,7 +2666,7 @@
     var tweetPreviewImg = document.getElementById('tweet-preview-img');
 
     function showTweetPreview(name, e) {
-      tweetPreviewImg.src = 'tweets/' + name + getTweetExt(name);
+      tweetPreviewImg.src = 'tweets/' + encodeURIComponent(name) + getTweetExt(name);
       tweetPreviewImg.onload = function() { positionTweetPreview(lastTweetMouseEvent || e); };
       positionTweetPreview(e);
       tweetPreview.classList.remove('visible');
