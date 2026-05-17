@@ -293,6 +293,38 @@
     .survey-q:nth-child(17){ animation-delay:2.64s; }
 
 
+
+    /* ── MOBILE BLOCK ── */
+    #mobile-block{
+      display:none;
+      position:fixed; inset:0; z-index:99999;
+      background:var(--bg);
+      flex-direction:column; align-items:center; justify-content:center;
+      padding:40px 32px; text-align:center; gap:24px;
+    }
+    @media(max-width:900px){
+      #mobile-block{ display:flex; }
+      body.survey-body > *:not(#mobile-block){ pointer-events:none; }
+    }
+    .mobile-block-icon{ font-size:3rem; line-height:1; }
+    .mobile-block-title{
+      font-family:var(--font-display); font-weight:900;
+      font-size:2rem; text-transform:uppercase;
+      letter-spacing:-.01em; color:var(--heading);
+      line-height:1;
+    }
+    .mobile-block-sub{
+      font-family:var(--font-mono); font-size:.6rem;
+      letter-spacing:.16em; text-transform:uppercase;
+      color:var(--text-muted); line-height:1.8;
+      max-width:280px;
+    }
+    .mobile-block-badge{
+      font-family:var(--font-mono); font-size:.55rem;
+      letter-spacing:.14em; text-transform:uppercase;
+      border:1px solid var(--orange); color:var(--orange);
+      padding:6px 16px;
+    }
     /* ── PICK-3 RANKED SELECTOR · CYBER ── */
     .pick3-list{
       padding:0 24px 28px;
@@ -841,7 +873,7 @@
     }
 </style>
 </head>
-<body>
+<body class="survey-body">
   <canvas id="matrix-canvas"></canvas>
   <div class="grid-overlay"></div>
   <div class="scanline"></div>
@@ -1168,6 +1200,14 @@
     <span class="save-hint-text"><strong>Don't forget to save!</strong>Tap the orange ✓ button to submit your responses.</span>
     <span class="save-hint-arrow">↘</span>
   </div>
+  <!-- Mobile block overlay -->
+  <div id="mobile-block">
+    <div class="mobile-block-icon">🖥</div>
+    <div class="mobile-block-title">Desktop Only</div>
+    <div class="mobile-block-sub">This survey requires drag-and-drop interactions that aren't supported on mobile. Please switch to a PC or laptop to complete it.</div>
+    <div class="mobile-block-badge">// Switch to desktop to continue</div>
+  </div>
+
   <!-- Floating save button — must be in DOM before scripts run -->
   <div id="float-save-wrap">
     <span id="float-save-confirm">Response Submitted</span>
@@ -1952,6 +1992,19 @@
       positionTT(e);
     }
 
+    // Hide all tooltips on mousedown so they don't linger during drag
+    document.addEventListener('mousedown', function() {
+      var tts = document.querySelectorAll('.rank-stat-tooltip');
+      tts.forEach(function(tt) {
+        tt.classList.remove('visible');
+        tt.style.display = 'none';
+      });
+      if (typeof philTT !== 'undefined') {
+        philTT.classList.remove('visible');
+        philTT.style.display = 'none';
+      }
+    });
+
     function positionTT(e) {
       // Use actual rendered size if available, else estimate
       var w = seasonTT.offsetWidth  || 200;
@@ -2139,19 +2192,19 @@
     var RISER_PLAYERS = [
       { name:'Cooper Clark RI',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:LAL_LOGO,
         rs:{ ppg:18.3, rpg:1.9, apg:8.4, fgp:'46.8%', tpp:'39.3%' },
-        po:{ ppg:19.8, rpg:1.9, apg:9.2, fgp:'47.2%', tpp:'42.5%' } },
+        po:{ ppg:22.2, rpg:2.2, apg:10.1, fgp:'48.0%', tpp:'41.3%' } },
       { name:'Paxon Hatch RI',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:LAL_LOGO,
         rs:{ ppg:22.8, rpg:10.6, apg:1.7, fgp:'49.4%', tpp:'42.5%' },
-        po:{ ppg:23.8, rpg:10.9, apg:1.7, fgp:'46.2%', tpp:'37.9%' } },
-      { name:'Sam Stogsdill RI',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png',
+        po:{ ppg:25.5, rpg:11.5, apg:1.9, fgp:'47.7%', tpp:'38.9%' } },
+      { name:'Sam Stogsdill RI',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:WBY+'was_orig.png',
         rs:{ ppg:9.6,  rpg:8.5,  apg:6.9, fgp:'45.6%', tpp:'15.9%' },
-        po:{ ppg:9.4,  rpg:8.8,  apg:7.5, fgp:'46.4%', tpp:'16.9%' } },
-      { name:'Jaykeb Stewart RI', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png',
+        po:{ ppg:9.3,  rpg:8.4,  apg:8.0, fgp:'44.7%', tpp:'29.9%' } },
+      { name:'Jaykeb Stewart RI', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:WBY+'mil_orig.png',
         rs:{ ppg:15.7, rpg:5.6,  apg:6.6, fgp:'49.1%', tpp:'38.9%' },
-        po:{ ppg:16.8, rpg:5.7,  apg:6.9, fgp:'49.6%', tpp:'40.8%' } },
-      { name:'Isaac Vitel RI',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png',
+        po:{ ppg:18.2, rpg:6.0,  apg:7.5, fgp:'49.9%', tpp:'41.9%' } },
+      { name:'Isaac Vitel RI',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:WBY+'orl_orig.png',
         rs:{ ppg:16.6, rpg:4.3,  apg:3.3, fgp:'48.0%', tpp:'33.6%' },
-        po:{ ppg:20.4, rpg:4.6,  apg:4.0, fgp:'49.7%', tpp:'38.6%' } },
+        po:{ ppg:21.3, rpg:4.8,  apg:4.1, fgp:'48.4%', tpp:'36.7%' } },
     ];
 
     function showRiserTT(p, e) {
@@ -2388,15 +2441,15 @@
     // ── CLUTCH RANKING WIDGET ──
     var CLUTCH_PLAYERS = [
       { name:'Cooper Clark CL',   label:'Clark',     img:'headshot_clark.png',    color:'#552583', logo:WBY+'lal_orig.png',  gameKey:'clark',
-        po:{ ppg:'22.2', rpg:'2.2', apg:'10.1', fgp:'48.0%', tpp:'41.3%' } },
+        po:{ ppg:'22.2', rpg:'2.2', apg:'10.1', spg:'1.6', bpg:'0.0', topg:'2.8', fgp:'48.0%', tpp:'41.3%', ftp:'91.3%', tpa:'8.6', gp:'132', mpg:'35.6' } },
       { name:'Paxon Hatch CL',    label:'Hatch',     img:'headshot_hatch.png',    color:'#552583', logo:WBY+'lal_orig.png',  gameKey:'hatch',
-        po:{ ppg:'25.5', rpg:'11.5', apg:'1.9', fgp:'47.7%', tpp:'38.9%' } },
+        po:{ ppg:'25.5', rpg:'11.5', apg:'1.9', spg:'0.8', bpg:'2.1', topg:'1.9', fgp:'47.7%', tpp:'38.9%', ftp:'80.1%', tpa:'8.6', gp:'145', mpg:'38.3' } },
       { name:'Sam Stogsdill CL',  label:'Stogsdill', img:'headshot_stogsdill.png',color:'#002B5C', logo:WBY+'was_orig.png',  gameKey:'stogsdill',
-        po:{ ppg:'9.3',  rpg:'8.4', apg:'8.0', fgp:'44.7%', tpp:'29.9%' } },
+        po:{ ppg:'9.3',  rpg:'8.4',  apg:'8.0', spg:'0.7', bpg:'1.2', topg:'1.3', fgp:'44.7%', tpp:'29.9%', ftp:'72.8%', tpa:'1.0', gp:'133', mpg:'27.8' } },
       { name:'Jaykeb Stewart CL', label:'Stewart',   img:'headshot_stewart.png',  color:'#00471B', logo:WBY+'mil_orig.png',  gameKey:'stewart',
-        po:{ ppg:'18.2', rpg:'6.0', apg:'7.5', fgp:'49.9%', tpp:'41.9%' } },
+        po:{ ppg:'18.2', rpg:'6.0',  apg:'7.5', spg:'1.7', bpg:'0.9', topg:'2.1', fgp:'49.9%', tpp:'41.9%', ftp:'91.2%', tpa:'6.0', gp:'164', mpg:'31.0' } },
       { name:'Isaac Vitel CL',    label:'Vitel',     img:'headshot_vitel.png',    color:'#0077C0', logo:WBY+'orl_orig.png',  gameKey:'vitel',
-        po:{ ppg:'20.2', rpg:'4.8', apg:'4.1', fgp:'48.4%', tpp:'36.7%' } },
+        po:{ ppg:'21.3', rpg:'4.8',  apg:'4.1', spg:'1.7', bpg:'0.4', topg:'2.8', fgp:'48.4%', tpp:'36.7%', ftp:'88.6%', tpa:'5.6', gp:'128', mpg:'32.6' } },
     ];
 
     function calcElimStats(gameKey) {
@@ -2435,7 +2488,8 @@
           +'</div></div>'
         +'<div style="font-family:var(--font-mono);font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-bottom:5px;">Career Playoffs → Elimination ('+elim.gp+' gm)</div>'
         +row('PPG',po.ppg,elim.ppg)+row('RPG',po.rpg,elim.rpg)+row('APG',po.apg,elim.apg)
-        +row('FG%',po.fgp,elim.fgp)+row('3P%',po.tpp,elim.tpp);
+        +row('FG%',po.fgp,elim.fgp)+row('3P%',po.tpp,elim.tpp)
+        +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">SPG</span><span class="rank-tt-val">'+po.spg+'</span></div>';
       seasonTT.classList.remove('visible'); void seasonTT.offsetHeight;
       seasonTT.style.display='block'; seasonTT.classList.add('visible'); positionTT(e);
     }
@@ -3345,7 +3399,7 @@
     var philTT = document.createElement('div');
     philTT.id = 'phil-team-tooltip';
     philTT.className = 'rank-stat-tooltip';
-    philTT.style.cssText = 'min-width:260px;max-width:320px;padding:14px 16px;';
+    philTT.style.cssText = 'min-width:280px;max-width:360px;padding:14px 16px;';
     document.body.appendChild(philTT);
 
     function showPhilTT(t, e) {
@@ -3368,7 +3422,7 @@
       t.roster.forEach(function(player) {
         fiveHtml +=
           '<div style="display:flex;align-items:center;gap:10px;">'
-            +'<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid '+t.color+';flex-shrink:0;">'
+            +'<div style="width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid '+t.color+';flex-shrink:0;">'
               +'<img src="'+player.img+'" alt="'+player.label+'" style="width:100%;height:100%;object-fit:cover;object-position:top center;">'
             +'</div>'
             +'<span style="font-family:var(--font-mono);font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';width:22px;flex-shrink:0;">'+player.pos+'</span>'
@@ -3377,11 +3431,9 @@
       });
       fiveHtml += '</div>';
 
-      var playoffColor = t.playoffs==='Champions' ? '#c9a84c' : t.playoffs==='Did not qualify' ? '#ef4444' : '#22c55e';
       var statsHtml =
         '<div style="border-top:1px solid rgba(255,255,255,.09);padding-top:8px;">'
           +'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Record</span><span class="rank-tt-val" style="color:'+textMain+';">'+t.record+'</span></div>'
-          +(t.playoffs?'<div class="rank-tt-row"><span class="rank-tt-label" style="color:'+textMuted+';">Playoffs</span><span class="rank-tt-val" style="color:'+playoffColor+';">'+t.playoffs+'</span></div>':'')
         +'</div>';
 
       philTT.innerHTML = header + fiveHtml + statsHtml;
