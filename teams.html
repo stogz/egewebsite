@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
+  <script src="logos/teaminfo.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     /* ── PAGE LAYOUT ── */
@@ -1446,73 +1447,61 @@
     function ROSTERS()      { return window.EGE_ROSTERS      || {}; }
     function PLAYER_ICONS() { return window.EGE_PLAYER_ICONS || {}; }
 
-    /* ─── CONSTANTS ───────────────────────────────────────────── */
-    var TEAM_LOGOS = {
-      "Atlanta Hawks":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hawks2_orig.png",
-      "Boston Celtics":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bos_orig.png",
-      "Brooklyn Nets":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/bkn_orig.png",
-      "Charlotte Hornets":       "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cha_orig.png",
-      "Chicago Bulls":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/chi_orig.png",
-      "Cleveland Cavaliers":     "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/cle_orig.png",
-      "Dallas Mavericks":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/dal_orig.png",
-      "Denver Nuggets":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/den_orig.png",
-      "Detroit Pistons":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/det_orig.png",
-      "Golden State Warriors":   "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/gsw_orig.png",
-      "Houston Rockets":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/rockets2_orig.png",
-      "Indiana Pacers":          "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/ind_orig.png",
-      "Los Angeles Clippers":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lac_orig.png",
-      "Los Angeles Lakers":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/lal_orig.png",
-      "Miami Heat":              "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mia_orig.png",
-      "Milwaukee Bucks":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mil_orig.png",
-      "Minnesota Timberwolves":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/min_orig.png",
-      "New Orleans Pelicans":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nop_orig.png",
-      "New York Knicks":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nyk_orig.png",
-      "Oklahoma City Thunder":   "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/okc_orig.png",
-      "Orlando Magic":           "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/orl_orig.png",
-      "Philadelphia 76ers":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ersicon2_orig.png",
-      "Phoenix Suns":            "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/phx2_orig.png",
-      "Portland Trail Blazers":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/por_orig.png",
-      "Sacramento Kings":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sac2_orig.png",
-      "San Antonio Spurs":       "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/sas_orig.png",
-      "Toronto Raptors":         "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/raptors2_orig.png",
-      "Utah Jazz":               "https://logos.logofury.com/logo_src/20dba3b5841d7dc92dc0c589c08493f7.png",
-      "Washington Wizards":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/was_orig.png",
-      "Mexico City Flight":      "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/mex_orig.png",
-      "St. Louis Spirit":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/stl_orig.png",
-      "Vancouver Grizzlies":     "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/van_orig.png",
-    };
-    /* ── STANDINGS-ONLY logo overrides ── */
-    var STANDINGS_LOGOS_ALWAYS = {
-      "Utah Jazz":        "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/uta_orig.png",
-      "Houston Rockets":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/hou_orig.png",
-      "Toronto Raptors":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/tor_orig.png",
-      "Atlanta Hawks":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/atl_orig.png",
-    };
-    /* 76ers: light mode = new blue logo, dark mode = existing logo */
-    var SIXERS_LIGHT_LOGO = "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/76ers-blue_orig.png";
+    /* ─── CONSTANTS — built from teaminfo.js ──────────────────── */
 
-    function getStandingsLogo(teamName) {
-      if (STANDINGS_LOGOS_ALWAYS[teamName]) return STANDINGS_LOGOS_ALWAYS[teamName];
-      if (teamName === "Philadelphia 76ers") {
-        var isLight = document.documentElement.classList.contains('light');
-        return isLight ? SIXERS_LIGHT_LOGO : (TEAM_LOGOS[teamName] || '');
-      }
-      return TEAM_LOGOS[teamName] || '';
+    // Build name→teamInfo lookup from teamInfo (keyed by abbr slug in teaminfo.js)
+    function _buildNameMap() {
+      var map = {};
+      if (typeof teamInfo === 'undefined') return map;
+      Object.keys(teamInfo).forEach(function(k) {
+        var t = teamInfo[k];
+        map[t.name] = t;
+      });
+      return map;
+    }
+    var _teamByName = _buildNameMap();
+
+    function getTeamInfo(teamName) {
+      return _teamByName[teamName] || null;
     }
 
-    var TEAM_COLORS = {
-      "Los Angeles Lakers":"#552583","San Antonio Spurs":"#000000","Atlanta Hawks":"#cc092f",
-      "Boston Celtics":"#007A33","Brooklyn Nets":"#000000","Charlotte Hornets":"#1D1160",
-      "Chicago Bulls":"#bc032b","Cleveland Cavaliers":"#72253d","Dallas Mavericks":"#00538C",
-      "Denver Nuggets":"#0E2240","Detroit Pistons":"#C8102E","Golden State Warriors":"#1D428A",
-      "Houston Rockets":"#CE1141","Indiana Pacers":"#002D62","Los Angeles Clippers":"#031c3d",
-      "Vancouver Grizzlies":"#5D76A9","Miami Heat":"#98002E","Milwaukee Bucks":"#00471B",
-      "Minnesota Timberwolves":"#0C2340","New Orleans Pelicans":"#0C2340","New York Knicks":"#ff6720",
-      "Oklahoma City Thunder":"#007AC1","Orlando Magic":"#0050b5","Philadelphia 76ers":"#006BB6",
-      "Phoenix Suns":"#1D1160","Portland Trail Blazers":"#E03A3E","Sacramento Kings":"#5A2D81",
-      "Toronto Raptors":"#CE1141","Utah Jazz":"#4e008e","Washington Wizards":"#002144",
-      "Mexico City Flight":"#07b4c0","St. Louis Spirit":"#d16405",
-    };
+    function getTeamLogo(teamName) {
+      var t = getTeamInfo(teamName);
+      if (!t) return '';
+      return 'logos/' + t.teamLogoCLR;
+    }
+
+    // Standings and all general uses: always color logo
+    function getStandingsLogo(teamName) {
+      var t = getTeamInfo(teamName);
+      if (!t) return '';
+      return 'logos/' + t.teamLogoCLR;
+    }
+
+    // Team detail banner: always white logo
+    function getDetailLogo(teamName) {
+      var t = getTeamInfo(teamName);
+      if (!t) return '';
+      return 'logos/' + t.teamLogoWHT;
+    }
+
+    // Build TEAM_LOGOS for any legacy references — always color
+    var TEAM_LOGOS = {};
+    if (typeof teamInfo !== 'undefined') {
+      Object.keys(teamInfo).forEach(function(k) {
+        var t = teamInfo[k];
+        TEAM_LOGOS[t.name] = 'logos/' + t.teamLogoCLR;
+      });
+    }
+
+    // Build TEAM_COLORS from teamInfo primaryColor
+    var TEAM_COLORS = {};
+    if (typeof teamInfo !== 'undefined') {
+      Object.keys(teamInfo).forEach(function(k) {
+        var t = teamInfo[k];
+        TEAM_COLORS[t.name] = t.primaryColor;
+      });
+    }
     var SLUG_ABBR = {
       atlantahawks:"ATL",bostonceltics:"BOS",brooklynnets:"BKN",charlottehornets:"CHA",
       chicagobulls:"CHI",clevelandcavaliers:"CLE",dallasmavericks:"DAL",denvernuggets:"DEN",
@@ -1914,7 +1903,7 @@
     function renderDetail(slug, year) {
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
-      var logo = TEAM_LOGOS[teamName] || '';
+      var logo = getDetailLogo(teamName) || '';
       var bg = TEAM_COLORS[teamName] || '#333';
       var ss = (SEASON_STATS()[year]||{})[slug] || null;
       var abbr = SLUG_ABBR[slug] || '';

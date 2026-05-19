@@ -515,82 +515,30 @@
     </ul>
   </footer>
 
+  <script src="logos/teaminfo.js"></script>
   <script src="shared.js"></script>
   <script>
   (function () {
 
-    /* ── TEAM COLOURS ── */
-    var TC = {
-      'Atlanta Hawks':          { p:'#CC092F', s:'#C1C6C8' },
-      'Boston Celtics':         { p:'#007A33', s:'#BA9653' },
-      'Brooklyn Nets':          { p:'#111111', s:'#FFFFFF' },
-      'Charlotte Hornets':      { p:'#1D1160', s:'#00788C' },
-      'Chicago Bulls':          { p:'#CE1141', s:'#000000' },
-      'Cleveland Cavaliers':    { p:'#860038', s:'#FDBB30' },
-      'Dallas Mavericks':       { p:'#00538C', s:'#002B5E' },
-      'Denver Nuggets':         { p:'#0E2240', s:'#FEC524' },
-      'Detroit Pistons':        { p:'#C8102E', s:'#1D42BA' },
-      'Golden State Warriors':  { p:'#1D428A', s:'#FFC72C' },
-      'Houston Rockets':        { p:'#CE1141', s:'#C4CED4' },
-      'Indiana Pacers':         { p:'#002D62', s:'#FDBB30' },
-      'Los Angeles Clippers':   { p:'#C8102E', s:'#1D428A' },
-      'Los Angeles Lakers':     { p:'#552583', s:'#FDB927' },
-      'Miami Heat':             { p:'#98002E', s:'#F9A01B' },
-      'Milwaukee Bucks':        { p:'#00471B', s:'#EEE1C6' },
-      'Minnesota Timberwolves': { p:'#0C2340', s:'#236192' },
-      'New Orleans Pelicans':   { p:'#0C2340', s:'#C8102E' },
-      'New York Knicks':        { p:'#006BB6', s:'#F58426' },
-      'Oklahoma City Thunder':  { p:'#007AC1', s:'#EF3B24' },
-      'Orlando Magic':          { p:'#0077C0', s:'#C4CED4' },
-      'Philadelphia 76ers':     { p:'#006BB6', s:'#ED174C' },
-      'Phoenix Suns':           { p:'#1D1160', s:'#E56020' },
-      'Portland Trail Blazers': { p:'#E03A3E', s:'#000000' },
-      'Sacramento Kings':       { p:'#5A2D81', s:'#63727A' },
-      'San Antonio Spurs':      { p:'#222222', s:'#C4CED4' },
-      'Toronto Raptors':        { p:'#CE1141', s:'#000000' },
-      'Utah Jazz':              { p:'#002B5C', s:'#F9A01B' },
-      'Washington Wizards':     { p:'#002B5C', s:'#E31837' },
-      'Vancouver Grizzlies':    { p:'#5D76A9', s:'#F5A623' },
-      'Mexico City Flight':     { p:'#07b4c0', s:'#e75719' },
-      'St. Louis Spirit':       { p:'#d16405', s:'#ffffff' },
-    };
+    /* ── TEAM COLOURS — built from teaminfo.js ── */
+    var TC = {};
+    if (typeof teamInfo !== 'undefined') {
+      Object.keys(teamInfo).forEach(function(k) {
+        var t = teamInfo[k];
+        TC[t.name] = { p: t.primaryColor, s: t.secondaryColor };
+      });
+    }
 
-    /* ── TEAM LOGOS ── */
-    var B = 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/';
-    var TL = {
-      'Atlanta Hawks':          B+'hawks2_orig.png',
-      'Boston Celtics':         B+'bos_orig.png',
-      'Brooklyn Nets':          B+'bkn_orig.png',
-      'Charlotte Hornets':      B+'cha_orig.png',
-      'Chicago Bulls':          B+'chi_orig.png',
-      'Cleveland Cavaliers':    B+'cle_orig.png',
-      'Dallas Mavericks':       B+'dal_orig.png',
-      'Denver Nuggets':         B+'den_orig.png',
-      'Detroit Pistons':        B+'det_orig.png',
-      'Golden State Warriors':  B+'gsw_orig.png',
-      'Houston Rockets':        B+'rockets2_orig.png',
-      'Indiana Pacers':         B+'ind_orig.png',
-      'Los Angeles Clippers':   B+'lac_orig.png',
-      'Los Angeles Lakers':     B+'lal_orig.png',
-      'Miami Heat':             B+'mia_orig.png',
-      'Milwaukee Bucks':        B+'mil_orig.png',
-      'Minnesota Timberwolves': B+'min_orig.png',
-      'New Orleans Pelicans':   B+'nop_orig.png',
-      'New York Knicks':        B+'nyk_orig.png',
-      'Oklahoma City Thunder':  B+'okc_orig.png',
-      'Orlando Magic':          B+'orl_orig.png',
-      'Philadelphia 76ers':     B+'76ersicon2_orig.png',
-      'Phoenix Suns':           B+'phx2_orig.png',
-      'Portland Trail Blazers': B+'por_orig.png',
-      'Sacramento Kings':       B+'sac2_orig.png',
-      'San Antonio Spurs':      B+'sas_orig.png',
-      'Toronto Raptors':        B+'raptors2_orig.png',
-      'Utah Jazz':              B+'uta_orig.png',
-      'Washington Wizards':     B+'was_orig.png',
-      'Vancouver Grizzlies':    B+'van_orig.png',
-      'Mexico City Flight':     B+'mex_orig.png',
-      'St. Louis Spirit':       B+'stl_orig.png',
-    };
+    /* ── TEAM LOGOS — built from teaminfo.js ── */
+    var TL = {};     // color logos — for list team-name section
+    var TL_WHT = {}; // white logos — for card grid and thumb watermarks
+    if (typeof teamInfo !== 'undefined') {
+      Object.keys(teamInfo).forEach(function(k) {
+        var t = teamInfo[k];
+        TL[t.name]     = 'logos/' + t.teamLogoCLR;
+        TL_WHT[t.name] = 'logos/' + t.teamLogoWHT;
+      });
+    }
 
     /* ── EGE PLAYER HEADSHOTS ── */
     var HS = {
@@ -706,7 +654,7 @@
        headshot → from entry.headshot (URL string, optional) */
     function buildCard(name, season, idx, team, headshot) {
       var colors = TC[team] || { p:'#231aa5', s:'#e75719' };
-      var logo   = team ? (TL[team] || '') : '';
+      var logo    = team ? (TL_WHT[team] || TL[team] || '') : '';
 
       var card = document.createElement('div');
       card.className = 'award-card';
@@ -807,8 +755,9 @@
 
     /* ── BUILD ONE LIST ROW ── */
     function buildListRow(name, season, idx, team, headshot) {
-      var colors = TC[team] || { p:'#231aa5', s:'#e75719' };
-      var logo   = team ? (TL[team] || '') : '';
+      var colors    = TC[team] || { p:'#231aa5', s:'#e75719' };
+      var logoWht   = team ? (TL_WHT[team] || TL[team] || '') : ''; // white — thumb watermark
+      var logoClr   = team ? (TL[team] || '') : '';                  // color — team name section
 
       var row = document.createElement('div');
       row.className = 'award-list-row';
@@ -825,10 +774,10 @@
       tbg.style.background = 'linear-gradient(160deg,' + colors.p + ' 0%,' + shadeBlend(-0.3, colors.p) + ' 100%)';
       thumb.appendChild(tbg);
 
-      if (logo) {
+      if (logoWht) {
         var tlogo = document.createElement('img');
         tlogo.className = 'award-list-row-thumb-logo';
-        tlogo.src = logo; tlogo.alt = '';
+        tlogo.src = logoWht; tlogo.alt = '';
         thumb.appendChild(tlogo);
       }
 
@@ -877,10 +826,10 @@
       var teamEl = document.createElement('div');
       teamEl.className = 'award-list-row-team';
 
-      if (logo) {
+      if (logoClr) {
         var teamLogo = document.createElement('img');
         teamLogo.className = 'award-list-row-team-logo';
-        teamLogo.src = logo; teamLogo.alt = team || '';
+        teamLogo.src = logoClr; teamLogo.alt = team || '';
         teamEl.appendChild(teamLogo);
       }
       var teamName = document.createElement('span');
