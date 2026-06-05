@@ -5,6 +5,25 @@
 
 (function () {
 
+  /* ── SIM LOGO SWAP ── */
+  /* Each sim can define a logoFile in sim-config.js.
+     Falls back to EGE_Logo.png if not set.
+     To add a logo for a future sim, just set logoFile in its registry entry. */
+  (function() {
+    if (typeof EGE_SIM === 'undefined') return;
+    var logo = EGE_SIM.logoFile;
+    if (!logo || logo === 'EGE_Logo.png') return;
+
+    // Swap nav logo img
+    document.querySelectorAll('img.logo-img').forEach(function(img) {
+      img.src = logo;
+    });
+
+    // Swap favicon
+    var favicon = document.querySelector('link[rel="icon"]');
+    if (favicon) favicon.href = logo;
+  })();
+
   /* ── SIM SWITCHER BUTTON (desktop nav) ── */
   (function() {
     if (typeof EGE_SIM === 'undefined') return;

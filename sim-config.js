@@ -23,11 +23,12 @@
       id:               'sim-original',
       label:            '2K25',
       season:           '2026-27',
-      subtitle:         'Curry Era Simulation · Est. 2025',
-      heroEyebrow:      'Curry Era Simulation · EGE League · Est. 2025',
+      subtitle:         'Curry Era Simulation · EGE League',
+      heroEyebrow:      'Curry Era Simulation · EGE League',
       heroLine1:        'EGE',
       heroLine2:        'NBA',
       heroLine3:        'Simulation',
+      logoFile:         'EGE_Logo.png',
       statsFile:        'stats.js',
       playerStatsFile:  'player-stats.js',
       playerGamesFile:  'player-games.js',
@@ -39,11 +40,12 @@
       id:               'sim-26',
       label:            '2K26',
       season:           '2025-26',
-      subtitle:         'Season in Progress · Est. 2025',
-      heroEyebrow:      'Season in Progress · EGE League · Est. 2025',
+      subtitle:         'Bron Era Simulation · EGE League',
+      heroEyebrow:      'Bron Era Simulation · EGE League',
       heroLine1:        'EGE',
       heroLine2:        'SIM',
       heroLine3:        'II',
+      logoFile:         'EGE_Logo_blue.png',
       statsFile:        'stats-26.js',
       playerStatsFile:  'player-stats-26.js',
       playerGamesFile:  'player-games-26.js',
@@ -60,6 +62,9 @@
   /* Expose globally */
   window.EGE_SIM          = SIM_REGISTRY[activeSim];
   window.EGE_SIM_REGISTRY = SIM_REGISTRY;
+
+  /* Apply sim theme to <html> immediately — before any paint */
+  document.documentElement.setAttribute('data-sim', activeSim);
 
   /* Helper — call this to switch sims and reload */
   window.EGE_switchSim = function (id) {

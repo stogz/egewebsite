@@ -30,7 +30,7 @@
     .history-hero::after {
       content:''; position:absolute;
       width:400px; height:400px; border-radius:50%;
-      background:radial-gradient(circle,rgba(231,87,25,.1) 0%,transparent 70%);
+      background:radial-gradient(circle,rgba(var(--accent-rgb),.1) 0%,transparent 70%);
       bottom:-100px; left:10%; pointer-events:none;
     }
     .history-hero-inner { position:relative; z-index:1; max-width:1400px; margin:0 auto; }
@@ -67,7 +67,7 @@
       min-width:280px;
       transition:border-color .2s, background .35s, color .35s;
     }
-    .history-select:hover { border-color:rgba(231,87,25,.5); }
+    .history-select:hover { border-color:rgba(var(--accent-rgb),.5); }
     .history-select:focus { border-color:var(--orange); }
     .history-select option { background:var(--bg-card); color:var(--text); }
     .history-select-chev {
@@ -272,7 +272,7 @@
     }
     .history-view-btn:hover { color: var(--text); }
     .history-view-btn.active {
-      background: rgba(231,87,25,.15);
+      background: rgba(var(--accent-rgb),.15);
       color: var(--orange);
     }
     .history-view-btn svg { display:block; }
@@ -300,8 +300,8 @@
     }
     .award-list-row:hover {
       transform: translateX(5px);
-      border-color: rgba(231,87,25,.45);
-      background: rgba(231,87,25,.04);
+      border-color: rgba(var(--accent-rgb),.45);
+      background: rgba(var(--accent-rgb),.04);
     }
     /* Left accent bar in team colour */
     .award-list-row::before {
@@ -653,7 +653,7 @@
        team     → from entry.team (required — no auto-detection)
        headshot → from entry.headshot (URL string, optional) */
     function buildCard(name, season, idx, team, headshot) {
-      var colors = TC[team] || { p:'#231aa5', s:'#e75719' };
+      var colors = TC[team] || { p:'#231aa5', s:'var(--orange)' };
       var logo    = team ? (TL_WHT[team] || TL[team] || '') : '';
 
       var card = document.createElement('div');
@@ -755,7 +755,7 @@
 
     /* ── BUILD ONE LIST ROW ── */
     function buildListRow(name, season, idx, team, headshot) {
-      var colors    = TC[team] || { p:'#231aa5', s:'#e75719' };
+      var colors    = TC[team] || { p:'#231aa5', s:'var(--orange)' };
       var logoWht   = team ? (TL_WHT[team] || TL[team] || '') : ''; // white — thumb watermark
       var logoClr   = team ? (TL[team] || '') : '';                  // color — team name section
 

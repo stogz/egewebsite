@@ -60,7 +60,7 @@
       cursor: pointer;
     }
     .feature-card:hover {
-      border-color: rgba(231,87,25,.5);
+      border-color: rgba(var(--accent-rgb),.5);
     }
     .feature-card:hover .feature-card-arrow { transform: translateX(4px); }
     .feature-card:hover .feature-card-bg { opacity: 1; }
@@ -77,7 +77,7 @@
     /* Subtle bg glow */
     .feature-card-bg {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 0% 100%, rgba(231,87,25,.06) 0%, transparent 60%);
+      background: radial-gradient(ellipse at 0% 100%, rgba(var(--accent-rgb),.06) 0%, transparent 60%);
       opacity: 0;
       transition: opacity .3s;
       pointer-events: none;
@@ -184,21 +184,6 @@
     <h1 class="other-title">Extras</h1>
 
     <div class="other-grid">
-
-      <!-- Survey card -->
-      <a href="survey.html" class="feature-card">
-        <div class="feature-card-bg"></div>
-        <div class="feature-card-body">
-          <div class="feature-card-icon">📋</div>
-          <div class="feature-card-label">// community · feedback</div>
-          <h2 class="feature-card-title">League<br>Survey</h2>
-          <p class="feature-card-desc">Share your thoughts on the EGE League. Vote on awards, debate trades, and shape the direction of the simulation.</p>
-        </div>
-        <div class="feature-card-footer">
-          <span class="feature-card-cta">Take the Survey</span>
-          <span class="feature-card-arrow">→</span>
-        </div>
-      </a>
 
     </div>
   </div>

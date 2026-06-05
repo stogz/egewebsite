@@ -140,7 +140,7 @@
       background: var(--dark-orange);
       border-color: var(--dark-orange);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(231,87,25,.35);
+      box-shadow: 0 8px 30px rgba(var(--accent-rgb),.35);
     }
     .btn-secondary {
       background: transparent;
@@ -162,7 +162,7 @@
       display: flex;
       align-items: stretch;
       margin-top: 44px;
-      border: 1px solid rgba(231,87,25,.3);
+      border: 1px solid rgba(var(--accent-rgb),.3);
       border-radius: 4px;
       overflow: hidden;
       animation: fadeUp .8s .6s ease both;
@@ -220,7 +220,7 @@
     }
     .stat-banner-sep {
       font-size: .5rem;
-      color: rgba(231,87,25,.35);
+      color: rgba(var(--accent-rgb),.35);
       flex-shrink: 0;
     }
     .stat-banner-player {
@@ -256,18 +256,18 @@
       gap: 6px;
       padding: 0 18px;
       flex-shrink: 0;
-      border-left: 1px solid rgba(231,87,25,.15);
+      border-left: 1px solid rgba(var(--accent-rgb),.15);
     }
     .stat-dot {
       width: 5px; height: 5px;
       border-radius: 50%;
-      background: rgba(231,87,25,.2);
+      background: rgba(var(--accent-rgb),.2);
       transition: background .3s, transform .3s;
       cursor: pointer;
       border: none;
       padding: 0;
     }
-    .stat-dot:hover { background: rgba(231,87,25,.5); }
+    .stat-dot:hover { background: rgba(var(--accent-rgb),.5); }
     .stat-dot.active {
       background: var(--orange);
       transform: scale(1.5);
@@ -279,14 +279,14 @@
       z-index: 2;
       width: 100%;
       overflow: hidden;
-      background: rgba(231,87,25,.12);
-      border-top: 1px solid rgba(231,87,25,.25);
-      border-bottom: 1px solid rgba(231,87,25,.25);
+      background: rgba(var(--accent-rgb),.12);
+      border-top: 1px solid rgba(var(--accent-rgb),.25);
+      border-bottom: 1px solid rgba(var(--accent-rgb),.25);
       padding: 10px 0;
     }
     .ticker {
       display: flex;
-      animation: ticker-scroll 28s linear infinite;
+      animation: ticker-scroll 55s linear infinite;
       white-space: nowrap;
       width: max-content;
     }
@@ -335,7 +335,7 @@
       transform: scaleX(0);
       transition: transform .4s ease;
     }
-    .stat-cell:hover { background: rgba(231,87,25,.05); }
+    .stat-cell:hover { background: rgba(var(--accent-rgb),.05); }
     .stat-cell:hover::before { transform: scaleX(1); }
     .stat-label {
       font-family: var(--font-mono);
@@ -446,12 +446,12 @@
     }
     html.light .stat-banner {
       background: rgba(240,237,232,.88);
-      border-color: rgba(231,87,25,.35);
+      border-color: rgba(var(--accent-rgb),.35);
     }
     html.light .ticker-wrap {
-      background: rgba(231,87,25,.08);
-      border-top-color: rgba(231,87,25,.2);
-      border-bottom-color: rgba(231,87,25,.2);
+      background: rgba(var(--accent-rgb),.08);
+      border-top-color: rgba(var(--accent-rgb),.2);
+      border-bottom-color: rgba(var(--accent-rgb),.2);
     }
     html.light .hero-content .btn-secondary {
       color: var(--text);
@@ -508,7 +508,7 @@
 
     <!-- Title overlay at the bottom -->
     <div class="hero-content">
-      <p class="hero-eyebrow" id="hero-eyebrow">Curry Era Simulation · EGE League · Est. 2025</p>
+      <p class="hero-eyebrow" id="hero-eyebrow">Curry Era Simulation · EGE League</p>
       <h1 class="hero-title">
         <span id="hero-sim-label">2K25</span><br>
         <span class="line-orange">EGE <span>NBA</span></span><br>
@@ -636,20 +636,52 @@
             {key:'fgp', label:'FG% Leader'},
           ];
           var items = [];
-          statDefs.forEach(function(def) {
-            var bestP = null, bestV = -Infinity;
-            activeKeys.forEach(function(p) {
-              var s = latestStats[p];
-              if (!s) return;
-              var v = parseFloat(String(s[def.key]||'').replace('%',''));
-              if (!isNaN(v) && v > bestV) { bestV = v; bestP = p; }
-            });
-            if (bestP) {
-              var display = fmt(latestStats[bestP][def.key], def.key);
-              if (display) items.push(def.label + ' · ' + (PLAYER_NAMES[bestP]||bestP) + ' · ' + display);
+          var allKeys = Object.keys(PLAYER_STATS);
+          var allRetired = allKeys.every(function(p) { return PLAYER_STATS[p].retired; });
+
+          if (allRetired) {
+            // Career averages — weighted by games played across all pro seasons
+            function careerAvg(p, key) {
+              var rows = (PLAYER_STATS[p].regular||[]).filter(isProRow);
+              var totalGP = 0, weightedSum = 0;
+              rows.forEach(function(r) {
+                var v = parseFloat(String(r[key]||'').replace('%',''));
+                if (!isNaN(v) && r.gp > 0) {
+                  weightedSum += v * r.gp;
+                  totalGP += r.gp;
+                }
+              });
+              return totalGP > 0 ? weightedSum / totalGP : null;
             }
-          });
-          items.push('Season · ' + latestSeason.replace('-', '–'));
+
+            statDefs.forEach(function(def) {
+              var bestP = null, bestV = -Infinity;
+              allKeys.forEach(function(p) {
+                var avg = careerAvg(p, def.key);
+                if (avg !== null && avg > bestV) { bestV = avg; bestP = p; }
+              });
+              if (bestP) {
+                var display = fmt(bestV, def.key);
+                if (display) items.push('Career ' + def.label + ' · ' + (PLAYER_NAMES[bestP]||bestP) + ' · ' + display);
+              }
+            });
+            items.push('All Players Retired · ' + sim.label);
+          } else {
+            statDefs.forEach(function(def) {
+              var bestP = null, bestV = -Infinity;
+              activeKeys.forEach(function(p) {
+                var s = latestStats[p];
+                if (!s) return;
+                var v = parseFloat(String(s[def.key]||'').replace('%',''));
+                if (!isNaN(v) && v > bestV) { bestV = v; bestP = p; }
+              });
+              if (bestP) {
+                var display = fmt(latestStats[bestP][def.key], def.key);
+                if (display) items.push(def.label + ' · ' + (PLAYER_NAMES[bestP]||bestP) + ' · ' + display);
+              }
+            });
+            items.push('Season · ' + latestSeason.replace('-', '–'));
+          }
           items.push(sim.label + ' · ' + sim.subtitle);
           ticker.innerHTML = items.concat(items).map(function(txt) {
             return '<span class="ticker-item">' + txt + '</span>';

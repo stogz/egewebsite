@@ -5,11 +5,11 @@
 
 /* ── TEXT SELECTION ── */
 ::selection {
-  background: rgba(231, 87, 25, 0.45);
+  background: rgba(var(--accent-rgb), 0.45);
   color: #ffffff;
 }
 ::-moz-selection {
-  background: rgba(231, 87, 25, 0.45);
+  background: rgba(var(--accent-rgb), 0.45);
   color: #ffffff;
 }
 
@@ -35,6 +35,7 @@
   /* always same */
   --orange:      #e75719;
   --dark-orange: #9c380c;
+  --accent-rgb:  231,87,25;
   --blue:        #231aa5;
   --navy:        #08052f;
   --gray:        #d0d0d0;
@@ -63,6 +64,28 @@ html.light {
   --scanline:    rgba(0, 0, 0, 0.015);
   --grid-line:   rgba(35, 26, 165, 0.05);
   --mode-icon:   '☾';
+}
+
+/* ── SIM THEME VARIABLES ──────────────────────────────────────────
+   To add a new sim theme, just add a [data-sim="sim-XX"] block here
+   and override --orange, --dark-orange, and --accent-rgb.
+   Every hardcoded rgba(var(--accent-rgb), X) across the site will
+   automatically pick up the new color. No other files need changing.
+────────────────────────────────────────────────────────────────── */
+
+/* ── SIM-26 THEME (Bron Era — blue accent) ── */
+[data-sim="sim-26"] {
+  --orange:      #1a6fd4;
+  --dark-orange: #0f4a8f;
+  --accent-rgb:  26,111,212;
+}
+[data-sim="sim-26"] ::selection {
+  background: rgba(var(--accent-rgb), 0.45);
+  color: #ffffff;
+}
+[data-sim="sim-26"] ::-moz-selection {
+  background: rgba(var(--accent-rgb), 0.45);
+  color: #ffffff;
 }
 
 /* ── BASE RESETS ── */
@@ -136,7 +159,7 @@ nav {
   max-height: 64px;
   background: var(--bg-nav);
   backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(231, 87, 25, 0.18);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.18);
   transition: background 0.35s;
   overflow: visible;
 }
@@ -191,12 +214,12 @@ nav {
 }
 .nav-links a:hover {
   color: var(--heading);
-  border-color: rgba(231, 87, 25, 0.4);
-  background: rgba(231, 87, 25, 0.07);
+  border-color: rgba(var(--accent-rgb), 0.4);
+  background: rgba(var(--accent-rgb), 0.07);
 }
 .nav-links a.active {
   color: var(--orange);
-  border-color: rgba(231, 87, 25, 0.35);
+  border-color: rgba(var(--accent-rgb), 0.35);
 }
 
 /* ── MODE TOGGLE BUTTON ── */
@@ -206,7 +229,7 @@ nav {
   justify-content: center;
   width: 36px; height: 36px;
   background: transparent;
-  border: 1px solid rgba(231, 87, 25, 0.3);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
   border-radius: 3px;
   cursor: pointer;
   font-size: 1rem;
@@ -216,7 +239,7 @@ nav {
   flex-shrink: 0;
 }
 #mode-toggle:hover {
-  background: rgba(231, 87, 25, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   border-color: var(--orange);
   transform: scale(1.1);
 }
@@ -376,7 +399,7 @@ section { position: relative; z-index: 2; }
     width: 36px;
     height: 36px;
     background: transparent;
-    border: 1px solid rgba(231,87,25,.3);
+    border: 1px solid rgba(var(--accent-rgb),.3);
     border-radius: 3px;
     cursor: pointer;
     padding: 8px;
@@ -402,7 +425,7 @@ section { position: relative; z-index: 2; }
     left: 0; right: 0;
     background: var(--bg-nav);
     backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(231,87,25,.18);
+    border-bottom: 1px solid rgba(var(--accent-rgb),.18);
     z-index: 9998;
     flex-direction: column;
     padding: 8px 0 12px;
@@ -423,11 +446,11 @@ section { position: relative; z-index: 2; }
   #nav-mobile-menu a.active {
     color: var(--orange);
     border-left-color: var(--orange);
-    background: rgba(231,87,25,.05);
+    background: rgba(var(--accent-rgb),.05);
   }
   #nav-mobile-menu .nav-menu-divider {
     height: 1px;
-    background: rgba(231,87,25,.1);
+    background: rgba(var(--accent-rgb),.1);
     margin: 6px 24px;
   }
 
@@ -451,7 +474,7 @@ section { position: relative; z-index: 2; }
   #nav-menu-mode-toggle:hover {
     color: var(--orange);
     border-left-color: var(--orange);
-    background: rgba(231,87,25,.05);
+    background: rgba(var(--accent-rgb),.05);
   }
 
   /* Show mobile dropdown when open */
@@ -608,7 +631,7 @@ section { position: relative; z-index: 2; }
   .nav-menu-sim-btn:hover {
     color: var(--orange);
     border-left-color: var(--orange);
-    background: rgba(231,87,25,.05);
+    background: rgba(var(--accent-rgb),.05);
   }
   .nav-menu-sim-btn.active {
     color: #8a82e8;
