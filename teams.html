@@ -70,7 +70,7 @@
       transition: border-color .2s, background .35s, color .35s;
       min-width: 180px;
     }
-    .ege-select:hover  { border-color: rgba(231,87,25,.5); }
+    .ege-select:hover  { border-color: rgba(var(--accent-rgb),.5); }
     .ege-select:focus  { border-color: var(--orange); }
     .ege-select option { background: var(--bg-card); color: var(--text); }
     .ege-select-chev {
@@ -116,7 +116,7 @@
       flex-shrink: 0;
     }
     .teams-back-btn.visible { display: flex; }
-    .teams-back-btn:hover { border-color: rgba(231,87,25,.5); color: var(--orange); }
+    .teams-back-btn:hover { border-color: rgba(var(--accent-rgb),.5); color: var(--orange); }
     .teams-back-btn svg { width:14px; height:14px; }
 
     /* ── STANDINGS VIEW ── */
@@ -162,8 +162,8 @@
       pointer-events: none;
       z-index: 2;
     }
-    .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(231,87,25,.3); }
-    .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(231,87,25,.25); }
+    .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
+    .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(var(--accent-rgb),.25); }
 
     .standings-row {
       display: flex;
@@ -185,9 +185,9 @@
     }
     .standings-row:hover {
       transform: translateY(-2px);
-      border-color: rgba(231,87,25,.4);
+      border-color: rgba(var(--accent-rgb),.4);
       border-left-color: var(--row-accent, var(--orange));
-      background: rgba(231,87,25,.03);
+      background: rgba(var(--accent-rgb),.03);
     }
     .standings-row:active { transform: translateY(0); }
 
@@ -530,7 +530,7 @@
       white-space: nowrap;
     }
     .roster-toggle-btn.active { background: var(--orange); color: #fff; }
-    .roster-toggle-btn:hover:not(.active) { background: rgba(231,87,25,.1); color: var(--text); }
+    .roster-toggle-btn:hover:not(.active) { background: rgba(var(--accent-rgb),.1); color: var(--text); }
 
     /* Scroll wrapper — copied exactly from players.html .splits-scroll */
     .roster-scroll {
@@ -558,9 +558,9 @@
       height: 2.4rem; vertical-align: middle;
     }
     .roster-table th:first-child { text-align: left; }
-    .roster-table th:hover { color: var(--heading); background: rgba(231,87,25,.04); }
+    .roster-table th:hover { color: var(--heading); background: rgba(var(--accent-rgb),.04); }
     .roster-table th.sort-asc, .roster-table th.sort-desc { color: var(--heading); }
-    .roster-table th.sort-col { background: rgba(231,87,25,.05); }
+    .roster-table th.sort-col { background: rgba(var(--accent-rgb),.05); }
     .roster-sort-arrow {
       display: inline-block; margin-left: 3px; font-size: .55rem;
       color: var(--orange); opacity: 0; transition: opacity .15s; vertical-align: middle;
@@ -570,7 +570,7 @@
 
     .roster-table tbody tr { border-bottom: 1px solid var(--border-soft); transition: background .12s; }
     .roster-table tbody tr:last-child { border-bottom: none; }
-    .roster-table tbody tr:hover td { background: rgba(231,87,25,.04); }
+    .roster-table tbody tr:hover td { background: rgba(var(--accent-rgb),.04); }
     .roster-table td {
       padding: 0 14px; color: var(--text); text-align: right;
       height: 3rem; white-space: nowrap; font-size: .92rem; font-weight: 600;
@@ -580,7 +580,7 @@
       font-size: .65rem; letter-spacing: .08em;
       color: var(--text); font-weight: 500;
     }
-    .roster-table td.sort-col { background: rgba(231,87,25,.04); }
+    .roster-table td.sort-col { background: rgba(var(--accent-rgb),.04); }
     .roster-table td.hi { color: var(--text); font-weight: 600; font-size: .92rem; }
 
     /* Career / totals row */
@@ -593,7 +593,7 @@
       font-family: var(--font-mono); font-size: .65rem;
       letter-spacing: .12em; color: var(--orange); text-transform: uppercase;
     }
-    .roster-table tr.roster-career-row td.sort-col { background: rgba(231,87,25,.06) !important; }
+    .roster-table tr.roster-career-row td.sort-col { background: rgba(var(--accent-rgb),.06) !important; }
     .roster-table tr.roster-career-row:hover td { background: var(--bg-card) !important; }
 
     .roster-empty {
@@ -680,7 +680,7 @@
       color: inherit;
     }
     .ps-series-row:last-child { border-bottom: none; }
-    .ps-series-row:hover { background: rgba(231,87,25,.05); }
+    .ps-series-row:hover { background: rgba(var(--accent-rgb),.05); }
     .ps-series-logo {
       width: 28px; height: 28px; object-fit: contain; flex-shrink: 0;
     }
@@ -955,7 +955,7 @@
     }
     .bracket-team.winner {
       border-left-color: var(--row-accent, var(--orange));
-      background: rgba(231,87,25,.04);
+      background: rgba(var(--accent-rgb),.04);
     }
     .bracket-team.champion {
       border-left-color: #ffc820;
@@ -966,12 +966,12 @@
       box-shadow: none;
     }
     .bracket-team:hover {
-      border-color: var(--row-accent, rgba(231,87,25,.6));
+      border-color: var(--row-accent, rgba(var(--accent-rgb),.6));
       border-left-color: var(--row-accent, var(--orange));
-      background: rgba(231,87,25,.07);
+      background: rgba(var(--accent-rgb),.07);
       transform: translateX(3px) scale(1.012);
       box-shadow: 0 4px 18px rgba(0,0,0,.22),
-                  0 0 0 1px var(--row-accent, rgba(231,87,25,.25));
+                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.25));
       z-index: 3;
     }
     /* Left-side columns hover goes right, right-side columns hover goes left */
@@ -982,9 +982,9 @@
       transform: scale(1.025);
     }
     html.light .bracket-team:hover {
-      background: rgba(231,87,25,.09);
+      background: rgba(var(--accent-rgb),.09);
       box-shadow: 0 4px 14px rgba(0,0,0,.1),
-                  0 0 0 1px var(--row-accent, rgba(231,87,25,.3));
+                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.3));
     }
 
     .bracket-team__logo {
@@ -1102,7 +1102,7 @@
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
-      background: rgba(231,87,25,.07);
+      background: rgba(var(--accent-rgb),.07);
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
