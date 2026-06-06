@@ -6,7 +6,8 @@
      window.EGE_SIM  →  { id, label, season, subtitle, heroEyebrow,
                           heroLine1, heroLine2, heroLine3,
                           statsFile, playerStatsFile, playerGamesFile,
-                          teamStatsFile, leagueHistoryFile }
+                          teamStatsFile, leagueHistoryFile,
+                          teamInfoFile, logosFolder }
 
    To add a new sim, add an entry to SIM_REGISTRY below.
    ═══════════════════════════════════════════════════════════════ */
@@ -34,6 +35,8 @@
       playerGamesFile:  'player-games.js',
       teamStatsFile:    'team-stats.js',
       leagueHistoryFile:'league-history.js',
+      teamInfoFile:     'logos/teaminfo.js',    // 2K25 — original flat teaminfo, no logo-ID system
+      logosFolder:      'logos',                 // 2K25 — original logo folder
     },
 
     'sim-26': {
@@ -51,6 +54,8 @@
       playerGamesFile:  'player-games-26.js',
       teamStatsFile:    'team-stats-26.js',
       leagueHistoryFile:'league-history-26.js',
+      teamInfoFile:     'logos26/teaminfo26.js',  // 2K26 — logo-ID system with season-aware resolver
+      logosFolder:      'logos26',              // 2K26 — era-specific logo folder
     },
 
   };

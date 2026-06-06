@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
   <script src="logos/teaminfo.js"></script>
+  <script>if(window.EGE_SIM&&window.EGE_SIM.id==='sim-26'){document.write('<scr'+'ipt src="logos26/teaminfo26.js"><\/scr'+'ipt>');}</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     /* ── PAGE LAYOUT ── */
@@ -1440,6 +1441,10 @@
   </script>
   <script>
   window.__EGE_TEAMS_BOOT = function() {
+    /* ─── LOGO FOLDER — sim-aware ─────────────────────────────── */
+    /* 2K25 → 'logos'   2K26 → 'logos26'  (set in sim-config.js) */
+    var LOGOS_DIR = ((window.EGE_SIM && window.EGE_SIM.logosFolder) || 'logos') + '/';
+
     /* ─── DATA ACCESS ─────────────────────────────────────────── */
     function TEAM_INFO()    { return window.EGE_TEAM_INFO    || {}; }
     function SEASON_STATS() { return window.EGE_SEASON_STATS || {}; }
@@ -1465,36 +1470,40 @@
       return _teamByName[teamName] || null;
     }
 
-    function getTeamLogo(teamName) {
+    // Resolve the correct logo for a team in a given season.
+    // Uses getTeamInfoForSeason (2K26) so logos change by year automatically.
+    // Falls back to the flat shim for 2K25.
+    function _logoForTeam(teamName, season, useWht) {
+      if (typeof window.getTeamInfoForSeason === 'function') {
+        var key = null;
+        if (typeof teamInfo !== 'undefined') {
+          Object.keys(teamInfo).some(function(k) {
+            if (teamInfo[k].name === teamName) { key = k; return true; }
+          });
+        }
+        if (key) {
+          var resolved = window.getTeamInfoForSeason(key, season);
+          if (resolved) return LOGOS_DIR + (useWht ? resolved.teamLogoWHT : resolved.teamLogoCLR);
+        }
+      }
       var t = getTeamInfo(teamName);
-      if (!t) return '';
-      return 'logos/' + t.teamLogoCLR;
+      return t ? LOGOS_DIR + (useWht ? t.teamLogoWHT : t.teamLogoCLR) : '';
     }
 
-    // Standings and all general uses: always color logo
-    function getStandingsLogo(teamName) {
-      var t = getTeamInfo(teamName);
-      if (!t) return '';
-      return 'logos/' + t.teamLogoCLR;
-    }
-
-    // Team detail banner: always white logo
-    function getDetailLogo(teamName) {
-      var t = getTeamInfo(teamName);
-      if (!t) return '';
-      return 'logos/' + t.teamLogoWHT;
-    }
+    function getTeamLogo(teamName, season)      { return _logoForTeam(teamName, season, false); }
+    function getStandingsLogo(teamName, season)  { return _logoForTeam(teamName, season, false); }
+    function getDetailLogo(teamName, season)     { return _logoForTeam(teamName, season, true);  }
 
     // Build TEAM_LOGOS for any legacy references — always color
     var TEAM_LOGOS = {};
     if (typeof teamInfo !== 'undefined') {
       Object.keys(teamInfo).forEach(function(k) {
         var t = teamInfo[k];
-        TEAM_LOGOS[t.name] = 'logos/' + t.teamLogoCLR;
+        TEAM_LOGOS[t.name] = LOGOS_DIR + t.teamLogoCLR;
       });
     }
 
-    // Build TEAM_COLORS from teamInfo primaryColor
+    // Build TEAM_COLORS from teamInfo primaryColor (used as fallback / 2K25)
     var TEAM_COLORS = {};
     if (typeof teamInfo !== 'undefined') {
       Object.keys(teamInfo).forEach(function(k) {
@@ -1502,12 +1511,33 @@
         TEAM_COLORS[t.name] = t.primaryColor;
       });
     }
+
+    // Season-aware color lookup.
+    // For 2K26 uses getTeamInfoForSeason so colors change with eras.
+    // Falls back to the static TEAM_COLORS map for 2K25.
+    function getTeamColor(teamName, season) {
+      if (typeof window.getTeamInfoForSeason === 'function') {
+        var key = null;
+        if (typeof teamInfo !== 'undefined') {
+          Object.keys(teamInfo).some(function(k) {
+            if (teamInfo[k].name === teamName) { key = k; return true; }
+          });
+        }
+        if (key) {
+          var resolved = window.getTeamInfoForSeason(key, season);
+          if (resolved && resolved.primaryColor) return resolved.primaryColor;
+        }
+      }
+      return TEAM_COLORS[teamName] || '#333';
+    }
     var SLUG_ABBR = {
       atlantahawks:"ATL",bostonceltics:"BOS",brooklynnets:"BKN",charlottehornets:"CHA",
+      charlottebobcats:"CHO",
       chicagobulls:"CHI",clevelandcavaliers:"CLE",dallasmavericks:"DAL",denvernuggets:"DEN",
       detroitpistons:"DET",goldenstatewarriors:"GSW",houstonrockets:"HOU",indianapacers:"IND",
-      losangelesclippers:"LAC",losangeleslakers:"LAL",miamiheat:"MIA",milwaukeebucks:"MIL",
-      minnesotatimberwolves:"MIN",neworleanspelicans:"NOP",newyorkknicks:"NYK",
+      losangelesclippers:"LAC",losangeleslakers:"LAL",memphisgrizzlies:"MEM",miamiheat:"MIA",
+      milwaukeebucks:"MIL",minnesotatimberwolves:"MIN",neworleanspelicans:"NOP",
+      neworleanshornets:"NOH",newyorkknicks:"NYK",
       oklahomacitythunder:"OKC",orlandomagic:"ORL",philadelphia76ers:"PHI",phoenixsuns:"PHX",
       portlandtrailblazers:"POR",sacramentokings:"SAC",sanantoniospurs:"SAS",torontoraptors:"TOR",
       utahjazz:"UTA",vancouvergrizzlies:"VAN",washingtonwizards:"WAS",
@@ -1672,8 +1702,8 @@
     function buildStandingsRow(slug, stats, seed, year) {
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
-      var logo = getStandingsLogo(teamName);
-      var bg = TEAM_COLORS[teamName] || '#333';
+      var logo = getStandingsLogo(teamName, year);
+      var bg = getTeamColor(teamName, year);
       var record = stats.record || 'N/A';
       var yy = seasonToSuffix(year);
       var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
@@ -1870,7 +1900,8 @@
         var opTi   = TEAM_INFO()[s.opSlug] || {};
         var opName = opTi.name || s.opSlug;
         var opAbbr = SLUG_ABBR[s.opSlug] || (s.opSlug||'').slice(0,3).toUpperCase();
-        var opLogo = getStandingsLogo(opName);
+        var opSs   = (SEASON_STATS()[year]||{})[s.opSlug] || null;
+        var opLogo = getStandingsLogo(opName, year);
         var opLink = '#' + s.opSlug + yy;
 
         return '<a class="ps-series-row" href="' + opLink + '">'
@@ -1903,9 +1934,9 @@
     function renderDetail(slug, year) {
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
-      var logo = getDetailLogo(teamName) || '';
-      var bg = TEAM_COLORS[teamName] || '#333';
       var ss = (SEASON_STATS()[year]||{})[slug] || null;
+      var logo = getDetailLogo(teamName, year) || '';
+      var bg = getTeamColor(teamName, year);
       var abbr = SLUG_ABBR[slug] || '';
 
       // Banner
@@ -2238,12 +2269,13 @@
       return confSlugs[seed-1] || '';
     }
 
-    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss) {
+    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year) {
       if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';
       var ti = TEAM_INFO()[slug]||{};
       var name = ti.name || slug;
       var abbr = SLUG_ABBR[slug] || slug.slice(0,3).toUpperCase();
-      var logo = getStandingsLogo(name);
+      var teamStats = ss ? (ss[slug] || {}) : {};
+      var logo = getStandingsLogo(name, year);
       var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'');
       var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
       // Player icons from standings data
@@ -2260,7 +2292,7 @@
             + '</span>';
         }
       }
-      return '<div class="'+cls+'" data-slug="'+slug+'" style="--row-accent:'+( TEAM_COLORS[name]||'var(--orange)')+';">'
+      return '<div class="'+cls+'" data-slug="'+slug+'" style="--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';">'
         +(logo?'<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">':'')
         +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
         +'<span class="bracket-team__name">'+abbr+'</span>'
@@ -2269,11 +2301,11 @@
         +'</div>';
     }
 
-    function buildMatchup(m, topSeed, botSeed, roundIndex, isChampMatch, ss) {
+    function buildMatchup(m, topSeed, botSeed, roundIndex, isChampMatch, ss, year) {
       if (!m) {
         return '<div class="bracket-matchup">'
-          + buildBracketTeam('',null,false,false,'',ss)
-          + buildBracketTeam('',null,false,false,'',ss)
+          + buildBracketTeam('',null,false,false,'',ss,year)
+          + buildBracketTeam('',null,false,false,'',ss,year)
           + '</div>';
       }
       var topWon = m.topW > m.botW;
@@ -2281,8 +2313,8 @@
       var topChamp = isChampMatch && topWon;
       var botChamp = isChampMatch && botWon;
       return '<div class="bracket-matchup">'
-        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss)
-        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss)
+        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss, year)
+        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss, year)
         + '</div>';
     }
 
@@ -2338,7 +2370,7 @@
         return matchups.map(function(m, i) {
           var ts = seeds ? seeds[i*2]   : (m ? getSeed(m.top, conf) : '');
           var bs = seeds ? seeds[i*2+1] : (m ? getSeed(m.bot, conf) : '');
-          return buildMatchup(m, ts, bs, i, isFinals, ss);
+          return buildMatchup(m, ts, bs, i, isFinals, ss, year);
         }).join('');
       }
 
@@ -2374,7 +2406,7 @@
         ? '<div class="bracket-finals-col">'
             + '<div class="bracket-finals-trophy"><img src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Trophy" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(255,185,20,.5));"></div>'
             + '<div class="bracket-finals-label">NBA Finals</div>'
-            + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss)
+            + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss, year)
           + '</div>'
         : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';
 

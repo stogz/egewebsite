@@ -516,6 +516,7 @@
   </footer>
 
   <script src="logos/teaminfo.js"></script>
+  <script>if(window.EGE_SIM&&window.EGE_SIM.id==='sim-26'){document.write('<scr'+'ipt src="logos26/teaminfo26.js"><\/scr'+'ipt>');}</script>
   <script src="shared.js"></script>
   <script>
   (function () {
@@ -530,13 +531,15 @@
     }
 
     /* ── TEAM LOGOS — built from teaminfo.js ── */
+    /* Logo folder — 'logos' for 2K25, 'logos26' for 2K26 (set in sim-config.js) */
+    var LOGOS_DIR = ((window.EGE_SIM && window.EGE_SIM.logosFolder) || 'logos') + '/';
     var TL = {};     // color logos — for list team-name section
     var TL_WHT = {}; // white logos — for card grid and thumb watermarks
     if (typeof teamInfo !== 'undefined') {
       Object.keys(teamInfo).forEach(function(k) {
         var t = teamInfo[k];
-        TL[t.name]     = 'logos/' + t.teamLogoCLR;
-        TL_WHT[t.name] = 'logos/' + t.teamLogoWHT;
+        TL[t.name]     = LOGOS_DIR + t.teamLogoCLR;
+        TL_WHT[t.name] = LOGOS_DIR + t.teamLogoWHT;
       });
     }
 

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
   <script src="logos/teaminfo.js"></script>
+  <script>if(window.EGE_SIM&&window.EGE_SIM.id==='sim-26'){document.write('<scr'+'ipt src="logos26/teaminfo26.js"><\/scr'+'ipt>');}</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     /* ══ PLAYER SELECT ══ */
@@ -2134,6 +2135,8 @@
   /* ── HEADSHOT IMAGES ── */
   /* ── TEAM LOGOS ── */
   var _isLight = document.documentElement.classList.contains('light');
+  /* Logo folder — 'logos' for 2K25, 'logos26' for 2K26 (set in sim-config.js) */
+  var LOGOS_DIR = ((window.EGE_SIM && window.EGE_SIM.logosFolder) || 'logos') + '/';
   // Build TEAM_LOGOS from teaminfo.js — always color logo
   var TEAM_LOGOS = {
     // ── College teams (still on weebly, not in teaminfo.js) ──
@@ -2147,7 +2150,7 @@
   if (typeof teamInfo !== 'undefined') {
     Object.keys(teamInfo).forEach(function(k) {
       var t = teamInfo[k];
-      TEAM_LOGOS[t.name] = 'logos/' + t.teamLogoCLR;
+      TEAM_LOGOS[t.name] = LOGOS_DIR + t.teamLogoCLR;
     });
   }
   // No-op: mode-dependent logos removed — always use color logo
