@@ -49,13 +49,19 @@ teamInfo = {
         primaryColor: '#c8102e', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── BROOKLYN NETS (formerly New Jersey Nets) ───────────────── */
   njn: {
     abr: 'NJN', name: 'New Jersey Nets', city: 'New Jersey', mascot: 'Nets',
     primaryColor: '#000000', secondaryColor: '#ffffff',
     logos: [
-      { clr: 'NJN.png', wht: 'NJN.png', toYear: Infinity,
+      { clr: 'NJN.webp', wht: 'NJN.webp', toYear: Infinity,
+        primaryColor: '#0D2056', secondaryColor: '#CD1041' },
+    ],
+  },
+    bkn: {
+    abr: 'BKN', name: 'Brooklyn Nets', city: 'Brooklyn', mascot: 'Nets',
+    primaryColor: '#000000', secondaryColor: '#ffffff',
+    logos: [
+      { clr: 'BKN.png', wht: 'BKN.png', toYear: Infinity,
         primaryColor: '#000000', secondaryColor: '#ffffff' },
     ],
   },
