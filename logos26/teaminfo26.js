@@ -39,14 +39,12 @@
 ═══════════════════════════════════════════════════════════════ */
 
 teamInfo = {
-
-  /* ─── ATLANTA HAWKS ──────────────────────────────────────────── */
   atl: {
     abr: 'ATL', name: 'Atlanta Hawks', city: 'Atlanta', mascot: 'Hawks',
     primaryColor: '#c8102e', secondaryColor: '#ffffff',
     logos: [
       { clr: 'ATL.png', wht: 'ATL.png', toYear: 2015,
-        primaryColor: '#c8102e', secondaryColor: '#ffffff' },
+        primaryColor: '#CB0829', secondaryColor: '#082341' },
       { clr: 'ATL_color.png', wht: 'ATL_white.png', toYear: Infinity,
         primaryColor: '#c8102e', secondaryColor: '#ffffff' },
     ],
@@ -61,8 +59,6 @@ teamInfo = {
         primaryColor: '#000000', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── BOSTON CELTICS ─────────────────────────────────────────── */
   bos: {
     abr: 'BOS', name: 'Boston Celtics', city: 'Boston', mascot: 'Celtics',
     primaryColor: '#007d28', secondaryColor: '#ffffff',
@@ -71,18 +67,14 @@ teamInfo = {
         primaryColor: '#007d28', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── CHARLOTTE BOBCATS ──────────────────────────────────────── */
   cho: {
     abr: 'CHO', name: 'Charlotte Bobcats', city: 'Charlotte', mascot: 'Bobcats',
-    primaryColor: '#00778c', secondaryColor: '#1f1647',
+    primaryColor: '#B2B0B4', secondaryColor: '#5991C5',
     logos: [
       { clr: 'CHO.png', wht: 'CHO.png', toYear: Infinity,
-        primaryColor: '#00778c', secondaryColor: '#1f1647' },
+        primaryColor: '#B2B0B4', secondaryColor: '#5991C5' },
     ],
   },
-
-  /* ─── CHARLOTTE HORNETS ──────────────────────────────────────── */
   cha: {
     abr: 'CHA', name: 'Charlotte Hornets', city: 'Charlotte', mascot: 'Hornets',
     primaryColor: '#00778c', secondaryColor: '#1f1647',
@@ -91,8 +83,6 @@ teamInfo = {
         primaryColor: '#00778c', secondaryColor: '#1f1647' },
     ],
   },
-
-  /* ─── CHICAGO BULLS ──────────────────────────────────────────── */
   chi: {
     abr: 'CHI', name: 'Chicago Bulls', city: 'Chicago', mascot: 'Bulls',
     primaryColor: '#fa0943', secondaryColor: '#000000',
@@ -101,22 +91,18 @@ teamInfo = {
         primaryColor: '#fa0943', secondaryColor: '#000000' },
     ],
   },
-
-  /* ─── CLEVELAND CAVALIERS ────────────────────────────────────── */
   cle: {
     abr: 'CLE', name: 'Cleveland Cavaliers', city: 'Cleveland', mascot: 'Cavaliers',
     primaryColor: '#72253d', secondaryColor: '#b4975a',
     logos: [
       { clr: 'CLE.png', wht: 'CLE.png', toYear: 2017,
-        primaryColor: '#72253d', secondaryColor: '#b4975a' },
+        primaryColor: '#7A1E3D', secondaryColor: '#FEB708' },
       { clr: 'CLE1.png', wht: 'CLE1.png', toYear: 2022,
-        primaryColor: '#72253d', secondaryColor: '#b4975a' },
+        primaryColor: '#781036', secondaryColor: '#EAA631' },
       { clr: 'CLE2.png', wht: 'CLE2.png', toYear: Infinity,
         primaryColor: '#72253d', secondaryColor: '#b4975a' },
     ],
   },
-
-  /* ─── DALLAS MAVERICKS ───────────────────────────────────────── */
   dal: {
     abr: 'DAL', name: 'Dallas Mavericks', city: 'Dallas', mascot: 'Mavericks',
     primaryColor: '#0064b5', secondaryColor: '#b9c5cc',
@@ -125,44 +111,36 @@ teamInfo = {
         primaryColor: '#0064b5', secondaryColor: '#b9c5cc' },
     ],
   },
-
-  /* ─── DENVER NUGGETS ─────────────────────────────────────────── */
   den: {
     abr: 'DEN', name: 'Denver Nuggets', city: 'Denver', mascot: 'Nuggets',
     primaryColor: '#0d213e', secondaryColor: '#ffc627',
     logos: [
       { clr: 'DEN.png', wht: 'DEN.png', toYear: 2018,
-        primaryColor: '#0d213e', secondaryColor: '#ffc627' },
+        primaryColor: '#4A90CD', secondaryColor: '#F9B72B' },
       { clr: 'DEN1.png', wht: 'DEN1.png', toYear: Infinity,
         primaryColor: '#0d213e', secondaryColor: '#ffc627' },
     ],
   },
-
-  /* ─── DETROIT PISTONS ────────────────────────────────────────── */
   det: {
     abr: 'DET', name: 'Detroit Pistons', city: 'Detroit', mascot: 'Pistons',
     primaryColor: '#c8102e', secondaryColor: '#1d4289',
     logos: [
       { clr: 'DET.png', wht: 'DET.png', toYear: 2017,
-        primaryColor: '#c8102e', secondaryColor: '#1d4289' },
+        primaryColor: '#D50132', secondaryColor: '#174DAC' },
       { clr: 'DET1.png', wht: 'DET1.png', toYear: Infinity,
         primaryColor: '#c8102e', secondaryColor: '#1d4289' },
     ],
   },
-
-  /* ─── GOLDEN STATE WARRIORS ──────────────────────────────────── */
   gsw: {
     abr: 'GSW', name: 'Golden State Warriors', city: 'Golden State', mascot: 'Warriors',
     primaryColor: '#1d428a', secondaryColor: '#fdb927',
     logos: [
       { clr: 'GSW.png', wht: 'GSW.png', toYear: 2019,
-        primaryColor: '#1d428a', secondaryColor: '#fdb927' },
+        primaryColor: '#0566B0', secondaryColor: '#F7C537' },
       { clr: 'GSW1.png', wht: 'GSW1.png', toYear: Infinity,
         primaryColor: '#1d428a', secondaryColor: '#fdb927' },
     ],
   },
-
-  /* ─── HOUSTON ROCKETS ────────────────────────────────────────── */
   hou: {
     abr: 'HOU', name: 'Houston Rockets', city: 'Houston', mascot: 'Rockets',
     primaryColor: '#ce1141', secondaryColor: '#ffffff',
@@ -171,8 +149,6 @@ teamInfo = {
         primaryColor: '#ce1141', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── INDIANA PACERS ─────────────────────────────────────────── */
   ind: {
     abr: 'IND', name: 'Indiana Pacers', city: 'Indiana', mascot: 'Pacers',
     primaryColor: '#002d62', secondaryColor: '#fdba31',
@@ -181,22 +157,18 @@ teamInfo = {
         primaryColor: '#002d62', secondaryColor: '#fdba31' },
     ],
   },
-
-  /* ─── LOS ANGELES CLIPPERS ───────────────────────────────────── */
   lac: {
     abr: 'LAC', name: 'Los Angeles Clippers', city: 'Los Angeles', mascot: 'Clippers',
     primaryColor: '#12173f', secondaryColor: '#ffffff',
     logos: [
       { clr: 'LAC.png', wht: 'LAC.png', toYear: 2015,
-        primaryColor: '#12173f', secondaryColor: '#ffffff' },
+        primaryColor: '#003CAB', secondaryColor: '#ffffff' },
       { clr: 'LAC1.png', wht: 'LAC1.png', toYear: 2024,
-        primaryColor: '#12173f', secondaryColor: '#ffffff' },
+        primaryColor: '#0146AF', secondaryColor: '#ffffff' },
       { clr: 'LAC2.png', wht: 'LAC2.png', toYear: Infinity,
         primaryColor: '#12173f', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── LOS ANGELES LAKERS ─────────────────────────────────────── */
   lal: {
     abr: 'LAL', name: 'Los Angeles Lakers', city: 'Los Angeles', mascot: 'Lakers',
     primaryColor: '#330072', secondaryColor: '#ffc72c',
@@ -205,8 +177,6 @@ teamInfo = {
         primaryColor: '#330072', secondaryColor: '#ffc72c' },
     ],
   },
-
-  /* ─── MEMPHIS GRIZZLIES ──────────────────────────────────────── */
   mem: {
     abr: 'MEM', name: 'Memphis Grizzlies', city: 'Memphis', mascot: 'Grizzlies',
     primaryColor: '#7d9bc1', secondaryColor: '#0c2340',
@@ -215,8 +185,6 @@ teamInfo = {
         primaryColor: '#7d9bc1', secondaryColor: '#0c2340' },
     ],
   },
-
-  /* ─── MIAMI HEAT ─────────────────────────────────────────────── */
   mia: {
     abr: 'MIA', name: 'Miami Heat', city: 'Miami', mascot: 'Heat',
     primaryColor: '#b3002b', secondaryColor: '#ffa200',
@@ -225,42 +193,34 @@ teamInfo = {
         primaryColor: '#b3002b', secondaryColor: '#ffa200' },
     ],
   },
-
-  /* ─── MILWAUKEE BUCKS ────────────────────────────────────────── */
   mil: {
     abr: 'MIL', name: 'Milwaukee Bucks', city: 'Milwaukee', mascot: 'Bucks',
     primaryColor: '#195331', secondaryColor: '#e1cb9f',
     logos: [
       { clr: 'MIL.png', wht: 'MIL.png', toYear: 2015,
-        primaryColor: '#195331', secondaryColor: '#e1cb9f' },
+        primaryColor: '#1A5432', secondaryColor: '#B80128' },
       { clr: 'MIL1.png', wht: 'MIL1.png', toYear: Infinity,
         primaryColor: '#195331', secondaryColor: '#e1cb9f' },
     ],
   },
-
-  /* ─── MINNESOTA TIMBERWOLVES ─────────────────────────────────── */
   min: {
     abr: 'MIN', name: 'Minnesota Timberwolves', city: 'Minnesota', mascot: 'Timberwolves',
     primaryColor: '#002b5b', secondaryColor: '#7ac243',
     logos: [
       { clr: 'MIN.png', wht: 'MIN.png', toYear: 2017,
-        primaryColor: '#002b5b', secondaryColor: '#7ac243' },
+        primaryColor: '#005084', secondaryColor: '#A6A9AC' },
       { clr: 'MIN1.png', wht: 'MIN1.png', toYear: Infinity,
         primaryColor: '#002b5b', secondaryColor: '#7ac243' },
     ],
   },
-
-  /* ─── NEW ORLEANS HORNETS ────────────────────────────────────── */
   noh: {
     abr: 'NOH', name: 'New Orleans Hornets', city: 'New Orleans', mascot: 'Hornets',
     primaryColor: '#061e3e', secondaryColor: '#ba985a',
     logos: [
       { clr: 'NOH.png', wht: 'NOH.png', toYear: Infinity,
-        primaryColor: '#061e3e', secondaryColor: '#ba985a' },
+        primaryColor: '#068BC2', secondaryColor: '#F8B827' },
     ],
   },
-
-  /* ─── NEW ORLEANS PELICANS ───────────────────────────────────── */
   nop: {
     abr: 'NOP', name: 'New Orleans Pelicans', city: 'New Orleans', mascot: 'Pelicans',
     primaryColor: '#061e3e', secondaryColor: '#ba985a',
@@ -269,8 +229,6 @@ teamInfo = {
         primaryColor: '#061e3e', secondaryColor: '#ba985a' },
     ],
   },
-
-  /* ─── NEW YORK KNICKS ────────────────────────────────────────── */
   nyk: {
     abr: 'NYK', name: 'New York Knicks', city: 'New York', mascot: 'Knicks',
     primaryColor: '#ff6720', secondaryColor: '#003da5',
@@ -279,8 +237,6 @@ teamInfo = {
         primaryColor: '#ff6720', secondaryColor: '#003da5' },
     ],
   },
-
-  /* ─── OKLAHOMA CITY THUNDER ──────────────────────────────────── */
   okc: {
     abr: 'OKC', name: 'Oklahoma City Thunder', city: 'Oklahoma City', mascot: 'Thunder',
     primaryColor: '#007dc3', secondaryColor: '#ef3b24',
@@ -289,20 +245,16 @@ teamInfo = {
         primaryColor: '#007dc3', secondaryColor: '#ef3b24' },
     ],
   },
-
-  /* ─── ORLANDO MAGIC ──────────────────────────────────────────── */
   orl: {
     abr: 'ORL', name: 'Orlando Magic', city: 'Orlando', mascot: 'Magic',
     primaryColor: '#1f55a6', secondaryColor: '#000000',
     logos: [
       { clr: 'ORL.png', wht: 'ORL.png', toYear: 2025,
-        primaryColor: '#1f55a6', secondaryColor: '#000000' },
+        primaryColor: '#007DC6', secondaryColor: '#081821' },
       { clr: 'ORL1.png', wht: 'ORL1.png', toYear: Infinity,
         primaryColor: '#1f55a6', secondaryColor: '#000000' },
     ],
   },
-
-  /* ─── PHILADELPHIA 76ERS ─────────────────────────────────────── */
   phi: {
     abr: 'PHI', name: 'Philadelphia 76ers', city: 'Philadelphia', mascot: '76ers',
     primaryColor: '#19449c', secondaryColor: '#de1e34',
@@ -311,42 +263,34 @@ teamInfo = {
         primaryColor: '#19449c', secondaryColor: '#de1e34' },
     ],
   },
-
-  /* ─── PHOENIX SUNS ───────────────────────────────────────────── */
   phx: {
     abr: 'PHX', name: 'Phoenix Suns', city: 'Phoenix', mascot: 'Suns',
-    primaryColor: '#e56020', secondaryColor: '#e56020',
+    primaryColor: '#e56020', secondaryColor: '#F9A01C',
     logos: [
       { clr: 'PHX.png', wht: 'PHX.png', toYear: Infinity,
-        primaryColor: '#e56020', secondaryColor: '#e56020' },
+        primaryColor: '#e56020', secondaryColor: '#F9A01C' },
     ],
   },
-
-  /* ─── PORTLAND TRAIL BLAZERS ─────────────────────────────────── */
   por: {
     abr: 'POR', name: 'Portland Trail Blazers', city: 'Portland', mascot: 'Trail Blazers',
     primaryColor: '#ff373c', secondaryColor: '#000000',
     logos: [
       { clr: 'POR.png', wht: 'POR.png', toYear: 2017,
-        primaryColor: '#ff373c', secondaryColor: '#000000' },
+        primaryColor: '#E13A3E', secondaryColor: '#061921' },
       { clr: 'POR1.png', wht: 'POR1.png', toYear: Infinity,
         primaryColor: '#ff373c', secondaryColor: '#000000' },
     ],
   },
-
-  /* ─── SACRAMENTO KINGS ───────────────────────────────────────── */
   sac: {
     abr: 'SAC', name: 'Sacramento Kings', city: 'Sacramento', mascot: 'Kings',
     primaryColor: '#5b2b82', secondaryColor: '#5c6670',
     logos: [
       { clr: 'SAC.png', wht: 'SAC.png', toYear: 2016,
-        primaryColor: '#5b2b82', secondaryColor: '#5c6670' },
+        primaryColor: '#6845A8', secondaryColor: '#8C8D8D' },
       { clr: 'SAC1.png', wht: 'SAC1.png', toYear: Infinity,
         primaryColor: '#5b2b82', secondaryColor: '#5c6670' },
     ],
   },
-
-  /* ─── SAN ANTONIO SPURS ──────────────────────────────────────── */
   sas: {
     abr: 'SAS', name: 'San Antonio Spurs', city: 'San Antonio', mascot: 'Spurs',
     primaryColor: '#c6cdd3', secondaryColor: '#000000',
@@ -355,46 +299,40 @@ teamInfo = {
         primaryColor: '#c6cdd3', secondaryColor: '#000000' },
     ],
   },
-
-  /* ─── TORONTO RAPTORS ────────────────────────────────────────── */
   tor: {
     abr: 'TOR', name: 'Toronto Raptors', city: 'Toronto', mascot: 'Raptors',
     primaryColor: '#be0f34', secondaryColor: '#000000',
     logos: [
       { clr: 'TOR.png', wht: 'TOR.png', toYear: 2015,
-        primaryColor: '#be0f34', secondaryColor: '#000000' },
+        primaryColor: '#BA0D2F', secondaryColor: '#000000' },
       { clr: 'TOR1.png', wht: 'TOR1.png', toYear: 2020,
-        primaryColor: '#be0f34', secondaryColor: '#000000' },
+        primaryColor: '#be0f34', secondaryColor: '#8C8D8E' },
       { clr: 'TOR_color.png', wht: 'TOR_white.png', toYear: Infinity,
         primaryColor: '#be0f34', secondaryColor: '#000000' },
     ],
   },
-
-  /* ─── UTAH JAZZ ──────────────────────────────────────────────── */
   uta: {
     abr: 'UTA', name: 'Utah Jazz', city: 'Utah', mascot: 'Jazz',
     primaryColor: '#4e008e', secondaryColor: '#ffffff',
     logos: [
       { clr: 'UTA.png', wht: 'UTA.png', toYear: 2016,
-        primaryColor: '#4e008e', secondaryColor: '#ffffff' },
+        primaryColor: '#002144', secondaryColor: '#264F37' },
       { clr: 'UTA1.png', wht: 'UTA1.png', toYear: 2022,
-        primaryColor: '#4e008e', secondaryColor: '#ffffff' },
+        primaryColor: '#0C2240', secondaryColor: '#2B5234' },
       { clr: 'UTA2.png', wht: 'UTA2.png', toYear: 2024,
         primaryColor: '#FCE022', secondaryColor: '#000000' },
       { clr: 'UTA_color.png', wht: 'UTA_white.png', toYear: Infinity,
         primaryColor: '#4e008e', secondaryColor: '#ffffff' },
     ],
   },
-
-  /* ─── WASHINGTON WIZARDS ─────────────────────────────────────── */
   was: {
     abr: 'WAS', name: 'Washington Wizards', city: 'Washington', mascot: 'Wizards',
     primaryColor: '#002144', secondaryColor: '#cc092f',
     logos: [
       { clr: 'WAS.png', wht: 'WAS.png', toYear: 2011,
-        primaryColor: '#002144', secondaryColor: '#cc092f' },
+        primaryColor: '#246394', secondaryColor: '#8A6D4C' },
       { clr: 'WAS1.png', wht: 'WAS1.png', toYear: 2015,
-        primaryColor: '#002144', secondaryColor: '#cc092f' },
+        primaryColor: '#E41735', secondaryColor: '#042A5C' },
       { clr: 'WAS2.png', wht: 'WAS2.png', toYear: Infinity,
         primaryColor: '#002144', secondaryColor: '#cc092f' },
     ],
