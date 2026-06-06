@@ -124,6 +124,6 @@ window.EGE_BRACKETS = {
         { top: "oklahomacitythunder",    topW: 1, bot: "dallasmavericks",botW: 4 },
       ],
     },
-    finals: { top: "dallasmavericks", topW: 4, bot: "miamiheat", botW: 0 },
+    finals: { top: "dallasmavericks", topW: 4, bot: "miamiheat", botW: 2 },
   },
 }
