@@ -1581,8 +1581,8 @@
       var pfpSrc = clonePfpImg.src || '';
       var pfpDiv = document.createElement('div');
       pfpDiv.style.cssText = [
-        'width:96px',
-        'height:96px',
+        'width:48px',
+        'height:48px',
         'border-radius:9999px',
         'flex-shrink:0',
         'background-color:#38444d',
@@ -1590,13 +1590,12 @@
         'background-size:cover',
         'background-position:center center',
         'background-repeat:no-repeat',
-        'image-rendering:high-quality',
       ].filter(Boolean).join(';');
       clonePfpImg.parentNode.replaceChild(pfpDiv, clonePfpImg);
     }
     var clonePfpContainer = clone.querySelector('.pfpContainer');
     if (clonePfpContainer) {
-      clonePfpContainer.style.cssText = 'margin-right:12px;display:flex;flex-basis:96px;align-items:center;flex-direction:column;flex-shrink:0;';
+      clonePfpContainer.style.cssText = 'margin-right:12px;display:flex;flex-basis:48px;align-items:center;flex-direction:column;flex-shrink:0;';
     }
 
     // Force desktop name/handle font sizes
@@ -1604,9 +1603,6 @@
     if (cloneNameEl) cloneNameEl.style.fontSize = '15px';
     var cloneUsername = clone.querySelector('#username');
     if (cloneUsername) cloneUsername.style.fontSize = '15px';
-    // Scale pfp in the card CSS so it matches the 96px clone div
-    var clonePfpCss = clone.querySelector('.pfpContainer img');
-    if (clonePfpCss) clonePfpCss.style.cssText = 'width:96px;height:96px;';
 
     // Force desktop inner padding
     var cloneInner = clone.querySelector('.tweetInnerContainer');
