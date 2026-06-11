@@ -1545,6 +1545,72 @@
   var CARD_WIDTH  = 598;   // CSS px — matches real Twitter card width
   var CARD_SCALE  = 4;     // retina multiplier → 2392px wide output
 
+  /*
+   * Pre-render the profile picture at EXACTLY the output pixel size
+   * (48 CSS px × CARD_SCALE = 192 device px).
+   *
+   * Why: html2canvas rasterizes background-images at the element's CSS
+   * size and does not honor the `scale` option for them, so high-res
+   * avatars come out compressed/blurry in the final PNG. By doing the
+   * "cover" crop + downscale ourselves (with high-quality stepped
+   * downscaling for very large sources), the background image maps 1:1
+   * onto output pixels and html2canvas can't degrade it.
+   *
+   * Resolves with a data URL, or the original src if anything fails
+   * (so behavior gracefully falls back to the old path).
+   */
+  function prepPfp(src, sizePx) {
+    return new Promise(function(resolve) {
+      if (!src) { resolve(''); return; }
+      var img = new Image();
+      img.onload = function() {
+        try {
+          var sw = img.naturalWidth, sh = img.naturalHeight;
+          if (!sw || !sh) { resolve(src); return; }
+
+          // Center "cover" crop to a square (mimics background-size:cover)
+          var side = Math.min(sw, sh);
+          var sx = (sw - side) / 2;
+          var sy = (sh - side) / 2;
+
+          var cur = document.createElement('canvas');
+          cur.width = cur.height = side;
+          var ctx = cur.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, side, side);
+
+          // Step down by halves for quality (avoids aliasing on big
+          // sources like 2160px icons), then land exactly on sizePx.
+          while (cur.width / 2 >= sizePx) {
+            var next = document.createElement('canvas');
+            next.width = next.height = Math.max(sizePx, Math.round(cur.width / 2));
+            var nctx = next.getContext('2d');
+            nctx.imageSmoothingEnabled = true;
+            nctx.imageSmoothingQuality = 'high';
+            nctx.drawImage(cur, 0, 0, cur.width, cur.height, 0, 0, next.width, next.height);
+            cur = next;
+          }
+          if (cur.width !== sizePx) {
+            var fin = document.createElement('canvas');
+            fin.width = fin.height = sizePx;
+            var fctx = fin.getContext('2d');
+            fctx.imageSmoothingEnabled = true;
+            fctx.imageSmoothingQuality = 'high';
+            fctx.drawImage(cur, 0, 0, cur.width, cur.height, 0, 0, sizePx, sizePx);
+            cur = fin;
+          }
+
+          resolve(cur.toDataURL('image/png'));
+        } catch (e) {
+          resolve(src); // tainted canvas or other failure → use original
+        }
+      };
+      img.onerror = function() { resolve(src); };
+      img.src = src;
+    });
+  }
+
   genBtn.addEventListener('click', function() {
     if (editable) editBtn.click();
     syncAll();
@@ -1576,25 +1642,58 @@
       cloneTweetText.style.cssText = 'font-size:23px;line-height:1.3125;margin-top:10px;overflow-wrap:break-word;color:#ffffff;white-space:pre-wrap;';
     }
 
-    // Force desktop pfp — replace the <img> with a div using background-size:cover
-    // because html2canvas does not support object-fit:cover on <img> elements,
-    // but it DOES correctly handle background-size:cover on divs.
+    // Force desktop pfp.
+    //
+    // html2canvas renders the two kinds of images very differently:
+    //   • background-image → resizeImage() rasterizes it at the element's
+    //     CSS size (48×48) and pattern-fills, then the scale upscales that
+    //     tiny raster → blurry, regardless of source resolution.
+    //   • <img>            → ctx.drawImage() straight from the full-res
+    //     source onto the scaled context, clipped to border-radius → sharp.
+    //
+    // So we want an <img> here. html2canvas ignores object-fit:cover on
+    // imgs, but prepPfp() already center-crops the avatar to a perfect
+    // square at output resolution, so no object-fit is needed. The old
+    // background-div is kept only as a fallback if prepPfp fails.
     var clonePfpImg = clone.querySelector('.pfp');
+    var pfpSrcRaw = clonePfpImg ? (clonePfpImg.src || '') : '';
+
+    prepPfp(pfpSrcRaw, 48 * CARD_SCALE).then(function(pfpHiRes) {
+
     if (clonePfpImg) {
-      var pfpSrc = clonePfpImg.src || '';
-      var pfpDiv = document.createElement('div');
-      pfpDiv.style.cssText = [
-        'width:48px',
-        'height:48px',
-        'border-radius:9999px',
-        'flex-shrink:0',
-        'background-color:#38444d',
-        pfpSrc ? 'background-image:url("' + pfpSrc + '")' : '',
-        'background-size:cover',
-        'background-position:center center',
-        'background-repeat:no-repeat',
-      ].filter(Boolean).join(';');
-      clonePfpImg.parentNode.replaceChild(pfpDiv, clonePfpImg);
+      var isPrepped = pfpHiRes && pfpHiRes !== pfpSrcRaw;
+      var replacement;
+      if (isPrepped) {
+        // Square pre-cropped avatar → plain <img> = sharp html2canvas path
+        replacement = document.createElement('img');
+        replacement.src = pfpHiRes;
+        replacement.width = 48;
+        replacement.height = 48;
+        replacement.style.cssText = [
+          'width:48px',
+          'height:48px',
+          'border-radius:9999px',
+          'flex-shrink:0',
+          'display:block',
+          'background-color:#38444d',
+        ].join(';');
+      } else {
+        // Fallback: original (possibly non-square) source → background div
+        // so the cover-crop still happens, even if softer.
+        replacement = document.createElement('div');
+        replacement.style.cssText = [
+          'width:48px',
+          'height:48px',
+          'border-radius:9999px',
+          'flex-shrink:0',
+          'background-color:#38444d',
+          pfpHiRes ? 'background-image:url("' + pfpHiRes + '")' : '',
+          'background-size:cover',
+          'background-position:center center',
+          'background-repeat:no-repeat',
+        ].filter(Boolean).join(';');
+      }
+      clonePfpImg.parentNode.replaceChild(replacement, clonePfpImg);
     }
     var clonePfpContainer = clone.querySelector('.pfpContainer');
     if (clonePfpContainer) {
@@ -1643,6 +1742,8 @@
       genBtn.textContent = '↓ Generate Image';
       alert('Generation failed — check console.');
     });
+
+    }); // end prepPfp().then — pfp pre-render
   });
 
   /* ── MODAL ── */
