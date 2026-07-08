@@ -88,6 +88,42 @@ window.EGE_SEASON_STATS = {
     sacramentokings:       { record: "24-58", pct: ".293", rank: "14th", playoffs: "Did not qualify" },
     minnesotatimberwolves: { record: "17-65", pct: ".207", rank: "15th", playoffs: "Did not qualify" },
   },
+
+  /* ── 2011-12 ──────────────────────────────────────────────── */
+  "2011-12": {
+    /* EAST */
+    chicagobulls:          { record: "50-16", pct: ".758", rank: "1st",  playoffs: "Lost in First Round" },
+    miamiheat:             { record: "46-20", pct: ".697", rank: "2nd",  playoffs: "Champions", finals_mvp: "LeBron James" },
+    indianapacers:         { record: "42-24", pct: ".636", rank: "3rd",  playoffs: "Lost in Conference Semifinals" },
+    bostonceltics:         { record: "39-27", pct: ".591", rank: "4th",  playoffs: "Lost in Conference Finals" },
+    atlantahawks:          { record: "40-26", pct: ".606", rank: "5th",  playoffs: "Lost in First Round" },
+    orlandomagic:          { record: "37-29", pct: ".561", rank: "6th",  playoffs: "Lost in First Round" },
+    newyorkknicks:         { record: "36-30", pct: ".545", rank: "7th",  playoffs: "Lost in First Round" },
+    philadelphia76ers:     { record: "35-31", pct: ".530", rank: "8th",  playoffs: "Lost in Conference Semifinals" },
+    milwaukeebucks:        { record: "31-35", pct: ".470", rank: "9th",  playoffs: "Did not qualify" },
+    detroitpistons:        { record: "25-41", pct: ".379", rank: "10th", playoffs: "Did not qualify" },
+    torontoraptors:        { record: "23-43", pct: ".348", rank: "11th", playoffs: "Did not qualify" },
+    newjerseynets:          { record: "22-44", pct: ".333", rank: "12th", playoffs: "Did not qualify" },
+    clevelandcavaliers:    { record: "21-45", pct: ".318", rank: "13th", playoffs: "Did not qualify" },
+    washingtonwizards:     { record: "20-46", pct: ".303", rank: "14th", playoffs: "Did not qualify" },
+    charlottebobcats:      { record: "7-59",  pct: ".106", rank: "15th", playoffs: "Did not qualify" },
+    /* WEST */
+    sanantoniospurs:       { record: "50-16", pct: ".758", rank: "1st",  playoffs: "Lost in Conference Finals" },
+    oklahomacitythunder:   { record: "47-19", pct: ".712", rank: "2nd",  playoffs: "Lost in NBA Finals" },
+    losangeleslakers:      { record: "41-25", pct: ".621", rank: "3rd",  playoffs: "Lost in Conference Semifinals" },
+    memphisgrizzlies:      { record: "41-25", pct: ".621", rank: "4th",  playoffs: "Lost in First Round" },
+    losangelesclippers:    { record: "40-26", pct: ".606", rank: "5th",  playoffs: "Lost in Conference Semifinals" },
+    denvernuggets:         { record: "38-28", pct: ".576", rank: "6th",  playoffs: "Lost in First Round" },
+    dallasmavericks:       { record: "36-30", pct: ".545", rank: "7th",  playoffs: "Lost in First Round" },
+    utahjazz:              { record: "36-30", pct: ".545", rank: "8th",  playoffs: "Lost in First Round" },
+    houstonrockets:        { record: "34-32", pct: ".515", rank: "9th",  playoffs: "Did not qualify" },
+    phoenixsuns:           { record: "33-33", pct: ".500", rank: "10th", playoffs: "Did not qualify" },
+    portlandtrailblazers:  { record: "28-38", pct: ".424", rank: "11th", playoffs: "Did not qualify" },
+    minnesotatimberwolves: { record: "26-40", pct: ".394", rank: "12th", playoffs: "Did not qualify" },
+    goldenstatewarriors:   { record: "23-43", pct: ".348", rank: "13th", playoffs: "Did not qualify" },
+    sacramentokings:       { record: "22-44", pct: ".333", rank: "14th", playoffs: "Did not qualify" },
+    neworleanshornets:     { record: "21-45", pct: ".318", rank: "15th", playoffs: "Did not qualify" },
+  },
   
 }; /* end EGE_SEASON_STATS */
 window.EGE_BRACKETS = {
@@ -125,5 +161,40 @@ window.EGE_BRACKETS = {
       ],
     },
     finals: { top: "dallasmavericks", topW: 4, bot: "miamiheat", botW: 2 },
+  },
+  "2011-12": {
+    east: {
+      playoff_seeds: {},
+      r1: [
+        { top: "chicagobulls",     topW: 2, bot: "philadelphia76ers",  botW: 4 },  /* 1 vs 8 */
+        { top: "bostonceltics",    topW: 4, bot: "atlantahawks",       botW: 2 },  /* 4 vs 5 */
+        { top: "indianapacers",    topW: 4, bot: "orlandomagic",       botW: 1 },  /* 3 vs 6 */
+        { top: "miamiheat",        topW: 4, bot: "newyorkknicks",      botW: 1 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "philadelphia76ers", topW: 3, bot: "bostonceltics",     botW: 4 },  /* 1/8 vs 4/5 */
+        { top: "indianapacers",     topW: 2, bot: "miamiheat",         botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "bostonceltics",    topW: 3, bot: "miamiheat",          botW: 4 },
+      ],
+    },
+    west: {
+      playoff_seeds: {},
+      r1: [
+        { top: "sanantoniospurs",     topW: 4, bot: "utahjazz",           botW: 0 },  /* 1 vs 8 */
+        { top: "memphisgrizzlies",    topW: 3, bot: "losangelesclippers", botW: 4 },  /* 4 vs 5 */
+        { top: "losangeleslakers",    topW: 4, bot: "denvernuggets",      botW: 3 },  /* 3 vs 6 */
+        { top: "oklahomacitythunder", topW: 4, bot: "dallasmavericks",    botW: 0 },  /* 2 vs 7 */
+      ],
+      r2: [
+        { top: "sanantoniospurs",     topW: 4, bot: "losangelesclippers", botW: 0 },  /* 1/8 vs 4/5 */
+        { top: "losangeleslakers",    topW: 1, bot: "oklahomacitythunder", botW: 4 },  /* 3/6 vs 2/7 */
+      ],
+      r3: [
+        { top: "sanantoniospurs",     topW: 2, bot: "oklahomacitythunder", botW: 4 },
+      ],
+    },
+    finals: { top: "miamiheat", topW: 4, bot: "oklahomacitythunder", botW: 1 },
   },
 }
