@@ -2079,8 +2079,9 @@
       var ps = ps_all[key];
       if (!ps) return;
       var info = ps.info || {};
-      // Retirement driven by player-stats.js retired boolean
-      PLAYERS[key].team = ps.retired ? 'Retired' : 'Active';
+      // Retirement driven by player-stats.js retired boolean;
+      // ps.team (if present) sets the active team, e.g. a college abbr in 2K26
+      PLAYERS[key].team = ps.retired ? 'Retired' : (ps.team || 'Active');
       // Build bio rows from info object
       PLAYERS[key].bio = [
         { key:'Height',     val: info.height    || '—' },
@@ -2152,6 +2153,12 @@
     'BU':   LOGOS_DIR + 'BU.png',   // Butler
     'IU':   LOGOS_DIR + 'IU.png',   // Indiana
     'TU':   LOGOS_DIR + 'TU.png',   // Texas
+    // Full-name keys — banner/game-card lookups use teamFull() names
+    'Marquette':  LOGOS_DIR + 'MA.png',
+    'Butler':     LOGOS_DIR + 'BU.png',
+    'Indiana':    LOGOS_DIR + 'IU.png',
+    'Texas':      LOGOS_DIR + 'TU.png',
+    'Louisville': LOGOS_DIR + 'LOU.png',
   };
   if (typeof teamInfo !== 'undefined') {
     Object.keys(teamInfo).forEach(function(k) {
@@ -2220,6 +2227,12 @@
     'VAN': 'Vancouver Grizzlies',
     'MEX': 'Mexico City Flight',
     'STL': 'St. Louis Spirit',
+    // 2K26 colleges — sim players' active teams
+    'MA':  'Marquette',
+    'BU':  'Butler',
+    'IU':  'Indiana',
+    'TU':  'Texas',
+    'LOU': 'Louisville',
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
@@ -2280,6 +2293,12 @@
       TEAM_BANNER_COLORS[t.name] = { primary: t.primaryColor, secondary: t.secondaryColor };
     });
   }
+  // ── 2K26 college colors (not in teaminfo) — official school brand colors ──
+  TEAM_BANNER_COLORS['Marquette']  = { primary: '#003366', secondary: '#FFCC00' };
+  TEAM_BANNER_COLORS['Butler']     = { primary: '#13294B', secondary: '#FFFFFF' };
+  TEAM_BANNER_COLORS['Indiana']    = { primary: '#990000', secondary: '#EEEDEB' };
+  TEAM_BANNER_COLORS['Texas']      = { primary: '#BF5700', secondary: '#FFFFFF' };
+  TEAM_BANNER_COLORS['Louisville'] = { primary: '#AD0000', secondary: '#000000' };
 
   var NBA_HS = 'https://cdn.nba.com/headshots/nba/latest/1040x760/';
   var NBA_FALLBACK = NBA_HS + '202458.png';
@@ -2336,6 +2355,8 @@
       if (k && PLAYER_STATS[k] && PLAYERS[k] && PLAYERS[k].team !== 'Retired') {
         var rows = (PLAYER_STATS[k].regular||[]).filter(isProRow);
         var latestTeam = rows.length ? rows[rows.length-1].team : null;
+        // No pro seasons yet — fall back to assigned team (e.g. 2K26 college abbr)
+        if (!latestTeam && PLAYERS[k].team && PLAYERS[k].team !== 'Active') latestTeam = PLAYERS[k].team;
         if (latestTeam && TEAM_LOGOS[latestTeam]) {
           var chip = document.createElement('div');
           chip.className = 'psc-team-chip';
