@@ -103,7 +103,7 @@ window.EGE_SEASON_STATS = {
     milwaukeebucks:        { record: "31-35", pct: ".470", rank: "9th",  playoffs: "Did not qualify" },
     detroitpistons:        { record: "25-41", pct: ".379", rank: "10th", playoffs: "Did not qualify" },
     torontoraptors:        { record: "23-43", pct: ".348", rank: "11th", playoffs: "Did not qualify" },
-    newjerseynets:          { record: "22-44", pct: ".333", rank: "12th", playoffs: "Did not qualify" },
+    brooklynnets:          { record: "22-44", pct: ".333", rank: "12th", playoffs: "Did not qualify" },
     clevelandcavaliers:    { record: "21-45", pct: ".318", rank: "13th", playoffs: "Did not qualify" },
     washingtonwizards:     { record: "20-46", pct: ".303", rank: "14th", playoffs: "Did not qualify" },
     charlottebobcats:      { record: "7-59",  pct: ".106", rank: "15th", playoffs: "Did not qualify" },
