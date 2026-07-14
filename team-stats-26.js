@@ -138,7 +138,7 @@ window.EGE_BRACKETS = {
       ],
       r2: [
         { top: "chicagobulls",     topW: 4, bot: "atlantahawks",     botW: 2 },  /* 1/8 vs 4/5 */
-        { top: "bostonceltics",  topW: 1, bot: "miamiheat",          botW: 0 },  /* 3/6 vs 2/7 */
+        { top: "bostonceltics",  topW: 1, bot: "miamiheat",          botW: 4 },  /* 3/6 vs 2/7 */
       ],
       r3: [
         { top: "chicagobulls",     topW: 1, bot: "miamiheat",  botW: 4 },
