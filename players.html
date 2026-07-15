@@ -30,6 +30,122 @@
     .player-select-card:hover .psc-team-chip img { opacity:1; }
     .player-select-card:hover .psc-arrow { gap:12px; }
 
+    /* ══ 2K26 SELECT TILES — character-select redesign ══
+       Namespace: sel26-*  (2K26 mode only; 2K25 keeps legacy cards)
+       Each tile reads team colors from --tc / --tc2 inline vars.
+       Tiles have no top edge — they gradient up into the page bg —
+       and tilt in 3D on hover (JS mousemove sets the transform). */
+    [data-sim="sim-26"] #player-select-view .section-header { display:none; }
+    .player-select-grid.sel26-grid { grid-template-columns:repeat(5,1fr); gap:18px; perspective:1100px; }
+
+    .sel26-card {
+      position:relative; display:flex; flex-direction:column;
+      border-radius:0; text-decoration:none; cursor:pointer; overflow:hidden;
+      /* no top edge: bg + side/bottom borders fade out toward the top */
+      background:linear-gradient(180deg, transparent 0, var(--bg-card) 150px);
+      border:1px solid var(--border); border-top:none;
+      border-image:linear-gradient(180deg, transparent 0, var(--border) 150px) 1;
+      /* --tcb: brightened team color for accents on the dark bg
+         (keeps dark primaries like Butler navy visible) */
+      --tcb: var(--tc);
+      --tcb: color-mix(in srgb, var(--tc) 60%, #ffffff);
+      transform-style:preserve-3d; will-change:transform;
+      transition:transform .18s ease-out, box-shadow .3s;
+    }
+    html.light .sel26-card { --tcb: var(--tc); }
+    .sel26-card:hover {
+      border-image:linear-gradient(180deg, transparent 0, var(--tcb) 150px) 1;
+      box-shadow:0 22px 44px -20px var(--tcb);
+    }
+    /* HUD corner bracket — bottom-right only (the top edge is open) */
+    .sel26-card::after {
+      content:''; position:absolute; width:16px; height:16px; z-index:3;
+      bottom:-1px; right:-1px; border:2px solid var(--tcb); border-left:none; border-top:none;
+      opacity:.45; transition:opacity .25s, width .25s, height .25s;
+      pointer-events:none;
+    }
+    .sel26-card:hover::after { opacity:1; width:24px; height:24px; }
+
+    /* ── visual stage — headshot emerging from the page, ghost number offset right ── */
+    .sel26-stage {
+      position:relative; height:172px; overflow:hidden;
+      /* fallback (no color-mix support): grid lines only */
+      background:
+        repeating-linear-gradient(0deg, transparent 0 23px, var(--grid-line) 23px 24px),
+        repeating-linear-gradient(90deg, transparent 0 23px, var(--grid-line) 23px 24px);
+      background:
+        repeating-linear-gradient(0deg, transparent 0 23px, var(--grid-line) 23px 24px),
+        repeating-linear-gradient(90deg, transparent 0 23px, var(--grid-line) 23px 24px),
+        linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--tc) 22%, transparent) 88%);
+    }
+    .sel26-ghost {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end;
+      padding-right:10px;
+      font-family:var(--font-display); font-weight:900; font-size:7.4rem; line-height:1;
+      color:transparent; -webkit-text-stroke:1.5px var(--tcb); opacity:.5; user-select:none;
+      transform:translateY(-3%); transition:opacity .3s, transform .3s;
+    }
+    .sel26-card:hover .sel26-ghost { opacity:.75; transform:translateY(-3%) scale(1.04); }
+    .sel26-stage img.sel26-hs {
+      position:absolute; left:42%; bottom:0; transform:translateX(-50%);
+      height:96%; width:auto; object-fit:contain; object-position:bottom center;
+      filter:drop-shadow(0 6px 12px rgba(0,0,0,.5)); transition:transform .3s;
+    }
+    .sel26-card:hover .sel26-stage img.sel26-hs { transform:translateX(-50%) scale(1.04); }
+    .sel26-stage .sel26-hs-fallback {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-display); font-weight:900; font-size:2.4rem; color:var(--tcb);
+    }
+    /* team-color rule under the stage */
+    .sel26-rule { height:2px; background:linear-gradient(90deg, var(--tc), var(--tc2) 65%, transparent); }
+
+    /* ── identity + scout report ── */
+    .sel26-body { display:flex; flex-direction:column; padding:14px 16px 12px; flex:1; }
+    .sel26-name {
+      font-family:var(--font-display); font-weight:900; font-size:1.5rem; line-height:.95;
+      text-transform:uppercase; letter-spacing:.03em; color:var(--heading); margin:0 0 4px;
+    }
+    .sel26-role {
+      font-family:var(--font-mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--text-muted); margin-bottom:12px;
+    }
+    .sel26-scout-label {
+      font-family:var(--font-mono); font-size:.56rem; letter-spacing:.16em; text-transform:lowercase;
+      color:var(--orange); margin:0 0 5px;
+    }
+    .sel26-bio {
+      font-family:var(--font-body); font-size:.86rem; line-height:1.5; font-weight:500;
+      color:var(--text); margin:0;
+    }
+
+    /* ── select footer ── */
+    .sel26-cta {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:9px 14px; border-top:1px solid var(--border);
+      font-family:var(--font-mono); font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--text-muted); transition:background .25s, color .25s;
+    }
+    .sel26-cta .sel26-cta-arrow { transition:transform .25s; }
+    .sel26-card:hover .sel26-cta { background:var(--tc); color:#fff; }
+    .sel26-card:hover .sel26-cta-arrow { transform:translateX(4px); }
+
+    /* entrance — 'backwards' fill so the transform frees up for the 3D tilt */
+    .sel26-card { animation:fadeSlideUp .45s ease backwards; }
+    @media (prefers-reduced-motion:reduce) {
+      .sel26-card { animation:none; }
+      .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow { transition:none; }
+    }
+
+    /* responsive: 5 → 3 → 2 → 1 */
+    @media (max-width:1350px) { .player-select-grid.sel26-grid { grid-template-columns:repeat(3,1fr); } }
+    @media (max-width:940px)  { .player-select-grid.sel26-grid { grid-template-columns:repeat(2,1fr); gap:14px; } }
+    @media (max-width:600px)  {
+      .player-select-grid.sel26-grid { grid-template-columns:1fr; gap:16px; }
+      .sel26-stage { height:196px; }
+      .sel26-ghost { font-size:9rem; }
+      .sel26-name { font-size:1.7rem; }
+    }
+
     /* ══ PROFILE VIEW ══ */
     #player-profile { display:none; padding-top:64px; position:relative; }
     #player-profile.visible { display:flex; flex-direction:column; }
@@ -2062,8 +2178,8 @@
   var PLAYERS = {
     clark:     { name:'Cooper Clark',   initials:'CC', number:'#5',  position:'Point Guard',   team:'Active', bio:[] },
     hatch:     { name:'Paxon Hatch',    initials:'PH', number:'#10', position:'Power Forward', team:'Retired', bio:[] },
-    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#34', position:'Center',        team:'Retired', bio:[] },
-    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#11', position:'Point Guard',   team:'Retired', bio:[] },
+    stogsdill: { name:'Sam Stogsdill',  initials:'SS', number:'#1', position:'Center',        team:'Retired', bio:[] },
+    stewart:   { name:'Jaykeb Stewart', initials:'JS', number:'#2', position:'Point Guard',   team:'Retired', bio:[] },
     vitel:     { name:'Isaac Vitel',    initials:'IV', number:'#8',  position:'Shooting Guard',team:'Retired', bio:[] },
   };
 
@@ -2149,16 +2265,16 @@
     'LOU':  LOGOS_DIR + 'LOU.png',
     'UCLA': 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/editor/ucla-bruins-logo-svg.png?1746204102',
     // ── 2K26 college additions (local logos/ files) ──
-    'MA':   LOGOS_DIR + 'MA.png',   // Marquette
+    'MA':   LOGOS_DIR + 'MU.png',   // Marquette
     'BU':   LOGOS_DIR + 'BU.png',   // Butler
     'IU':   LOGOS_DIR + 'IU.png',   // Indiana
     'TU':   LOGOS_DIR + 'TU.png',   // Texas
     // Full-name keys — banner/game-card lookups use teamFull() names
-    'Marquette':  LOGOS_DIR + 'MA.png',
-    'Butler':     LOGOS_DIR + 'BU.png',
-    'Indiana':    LOGOS_DIR + 'IU.png',
-    'Texas':      LOGOS_DIR + 'TU.png',
-    'Louisville': LOGOS_DIR + 'LOU.png',
+    'Marquette Golden Eagles':  LOGOS_DIR + 'MU.png',
+    'Butler Bulldogs':     LOGOS_DIR + 'BU.png',
+    'Indiana Hoosiers':    LOGOS_DIR + 'IU.png',
+    'Texas Longhorns':      LOGOS_DIR + 'TU.png',
+    'Louisville Cardinals': LOGOS_DIR + 'LOU.png',
   };
   if (typeof teamInfo !== 'undefined') {
     Object.keys(teamInfo).forEach(function(k) {
@@ -2228,11 +2344,11 @@
     'MEX': 'Mexico City Flight',
     'STL': 'St. Louis Spirit',
     // 2K26 colleges — sim players' active teams
-    'MA':  'Marquette',
-    'BU':  'Butler',
-    'IU':  'Indiana',
-    'TU':  'Texas',
-    'LOU': 'Louisville',
+    'MA':  'Marquette Golden Eagles',
+    'BU':  'Butler Bulldogs',
+    'IU':  'Indiana Hoosiers',
+    'TU':  'Texas Longhorns',
+    'LOU': 'Louisville Cardinals',
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
@@ -2294,11 +2410,11 @@
     });
   }
   // ── 2K26 college colors (not in teaminfo) — official school brand colors ──
-  TEAM_BANNER_COLORS['Marquette']  = { primary: '#003366', secondary: '#FFCC00' };
-  TEAM_BANNER_COLORS['Butler']     = { primary: '#13294B', secondary: '#FFFFFF' };
-  TEAM_BANNER_COLORS['Indiana']    = { primary: '#990000', secondary: '#EEEDEB' };
-  TEAM_BANNER_COLORS['Texas']      = { primary: '#BF5700', secondary: '#FFFFFF' };
-  TEAM_BANNER_COLORS['Louisville'] = { primary: '#AD0000', secondary: '#000000' };
+  TEAM_BANNER_COLORS['Marquette Golden Eagles']  = { primary: '#003366', secondary: '#FFCC00' };
+  TEAM_BANNER_COLORS['Butler Bulldogs']     = { primary: '#13294B', secondary: '#FFFFFF' };
+  TEAM_BANNER_COLORS['Indiana Hoosiers']    = { primary: '#990000', secondary: '#EEEDEB' };
+  TEAM_BANNER_COLORS['Texas Longhorns']      = { primary: '#BF5700', secondary: '#FFFFFF' };
+  TEAM_BANNER_COLORS['Louisville Cardinals'] = { primary: '#AD0000', secondary: '#000000' };
 
   var NBA_HS = 'https://cdn.nba.com/headshots/nba/latest/1040x760/';
   var NBA_FALLBACK = NBA_HS + '202458.png';
@@ -2310,38 +2426,119 @@
     vitel:     'headshots/headshot_vitel.png'
   };
 
+  /* ── 2K26 SELECT-CARD META ──
+     Positions + scouting-report bios shown on the Select a Player grid.
+     Only used when Sim II (2K26) is active. */
+  var SIM26_SELECT_META = {
+    clark: {
+      pos: 'SG', posFull: 'Shooting Guard',
+      bio: 'Two-way slasher. Knocks down contested looks like the defender isn\'t even there. Self-creation and iso-scoring is Clark\'s bread and butter.'
+    },
+    hatch: {
+      pos: 'C', posFull: 'Center',
+      bio: 'Two-way unicorn. Separates himself from most centers with a deadly mid-range pull up shot and giant frame. Puts the paint on lock down with shot-blocking prowess.'
+    },
+    stogsdill: {
+      pos: 'G/F', posFull: 'Guard / Forward',
+      bio: 'Slashing floor-general. Slashing that commands multiple defenders creating wide open looks for teammates. Freak athlete with high-IQ.'
+    },
+    stewart: {
+      pos: 'SF', posFull: 'Small Forward',
+      bio: 'Lockdown defender. Rim running defensive demon that loves a star matchup to shutdown. Can block shots and disrupt the leagues best shooters.'
+    },
+    vitel: {
+      pos: 'G', posFull: 'Combo Guard',
+      bio: 'Three-level playmaker. Silky smooth three-point shot that feels unguardable. A true offensive engine that creates easy open-looks with quick decision making.'
+    },
+  };
+
+  /* ── 3D TILT — sel26 tiles follow the cursor on hover ──
+     Skipped for touch-only devices and reduced-motion preference. */
+  var SEL26_TILT_OK = window.matchMedia &&
+    window.matchMedia('(hover:hover)').matches &&
+    !window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function attachSel26Tilt(card) {
+    if (!SEL26_TILT_OK) return;
+    var MAX = 7; // degrees
+    card.addEventListener('mousemove', function(e) {
+      var r  = card.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width  - 0.5;  // -0.5 .. 0.5
+      var py = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform =
+        'perspective(900px) rotateX(' + (-py * MAX).toFixed(2) + 'deg)' +
+        ' rotateY(' + (px * MAX).toFixed(2) + 'deg) translateY(-4px) scale(1.015)';
+    });
+    card.addEventListener('mouseleave', function() {
+      card.style.transform = '';
+    });
+  }
+
   /* ── ROSTER GRID RENDERER ──
-     Builds player-select-card elements dynamically from PLAYERS{} so
-     both Sim I and Sim II rosters render correctly without hardcoded HTML. */
+     Builds player select cards dynamically from PLAYERS{} so both
+     Sim I and Sim II rosters render correctly without hardcoded HTML.
+     2K25 (sim-original): legacy .player-select-card layout.
+     2K26 (sim-26): .sel26-card character-select tiles — team-color
+     band, ghost jersey number, scout report from SIM26_SELECT_META. */
   function renderRosterGrid() {
     var grid = document.getElementById('player-select-grid');
     if (!grid) return;
     grid.innerHTML = '';
+    var isSim26 = !!(window.EGE_SIM && window.EGE_SIM.id === 'sim-26');
+    grid.classList.toggle('sel26-grid', isSim26);
     var keys = Object.keys(PLAYERS);
     keys.forEach(function(k, idx) {
-      var p   = PLAYERS[k];
-      var img = PLAYER_HEADSHOTS[k] || '';
+      var p    = PLAYERS[k];
+      var img  = PLAYER_HEADSHOTS[k] || '';
+      var meta = isSim26 ? SIM26_SELECT_META[k] : null;
       // Position abbreviation for the number chip
-      var posAbbr = (p.position||'').replace('Point Guard','PG')
-        .replace('Shooting Guard','SG').replace('Small Forward','SF')
-        .replace('Power Forward','PF').replace('Center','C')
-        .replace(' / ','/');
+      var posAbbr = meta ? meta.pos
+        : (p.position||'').replace('Point Guard','PG')
+          .replace('Shooting Guard','SG').replace('Small Forward','SF')
+          .replace('Power Forward','PF').replace('Center','C')
+          .replace(' / ','/');
+      var posFull = meta ? meta.posFull : (p.position||'');
       // Number display (strip leading #)
       var numDisplay = (p.number||'').replace('#','');
       var card = document.createElement('a');
-      card.className = 'player-select-card';
+      card.className = meta ? 'sel26-card' : 'player-select-card';
       card.href = '#' + k + '-bio';
       card.dataset.player = k;
-      card.style.animationDelay = (idx * 0.04) + 's';
-      var avatarInner = img
-        ? '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display=\'none\'">'
-        : '<span style="font-family:var(--font-display);font-weight:900;font-size:1.8rem;color:var(--orange);">' + (p.initials||'?') + '</span>';
-      card.innerHTML =
-        '<div class="psc-num">#' + numDisplay + ' · ' + posAbbr + '</div>' +
-        '<div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;">' + avatarInner + '</div>' +
-        '<div class="psc-name">' + p.name + '</div>' +
-        '<div class="psc-pos">' + (p.position||'') + '</div>' +
-        '<span class="psc-arrow">View Profile →</span>';
+      card.style.animationDelay = (idx * 0.06) + 's';
+      if (meta) {
+        // ── 2K26 character-select tile (team shown via colors only) ──
+        var abbr    = (p.team && p.team !== 'Active' && p.team !== 'Retired') ? p.team : null;
+        var tFull   = abbr ? teamFull(abbr) : null;
+        var tColors = (tFull && TEAM_BANNER_COLORS[tFull]) || { primary:'var(--orange)', secondary:'var(--blue)' };
+        card.style.setProperty('--tc',  tColors.primary);
+        card.style.setProperty('--tc2', tColors.secondary);
+        var stageInner = img
+          ? '<img class="sel26-hs" src="' + img + '" alt="" onerror="this.style.display=\'none\'">'
+          : '<span class="sel26-hs-fallback">' + (p.initials||'?') + '</span>';
+        card.innerHTML =
+          '<div class="sel26-stage">' +
+            '<span class="sel26-ghost">' + numDisplay + '</span>' +
+            stageInner +
+          '</div>' +
+          '<div class="sel26-rule"></div>' +
+          '<div class="sel26-body">' +
+            '<h3 class="sel26-name">' + p.name + '</h3>' +
+            '<div class="sel26-role">' + posFull + '</div>' +
+            '<p class="sel26-scout-label">// scout report</p>' +
+            '<p class="sel26-bio">' + meta.bio + '</p>' +
+          '</div>' +
+          '<div class="sel26-cta"><span>Select Player</span><span class="sel26-cta-arrow">→</span></div>';
+        attachSel26Tilt(card);
+      } else {
+        var avatarInner = img
+          ? '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display=\'none\'">'
+          : '<span style="font-family:var(--font-display);font-weight:900;font-size:1.8rem;color:var(--orange);">' + (p.initials||'?') + '</span>';
+        card.innerHTML =
+          '<div class="psc-num">#' + numDisplay + ' · ' + posAbbr + '</div>' +
+          '<div class="psc-avatar" style="background:transparent;overflow:hidden;padding:0;">' + avatarInner + '</div>' +
+          '<div class="psc-name">' + p.name + '</div>' +
+          '<div class="psc-pos">' + posFull + '</div>' +
+          '<span class="psc-arrow">View Profile →</span>';
+      }
       card.addEventListener('click', function(e) {
         e.preventDefault();
         showProfile(k, 'bio');
@@ -2349,7 +2546,8 @@
       grid.appendChild(card);
     });
 
-    // Wire team logo chips after cards exist
+    // Wire team logo chips after cards exist (legacy 2K25 cards only —
+    // sel26 tiles carry their own team band)
     grid.querySelectorAll('.player-select-card').forEach(function(card) {
       var k = card.dataset.player;
       if (k && PLAYER_STATS[k] && PLAYERS[k] && PLAYERS[k].team !== 'Retired') {
