@@ -13,7 +13,7 @@ window.PLAYER_STATS = {
   /* ─────────────── COOPER CLARK ─────────────── */
   clark: {
     info: {
-      height:    '???',
+      height:    '6\'5\"',
       weight:    '???',
       age:       '—',
       college:   'Louisville',
@@ -32,7 +32,7 @@ window.PLAYER_STATS = {
   /* ─────────────── PAXON HATCH ─────────────── */
   hatch: {
     info: {
-      height:    '???',
+      height:    '7\'0\"',
       weight:    '???',
       age:       '—',
       college:   'Texas',
@@ -51,7 +51,7 @@ window.PLAYER_STATS = {
   /* ─────────────── SAM STOGSDILL ─────────────── */
   stogsdill: {
     info: {
-      height:    '???',
+      height:    '6\'9\"',
       weight:    '???',
       age:       '—',
       college:   'Butler',
@@ -70,7 +70,7 @@ window.PLAYER_STATS = {
   /* ─────────────── JAYKEB STEWART ─────────────── */
   stewart: {
     info: {
-      height:    '???',
+      height:    '6\'7\"',
       weight:    '???',
       age:       '—',
       college:   'Marquette',
@@ -89,7 +89,7 @@ window.PLAYER_STATS = {
   /* ─────────────── ISAAC VITEL ─────────────── */
   vitel: {
     info: {
-      height:    '???',
+      height:    '6\'3\"',
       weight:    '???',
       age:       '—',
       college:   'Indiana',

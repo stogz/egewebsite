@@ -33,13 +33,21 @@
     /* ══ 2K26 SELECT TILES — character-select redesign ══
        Namespace: sel26-*  (2K26 mode only; 2K25 keeps legacy cards)
        Each tile reads team colors from --tc / --tc2 inline vars.
-       Tiles have no top edge — they gradient up into the page bg —
-       and tilt in 3D on hover (JS mousemove sets the transform). */
+       Grid children are .sel26-cell wrappers: the tilting card plus a
+       static team logo mark below it (logo never joins the 3D tilt). */
+    @font-face {
+      font-family:'EGE Numbers';
+      /* tries numbers.ttf first, then numbers.tff, in case of either filename */
+      src:url('numbers.ttf') format('truetype'), url('numbers.tff') format('truetype');
+      font-display:swap;
+    }
     [data-sim="sim-26"] #player-select-view .section-header { display:none; }
-    .player-select-grid.sel26-grid { grid-template-columns:repeat(5,1fr); gap:18px; perspective:1100px; }
+    .player-select-grid.sel26-grid { grid-template-columns:repeat(5,1fr); gap:18px; }
+
+    .sel26-cell { display:flex; flex-direction:column; min-width:0; animation:fadeSlideUp .45s ease backwards; }
 
     .sel26-card {
-      position:relative; display:flex; flex-direction:column;
+      position:relative; flex:1; display:flex; flex-direction:column;
       border-radius:0; text-decoration:none; cursor:pointer; overflow:hidden;
       /* no top edge: bg + side/bottom borders fade out toward the top */
       background:linear-gradient(180deg, transparent 0, var(--bg-card) 150px);
@@ -81,7 +89,7 @@
     .sel26-ghost {
       position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end;
       padding-right:10px;
-      font-family:var(--font-display); font-weight:900; font-size:7.4rem; line-height:1;
+      font-family:'EGE Numbers', var(--font-display); font-weight:900; font-size:7.4rem; line-height:1;
       color:transparent; -webkit-text-stroke:1.5px var(--tcb); opacity:.5; user-select:none;
       transform:translateY(-3%); transition:opacity .3s, transform .3s;
     }
@@ -129,11 +137,20 @@
     .sel26-card:hover .sel26-cta { background:var(--tc); color:#fff; }
     .sel26-card:hover .sel26-cta-arrow { transform:translateX(4px); }
 
-    /* entrance — 'backwards' fill so the transform frees up for the 3D tilt */
-    .sel26-card { animation:fadeSlideUp .45s ease backwards; }
+    /* ── team logo mark — static, below the card, outside the 3D tilt ── */
+    .sel26-team-mark { display:flex; justify-content:center; margin-top:18px; }
+    .sel26-team-mark img {
+      width:24px; height:24px; object-fit:contain; opacity:.75; transition:opacity .2s, transform .2s;
+    }
+    .sel26-cell:hover .sel26-team-mark img { opacity:1; transform:translateY(2px); }
+
+    /* mobile-only logo strip (replaces the per-card marks) */
+    .sel26-logo-row { display:none; }
+
     @media (prefers-reduced-motion:reduce) {
-      .sel26-card { animation:none; }
-      .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow { transition:none; }
+      .sel26-cell { animation:none; }
+      .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow,
+      .sel26-team-mark img { transition:none; }
     }
 
     /* responsive: 5 → 3 → 2 → 1 */
@@ -144,6 +161,13 @@
       .sel26-stage { height:196px; }
       .sel26-ghost { font-size:9rem; }
       .sel26-name { font-size:1.7rem; }
+      /* per-card marks collapse into one strip at the bottom */
+      .sel26-team-mark { display:none; }
+      .sel26-logo-row {
+        display:flex; grid-column:1 / -1; justify-content:center; align-items:center;
+        gap:28px; padding:14px 0 4px;
+      }
+      .sel26-logo-row img { width:26px; height:26px; object-fit:contain; opacity:.8; }
     }
 
     /* ══ PROFILE VIEW ══ */
@@ -2504,10 +2528,16 @@
       card.href = '#' + k + '-bio';
       card.dataset.player = k;
       card.style.animationDelay = (idx * 0.06) + 's';
+      card.addEventListener('click', function(e) {
+        e.preventDefault();
+        showProfile(k, 'bio');
+      });
       if (meta) {
-        // ── 2K26 character-select tile (team shown via colors only) ──
+        // ── 2K26 character-select tile, wrapped in a cell with a static
+        //    team logo mark below (mark stays outside the 3D tilt) ──
         var abbr    = (p.team && p.team !== 'Active' && p.team !== 'Retired') ? p.team : null;
         var tFull   = abbr ? teamFull(abbr) : null;
+        var tLogo   = abbr ? (TEAM_LOGOS[abbr] || TEAM_LOGOS[tFull] || '') : '';
         var tColors = (tFull && TEAM_BANNER_COLORS[tFull]) || { primary:'var(--orange)', secondary:'var(--blue)' };
         card.style.setProperty('--tc',  tColors.primary);
         card.style.setProperty('--tc2', tColors.secondary);
@@ -2528,6 +2558,18 @@
           '</div>' +
           '<div class="sel26-cta"><span>Select Player</span><span class="sel26-cta-arrow">→</span></div>';
         attachSel26Tilt(card);
+        var cell = document.createElement('div');
+        cell.className = 'sel26-cell';
+        cell.style.animationDelay = (idx * 0.06) + 's';
+        cell.appendChild(card);
+        if (tLogo) {
+          var mark = document.createElement('div');
+          mark.className = 'sel26-team-mark';
+          mark.innerHTML = '<img src="' + tLogo + '" alt="' + (tFull||'') + '" title="' + (tFull||'') + '">';
+          cell.appendChild(mark);
+        }
+        grid.appendChild(cell);
+        return;
       } else {
         var avatarInner = img
           ? '<img src="' + img + '" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top center;" onerror="this.style.display=\'none\'">'
@@ -2539,12 +2581,23 @@
           '<div class="psc-pos">' + posFull + '</div>' +
           '<span class="psc-arrow">View Profile →</span>';
       }
-      card.addEventListener('click', function(e) {
-        e.preventDefault();
-        showProfile(k, 'bio');
-      });
       grid.appendChild(card);
     });
+
+    // 2K26: mobile-only logo strip — all team logos side by side at the
+    // bottom of the grid (per-card marks are hidden at that breakpoint)
+    if (isSim26) {
+      var row = document.createElement('div');
+      row.className = 'sel26-logo-row';
+      keys.forEach(function(k) {
+        var t = (PLAYERS[k]||{}).team;
+        if (!t || t === 'Active' || t === 'Retired') return;
+        var full = teamFull(t);
+        var logo = TEAM_LOGOS[t] || TEAM_LOGOS[full] || '';
+        if (logo) row.innerHTML += '<img src="' + logo + '" alt="' + full + '" title="' + full + '">';
+      });
+      if (row.children.length) grid.appendChild(row);
+    }
 
     // Wire team logo chips after cards exist (legacy 2K25 cards only —
     // sel26 tiles carry their own team band)
