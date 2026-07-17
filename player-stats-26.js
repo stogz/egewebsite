@@ -23,7 +23,9 @@ window.PLAYER_STATS = {
     },
     retired:  false,
     team:     'LOU',   // active team — college abbr (matches TEAM_ABBR / logos/LOU.png)
-    jerseys:  [],
+    jerseys:  [
+        { team:'Louisville Cardinals', name:'Home',  number:'5', bg:'#ff0000', stroke:'#050505', num:'#ffffff', seasons:'2011–2012', img:'' },
+    ],
     regular:  [],
     playoffs: [],
     totals:   [],
@@ -42,7 +44,9 @@ window.PLAYER_STATS = {
     },
     retired:  false,
     team:     'TU',   // active team — college abbr (matches TEAM_ABBR / logos/TU.png)
-    jerseys:  [],
+    jerseys:  [
+        { team:'Texas Longhorns', name:'Home',  number:'10', bg:'#cd6600', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
+    ],
     regular:  [],
     playoffs: [],
     totals:   [],
@@ -61,7 +65,9 @@ window.PLAYER_STATS = {
     },
     retired:  false,
     team:     'BU',   // active team — college abbr (matches TEAM_ABBR / logos/BU.png)
-    jerseys:  [],
+    jerseys:  [
+        { team:'Butler Bulldogs', name:'Home',  number:'1', bg:'#0000ff', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
+    ],
     regular:  [],
     playoffs: [],
     totals:   [],
@@ -80,7 +86,9 @@ window.PLAYER_STATS = {
     },
     retired:  false,
     team:     'MA',   // active team — college abbr (matches TEAM_ABBR / logos/MA.png)
-    jerseys:  [],
+    jerseys:  [
+        { team:'Marquette Golden Eagles', name:'Home',  number:'2', bg:'#0000ff', stroke:'#ffd700', num:'#ffffff', seasons:'2011–2012', img:'' },
+    ],
     regular:  [],
     playoffs: [],
     totals:   [],
@@ -99,7 +107,9 @@ window.PLAYER_STATS = {
     },
     retired:  false,
     team:     'IU',   // active team — college abbr (matches TEAM_ABBR / logos/IU.png)
-    jerseys:  [],
+    jerseys:  [
+        { team:'Indiana Hoosiers', name:'Home',  number:'8', bg:'#dc143c', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
+    ],
     regular:  [],
     playoffs: [],
     totals:   [],
