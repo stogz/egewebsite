@@ -50,7 +50,7 @@ window.PLAYER_STATS = {
         { team:'Texas Longhorns', name:'Home',  number:'10', bg:'#cd6600', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'TEX',  ppg:15.6, rpg:9.0, apg:1.4,  spg:0.8, bpg:2.5, topg:1.9, fgp:'54.8%', tpp:'32.7%', ftp:'78.3%', tpa:1.3, gs:33, gp:33, mpg:31.9, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'TU',  ppg:15.6, rpg:9.0, apg:1.4,  spg:0.8, bpg:2.5, topg:1.9, fgp:'54.8%', tpp:'32.7%', ftp:'78.3%', tpa:1.3, gs:33, gp:33, mpg:31.9, star:false, dnq:false },
     ],
     playoffs: [],
     totals:   [],
@@ -96,7 +96,7 @@ window.PLAYER_STATS = {
         { team:'Marquette Golden Eagles', name:'Home',  number:'2', bg:'#0000ff', stroke:'#ffd700', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'MU',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'MA',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false },
     ],
     playoffs: [],
     totals:   [],
