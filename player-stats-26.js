@@ -26,7 +26,9 @@ window.PLAYER_STATS = {
     jerseys:  [
         { team:'Louisville Cardinals', name:'Home',  number:'5', bg:'#ff0000', stroke:'#050505', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
-    regular:  [],
+    regular:  [
+       { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
+    ],
     playoffs: [],
     totals:   [],
   },
@@ -47,7 +49,9 @@ window.PLAYER_STATS = {
     jerseys:  [
         { team:'Texas Longhorns', name:'Home',  number:'10', bg:'#cd6600', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
-    regular:  [],
+    regular:  [
+       { season:'2011-12', age:18, team:'TEX',  ppg:15.6, rpg:9.0, apg:1.4,  spg:0.8, bpg:2.5, topg:1.9, fgp:'54.8%', tpp:'32.7%', ftp:'78.3%', tpa:1.3, gs:33, gp:33, mpg:31.9, star:false, dnq:false },
+    ],
     playoffs: [],
     totals:   [],
   },
@@ -68,7 +72,9 @@ window.PLAYER_STATS = {
     jerseys:  [
         { team:'Butler Bulldogs', name:'Home',  number:'1', bg:'#0000ff', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
-    regular:  [],
+    regular:  [
+       { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false },
+    ],
     playoffs: [],
     totals:   [],
   },
@@ -89,7 +95,9 @@ window.PLAYER_STATS = {
     jerseys:  [
         { team:'Marquette Golden Eagles', name:'Home',  number:'2', bg:'#0000ff', stroke:'#ffd700', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
-    regular:  [],
+    regular:  [
+       { season:'2011-12', age:18, team:'MU',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false },
+    ],
     playoffs: [],
     totals:   [],
   },
@@ -110,7 +118,9 @@ window.PLAYER_STATS = {
     jerseys:  [
         { team:'Indiana Hoosiers', name:'Home',  number:'8', bg:'#dc143c', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
-    regular:  [],
+    regular:  [
+       { season:'2011-12', age:18, team:'IU',  ppg:16.9, rpg:4.3, apg:4.1,  spg:1.8, bpg:0.3, topg:2.2, fgp:'48.1%', tpp:'42.1%', ftp:'86.2%', tpa:5.6, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
+    ],
     playoffs: [],
     totals:   [],
   },
