@@ -1,0 +1,937 @@
+
+    /* ─────────────────────────────────────────────
+       TWITTER CHIRP FONTS  (same as tweetgen)
+    ───────────────────────────────────────────── */
+    @font-face {
+      font-family: "Twitter Chirp";
+      src: url("../fonts/chirp-regular-web.woff");
+      font-weight: normal;
+    }
+    @font-face {
+      font-family: "Twitter Chirp";
+      src: url("../fonts/chirp-medium-web.woff");
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: "Twitter Chirp";
+      src: url("../fonts/chirp-bold-web.woff");
+      font-weight: bold;
+    }
+    @font-face {
+      font-family: "Twitter Chirp";
+      src: url("../fonts/chirp-heavy-web.woff");
+      font-weight: 900;
+    }
+
+    /* ─────────────────────────────────────────────
+       PAGE LAYOUT
+    ───────────────────────────────────────────── */
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .tg-wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 100px 60px 120px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
+    }
+    .tg-eyebrow {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+    }
+    .tg-eyebrow::before { content: '// '; opacity: .5; }
+    .tg-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+      color: var(--heading);
+      margin-bottom: 8px;
+      transition: color .35s;
+    }
+    .tg-sub {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--text-muted);
+      letter-spacing: .1em;
+      margin-bottom: 52px;
+    }
+    .tg-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── PANEL INTERIOR ──────────────────────────────────────────────────────
+       Three equal columns on desktop. Each column has a minimum width of
+       260px. When the panel gets too narrow to fit all three at 260px+,
+       the breakpoint below takes over and stacks them vertically.
+       Breakpoint = 3 × 260px = 780px.
+    ─────────────────────────────────────────────────────────────────────── */
+    .tg-panel-interior {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      align-items: start;
+    }
+    .tg-col {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+      box-sizing: border-box;
+      overflow: hidden;    /* content can never bleed into adjacent column */
+    }
+    .tg-col + .tg-col {
+      border-left: 1px solid var(--border-soft);
+    }
+    .tg-col-label {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--orange);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 4px;
+    }
+    /* Generate button row — full width below the columns */
+    .tg-generate-row {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─────────────────────────────────────────────
+       CONTROL PANEL
+    ───────────────────────────────────────────── */
+    .tg-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .tg-panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .tg-panel-body {
+      display: flex;
+      flex-direction: column;
+    }
+    .tg-section-label {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .tg-divider {
+      height: 1px;
+      background: var(--border-soft);
+      margin: 0 -20px;
+    }
+
+    /* ── PRESET ACCOUNTS ── */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;          /* never exceed the column */
+      min-width: 0;
+      overflow: hidden;
+    }
+    .preset-btn {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, transform .15s;
+      text-align: left;
+      min-width: 0;         /* allow shrinking */
+      overflow: hidden;     /* clip content, never push wider */
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .preset-btn:hover {
+      border-color: rgba(var(--accent-rgb), 0.5);
+      background: rgba(var(--accent-rgb), 0.07);
+      transform: translateY(-1px);
+    }
+    .preset-btn.active {
+      border-color: var(--orange);
+      background: rgba(var(--accent-rgb), 0.12);
+    }
+    .preset-btn.custom-btn { grid-column: 1 / -1; border-style: dashed; }
+    .preset-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--border-soft);
+    }
+    .preset-avatar-placeholder {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+    .preset-info {
+      min-width: 0;         /* critical — lets text truncate inside flex */
+      overflow: hidden;
+    }
+    .preset-name {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: .82rem;
+      color: var(--heading);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      display: block;
+    }
+    .preset-handle {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      color: var(--text-muted);
+      letter-spacing: .05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    /* ── FORM FIELDS ── */
+    .tg-field { display: flex; flex-direction: column; gap: 6px; }
+    .tg-label {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .tg-input, .tg-textarea {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      color: var(--heading);
+      font-family: var(--font-body);
+      font-size: .9rem;
+      padding: 9px 12px;
+      transition: border-color .2s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tg-input:focus, .tg-textarea:focus {
+      outline: none;
+      border-color: rgba(var(--accent-rgb), 0.6);
+    }
+    .tg-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+    /* ── PFP UPLOAD ── */
+    .pfp-upload-wrap { display: flex; align-items: center; gap: 12px; }
+    .pfp-preview {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border-soft);
+      flex-shrink: 0;
+      background: var(--bg-panel);
+    }
+    .pfp-upload-btn {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg-panel);
+      border: 1px dashed var(--border-soft);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .2s, color .2s;
+    }
+    .pfp-upload-btn:hover { border-color: rgba(var(--accent-rgb), 0.5); color: var(--orange); }
+    #pfp-file { display: none; }
+
+    /* ── TWEET IMAGE UPLOAD ── */
+    .img-upload-btn {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg-panel);
+      border: 1px dashed var(--border-soft);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .2s, color .2s;
+      display: block;
+    }
+    .img-upload-btn:hover { border-color: rgba(var(--accent-rgb), 0.5); color: var(--orange); }
+    #img-file { display: none; }
+    .img-clear-btn {
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #e74c3c;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: none;
+    }
+    .img-clear-btn:hover { text-decoration: underline; }
+
+    /* ── TOGGLE ROW ── */
+    .tg-toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .tg-toggle-label {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .tg-toggle { position: relative; width: 40px; height: 20px; flex-shrink: 0; }
+    .tg-toggle input { opacity: 0; width: 0; height: 0; }
+    .tg-toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--border); border-radius: 20px;
+      cursor: pointer; transition: background .2s;
+    }
+    .tg-toggle-slider::before {
+      content: ''; position: absolute;
+      left: 3px; top: 3px; width: 14px; height: 14px;
+      background: #fff; border-radius: 50%; transition: transform .2s;
+    }
+    .tg-toggle input:checked + .tg-toggle-slider { background: var(--orange); }
+    .tg-toggle input:checked + .tg-toggle-slider::before { transform: translateX(20px); }
+
+    /* ── GENERATE BUTTON ── */
+    .tg-generate-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--orange);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      font-weight: 700;
+    }
+    .tg-generate-btn:hover { background: var(--dark-orange); transform: translateY(-1px); }
+    .tg-generate-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    /* ─────────────────────────────────────────────
+       PREVIEW COLUMN
+    ───────────────────────────────────────────── */
+    .tg-preview-col { display: flex; flex-direction: column; gap: 16px; }
+    .tg-preview-header { display: flex; align-items: center; justify-content: space-between; }
+    .tg-preview-label {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .tg-edit-btn {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .tg-edit-btn:hover,
+    .tg-edit-btn.previewing { color: var(--orange); border-color: var(--orange); }
+
+    .tweet-card-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ─────────────────────────────────────────────
+       TWEET CARD — exact mirror of tweetgen's CSS
+       using the same class names and variables
+    ───────────────────────────────────────────── */
+
+    .tweetContainer {
+      max-width: 624px;
+      min-width: 0;
+      width: 100%;
+      font-family: "Twitter Chirp", system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+    }
+
+    /* Dim theme only — hard-coded, no switcher */
+    .tweetContainer {
+      background-color: #15202b;
+      border-color: #38444d;
+      --tweet-primary-color: #ffffff;
+      --tweet-secondary-color: #8899a6;
+      --tweet-tertiary-color: #38444d;
+    }
+
+    .simulatedLink {
+      color: #1b95e0;
+    }
+
+    .tweetInnerContainer {
+      padding: 12px;
+    }
+
+    /* css-1dbjc4n = Twitter's base flex box class */
+    .css-1dbjc4n {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      flex-basis: auto;
+      flex-shrink: 0;
+      min-height: 0px;
+      min-width: 0px;
+      padding: 0px;
+      position: relative;
+      z-index: 0;
+      align-items: stretch;
+      border: 0px solid black;
+    }
+
+    .tweetContainer .headerContainer {
+      margin-bottom: 4px;
+      display: flex;
+      flex-shrink: 0;
+      position: relative;
+      max-width: 100%;
+      flex-direction: row;
+    }
+
+    .tweetContainer .pfpContainer {
+      margin-right: 12px;
+      display: flex;
+      flex-basis: 48px;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .tweetContainer .pfpContainer img {
+      border-radius: 9999px;
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+    }
+    /* Hide pfp image element entirely when no src is set */
+    .tweetContainer .pfpContainer img:not([src]),
+    .tweetContainer .pfpContainer img[src=""] {
+      display: none;
+    }
+    /* Also hide the side-panel preview when empty */
+    .pfp-preview:not([src]),
+    .pfp-preview[src=""] {
+      display: none;
+    }
+
+    .tweetContainer .headerRight {
+      display: flex;
+      flex-basis: 0px;
+      flex-grow: 1;
+      align-items: stretch;
+      justify-content: space-between;
+      flex-direction: row;
+    }
+
+    .tweetContainer .userinfo {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      flex-shrink: 1;
+    }
+
+    .tweetContainer .nameContainer,
+    .tweetContainer .username {
+      display: flex;
+      font-size: 15px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      overflow-wrap: break-word;
+      flex-direction: row;
+    }
+
+    .tweetContainer .username {
+      color: var(--tweet-secondary-color);
+    }
+
+    .tweetContainer .nameContainer span {
+      display: inline;
+      overflow-wrap: break-word;
+    }
+
+    .tweetContainer .nameContainer .name {
+      font-weight: bold;
+      color: var(--tweet-primary-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* dim + dark = white verified icon */
+    .tweetContainer .verified {
+      fill: currentcolor;
+      color: var(--tweet-primary-color);
+      margin-left: 2px;
+      min-width: 0px;
+      height: 1.25em;
+      width: 1.25em;
+      flex-shrink: 0;
+    }
+    .tweetContainer .verified svg {
+      position: relative;
+      vertical-align: baseline;
+    }
+
+    .tweetContainer .tweetDropdown {
+      display: flex;
+      align-self: flex-start;
+      justify-content: flex-start;
+      margin-left: 20px;
+      flex-direction: row;
+      color: var(--tweet-secondary-color);
+    }
+    .tweetContainer .tweetDropdown svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .tweetContainer .tweetText {
+      margin-top: 10px;
+      font-size: 23px;
+      line-height: 1.3125;
+      overflow-wrap: break-word;
+      color: var(--tweet-primary-color);
+    }
+    .tweetContainer[editing=on] .tweetText {
+      font-size: 20px;
+    }
+    .tweetContainer .tweetText span {
+      white-space: pre-wrap;
+    }
+
+    .tweetContainer .imgContainer {
+      margin-top: 6px;
+      border: 1px solid;
+      border-color: var(--tweet-tertiary-color);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .tweetContainer .tweetImg {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .tweetContainer .buttonsContainer {
+      border-top: none;
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-around;
+      height: 49px;
+      flex-direction: row;
+    }
+    .tweetContainer .tweetButton {
+      display: inline-flex;
+      padding: 0 0.85rem;
+      white-space: nowrap;
+      justify-content: center;
+      align-items: center;
+      color: var(--tweet-secondary-color);
+    }
+    .tweetContainer .tweetButton svg {
+      height: 1.5em;
+      width: 1.5em;
+      fill: currentColor;
+    }
+
+    /* ── EDIT MODE BORDERS (same as tweetgen) ── */
+    .tweetContainer[editing=on] .editable-border {
+      padding: 5px;
+      border: 2px dashed var(--tweet-tertiary-color);
+      cursor: pointer;
+    }
+    .tweetContainer[editing=on] .editable-border:focus {
+      outline: none;
+      border: 2px dashed var(--tweet-primary-color);
+      cursor: text;
+    }
+    .tweetContainer[editing=on] .verified {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .tweetContainer[editing=off] .editing-only { display: none; }
+
+    /* ── MODAL ── */
+    .tg-modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.8);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .tg-modal-backdrop.open { display: flex; }
+    .tg-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-width: 640px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .tg-modal-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tg-modal-title {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .tg-modal-close {
+      background: none; border: none;
+      color: var(--text-muted); cursor: pointer;
+      font-size: 1.2rem; line-height: 1; padding: 0;
+      transition: color .2s;
+    }
+    .tg-modal-close:hover { color: var(--heading); }
+    .tg-modal-body { padding: 20px; }
+    .tg-modal-hint {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .tg-modal-img { width: 100%; border-radius: 6px; border: 1px solid var(--border-soft); display: block; }
+    .tg-modal-foot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+    .tg-modal-done {
+      padding: 9px 24px;
+      background: var(--orange); border: none; border-radius: 4px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: .65rem; letter-spacing: .14em; text-transform: uppercase;
+      cursor: pointer; transition: background .2s; font-weight: 700;
+    }
+    .tg-modal-done:hover { background: var(--dark-orange); }
+
+    /* ── PIN MODAL ── */
+    .pin-modal { max-width: min(320px, 100%); width: 100%; }
+
+    .pin-modal-body {
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pin-account-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--heading);
+    }
+
+    .pin-prompt {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .pin-dots {
+      font-size: 1.6rem;
+      letter-spacing: .35em;
+      color: var(--orange);
+      height: 2.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+      transition: letter-spacing .1s;
+    }
+
+    .pin-error {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .1em;
+      color: #e74c3c;
+      text-transform: uppercase;
+      min-height: 1rem;
+      text-align: center;
+    }
+    @keyframes pin-shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .pin-error.shake { animation: pin-shake .4s ease; }
+
+    .pin-key-spacer {
+      display: block;
+    }
+
+    .pin-numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      width: 100%;
+    }
+
+    .pin-key {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-panel);
+      color: var(--heading);
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pin-key:hover {
+      background: rgba(var(--accent-rgb), 0.1);
+      border-color: rgba(var(--accent-rgb), 0.4);
+    }
+    .pin-key:active { transform: scale(.93); }
+
+    .pin-key-action {
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      border-color: transparent;
+    }
+    .pin-key-action:hover {
+      background: rgba(var(--accent-rgb), 0.07);
+      border-color: rgba(var(--accent-rgb), 0.2);
+      color: var(--orange);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .tg-spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE — mobile-first, down to 300px wide
+       ══════════════════════════════════════════════════════ */
+
+    /* Prevent any horizontal overflow globally */
+    html, body { overflow-x: hidden; }
+    * { max-width: 100%; }
+    /* Exception: fixed/absolute elements and things that
+       intentionally escape the flow */
+    .tg-modal-backdrop, nav, #matrix-canvas,
+    .grid-overlay, .scanline { max-width: none; }
+
+    /* ── stack columns at 780px (= 3 × 260px minimum per column) ── */
+    @media (max-width: 780px) {
+      .tg-wrap   { padding: 74px 14px 70px; }
+      .tg-title  { font-size: clamp(1.6rem, 6vw, 2.6rem); }
+      .tg-panel-interior {
+        grid-template-columns: 1fr;   /* single column — stacked */
+      }
+      .tg-col {
+        border-left: none !important;
+        border-top: 1px solid var(--border-soft);
+      }
+      .tg-col:first-child { border-top: none; }
+      /* Preset grid 2-col when col has full panel width */
+      .tg-col:first-child .preset-grid { grid-template-columns: 1fr 1fr; }
+      .tg-col:first-child .preset-btn.custom-btn { grid-column: 1 / -1; }
+    }
+
+    /* ── phone (≤480px): panel interior single column ── */
+    @media (max-width: 480px) {
+      .tg-col { border-left: none !important; border-top: 1px solid var(--border-soft); padding: 12px; gap: 12px; }
+      .tg-col:first-child { border-top: none; }
+      /* On phone, preset grid 2-col since it has full width */
+      .tg-col:first-child .preset-grid { grid-template-columns: 1fr 1fr; }
+      .tg-col:first-child .preset-btn.custom-btn { grid-column: 1 / -1; }
+      .tg-generate-row { padding: 12px; }
+      .tg-wrap    { padding: 64px 10px 56px; }
+      .tg-eyebrow { font-size: .58rem; letter-spacing: .18em; margin-bottom: 4px; }
+      .tg-title   { font-size: clamp(1.3rem, 6vw, 1.8rem); margin-bottom: 4px; }
+      .tg-sub     { display: none; }
+
+      .tg-panel-body   { padding: 12px; gap: 12px; }
+      .tg-panel-header { padding: 10px 12px; font-size: .58rem; }
+      .tg-divider      { margin: 0 -12px; }
+      .tg-section-label { font-size: .55rem; margin-bottom: 8px; }
+
+      /* Preset grid: 2 columns, tighter */
+      .preset-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .preset-btn  { padding: 7px 7px; gap: 6px; }
+      .preset-name { font-size: .72rem; }
+      .preset-handle { font-size: .54rem; }
+      .preset-avatar { width: 26px; height: 26px; }
+      .preset-avatar-placeholder { width: 26px; height: 26px; font-size: .85rem; }
+
+      /* Form inputs — 16px prevents iOS auto-zoom */
+      .tg-input, .tg-textarea { font-size: 16px; padding: 10px 10px; }
+      .tg-label  { font-size: .55rem; }
+      .tg-textarea { min-height: 72px; }
+
+      /* PFP upload row */
+      .pfp-upload-wrap { gap: 8px; }
+      .pfp-preview     { width: 38px; height: 38px; flex-shrink: 0; }
+      .pfp-upload-btn  { font-size: .55rem; padding: 9px 6px; letter-spacing: .08em; }
+
+      /* Tweet card — flush, no padding waste */
+      .tweet-card-wrap  { padding: 8px; }
+      .tweetContainer   { min-width: 0 !important; width: 100%; }
+      .tweetInnerContainer { padding: 10px; }
+      .tweetContainer .tweetText { font-size: 16px; }
+      .tweetContainer .nameContainer,
+      .tweetContainer .username    { font-size: 13px; }
+      .tweetContainer .pfpContainer { margin-right: 8px; }
+      .tweetContainer .pfpContainer img { width: 38px; height: 38px; }
+      .tweetContainer .tweetButton { padding: 0 0.5rem; }
+      .tweetContainer .buttonsContainer { height: 40px; }
+
+      /* Preview header */
+      .tg-preview-header { gap: 8px; }
+      .tg-preview-label  { font-size: .55rem; letter-spacing: .14em; }
+      .tg-edit-btn       { font-size: .54rem; padding: 6px 8px; letter-spacing: .08em; }
+
+      /* Toggle */
+      .tg-toggle-label { font-size: .58rem; }
+
+      /* Generate button */
+      .tg-generate-btn { padding: 14px; font-size: .64rem; letter-spacing: .14em; }
+
+      /* Hide hint below preview on phones */
+      .tg-hint { display: none; }
+
+      /* Modals: take nearly full width, small padding */
+      .tg-modal-backdrop { padding: 10px; }
+      .tg-modal          { max-width: 100%; border-radius: 6px; }
+      .tg-modal-head     { padding: 12px 14px; }
+      .tg-modal-body     { padding: 14px; }
+      .tg-modal-foot     { padding: 10px 14px; }
+
+      /* PIN modal */
+      .pin-modal         { max-width: 100%; }
+      .pin-modal-body    { padding: 16px 12px 12px; gap: 4px; }
+      .pin-account-name  { font-size: .95rem; }
+      .pin-prompt        { font-size: .56rem; letter-spacing: .14em; margin-bottom: 4px; }
+      .pin-dots          { font-size: 1.3rem; letter-spacing: .28em; height: 1.8rem; }
+      .pin-numpad        { gap: 7px; margin-top: 10px; }
+      .pin-key           { font-size: 1.2rem; }
+      .pin-error         { font-size: .54rem; }
+    }
+
+    /* ── very small (≤360px) ── */
+    @media (max-width: 360px) {
+      .tg-wrap    { padding: 60px 8px 48px; }
+      .tg-title   { font-size: 1.3rem; }
+
+      .tg-panel-body   { padding: 10px; gap: 10px; }
+      .tg-panel-header { padding: 9px 10px; }
+      .tg-divider      { margin: 0 -10px; }
+
+      /* Single-column presets on truly tiny screens */
+      .preset-grid { grid-template-columns: 1fr; }
+      .preset-btn  { padding: 8px 10px; }
+      .preset-name { font-size: .78rem; }
+      .preset-handle { font-size: .58rem; }
+
+      .tg-input, .tg-textarea { font-size: 16px; padding: 9px 8px; }
+      .tweet-card-wrap { padding: 4px; }
+      .tweetInnerContainer { padding: 8px; }
+      .tweetContainer .tweetText { font-size: 14px; }
+      .tweetContainer .pfpContainer img { width: 32px; height: 32px; }
+      .tweetContainer .pfpContainer { margin-right: 6px; }
+      .tweetContainer .nameContainer,
+      .tweetContainer .username { font-size: 12px; }
+
+      .pin-numpad { gap: 5px; }
+      .pin-key    { font-size: 1.1rem; }
+    }
+
+    /* ── 300px worst case ── */
+    @media (max-width: 320px) {
+      .tg-wrap  { padding: 58px 6px 40px; }
+      .tg-title { font-size: 1.15rem; }
+      .tg-generate-btn { font-size: .6rem; letter-spacing: .08em; padding: 12px; }
+      .tweetContainer .tweetText { font-size: 13px; }
+      .tweetContainer .tweetButton svg { height: 1.1em; width: 1.1em; }
+    }
