@@ -5,6 +5,11 @@
 
 (function () {
 
+  /* ── SIM-AWARE PAGE TITLE ── */
+  if (window.EGE_SIM && EGE_SIM.id !== 'sim-original') {
+    document.title = document.title.replace('EGE NBA Simulation', 'EGE ' + EGE_SIM.label + ' Simulation');
+  }
+
   /* ── SIM LOGO SWAP ── */
   /* Each sim can define a logoFile in sim-config.js.
      Falls back to EGE_Logo.png if not set.
