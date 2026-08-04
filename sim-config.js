@@ -30,11 +30,11 @@
       heroLine2:        'NBA',
       heroLine3:        'Simulation',
       logoFile:         'EGE_Logo.png',
-      statsFile:        'stats.js',
-      playerStatsFile:  'player-stats.js',
-      playerGamesFile:  'player-games.js',
-      teamStatsFile:    'team-stats.js',
-      leagueHistoryFile:'league-history.js',
+      statsFile:        '2K25/stats.js',
+      playerStatsFile:  '2K25/player-stats.js',
+      playerGamesFile:  '2K25/player-games.js',
+      teamStatsFile:    '2K25/team-stats.js',
+      leagueHistoryFile:'2K25/league-history.js',
       teamInfoFile:     'logos/teaminfo.js',    // 2K25 — original flat teaminfo, no logo-ID system
       logosFolder:      'logos',                 // 2K25 — original logo folder
     },
@@ -49,11 +49,11 @@
       heroLine2:        'SIM',
       heroLine3:        'II',
       logoFile:         'EGE_Logo_blue.png',
-      statsFile:        'stats-26.js',
-      playerStatsFile:  'player-stats-26.js',
-      playerGamesFile:  'player-games-26.js',
-      teamStatsFile:    'team-stats-26.js',
-      leagueHistoryFile:'league-history-26.js',
+      statsFile:        '2K26/stats-26.js',
+      playerStatsFile:  '2K26/player-stats-26.js',
+      playerGamesFile:  '2K26/player-games-26.js',
+      teamStatsFile:    '2K26/team-stats-26.js',
+      leagueHistoryFile:'2K26/league-history-26.js',
       teamInfoFile:     'logos/teaminfo26.js',   // 2K26 — era-based logo resolver
       logosFolder:      'logos',                // merged — all logo images now in logos/
     },

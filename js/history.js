@@ -271,7 +271,7 @@
   }
 
   function init() {
-    var sim = window.EGE_SIM || { leagueHistoryFile: 'league-history.js' };
+    var sim = window.EGE_SIM || { leagueHistoryFile: '2K25/league-history.js' };
     var script = document.createElement('script');
     script.src = sim.leagueHistoryFile;
     script.onload = function () {

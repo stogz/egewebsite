@@ -9,7 +9,7 @@
         into view — see .counter / data-target in shared.js)
 ═══════════════════════════════════════════ */
 (function () {
-  var sim = window.EGE_SIM || { playerStatsFile: 'player-stats.js' };
+  var sim = window.EGE_SIM || { playerStatsFile: '2K25/player-stats.js' };
 
   function loadScript(src, onLoad) {
     var s = document.createElement('script');

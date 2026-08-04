@@ -13,7 +13,7 @@
 
   /* Load correct data files for active sim, then call boot */
   (function() {
-    var sim = window.EGE_SIM || { playerStatsFile:'player-stats.js', playerGamesFile:'player-games.js' };
+    var sim = window.EGE_SIM || { playerStatsFile:'2K25/player-stats.js', playerGamesFile:'2K25/player-games.js' };
     var loaded = 0;
     var needed = 2;
 
