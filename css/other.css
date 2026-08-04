@@ -1,4 +1,9 @@
-    body { display: flex; flex-direction: column; min-height: 100vh; }
+    /* ═══════════════════════════════════════════
+       OTHER / EXTRAS PAGE (other.html)
+       A simple grid of "feature cards" linking to
+       misc tools — currently just the Tweet Generator.
+    ═══════════════════════════════════════════ */
+    body { display: flex; flex-direction: column; min-height: 100vh; } /* sticky footer */
 
     .other-wrap {
       position: relative; z-index: 2;
@@ -86,6 +91,12 @@
       font-size: 2rem;
       margin-bottom: 20px;
       line-height: 1;
+    }
+    .feature-card-icon img {
+      width: 2rem;
+      height: auto;
+      display: block;
+      transform: rotate(-10deg);
     }
 
     .feature-card-label {

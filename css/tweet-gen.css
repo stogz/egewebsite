@@ -1,4 +1,12 @@
 
+    /* ═══════════════════════════════════════════
+       TWEET GENERATOR PAGE (tweet-gen.html)
+       A form (left/top) that edits a live preview
+       tweet card styled to mirror real Twitter, plus
+       a PIN-gated preset-account picker and a
+       "generate PNG" flow via html2canvas.
+    ═══════════════════════════════════════════ */
+
     /* ─────────────────────────────────────────────
        TWITTER CHIRP FONTS  (same as tweetgen)
     ───────────────────────────────────────────── */
@@ -56,13 +64,6 @@
       color: var(--heading);
       margin-bottom: 8px;
       transition: color .35s;
-    }
-    .tg-sub {
-      font-family: var(--font-mono);
-      font-size: .7rem;
-      color: var(--text-muted);
-      letter-spacing: .1em;
-      margin-bottom: 52px;
     }
     .tg-layout {
       display: flex;
@@ -132,20 +133,6 @@
       display: flex;
       flex-direction: column;
     }
-    .tg-section-label {
-      font-family: var(--font-mono);
-      font-size: .6rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-    .tg-divider {
-      height: 1px;
-      background: var(--border-soft);
-      margin: 0 -20px;
-    }
-
     /* ── PRESET ACCOUNTS ── */
     .preset-grid {
       display: grid;
@@ -830,12 +817,9 @@
       .tg-wrap    { padding: 64px 10px 56px; }
       .tg-eyebrow { font-size: .58rem; letter-spacing: .18em; margin-bottom: 4px; }
       .tg-title   { font-size: clamp(1.3rem, 6vw, 1.8rem); margin-bottom: 4px; }
-      .tg-sub     { display: none; }
 
       .tg-panel-body   { padding: 12px; gap: 12px; }
       .tg-panel-header { padding: 10px 12px; font-size: .58rem; }
-      .tg-divider      { margin: 0 -12px; }
-      .tg-section-label { font-size: .55rem; margin-bottom: 8px; }
 
       /* Preset grid: 2 columns, tighter */
       .preset-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -878,9 +862,6 @@
       /* Generate button */
       .tg-generate-btn { padding: 14px; font-size: .64rem; letter-spacing: .14em; }
 
-      /* Hide hint below preview on phones */
-      .tg-hint { display: none; }
-
       /* Modals: take nearly full width, small padding */
       .tg-modal-backdrop { padding: 10px; }
       .tg-modal          { max-width: 100%; border-radius: 6px; }
@@ -906,7 +887,6 @@
 
       .tg-panel-body   { padding: 10px; gap: 10px; }
       .tg-panel-header { padding: 9px 10px; }
-      .tg-divider      { margin: 0 -10px; }
 
       /* Single-column presets on truly tiny screens */
       .preset-grid { grid-template-columns: 1fr; }

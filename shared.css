@@ -1,9 +1,23 @@
 /* ═══════════════════════════════════════════
    EGE NBA SIMULATION · SHARED STYLES
-   Applies to all pages
+   Loaded on every page (after shared.css comes
+   a page-specific css/<page>.css for anything
+   that only applies to one page).
+
+   Sections in this file:
+     1. Text selection color
+     2. Theme variables (dark/light + per-sim accent color)
+     3. Base resets
+     4. Background effects (matrix rain canvas, grid, scanline)
+     5. Nav bar (logo, links, mode toggle, sim switcher)
+     6. Footer
+     7. Section header / reveal-on-scroll helpers shared by pages
+     8. Mobile responsive overrides (single breakpoint: 768px)
 ═══════════════════════════════════════════ */
 
-/* ── TEXT SELECTION ── */
+/* ── 1. TEXT SELECTION ──
+   Uses --accent-rgb so the highlight color automatically matches
+   whichever sim theme is active — no per-sim override needed here. */
 ::selection {
   background: rgba(var(--accent-rgb), 0.45);
   color: #ffffff;
@@ -13,7 +27,9 @@
   color: #ffffff;
 }
 
-/* ── DARK MODE (default) ── */
+/* ── 2. THEME VARIABLES ── */
+
+/* Dark mode is the default look (no class needed on <html>). */
 :root {
   --bg:          #08052f;
   --bg-nav:      rgba(8, 5, 47, 0.85);
@@ -32,7 +48,7 @@
   --scanline:    rgba(0, 0, 0, 0.03);
   --grid-line:   rgba(35, 26, 165, 0.08);
   --mode-icon:   '☀';
-  /* always same */
+  /* Brand colors — same in light and dark mode */
   --orange:      #e75719;
   --dark-orange: #9c380c;
   --accent-rgb:  231,87,25;
@@ -45,7 +61,7 @@
   --font-body:   'Rajdhani', sans-serif;
 }
 
-/* ── LIGHT MODE ── */
+/* Light mode — toggled by shared.js adding class="light" to <html> */
 html.light {
   --bg:          #f0ede8;
   --bg-nav:      rgba(240, 237, 232, 0.92);
@@ -66,29 +82,17 @@ html.light {
   --mode-icon:   '☾';
 }
 
-/* ── SIM THEME VARIABLES ──────────────────────────────────────────
-   To add a new sim theme, just add a [data-sim="sim-XX"] block here
-   and override --orange, --dark-orange, and --accent-rgb.
-   Every hardcoded rgba(var(--accent-rgb), X) across the site will
-   automatically pick up the new color. No other files need changing.
-────────────────────────────────────────────────────────────────── */
-
-/* ── SIM-26 THEME (Bron Era — blue accent) ── */
+/* Per-sim accent color — toggled by sim-config.js setting
+   data-sim="sim-XX" on <html>. To add a new sim theme, add a block
+   here overriding --orange / --dark-orange / --accent-rgb; every
+   rgba(var(--accent-rgb), X) on the site picks it up automatically. */
 [data-sim="sim-26"] {
   --orange:      #1a6fd4;
   --dark-orange: #0f4a8f;
   --accent-rgb:  26,111,212;
 }
-[data-sim="sim-26"] ::selection {
-  background: rgba(var(--accent-rgb), 0.45);
-  color: #ffffff;
-}
-[data-sim="sim-26"] ::-moz-selection {
-  background: rgba(var(--accent-rgb), 0.45);
-  color: #ffffff;
-}
 
-/* ── BASE RESETS ── */
+/* ── 3. BASE RESETS ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
   scroll-behavior: smooth;
@@ -96,7 +100,6 @@ html {
      navigating between pages that do/don't need a scrollbar */
   scrollbar-gutter: stable;
 }
-
 body {
   background: var(--bg);
   color: var(--text);
@@ -106,7 +109,9 @@ body {
   transition: background 0.35s ease, color 0.35s ease;
 }
 
-/* ── MATRIX CANVAS ── */
+/* ── 4. BACKGROUND EFFECTS ── */
+
+/* Faint animated "digital rain" canvas, drawn by shared.js */
 #matrix-canvas {
   position: fixed;
   inset: 0;
@@ -117,7 +122,7 @@ body {
 }
 html.light #matrix-canvas { opacity: .03; }
 
-/* ── GRID OVERLAY ── */
+/* Faint background grid */
 .grid-overlay {
   position: fixed;
   inset: 0;
@@ -130,7 +135,7 @@ html.light #matrix-canvas { opacity: .03; }
   transition: background-image 0.35s;
 }
 
-/* ── SCANLINE ── */
+/* CRT-style scanlines over everything */
 .scanline {
   position: fixed;
   inset: 0;
@@ -145,7 +150,7 @@ html.light #matrix-canvas { opacity: .03; }
   );
 }
 
-/* ── NAV ── */
+/* ── 5. NAV ── */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -190,6 +195,12 @@ nav {
   gap: 6px;
   list-style: none;
   align-items: center;
+  /* Never wrap and never shrink — items are injected by JS (sim toggle,
+     mobile hamburger) after first paint, and the nav must not reflow
+     or grow taller when that happens. */
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  overflow: visible;
 }
 .nav-links a {
   font-family: var(--font-mono);
@@ -222,7 +233,7 @@ nav {
   border-color: rgba(var(--accent-rgb), 0.35);
 }
 
-/* ── MODE TOGGLE BUTTON ── */
+/* Dark/light toggle button */
 #mode-toggle {
   display: inline-flex;
   align-items: center;
@@ -244,273 +255,13 @@ nav {
   transform: scale(1.1);
 }
 
-/* ── HAMBURGER + MOBILE MENU: hidden on desktop by default ── */
+/* Hamburger + its dropdown menu are mobile-only (see media query below);
+   hidden by default so they don't flash on desktop before CSS loads. */
 #nav-hamburger { display: none; }
 #nav-mobile-menu { display: none; }
 #nav-menu-mode-toggle { display: none; }
 
-/* ── FOOTER ── */
-footer {
-  position: relative;
-  z-index: 2;
-  border-top: 1px solid var(--border);
-  padding: 32px 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-footer);
-  transition: background 0.35s;
-}
-.footer-logo {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.footer-logo span { color: var(--orange); }
-.footer-copy {
-  font-family: var(--font-mono);
-  font-size: .6rem;
-  letter-spacing: .12em;
-  color: var(--text-faint);
-  text-transform: uppercase;
-}
-.footer-links {
-  display: flex;
-  gap: 24px;
-  list-style: none;
-}
-.footer-links a {
-  font-family: var(--font-mono);
-  font-size: .6rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  text-decoration: none;
-  transition: color .2s;
-}
-.footer-links a:hover { color: var(--orange); }
-
-/* ── SECTION COMMON ── */
-section { position: relative; z-index: 2; }
-
-.section-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 40px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.section-label {
-  font-family: var(--font-mono);
-  font-size: .65rem;
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  color: var(--orange);
-  margin-bottom: 6px;
-}
-.section-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  text-transform: uppercase;
-  color: var(--heading);
-  line-height: 1;
-  transition: color 0.35s;
-}
-.section-action {
-  font-family: var(--font-mono);
-  font-size: .7rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--orange);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: gap .2s;
-}
-.section-action:hover { gap: 14px; }
-
-/* ── REVEAL ANIMATION ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity .7s ease, transform .7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .25; }
-}
-@keyframes pulse-glow {
-  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
-  50%       { transform: translate(-50%,-50%) scale(1.12); opacity: .7; }
-}
-
-/* ══════════════════════════════════════════
-   MOBILE RESPONSIVE — shared elements
-   ══════════════════════════════════════════ */
-@media (max-width: 768px) {
-
-  /* ── NAV ── */
-  nav {
-    padding: 0 18px;
-    height: 56px;
-    min-height: 56px;
-    max-height: 56px;
-    flex-wrap: nowrap;
-    position: fixed;
-    z-index: 9999;
-  }
-  .nav-logo {
-    font-size: 1rem;
-    gap: 8px;
-  }
-  .logo-img {
-    width: 30px; height: 30px;
-  }
-  .nav-logo > span { display: none; }
-
-  /* Hide desktop nav links + mode toggle on mobile — hamburger takes over */
-  .nav-links { display: none; }
-
-  /* Show hamburger on mobile */
-  #nav-hamburger { display: inline-flex; }
-
-  /* Hamburger button */
-  #nav-hamburger {
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    border: 1px solid rgba(var(--accent-rgb),.3);
-    border-radius: 3px;
-    cursor: pointer;
-    padding: 8px;
-    flex-shrink: 0;
-    margin-left: 6px;
-  }
-  #nav-hamburger span {
-    display: block;
-    height: 2px;
-    background: var(--orange);
-    border-radius: 2px;
-    transition: transform 0.25s ease, opacity 0.2s;
-  }
-  #nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  #nav-hamburger.open span:nth-child(2) { opacity: 0; }
-  #nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-  /* Mobile dropdown menu */
-  #nav-mobile-menu {
-    display: none;
-    position: fixed;
-    top: 56px;
-    left: 0; right: 0;
-    background: var(--bg-nav);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(var(--accent-rgb),.18);
-    z-index: 9998;
-    flex-direction: column;
-    padding: 8px 0 12px;
-  }
-  #nav-mobile-menu.open { display: flex; }
-  #nav-mobile-menu a {
-    font-family: var(--font-mono);
-    font-size: .72rem;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 14px 24px;
-    border-left: 2px solid transparent;
-    transition: color .2s, border-color .2s, background .2s;
-  }
-  #nav-mobile-menu a:hover,
-  #nav-mobile-menu a.active {
-    color: var(--orange);
-    border-left-color: var(--orange);
-    background: rgba(var(--accent-rgb),.05);
-  }
-  #nav-mobile-menu .nav-menu-divider {
-    height: 1px;
-    background: rgba(var(--accent-rgb),.1);
-    margin: 6px 24px;
-  }
-
-  /* Mode toggle row inside mobile menu */
-  #nav-menu-mode-toggle {
-    display: block;
-    width: 100%;
-    text-align: left;
-    font-family: var(--font-mono);
-    font-size: .72rem;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    background: transparent;
-    border: none;
-    border-left: 2px solid transparent;
-    padding: 14px 24px;
-    cursor: pointer;
-    transition: color .2s, border-color .2s, background .2s;
-  }
-  #nav-menu-mode-toggle:hover {
-    color: var(--orange);
-    border-left-color: var(--orange);
-    background: rgba(var(--accent-rgb),.05);
-  }
-
-  /* Show mobile dropdown when open */
-  #nav-mobile-menu.open { display: flex; }
-
-  /* Hide injected mobile row (legacy) */
-  .nav-mobile-row { display: none; }
-
-  /* ── SECTION HEADERS ── */
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .section-title { font-size: clamp(1.8rem, 8vw, 2.6rem); }
-
-  /* ── FOOTER ── */
-  footer {
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    padding: 28px 20px;
-    text-align: center;
-  }
-  .footer-links {
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-/* ══════════════════════════════════════════
-   SIM SWITCHER — shared styles
-   ══════════════════════════════════════════ */
-
-/* ── SIM TOGGLE BUTTON (nav) ── */
+/* ── SIM SWITCHER (nav dropdown for choosing between simulations) ── */
 #sim-toggle {
   display: inline-flex;
   align-items: center;
@@ -523,6 +274,7 @@ section { position: relative; z-index: 2; }
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s, transform 0.2s;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 #sim-toggle:hover {
   background: rgba(35, 26, 165, 0.22);
@@ -544,7 +296,16 @@ section { position: relative; z-index: 2; }
 }
 #sim-toggle:hover .sim-toggle-icon { transform: translateY(2px); }
 
-/* ── SIM DROPDOWN ── */
+/* Reserves nav space for #sim-toggle before JS populates it, so the
+   nav doesn't reflow/flash once the button is inserted. */
+#sim-toggle-li {
+  display: inline-flex;
+  align-items: center;
+  min-width: 72px; /* matches the rendered #sim-toggle width */
+  height: 36px;
+  flex-shrink: 0;
+}
+
 #sim-dropdown {
   position: fixed;
   z-index: 9999;
@@ -595,7 +356,6 @@ section { position: relative; z-index: 2; }
   letter-spacing: .04em;
 }
 
-/* ── SIM BADGE on nav logo ── */
 .sim-nav-badge {
   font-family: var(--font-mono);
   font-size: .55rem;
@@ -610,8 +370,225 @@ section { position: relative; z-index: 2; }
   flex-shrink: 0;
 }
 
-/* ── MOBILE SIM SWITCHER ROWS ── */
+/* ── 6. FOOTER ── */
+footer {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border);
+  padding: 32px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-footer);
+  transition: background 0.35s;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.footer-logo span { color: var(--orange); }
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .12em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+.footer-links a {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-decoration: none;
+  transition: color .2s;
+}
+.footer-links a:hover { color: var(--orange); }
+
+/* ── 7. SECTION HEADER / REVEAL HELPERS ──
+   Reused by every page for "// label" + big title headers, and for
+   fade-in-on-scroll (shared.js adds .visible via IntersectionObserver). */
+section { position: relative; z-index: 2; }
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 6px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  text-transform: uppercase;
+  color: var(--heading);
+  line-height: 1;
+  transition: color 0.35s;
+}
+.section-action {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: gap .2s;
+}
+.section-action:hover { gap: 14px; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
+}
+@keyframes pulse-glow {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  50%       { transform: translate(-50%,-50%) scale(1.12); opacity: .7; }
+}
+
+/* ── 8. MOBILE RESPONSIVE (≤768px) ──
+   One breakpoint covers every shared element: nav collapses to a
+   hamburger + dropdown, section headers stack, footer centers. */
 @media (max-width: 768px) {
+
+  /* Nav bar shrinks and switches to the hamburger menu */
+  nav {
+    padding: 0 18px;
+    height: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    flex-wrap: nowrap;
+    position: fixed;
+    z-index: 9999;
+  }
+  .nav-logo { font-size: 1rem; gap: 8px; }
+  .logo-img { width: 30px; height: 30px; }
+  .nav-logo > span { display: none; }
+
+  /* Desktop links + mode toggle live inside the hamburger menu instead */
+  .nav-links { display: none; }
+  #nav-hamburger {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid rgba(var(--accent-rgb),.3);
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 8px;
+    flex-shrink: 0;
+    margin-left: 6px;
+  }
+  #nav-hamburger span {
+    display: block;
+    height: 2px;
+    background: var(--orange);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s;
+  }
+  /* Hamburger icon morphs into an X when the menu is open */
+  #nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  #nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  #nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  #nav-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0;
+    background: var(--bg-nav);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(var(--accent-rgb),.18);
+    z-index: 9998;
+    flex-direction: column;
+    padding: 8px 0 12px;
+  }
+  #nav-mobile-menu.open { display: flex; }
+  #nav-mobile-menu a {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 14px 24px;
+    border-left: 2px solid transparent;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  #nav-mobile-menu a:hover,
+  #nav-mobile-menu a.active {
+    color: var(--orange);
+    border-left-color: var(--orange);
+    background: rgba(var(--accent-rgb),.05);
+  }
+  #nav-mobile-menu .nav-menu-divider {
+    height: 1px;
+    background: rgba(var(--accent-rgb),.1);
+    margin: 6px 24px;
+  }
+
+  /* Dark/light toggle, shown as a row inside the mobile menu */
+  #nav-menu-mode-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  #nav-menu-mode-toggle:hover {
+    color: var(--orange);
+    border-left-color: var(--orange);
+    background: rgba(var(--accent-rgb),.05);
+  }
+
+  /* Sim switcher, shown as rows inside the mobile menu */
   .nav-menu-sim-btn {
     display: block;
     width: 100%;
@@ -639,33 +616,26 @@ section { position: relative; z-index: 2; }
     background: rgba(35,26,165,.07);
     cursor: default;
   }
-}
 
-/* ══════════════════════════════════════════
-   NAV LAYOUT STABILITY
-   ══════════════════════════════════════════ */
+  /* Section headers stack instead of sitting side by side */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .section-title { font-size: clamp(1.8rem, 8vw, 2.6rem); }
 
-/* nav-links must never wrap — prevents height growth when items are injected */
-.nav-links {
-  flex-wrap: nowrap;
-  overflow: visible;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-/* Sim toggle — fixed size, never grows */
-#sim-toggle {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-/* ── SIM TOGGLE PLACEHOLDER — reserves nav space before JS populates the button ── */
-/* Prevents nav layout shift (flash) on page load and navigation.                   */
-#sim-toggle-li {
-  display: inline-flex;
-  align-items: center;
-  /* Min-width matches the rendered button width so the nav never reflows */
-  min-width: 72px;
-  height: 36px;
-  flex-shrink: 0;
+  /* Footer centers everything and wraps its link list */
+  footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 20px;
+    text-align: center;
+  }
+  .footer-links {
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
