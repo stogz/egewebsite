@@ -12,7 +12,7 @@
      its error handler, fires).
   ═══════════════════════════════════════════ */
   (function() {
-    var sim = window.EGE_SIM || { teamStatsFile:'team-stats.js' };
+    var sim = window.EGE_SIM || { teamStatsFile:'2K25/team-stats.js' };
     var s = document.createElement('script');
     s.src = sim.teamStatsFile;
     s.onload = function() {
