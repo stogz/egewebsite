@@ -3,15 +3,12 @@
      Mirrors tweetgen's logic exactly.
   ════════════════════════════════════════════════════════ */
 
-  /* ── PRESET ACCOUNTS ────────────────────────────────────
-     Edit this array to add/change preset accounts.
-     avatar: image path relative to this page.
-  ──────────────────────────────────────────────────────── */
   /* ── PRESET ACCOUNTS ─────────────────────────────────────────────────────
-     Avatar images are embedded as base64 data URLs so they work with
-     html2canvas on any hosting without CORS issues.
-     To update a headshot: replace the data URL string with a new one.
-     To change a PIN: edit the pin field and redeploy.
+     Edit this array to add/change preset accounts. Avatars are either a
+     local /icons/*.png path, or a base64 data URL embedded directly (used
+     for a couple of accounts so html2canvas can render them without a
+     CORS-related taint issue on some hosts).
+     To change a PIN: edit the pin field below and redeploy.
   ──────────────────────────────────────────────────────────────────────── */
   var PRESET_ACCOUNTS = [
     { id:'clark',     label:'Cooper Clark',  avatar:'/icons/Cooper.png',

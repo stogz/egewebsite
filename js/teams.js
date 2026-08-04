@@ -1,3 +1,16 @@
+  /* ═══════════════════════════════════════════
+     TEAMS PAGE LOGIC (teams.html)
+
+     Two views, toggled by whether a team is selected (tracked in the
+     URL hash, e.g. #bostonceltics26):
+       - Standings: both conferences + the playoff bracket
+       - Detail: one team's banner, roster, win chart, ratings gauges,
+         postseason series, and trends vs. the prior season
+
+     Loads team-stats.js for the active sim, then everything below
+     runs inside window.__EGE_TEAMS_BOOT (called once that file, or
+     its error handler, fires).
+  ═══════════════════════════════════════════ */
   (function() {
     var sim = window.EGE_SIM || { teamStatsFile:'team-stats.js' };
     var s = document.createElement('script');
@@ -61,18 +74,8 @@
       return t ? LOGOS_DIR + (useWht ? t.teamLogoWHT : t.teamLogoCLR) : '';
     }
 
-    function getTeamLogo(teamName, season)      { return _logoForTeam(teamName, season, false); }
     function getStandingsLogo(teamName, season)  { return _logoForTeam(teamName, season, false); }
     function getDetailLogo(teamName, season)     { return _logoForTeam(teamName, season, true);  }
-
-    // Build TEAM_LOGOS for any legacy references — always color
-    var TEAM_LOGOS = {};
-    if (typeof teamInfo !== 'undefined') {
-      Object.keys(teamInfo).forEach(function(k) {
-        var t = teamInfo[k];
-        TEAM_LOGOS[t.name] = LOGOS_DIR + t.teamLogoCLR;
-      });
-    }
 
     // Build TEAM_COLORS from teamInfo primaryColor (used as fallback / 2K25)
     var TEAM_COLORS = {};
@@ -143,8 +146,6 @@
       if (push) { history.pushState(null,'',url); }
       else       { history.replaceState(null,'',url); }
     }
-    function fireHash() { try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch(e){} }
-
     /* ─── DOM REFS ────────────────────────────────────────────── */
     var teamSel    = document.getElementById('teamSelect');
     var yearSel    = document.getElementById('yearSelect');
@@ -759,23 +760,6 @@
       });
     }
 
-    // Wire scope toggle
-    (function(){
-      var wrap = document.getElementById('rosterScopeToggle');
-      if (!wrap) return;
-      wrap.querySelectorAll('.roster-toggle-btn').forEach(function(btn){
-        btn.addEventListener('click', function(){
-          wrap.querySelectorAll('.roster-toggle-btn').forEach(function(b){ b.classList.remove('active'); });
-          btn.classList.add('active');
-          _rosterScope = btn.dataset.scope || 'regular';
-          var h = parseHash();
-          var slug2 = h.slug || (document.getElementById('teamSelect')||{}).value || '';
-          var year2 = (document.getElementById('yearSelect')||{}).value || '';
-          if (slug2 && year2) renderRoster(slug2, year2, _rosterScope);
-        });
-      });
-    })();
-
     /* ─── MAIN RENDER ─────────────────────────────────────────── */
     function render() {
       var h = parseHash();
@@ -825,20 +809,6 @@
 
     /* ─── PLAYOFF BRACKET ────────────────────────────────────── */
     function BRACKETS() { return window.EGE_BRACKETS || {}; }
-
-    function bracketTeamSlug(ss, conf, seed) {
-      // Returns slug of the nth seed (1-based) in the given conference
-      var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
-      var sorted = slugs.slice().sort(function(a,b){
-        var ra=parseInt(String(ss[a].rank||'').replace(/\D/g,''),10)||9999;
-        var rb=parseInt(String(ss[b].rank||'').replace(/\D/g,''),10)||9999;
-        return ra-rb;
-      });
-      var confSlugs = sorted.filter(function(s){
-        return conf==='east' ? isEastern(s) : !isEastern(s);
-      });
-      return confSlugs[seed-1] || '';
-    }
 
     function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year) {
       if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';

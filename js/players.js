@@ -1,3 +1,16 @@
+  /* ═══════════════════════════════════════════
+     PLAYERS PAGE LOGIC (players.html)
+
+     Two views: a roster-select grid, and a single player's profile
+     (bio, stats/charts, awards, contracts, career-high, performances,
+     shoes — each a tab, switchable and deep-linkable via URL hash,
+     e.g. #clark-traditional-splits).
+
+     Loads player-stats.js + player-games.js for the active sim, then
+     everything below runs inside window.__EGE_PLAYERS_BOOT (called
+     once both files, or their error handlers, have fired).
+  ═══════════════════════════════════════════ */
+
   /* Load correct data files for active sim, then call boot */
   (function() {
     var sim = window.EGE_SIM || { playerStatsFile:'player-stats.js', playerGamesFile:'player-games.js' };
@@ -209,52 +222,6 @@
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
-  }
-
-  // Reverse map: full team name → abbreviation
-  var TEAM_FULL_TO_ABBR = {};
-  Object.keys(TEAM_ABBR).forEach(function(abbr){ TEAM_FULL_TO_ABBR[TEAM_ABBR[abbr]] = abbr; });
-
-  // Full team name → city/location only (e.g. "Los Angeles Lakers" → "Los Angeles", "Mexico City Flight" → "Mexico City")
-  var TEAM_LOCATION_OVERRIDE = {
-    'Los Angeles Lakers':        'LA Lakers',
-    'Los Angeles Clippers':      'LA Clippers',
-    'Golden State Warriors':     'Golden State',
-    'Oklahoma City Thunder':     'Oklahoma City',
-    'New Orleans Pelicans':      'New Orleans',
-    'New York Knicks':           'New York',
-    'Mexico City Flight':        'Mexico City',
-    'St. Louis Spirit':          'St. Louis',
-    'San Antonio Spurs':         'San Antonio',
-    'Portland Trail Blazers':    'Portland',
-    'Indiana Pacers':            'Indiana',
-    'Utah Jazz':                 'Utah',
-    'Miami Heat':                'Miami',
-    'Boston Celtics':            'Boston',
-    'Brooklyn Nets':             'Brooklyn',
-    'Chicago Bulls':             'Chicago',
-    'Charlotte Hornets':         'Charlotte',
-    'Cleveland Cavaliers':       'Cleveland',
-    'Dallas Mavericks':          'Dallas',
-    'Denver Nuggets':            'Denver',
-    'Detroit Pistons':           'Detroit',
-    'Houston Rockets':           'Houston',
-    'Milwaukee Bucks':           'Milwaukee',
-    'Minnesota Timberwolves':    'Minnesota',
-    'Orlando Magic':             'Orlando',
-    'Philadelphia 76ers':        'Philadelphia',
-    'Phoenix Suns':              'Phoenix',
-    'Sacramento Kings':          'Sacramento',
-    'Toronto Raptors':           'Toronto',
-    'Washington Wizards':        'Washington',
-    'Vancouver Grizzlies':       'Vancouver',
-    'Atlanta Hawks':             'Atlanta',
-  };
-  function teamLocation(fullName) {
-    return TEAM_LOCATION_OVERRIDE[fullName] || fullName.split(' ').slice(0,-1).join(' ') || fullName;
-  }
-  function teamAbbrev(fullName) {
-    return TEAM_FULL_TO_ABBR[fullName] || fullName;
   }
 
   // Primary and secondary colors per team for banner gradients
@@ -1160,61 +1127,6 @@
     var canvasEl=document.getElementById('chart-progression');
     canvasEl.onmouseleave=function(){ tooltipEl.style.display='none'; };
   }
-
-  /* ══ CHART 2: RADAR ══ */
-  function populateRadarYears(key) {
-    var sel=document.getElementById('radar-year-select');
-    sel.innerHTML='';
-    var data=(PLAYER_STATS[key]||{}).regular||[];
-    var valid=data.filter(isProRow);
-    var opt=document.createElement('option'); opt.value='career'; opt.textContent='All-Time'; sel.appendChild(opt);
-    valid.forEach(function(r){
-      var o=document.createElement('option'); o.value=r.season; o.textContent=fmtSeason(r.season); sel.appendChild(o);
-    });
-    // default to latest season
-    if(valid.length) sel.value=valid[valid.length-1].season;
-  }
-
-  function buildRadarChart(key, yearVal) {
-    if(activeCharts['radar']){ activeCharts['radar'].destroy(); delete activeCharts['radar']; }
-    var data=(PLAYER_STATS[key]||{}).regular||[];
-    var valid=data.filter(isProRow);
-    if(!valid.length) return;
-    var row = yearVal==='career' ? weightedAvgRow(valid) : (valid.find(function(r){ return r.season===yearVal; })||null);
-    if(!row) return;
-    var c=chartColors();
-    var radarMax={ppg:35,rpg:15,apg:15,spg:4,bpg:4,topg:6};
-    var label=yearVal==='career'?'All-Time Avg':fmtSeason(yearVal);
-    var ctx=document.getElementById('chart-radar').getContext('2d');
-    activeCharts['radar']=new Chart(ctx,{
-      type:'radar',
-      data:{ labels:['PPG','RPG','APG','SPG','BPG','TOPG'],
-        datasets:[{ label:label,
-          data:[ (row.ppg/radarMax.ppg)*100, (row.rpg/radarMax.rpg)*100, (row.apg/radarMax.apg)*100,
-                 (row.spg/radarMax.spg)*100, (row.bpg/radarMax.bpg)*100, (row.topg/radarMax.topg)*100 ],
-          backgroundColor:'rgba(var(--accent-rgb),0.18)', borderColor:'var(--orange)',
-          pointBackgroundColor:'var(--orange)', pointRadius:4 }]},
-      options:{ responsive:true, maintainAspectRatio:false,
-        scales:{ r:{ min:0, max:100, ticks:{display:false},
-          grid:{color:c.grid}, angleLines:{color:c.grid},
-          pointLabels:{color:c.text,font:{family:"'Share Tech Mono',monospace",size:9}} }},
-        plugins:{ legend:legendOpts(c) } }
-    });
-  }
-
-  /* ══ CHART 3: RATIO BAR COMPARISON ══ */
-  var COMPARE_STATS  = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','mpg'];
-  var COMPARE_LABELS = ['PPG','RPG','APG','SPG','BPG','TOPG','FG%','3P%','FT%','MPG'];
-
-  function getRowForYear(key, yearVal) {
-    var data  = (PLAYER_STATS[key]||{}).regular||[];
-    var valid = data.filter(isProRow);
-    if (yearVal === 'career') return weightedAvgRow(valid);
-    return valid.find(function(r){ return r.season === yearVal; })
-        || valid.find(function(r){ return String(r.season).replace('-','–') === yearVal; })
-        || null;
-  }
-
 
   /* ── BUILD ALL CHARTS ── */
   function buildCharts(key) {
@@ -2740,13 +2652,6 @@
     return (parts[0].charAt(0) + '. ' + parts.slice(1).join(' ')).toUpperCase();
   }
 
-  /* ── hex → rgba ── */
-  function hexRgba(hex, a) {
-    if (!hex || hex.charAt(0) !== '#') return 'rgba(35,26,165,'+a+')';
-    var r=parseInt(hex.slice(1,3),16), gg=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-    return 'rgba('+r+','+gg+','+b+','+a+')';
-  }
-
   /* ── Derive team abbreviation from PLAYER_STATS for a given season ── */
   function teamForSeason(key, season, type) {
     var rows = ((PLAYER_STATS[key]||{})[type||'regular']||[]);
@@ -3832,14 +3737,8 @@
   }
 
   function boot() {
-    var hash = (location.hash||'').replace('#','').toLowerCase();
-    var playerKey = null;
-    Object.keys(PLAYERS).forEach(function(k){ if(hash===k||hash.indexOf(k+'-')===0) playerKey=k; });
-    if (playerKey) {
-      var tabPart = hash.replace(playerKey+'-','');
-      var validTab = TABS.indexOf(tabPart) !== -1 ? tabPart : 'bio';
-      showProfile(playerKey, validTab);
-    }
+    var initialHash = parseHash(location.hash);
+    if (initialHash.player) showProfile(initialHash.player, initialHash.tab);
 
     // Wire subnav tab clicks
     document.querySelectorAll('.subnav-tab').forEach(function(btn) {
@@ -3860,13 +3759,9 @@
     var backBtn = document.getElementById('back-btn');
     if (backBtn) backBtn.addEventListener('click', showRoster);
     window.addEventListener('popstate', function(){
-      var h = (location.hash||'').replace('#','').toLowerCase();
-      var pk = null;
-      Object.keys(PLAYERS).forEach(function(k){ if(h===k||h.indexOf(k+'-')===0) pk=k; });
-      if (pk) {
-        var tb = h.replace(pk+'-','');
-        var vt = TABS.indexOf(tb)!==-1 ? tb : 'bio';
-        showProfile(pk, vt);
+      var popHash = parseHash(location.hash);
+      if (popHash.player) {
+        showProfile(popHash.player, popHash.tab);
       } else {
         showRoster();
       }
