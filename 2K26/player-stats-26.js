@@ -14,7 +14,7 @@ window.PLAYER_STATS = {
   clark: {
     info: {
       height:    '6\'5\"',
-      weight:    '???',
+      weight:    '202 lbs',
       age:       '—',
       college:   'Louisville',
       draftYear: '???',
@@ -37,7 +37,7 @@ window.PLAYER_STATS = {
   hatch: {
     info: {
       height:    '7\'0\"',
-      weight:    '???',
+      weight:    '223 lbs',
       age:       '—',
       college:   'Texas',
       draftYear: '???',
@@ -60,7 +60,7 @@ window.PLAYER_STATS = {
   stogsdill: {
     info: {
       height:    '6\'9\"',
-      weight:    '???',
+      weight:    '237 lbs',
       age:       '—',
       college:   'Butler',
       draftYear: '???',
@@ -83,7 +83,7 @@ window.PLAYER_STATS = {
   stewart: {
     info: {
       height:    '6\'7\"',
-      weight:    '???',
+      weight:    '214 lbs',
       age:       '—',
       college:   'Marquette',
       draftYear: '???',
@@ -106,7 +106,7 @@ window.PLAYER_STATS = {
   vitel: {
     info: {
       height:    '6\'3\"',
-      weight:    '???',
+      weight:    '188 lbs',
       age:       '—',
       college:   'Indiana',
       draftYear: '???',
