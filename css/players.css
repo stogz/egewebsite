@@ -393,12 +393,10 @@
     .splits-table td:first-child { text-align:left; font-family:var(--font-mono); font-size:.65rem; letter-spacing:.08em; color:var(--text); font-weight:500; }
     .splits-table td.sort-col { background:rgba(var(--accent-rgb),.04); }
     .splits-table td.hi { color:var(--text); font-weight:600; font-size:.92rem; }
-    /* League-leading stat for that season — bolded, no color change.
-       Rajdhani only ships weights up to 700, so font-weight alone caps
-       out barely above the table's normal 600 — a text-stroke fakes the
-       extra-bold weight the font doesn't have (same trick used on the
-       display-font headline numbers elsewhere on the site). */
-    .splits-table td .stat-leader { font-weight:700; -webkit-text-stroke:.6px currentColor; }
+    /* League-leading stat for that season — italicized, no color change.
+       Explained via the "*" key rendered under each table (players.html)
+       instead of a hover tooltip. */
+    .splits-table td .stat-leader { font-style:italic; }
 
     /* DNQ rows */
     tr.dnq-row td { color:var(--text-muted); font-size:.82rem; height:2.6rem; opacity:.7; }

@@ -455,8 +455,9 @@
      PLAYER_STATS is the entire tracked league, so "leads the league" means
      posts the season's top value (among pro rows) across all players there.
      Ties all get marked. Applies to every numeric stat column in both
-     tables — the leading value is simply bolded (no color change), same
-     treatment whether it's a "good" stat to lead (PPG) or not (TOPG).
+     tables — the leading value is simply italicized (see the * key under
+     each table), same treatment whether it's a "good" stat to lead (PPG)
+     or not (TOPG).
 
      To force a specific stat to show as a league leader regardless of the
      numbers (e.g. a real-world honor the data model can't compute), add a
@@ -490,7 +491,7 @@
     return best;
   }
 
-  /* Wrap text in bold if row's value ties the league lead for that season/stat,
+  /* Wrap text in italics if row's value ties the league lead for that season/stat,
      or if the row manually forces it via a `leaders` array (see above). */
   function leadWrap(leaders, stat, row, text) {
     var val = statNum(row[stat]);
@@ -498,7 +499,7 @@
     var isAutoLeader = val !== null && best !== undefined && val === best;
     var isManualLeader = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
     var isLeader = isAutoLeader || isManualLeader;
-    return isLeader ? '<strong class="stat-leader" title="League leader">'+text+'</strong>' : text;
+    return isLeader ? '<em class="stat-leader">'+text+'</em>' : text;
   }
 
   /* ── COMPUTE CAREER AVERAGES FROM PLAYER_STATS ── */
