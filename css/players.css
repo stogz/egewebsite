@@ -208,7 +208,7 @@
     .player-banner-card-bg { display: none; }
 
     /* Ghost jersey number — same treatment as the select-page tiles:
-       numbers font, outline-only stroke in brightened team color.
+       outline-only stroke in the team's exact color (no lightening).
        Team color arrives via --nav-tc set on #player-profile from JS. */
     .player-banner-num {
       position: absolute; right: 0; top: 50%; transform: translateY(-50%);
@@ -217,11 +217,9 @@
       font-size: clamp(6rem, 14vw, 13rem); line-height: 1;
       color: transparent; opacity: .5;
       --num-stroke: var(--nav-tc, var(--orange));
-      --num-stroke: color-mix(in srgb, var(--nav-tc, var(--orange)) 60%, #ffffff);
       -webkit-text-stroke: 1.5px var(--num-stroke);
       transition: opacity .3s;
     }
-    html.light .player-banner-num { --num-stroke: var(--nav-tc, var(--orange)); }
 
     /* Bracket wrapper — corners removed, now a plain container */
     .player-headshot-bracket {

@@ -231,6 +231,12 @@
     return (isNaN(r)||isNaN(g)||isNaN(b)) ? null : (r+','+g+','+b);
   }
 
+  /* Perceived brightness (0=black, 1=white) of an 'r,g,b' string */
+  function relLuminance(rgbStr) {
+    var parts = rgbStr.split(',').map(Number);
+    return (0.299*parts[0] + 0.587*parts[1] + 0.114*parts[2]) / 255;
+  }
+
   // Primary and secondary colors per team for banner gradients
   // Build TEAM_BANNER_COLORS from teaminfo.js primary/secondaryColor
   var TEAM_BANNER_COLORS = {};
@@ -616,22 +622,52 @@
     var nameEl = document.getElementById('profile-name');
     nameEl.innerHTML = '<span>'+p.name+'</span>';
 
-    // Team + position badges — boxed, colored with the team's primary color
+    renderTeamBadges(key);
+
+    var meta = document.getElementById('profile-meta');
+    meta.innerHTML='';
+  }
+
+  /* ── TEAM / POSITION BADGES ──
+     Split out from renderBanner so the mode-toggle button can re-run just
+     this piece: a dark team color reads fine as text against the page's
+     light-mode background, but on the dark background of dark mode it
+     needs a brighter box behind it to stay legible. Bright team colors
+     already read fine against a dark box in either theme, so they keep
+     the normal tinted-box treatment. */
+  function renderTeamBadges(key) {
+    var p = PLAYERS[key];
+    if (!p) return;
     var tLineEl = document.getElementById('profile-team-line');
+    if (!tLineEl) return;
+    var isRetired = p.team === 'Retired';
+    var latest = isRetired ? null : latestSeason(key);
+    var teamRaw = latest ? latest.team : (isRetired ? null : p.team);
+    var team = teamRaw ? teamFull(teamRaw) : null;
+    var colors = !isRetired && team ? TEAM_BANNER_COLORS[team] : null;
+    var primaryColor = (colors && colors.primary) ? colors.primary : 'var(--orange)';
+
     var badgeColor = isRetired ? 'var(--orange)' : primaryColor;
     var badgeRgb = hexToRgbStr(badgeColor);
-    var badgeBg     = badgeRgb ? 'rgba('+badgeRgb+',.12)' : 'rgba(var(--accent-rgb),.12)';
-    var badgeBorder = badgeRgb ? 'rgba('+badgeRgb+',.4)'  : 'rgba(var(--accent-rgb),.4)';
-    var badgeStyle = 'color:'+badgeColor+';background:'+badgeBg+';border-color:'+badgeBorder+';';
+    var isLightTheme = document.documentElement.classList.contains('light');
+    var isDarkTeamColor = badgeRgb && relLuminance(badgeRgb) < 0.5;
+    var needsBrightBox = !isLightTheme && isDarkTeamColor;
+
+    var badgeStyle;
+    if (needsBrightBox) {
+      badgeStyle = 'color:'+badgeColor+';background:#ffffff;border-color:rgba(0,0,0,.18);';
+    } else {
+      var badgeBg     = badgeRgb ? 'rgba('+badgeRgb+',.12)' : 'rgba(var(--accent-rgb),.12)';
+      var badgeBorder = badgeRgb ? 'rgba('+badgeRgb+',.4)'  : 'rgba(var(--accent-rgb),.4)';
+      badgeStyle = 'color:'+badgeColor+';background:'+badgeBg+';border-color:'+badgeBorder+';';
+    }
+
     var teamLabel = isRetired ? 'Retired' : (team || '');
     var posLabel = p.position || '';
     var badgesHtml = '';
     if (teamLabel) badgesHtml += '<span class="banner-badge" style="'+badgeStyle+'">'+teamLabel+'</span>';
     if (posLabel)  badgesHtml += '<span class="banner-badge" style="'+badgeStyle+'">'+posLabel+'</span>';
     tLineEl.innerHTML = badgesHtml;
-
-    var meta = document.getElementById('profile-meta');
-    meta.innerHTML='';
   }
 
   /* ── BIO (driven by PLAYER_STATS) ── */
@@ -3844,7 +3880,10 @@
   document.addEventListener('click', function(e) {
     if (e.target && e.target.closest && e.target.closest('#nav-menu-mode-toggle')) {
       setTimeout(function() {
-        if (currentKey) renderBioJerseys(currentKey);
+        if (currentKey) {
+          renderBanner(currentKey);
+          renderBioJerseys(currentKey);
+        }
       }, 50);
     }
   });
