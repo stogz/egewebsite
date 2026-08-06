@@ -82,7 +82,7 @@ window.PLAYER_STATS = {
         { team:'Butler Bulldogs', name:'Home',  number:'1', bg:'#0000ff', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false, leaders:['ppg'] },
     ],
     playoffs: [],
     totals:   [],
