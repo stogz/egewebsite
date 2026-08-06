@@ -172,8 +172,6 @@
       if (brkt) brkt.style.color = pc;
       var card = document.querySelector('.player-banner-card');
       if (card) card.style.color = pc;
-      var tLine = document.getElementById('profile-team-line');
-      if (tLine) tLine.style.color = isRet ? 'var(--orange)' : pc;
     }
   }
 
@@ -222,6 +220,15 @@
   };
   function teamFull(t) {
     return TEAM_ABBR[t] || t;
+  }
+
+  /* '#rrggbb' -> 'r,g,b' for use inside rgba(); null for non-hex colors
+     (e.g. the 'var(--orange)' fallback), which callers instead pair
+     with the theme's own rgba(var(--accent-rgb), x). */
+  function hexToRgbStr(hex) {
+    if (!hex || hex[0] !== '#' || hex.length < 7) return null;
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return (isNaN(r)||isNaN(g)||isNaN(b)) ? null : (r+','+g+','+b);
   }
 
   // Primary and secondary colors per team for banner gradients
@@ -435,6 +442,45 @@
   /* isProRow — exclude college seasons, dnq rows, and zero-GP rows */
   function isProRow(r) { return COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase()) === -1 && !r.dnq && r.gp > 0; }
 
+  /* ── LEAGUE LEADER HELPERS ──
+     PLAYER_STATS is the entire tracked league, so "leads the league" means
+     posts the season's top value (among pro rows) across all players there.
+     Ties all get marked. Turnovers/volume columns are excluded — only
+     stats where higher is better. */
+  var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','fgp','tpp','ftp'];
+  var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk'];
+
+  function statNum(raw) {
+    var v = typeof raw === 'string' ? parseFloat(raw.replace('%','')) : raw;
+    return (v === undefined || v === null || isNaN(v)) ? null : v;
+  }
+
+  /* Best value per season/stat for dataKey ('regular'|'playoffs'|'totals') */
+  function seasonLeaders(dataKey, statList) {
+    var best = {};
+    Object.keys(PLAYER_STATS).forEach(function(key){
+      ((PLAYER_STATS[key]||{})[dataKey]||[]).filter(isProRow).forEach(function(row){
+        statList.forEach(function(stat){
+          var val = statNum(row[stat]);
+          if (val === null) return;
+          best[row.season] = best[row.season] || {};
+          if (best[row.season][stat] === undefined || val > best[row.season][stat]) {
+            best[row.season][stat] = val;
+          }
+        });
+      });
+    });
+    return best;
+  }
+
+  /* Wrap text in bold if row's value ties the league lead for that season/stat */
+  function leadWrap(leaders, stat, row, text) {
+    var val = statNum(row[stat]);
+    var best = leaders[row.season] && leaders[row.season][stat];
+    var isLeader = val !== null && best !== undefined && val === best;
+    return isLeader ? '<strong class="stat-leader" title="League leader">'+text+'</strong>' : text;
+  }
+
   /* ── COMPUTE CAREER AVERAGES FROM PLAYER_STATS ── */
   function careerAvg(key) {
     var rows = ((PLAYER_STATS[key]||{}).regular||[]).filter(isProRow);
@@ -570,15 +616,20 @@
     var nameEl = document.getElementById('profile-name');
     nameEl.innerHTML = '<span>'+p.name+'</span>';
 
-    // Team line — "// TEAM NAME" in primary color, or "// Retired" in orange
+    // Team + position badges — boxed, colored with the team's primary color
     var tLineEl = document.getElementById('profile-team-line');
-    if (isRetired) {
-      tLineEl.textContent = '// Retired';
-      tLineEl.style.color = 'var(--orange)';
-    } else {
-      tLineEl.textContent = team ? '// ' + team : '';
-      tLineEl.style.color = primaryColor;
-    }
+    var badgeColor = isRetired ? 'var(--orange)' : primaryColor;
+    var badgeRgb = hexToRgbStr(badgeColor);
+    var badgeBg     = badgeRgb ? 'rgba('+badgeRgb+',.12)' : 'rgba(var(--accent-rgb),.12)';
+    var badgeBorder = badgeRgb ? 'rgba('+badgeRgb+',.4)'  : 'rgba(var(--accent-rgb),.4)';
+    var badgeStyle = 'color:'+badgeColor+';background:'+badgeBg+';border-color:'+badgeBorder+';';
+    var teamLabel = isRetired ? 'Retired' : (team || '');
+    var posLabel = p.position || '';
+    var badgesHtml = '';
+    if (teamLabel) badgesHtml += '<span class="banner-badge" style="'+badgeStyle+'">'+teamLabel+'</span>';
+    if (posLabel)  badgesHtml += '<span class="banner-badge" style="'+badgeStyle+'">'+posLabel+'</span>';
+    tLineEl.innerHTML = badgesHtml;
+
     var meta = document.getElementById('profile-meta');
     meta.innerHTML='';
   }
@@ -640,6 +691,7 @@
       { key:'Age',    val: ageVal },
       { key:'School', val: bioMap['College']   || '—' },
       { key:'Class',  val: bioMap['Draft Year']|| '—' },
+      { key:'Draft Pick', val: bioMap['Draft Pick'] || '—' },
     ];
 
     rows.forEach(function(r){
@@ -801,6 +853,7 @@
     var thead = '<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
+    var leaders = seasonLeaders(pgMode, PG_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       if(row.dnq){
@@ -822,9 +875,9 @@
       }
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
       tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+teamCell(row.team,row.season)+'</td>';
-      tbody+='<td class="hi">'+fmt1(row.ppg)+'</td><td>'+fmt1(row.rpg)+'</td><td>'+fmt1(row.apg)+'</td>';
-      tbody+='<td>'+fmt1(row.spg)+'</td><td>'+fmt1(row.bpg)+'</td><td>'+fmt1(row.topg)+'</td>';
-      tbody+='<td>'+row.fgp+'</td><td>'+row.tpp+'</td><td>'+row.ftp+'</td>';
+      tbody+='<td class="hi">'+leadWrap(leaders,'ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap(leaders,'rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap(leaders,'apg',row,fmt1(row.apg))+'</td>';
+      tbody+='<td>'+leadWrap(leaders,'spg',row,fmt1(row.spg))+'</td><td>'+leadWrap(leaders,'bpg',row,fmt1(row.bpg))+'</td><td>'+fmt1(row.topg)+'</td>';
+      tbody+='<td>'+leadWrap(leaders,'fgp',row,row.fgp)+'</td><td>'+leadWrap(leaders,'tpp',row,row.tpp)+'</td><td>'+leadWrap(leaders,'ftp',row,row.ftp)+'</td>';
       tbody+='<td>'+fmt1(row.tpa)+'</td><td>'+row.gs+'</td><td>'+row.gp+'</td><td>'+fmt1(row.mpg)+'</td></tr>';
     });
     // Career avg row
@@ -859,6 +912,7 @@
     var thead='<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
+    var leaders = seasonLeaders('totals', TOTALS_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       var isCollege = COLLEGE_TEAMS.indexOf((row.team||'').toUpperCase()) !== -1;
@@ -869,8 +923,12 @@
       tbody+='<tr'+trClass+' data-orig="'+idx+'"'+(isCollege?' data-college="1"':'')+'>'+
         '<td>'+(isCollege?'<span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span>':fmtSeason(row.season)+icons)+'</td>'+
         '<td>'+row.age+'</td><td>'+teamTd+'</td><td style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;">'+posVal+'</td>';
-      tbody+='<td class="hi">'+row.pts+'</td>';
-      ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){ tbody+='<td>'+(row[k]||0)+'</td>'; });
+      tbody+='<td class="hi">'+(isCollege?row.pts:leadWrap(leaders,'pts',row,row.pts))+'</td>';
+      ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){
+        var val = row[k]||0;
+        var isLeaderStat = !isCollege && TOTALS_LEADER_STATS.indexOf(k)!==-1;
+        tbody+='<td>'+(isLeaderStat?leadWrap(leaders,k,row,val):val)+'</td>';
+      });
       tbody+='</tr>';
     });
     var valid=data.filter(function(r){ return r.gp>0 && COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase())===-1; });
