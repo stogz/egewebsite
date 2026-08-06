@@ -68,6 +68,9 @@
       // Retirement driven by player-stats.js retired boolean;
       // ps.team (if present) sets the active team, e.g. a college abbr in 2K26
       PLAYERS[key].team = ps.retired ? 'Retired' : (ps.team || 'Active');
+      // info.position (if set) overrides the static banner position per-sim,
+      // e.g. a player's college position in player-stats-26.js
+      if (info.position) PLAYERS[key].position = info.position;
       // Build bio rows from info object
       PLAYERS[key].bio = [
         { key:'Height',     val: info.height    || '—' },
@@ -630,11 +633,10 @@
 
   /* ── TEAM / POSITION BADGES ──
      Split out from renderBanner so the mode-toggle button can re-run just
-     this piece: a dark team color reads fine as text against the page's
-     light-mode background, but on the dark background of dark mode it
-     needs a brighter box behind it to stay legible. Bright team colors
-     already read fine against a dark box in either theme, so they keep
-     the normal tinted-box treatment. */
+     this piece. The box is filled solid with the same color as the
+     headshot box border (--nav-tc); text is white unless the team color
+     itself is really bright, in which case white would wash out and the
+     site's dark navy reads better instead. */
   function renderTeamBadges(key) {
     var p = PLAYERS[key];
     if (!p) return;
@@ -649,18 +651,9 @@
 
     var badgeColor = isRetired ? 'var(--orange)' : primaryColor;
     var badgeRgb = hexToRgbStr(badgeColor);
-    var isLightTheme = document.documentElement.classList.contains('light');
-    var isDarkTeamColor = badgeRgb && relLuminance(badgeRgb) < 0.5;
-    var needsBrightBox = !isLightTheme && isDarkTeamColor;
-
-    var badgeStyle;
-    if (needsBrightBox) {
-      badgeStyle = 'color:'+badgeColor+';background:#ffffff;border-color:rgba(0,0,0,.18);';
-    } else {
-      var badgeBg     = badgeRgb ? 'rgba('+badgeRgb+',.12)' : 'rgba(var(--accent-rgb),.12)';
-      var badgeBorder = badgeRgb ? 'rgba('+badgeRgb+',.4)'  : 'rgba(var(--accent-rgb),.4)';
-      badgeStyle = 'color:'+badgeColor+';background:'+badgeBg+';border-color:'+badgeBorder+';';
-    }
+    var isReallyBright = badgeRgb && relLuminance(badgeRgb) > 0.6;
+    var textColor = isReallyBright ? 'var(--navy)' : '#ffffff';
+    var badgeStyle = 'background:'+badgeColor+';color:'+textColor+';';
 
     var teamLabel = isRetired ? 'Retired' : (team || '');
     var posLabel = p.position || '';
