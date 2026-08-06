@@ -49,12 +49,14 @@
    College teams excluded from all career/chart stats: AU, KU, LOU, FSU, DUKE, UCLA
    MEX, VAN, and STL count as pro seasons and ARE included in all-time metrics.
    dnq:true    → Did Not Qualify for playoffs (shows as DNQ row in table)
-   leaders:[]  → optional array of stat keys (e.g. ['ppg','fgp']) to force-bold
-                 as a league leader on that row, regardless of the numbers.
-                 Otherwise the site bolds it automatically whenever the value
-                 is the season's highest among all tracked players. Valid on
-                 regular/playoffs rows (ppg, rpg, apg, spg, bpg, fgp, tpp, ftp)
-                 and totals rows (pts, reb, ast, stl, blk).
+   leaders:[]  → optional array of stat keys (e.g. ['ppg','fgp']) to mark that
+                 row as leading the league in those stats (shown italicized).
+                 This is the only way a stat shows as a league leader — it is
+                 never computed automatically. Works on college and pro
+                 seasons alike. Valid on regular/playoffs rows (ppg, rpg,
+                 apg, spg, bpg, topg, fgp, tpp, ftp, tpa, gs, gp, mpg) and
+                 totals rows (pts, reb, ast, stl, blk, tov, fgm, fga, tpm,
+                 tpa, ftm, fta, min, gs, gp, dd, td).
 
    Each player now also has:
      info    → { height, weight, age, college, draftYear, draftPick, nickname }
