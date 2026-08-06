@@ -279,7 +279,7 @@
     .player-banner-name { font-family:var(--font-display); font-weight:900; font-size:clamp(3.8rem,7vw,8rem); text-transform:uppercase; letter-spacing:-.02em; line-height:.88; color:var(--heading); transition:color .35s; margin-bottom:14px; }
     .player-banner-team { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; margin-bottom:0; display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
     /* Team / position boxes — solid-filled with the team color, set inline via JS */
-    .banner-badge { display:inline-block; padding:6px 14px; border-radius:0; font-weight:600; transition:color .4s,background .4s; }
+    .banner-badge { display:inline-block; padding:6px 14px; border-radius:0; font-weight:400; transition:color .4s,background .4s; }
     .player-banner-meta { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
 
     /* Subnav */
