@@ -455,7 +455,14 @@
      PLAYER_STATS is the entire tracked league, so "leads the league" means
      posts the season's top value (among pro rows) across all players there.
      Ties all get marked. Turnovers/volume columns are excluded — only
-     stats where higher is better. */
+     stats where higher is better.
+
+     To force a specific stat to show as a league leader regardless of the
+     numbers (e.g. a real-world honor the data model can't compute), add a
+     `leaders` array of stat keys to that season row:
+       { season:'2022-23', ..., fgp:'48.3%', ..., leaders:['fgp'] }
+     Works the same on 'regular'/'playoffs' rows (PG_LEADER_STATS keys) and
+     'totals' rows (TOTALS_LEADER_STATS keys). */
   var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','fgp','tpp','ftp'];
   var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk'];
 
@@ -482,11 +489,14 @@
     return best;
   }
 
-  /* Wrap text in bold if row's value ties the league lead for that season/stat */
+  /* Wrap text in bold if row's value ties the league lead for that season/stat,
+     or if the row manually forces it via a `leaders` array (see above). */
   function leadWrap(leaders, stat, row, text) {
     var val = statNum(row[stat]);
     var best = leaders[row.season] && leaders[row.season][stat];
-    var isLeader = val !== null && best !== undefined && val === best;
+    var isAutoLeader = val !== null && best !== undefined && val === best;
+    var isManualLeader = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
+    var isLeader = isAutoLeader || isManualLeader;
     return isLeader ? '<strong class="stat-leader" title="League leader">'+text+'</strong>' : text;
   }
 
