@@ -9,6 +9,9 @@
    retired  → true | false  (controls active count and profile badge)
    team     → active team abbreviation (college abbr here; works the
               same as an NBA abbr for banner logo, colors, roster chip)
+   leaders:[] on a regular/playoffs/totals row → force-bold specific stat
+              keys as a league leader, e.g. leaders:['ppg','fgp']. See
+              2K25/player-stats.js for the full stat-key list.
 ═══════════════════════════════════════════════════════════════ */
 
 window.PLAYER_STATS = {
