@@ -454,8 +454,9 @@
   /* ── LEAGUE LEADER HELPERS ──
      PLAYER_STATS is the entire tracked league, so "leads the league" means
      posts the season's top value (among pro rows) across all players there.
-     Ties all get marked. Turnovers/volume columns are excluded — only
-     stats where higher is better.
+     Ties all get marked. Applies to every numeric stat column in both
+     tables — the leading value is simply bolded (no color change), same
+     treatment whether it's a "good" stat to lead (PPG) or not (TOPG).
 
      To force a specific stat to show as a league leader regardless of the
      numbers (e.g. a real-world honor the data model can't compute), add a
@@ -463,8 +464,8 @@
        { season:'2022-23', ..., fgp:'48.3%', ..., leaders:['fgp'] }
      Works the same on 'regular'/'playoffs' rows (PG_LEADER_STATS keys) and
      'totals' rows (TOTALS_LEADER_STATS keys). */
-  var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','fgp','tpp','ftp'];
-  var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk'];
+  var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa','gs','gp','mpg'];
+  var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'];
 
   function statNum(raw) {
     var v = typeof raw === 'string' ? parseFloat(raw.replace('%','')) : raw;
@@ -915,9 +916,9 @@
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
       tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+teamCell(row.team,row.season)+'</td>';
       tbody+='<td class="hi">'+leadWrap(leaders,'ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap(leaders,'rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap(leaders,'apg',row,fmt1(row.apg))+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'spg',row,fmt1(row.spg))+'</td><td>'+leadWrap(leaders,'bpg',row,fmt1(row.bpg))+'</td><td>'+fmt1(row.topg)+'</td>';
+      tbody+='<td>'+leadWrap(leaders,'spg',row,fmt1(row.spg))+'</td><td>'+leadWrap(leaders,'bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap(leaders,'topg',row,fmt1(row.topg))+'</td>';
       tbody+='<td>'+leadWrap(leaders,'fgp',row,row.fgp)+'</td><td>'+leadWrap(leaders,'tpp',row,row.tpp)+'</td><td>'+leadWrap(leaders,'ftp',row,row.ftp)+'</td>';
-      tbody+='<td>'+fmt1(row.tpa)+'</td><td>'+row.gs+'</td><td>'+row.gp+'</td><td>'+fmt1(row.mpg)+'</td></tr>';
+      tbody+='<td>'+leadWrap(leaders,'tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap(leaders,'gs',row,row.gs)+'</td><td>'+leadWrap(leaders,'gp',row,row.gp)+'</td><td>'+leadWrap(leaders,'mpg',row,fmt1(row.mpg))+'</td></tr>';
     });
     // Career avg row
     var valid=data.filter(isProRow);
