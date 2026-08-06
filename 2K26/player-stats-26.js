@@ -23,7 +23,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Clutch Clark", "Cswag"',
-      position:  'Point Guard',
+      position:  'Shooting Guard',
     },
     retired:  false,
     team:     'LOU',   // active team — college abbr (matches TEAM_ABBR / logos/LOU.png)
@@ -47,7 +47,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Pax"',
-      position:  'Power Forward',
+      position:  'Center',
     },
     retired:  false,
     team:     'TU',   // active team — college abbr (matches TEAM_ABBR / logos/TU.png)
@@ -71,7 +71,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Uncle Sam"',
-      position:  'Center',
+      position:  'Point Guard',
     },
     retired:  false,
     team:     'BU',   // active team — college abbr (matches TEAM_ABBR / logos/BU.png)
@@ -95,7 +95,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '—',
-      position:  'Point Guard',
+      position:  'Small Forward',
     },
     retired:  false,
     team:     'MA',   // active team — college abbr (matches TEAM_ABBR / logos/MA.png)
@@ -119,7 +119,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"V8"',
-      position:  'Shooting Guard',
+      position:  'Combo Guard',
     },
     retired:  false,
     team:     'IU',   // active team — college abbr (matches TEAM_ABBR / logos/IU.png)
