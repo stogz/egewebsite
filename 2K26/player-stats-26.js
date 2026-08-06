@@ -3,6 +3,9 @@
 
    Same five players as 2K25.
    info{}   → player bio shown on the profile Bio tab
+              info.position (optional) overrides the position shown in
+              the player banner for this sim, e.g. a different college
+              position than their default NBA position in 2K25
    retired  → true | false  (controls active count and profile badge)
    team     → active team abbreviation (college abbr here; works the
               same as an NBA abbr for banner logo, colors, roster chip)
@@ -20,6 +23,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Clutch Clark", "Cswag"',
+      position:  'Point Guard',
     },
     retired:  false,
     team:     'LOU',   // active team — college abbr (matches TEAM_ABBR / logos/LOU.png)
@@ -43,6 +47,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Pax"',
+      position:  'Power Forward',
     },
     retired:  false,
     team:     'TU',   // active team — college abbr (matches TEAM_ABBR / logos/TU.png)
@@ -66,6 +71,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"Uncle Sam"',
+      position:  'Center',
     },
     retired:  false,
     team:     'BU',   // active team — college abbr (matches TEAM_ABBR / logos/BU.png)
@@ -89,6 +95,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '—',
+      position:  'Point Guard',
     },
     retired:  false,
     team:     'MA',   // active team — college abbr (matches TEAM_ABBR / logos/MA.png)
@@ -112,6 +119,7 @@ window.PLAYER_STATS = {
       draftYear: '2012',
       draftPick: '???',
       nickname:  '"V8"',
+      position:  'Shooting Guard',
     },
     retired:  false,
     team:     'IU',   // active team — college abbr (matches TEAM_ABBR / logos/IU.png)
