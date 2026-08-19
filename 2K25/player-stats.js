@@ -20,7 +20,8 @@
                     bg:'#041e42', stroke:'#fdbb30', num:'#fdbb30',
                     seasons:'2027–Present', img:'' }
 
-     photos    → array of career photo entries shown in the slideshow on the Bio tab
+     photos    → array of career photo entries (data kept, no longer rendered —
+                 the Bio tab photo slideshow was removed)
                  Each entry:
                    url     : direct image URL  e.g. 'https://example.com/photo.jpg'
                    caption : optional caption shown at the bottom of the slide
@@ -69,9 +70,12 @@ window.PLAYER_STATS = {
       height:    '6\'1\"',
       weight:    '155 lbs',
       age:       '—',
+      birthPlace: '—',
+      highSchool: '—',
       college:   'Arizona',
       draftYear: '2018',
-      draftPick: 'First Round, Thirteenth Pick'
+      draftPick: 'First Round, Thirteenth Pick',
+      draftTeam: '—'
 
     },
     retired: true,
@@ -313,9 +317,12 @@ window.PLAYER_STATS = {
       height:    '6\'7\"',
       weight:    '228 lbs',
       age:       '—',
+      birthPlace: '—',
+      highSchool: '—',
       college:   'UCLA',
       draftYear: '2017',
-      draftPick: 'First Round, Second Pick'
+      draftPick: 'First Round, Second Pick',
+      draftTeam: '—'
 
     },
     retired: true,
@@ -467,9 +474,12 @@ window.PLAYER_STATS = {
       height:    '6\'9\"',
       weight:    '253 lbs',
       age:       '—',
+      birthPlace: '—',
+      highSchool: '—',
       college:   'Louisville',
       draftYear: '2018',
-      draftPick: 'First Round, Seventeenth Pick'
+      draftPick: 'First Round, Seventeenth Pick',
+      draftTeam: '—'
 
     },
     retired: true,
@@ -643,9 +653,12 @@ window.PLAYER_STATS = {
       height:    '6\'5\"',
       weight:    '200 lbs',
       age:       '—',
+      birthPlace: '—',
+      highSchool: '—',
       college:   'Florida State, Duke',
       draftYear: '2018',
-      draftPick: 'First Round, Eleventh Pick'
+      draftPick: 'First Round, Eleventh Pick',
+      draftTeam: '—'
 
     },
     retired: true,
@@ -822,9 +835,12 @@ window.PLAYER_STATS = {
       height:    '6\'4\"',
       weight:    '203 lbs',
       age:       '—',
+      birthPlace: '—',
+      highSchool: '—',
       college:   'Kansas',
       draftYear: '2017',
-      draftPick: 'First Round, Sixth Pick'
+      draftPick: 'First Round, Sixth Pick',
+      draftTeam: '—'
 
     },
     retired: true,

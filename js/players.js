@@ -73,13 +73,16 @@
       if (info.position) PLAYERS[key].position = info.position;
       // Build bio rows from info object
       PLAYERS[key].bio = [
-        { key:'Height',     val: info.height    || '—' },
-        { key:'Weight',     val: info.weight    || '—' },
-        { key:'Age',        val: info.age       || '—' },
-        { key:'College',    val: info.college   || '—' },
-        { key:'Draft Year', val: info.draftYear || '—' },
-        { key:'Draft Pick', val: info.draftPick || '—' },
-        { key:'Nickname',   val: info.nickname  || '—' },
+        { key:'Height',      val: info.height     || '—' },
+        { key:'Weight',      val: info.weight     || '—' },
+        { key:'Age',         val: info.age        || '—' },
+        { key:'Birth Place', val: info.birthPlace || '—' },
+        { key:'Highschool',  val: info.highSchool || '—' },
+        { key:'College',     val: info.college    || '—' },
+        { key:'Draft Year',  val: info.draftYear  || '—' },
+        { key:'Draft Pick',  val: info.draftPick  || '—' },
+        { key:'Draft Team',  val: info.draftTeam  || '—' },
+        { key:'Nickname',    val: info.nickname   || '—' },
       ];
     });
   })();
@@ -727,12 +730,15 @@
     var ageVal = (latest && latest.age) ? String(latest.age) : (bioMap['Age'] || '—');
 
     var rows = [
-      { key:'Height', val: bioMap['Height']    || '—' },
-      { key:'Weight', val: bioMap['Weight']    || '—' },
-      { key:'Age',    val: ageVal },
-      { key:'School', val: bioMap['College']   || '—' },
-      { key:'Class',  val: bioMap['Draft Year']|| '—' },
-      { key:'Draft Pick', val: bioMap['Draft Pick'] || '—' },
+      { key:'Height',      val: bioMap['Height']     || '—' },
+      { key:'Weight',      val: bioMap['Weight']     || '—' },
+      { key:'Age',         val: ageVal },
+      { key:'Birth Place', val: bioMap['Birth Place']|| '—' },
+      { key:'Highschool',  val: bioMap['Highschool'] || '—' },
+      { key:'College',     val: bioMap['College']    || '—' },
+      { key:'Class',       val: bioMap['Draft Year'] || '—' },
+      { key:'Draft Pick',  val: bioMap['Draft Pick'] || '—' },
+      { key:'Draft Team',  val: bioMap['Draft Team'] || '—' },
     ];
 
     rows.forEach(function(r){
@@ -747,68 +753,65 @@
 
     // Render play style
     renderPlaystyle(key);
-    renderCareerPhotos(key);
+    renderCareerOverview(key, avg, champs, stars);
   }
 
-  /* ── CAREER PHOTOS ── */
-  function renderCareerPhotos(key) {
-    var ps = (typeof PLAYER_STATS !== 'undefined' && PLAYER_STATS[key]) ? PLAYER_STATS[key] : null;
-    var photos = ps ? (ps.photos || []) : [];
-    var wrap  = document.getElementById('bio-career-photos');
-    var track = document.getElementById('bio-career-photos-track');
-    var dotsEl= document.getElementById('bio-photos-dots');
-    var prevBtn = document.getElementById('bio-photos-prev');
-    var nextBtn = document.getElementById('bio-photos-next');
-    if (!wrap || !track) return;
+  /* ── CAREER OVERVIEW ── */
+  function renderCareerOverview(key, avg, champs, stars) {
+    var el = document.getElementById('bio-overview-rows');
+    if (!el) return;
+    el.innerHTML = '';
 
-    if (!photos.length) { wrap.style.display = 'none'; return; }
-    wrap.style.display = '';
-    track.innerHTML = '';
-    dotsEl.innerHTML = '';
+    var proRegular = ((PLAYER_STATS[key]||{}).regular||[]).filter(isProRow);
+    var proTotals  = ((PLAYER_STATS[key]||{}).totals ||[]).filter(isProRow);
 
-    var current = 0;
-
-    // Build slides
-    photos.forEach(function(photo, i) {
-      var slide = document.createElement('div');
-      slide.className = 'career-photos-slide';
-      var img = document.createElement('img');
-      img.src = photo.url;
-      img.alt = photo.caption || '';
-      img.loading = i === 0 ? 'eager' : 'lazy';
-      slide.appendChild(img);
-      if (photo.caption) {
-        var cap = document.createElement('div');
-        cap.className = 'career-photos-caption';
-        cap.textContent = photo.caption;
-        slide.appendChild(cap);
-      }
-      track.appendChild(slide);
-
-      // Dot
-      var dot = document.createElement('button');
-      dot.className = 'career-photos-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', function() { goTo(i); });
-      dotsEl.appendChild(dot);
-    });
-
-    function goTo(idx) {
-      current = (idx + photos.length) % photos.length;
-      track.style.transform = 'translateX(-' + (current * 100) + '%)';
-      dotsEl.querySelectorAll('.career-photos-dot').forEach(function(d, i) {
-        d.classList.toggle('active', i === current);
-      });
-      // Show/hide arrows for single photo
-      var show = photos.length > 1;
-      prevBtn.style.display = show ? '' : 'none';
-      nextBtn.style.display = show ? '' : 'none';
-      dotsEl.style.display  = show ? '' : 'none';
+    if (!avg || !proRegular.length) {
+      el.innerHTML = '<div class="bio-row"><span class="bio-row-key">Career</span><span class="bio-row-val">—</span></div>';
+      return;
     }
 
-    prevBtn.onclick = function() { goTo(current - 1); };
-    nextBtn.onclick = function() { goTo(current + 1); };
+    // Seasons span, e.g. "2016–17 – 2036–37"
+    var firstSeason = proRegular[0].season;
+    var lastSeason  = proRegular[proRegular.length-1].season;
+    var span = fmtSeason(firstSeason) === fmtSeason(lastSeason)
+      ? fmtSeason(firstSeason)
+      : fmtSeason(firstSeason) + ' – ' + fmtSeason(lastSeason);
 
-    goTo(0);
+    // Distinct teams, in order first played
+    var teams = [];
+    proRegular.forEach(function(r){ if (r.team && teams.indexOf(r.team) === -1) teams.push(r.team); });
+
+    // Career totals — sum from totals rows when present, else derive from per-game averages
+    var careerPts, careerReb, careerAst;
+    if (proTotals.length) {
+      careerPts = proTotals.reduce(function(s,r){ return s+(r.pts||0); }, 0);
+      careerReb = proTotals.reduce(function(s,r){ return s+(r.reb||0); }, 0);
+      careerAst = proTotals.reduce(function(s,r){ return s+(r.ast||0); }, 0);
+    } else {
+      careerPts = Math.round(proRegular.reduce(function(s,r){ return s+r.ppg*r.gp; }, 0));
+      careerReb = Math.round(proRegular.reduce(function(s,r){ return s+r.rpg*r.gp; }, 0));
+      careerAst = Math.round(proRegular.reduce(function(s,r){ return s+r.apg*r.gp; }, 0));
+    }
+
+    // Peak season by PPG
+    var peak = proRegular.reduce(function(best,r){ return (!best || r.ppg > best.ppg) ? r : best; }, null);
+
+    var rows = [
+      { key:'Seasons',          val: avg.seasons + ' (' + span + ')' },
+      { key:'Teams',            val: teams.join(', ') || '—' },
+      { key:'Career Points',    val: careerPts.toLocaleString() },
+      { key:'Career Rebounds',  val: careerReb.toLocaleString() },
+      { key:'Career Assists',   val: careerAst.toLocaleString() },
+      { key:'Peak Season',      val: peak ? (fmtSeason(peak.season) + ' · ' + fmt1(peak.ppg) + ' PPG') : '—' },
+      { key:'All-Star Selections', val: String(stars) },
+      { key:'Championships',    val: String(champs) },
+    ];
+
+    rows.forEach(function(r){
+      var d = document.createElement('div'); d.className='bio-row';
+      d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val">'+r.val+'</span>';
+      el.appendChild(d);
+    });
   }
   function renderPlaystyle(key) {
     var ps = (typeof PLAYER_STATS !== 'undefined' && PLAYER_STATS[key]) ? PLAYER_STATS[key] : null;
