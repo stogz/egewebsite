@@ -25,7 +25,7 @@ window.PLAYER_STATS = {
       college:   'Louisville',
       draftYear: '2012',
       draftPick: '???',
-      nickname:  '"Clutch Clark", "Cswag"',
+      nickname:  '—',
       position:  'Shooting Guard',
     },
     retired:  false,
@@ -38,6 +38,10 @@ window.PLAYER_STATS = {
     ],
     playoffs: [],
     totals:   [],
+    awards: {
+       college: [
+          { title:'NCAA Champion',                         years:[2017], icon:'🏆' },
+       ],
   },
 
   /* ─────────────── PAXON HATCH ─────────────── */
@@ -49,7 +53,7 @@ window.PLAYER_STATS = {
       college:   'Texas',
       draftYear: '2012',
       draftPick: '???',
-      nickname:  '"Pax"',
+      nickname:  '—',
       position:  'Center',
     },
     retired:  false,
@@ -73,7 +77,7 @@ window.PLAYER_STATS = {
       college:   'Butler',
       draftYear: '2012',
       draftPick: '???',
-      nickname:  '"Uncle Sam"',
+      nickname:  '—',
       position:  'Point Guard',
     },
     retired:  false,
@@ -121,7 +125,7 @@ window.PLAYER_STATS = {
       college:   'Indiana',
       draftYear: '2012',
       draftPick: '???',
-      nickname:  '"V8"',
+      nickname:  '—',
       position:  'Combo Guard',
     },
     retired:  false,
