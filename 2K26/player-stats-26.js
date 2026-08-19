@@ -38,10 +38,6 @@ window.PLAYER_STATS = {
     ],
     playoffs: [],
     totals:   [],
-    awards: {
-       college: [
-          { title:'NCAA Champion',                         years:[2017], icon:'🏆' },
-       ],
   },
 
   /* ─────────────── PAXON HATCH ─────────────── */
