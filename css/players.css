@@ -349,16 +349,15 @@
     .bio-icon-row .bio-icon-empty { font-family:var(--font-body); font-weight:600; font-size:1rem; color:var(--heading); }
     .bio-icon-star {
       display:inline-block; font-size:1.15rem; line-height:1; color:#ffffff;
-      /* thin warm outline keeps the white fill readable against light-mode cards */
-      text-shadow:
-        -1px 0 0 rgba(214,158,46,.6), 1px 0 0 rgba(214,158,46,.6),
-        0 -1px 0 rgba(214,158,46,.6), 0 1px 0 rgba(214,158,46,.6);
-      filter:drop-shadow(0 0 3px rgba(255,255,255,.8)) drop-shadow(0 0 7px rgba(255,196,84,.45));
+      filter:drop-shadow(0 0 3px rgba(255,255,255,.8)) drop-shadow(0 0 7px rgba(var(--accent-rgb),.5));
       animation:bioStarGlow 2.6s ease-in-out infinite;
     }
+    /* Light mode: white reads poorly on light cards, so fill with the
+       active sim's accent instead — orange for 2K25, blue for 2K26. */
+    html.light .bio-icon-star { color:var(--orange); }
     @keyframes bioStarGlow {
-      0%, 100% { filter:drop-shadow(0 0 3px rgba(255,255,255,.7))  drop-shadow(0 0 6px rgba(255,196,84,.35)); }
-      50%      { filter:drop-shadow(0 0 6px rgba(255,255,255,1))   drop-shadow(0 0 13px rgba(255,196,84,.7)); }
+      0%, 100% { filter:drop-shadow(0 0 3px rgba(255,255,255,.7))  drop-shadow(0 0 6px rgba(var(--accent-rgb),.4)); }
+      50%      { filter:drop-shadow(0 0 6px rgba(255,255,255,1))   drop-shadow(0 0 13px rgba(var(--accent-rgb),.75)); }
     }
     .bio-icon-trophy {
       display:inline-block; height:20px; width:auto; vertical-align:middle;
@@ -371,13 +370,11 @@
     }
     .bio-teams-strip {
       display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-      gap:32px; padding:28px 20px 8px;
+      gap:48px; padding:28px 20px 8px;
     }
     .bio-teams-strip img {
-      height:44px; width:auto; max-width:64px; object-fit:contain;
-      transition:transform .15s;
+      height:32px; width:auto; max-width:52px; object-fit:contain;
     }
-    .bio-teams-strip img:hover { transform:scale(1.12); }
     .stat-snapshot { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border-radius:0; overflow:hidden; border:1px solid var(--border); margin-bottom:24px; }
     .snapshot-cell { background:var(--bg-card); padding:22px 16px; text-align:center; transition:background .35s; }
     .snapshot-cell:hover { background:rgba(var(--accent-rgb),.05); }
@@ -592,57 +589,6 @@
     @media (max-width:420px) {
       .stat-snapshot { grid-template-columns:repeat(3,1fr); }
     }
-    .playstyle-section { margin-top: 24px; }
-    .playstyle-header { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); padding:14px 24px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
-    .playstyle-header .bio-card-dot { flex-shrink:0; }
-    .playstyle-grid { display:flex; flex-wrap:wrap; gap:10px; padding:20px 24px; }
-    .playstyle-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 14px;
-      border: 1px solid var(--border);
-      background: transparent;
-      cursor: pointer;
-      font-family: var(--font-mono); font-size: .62rem;
-      letter-spacing: .12em; text-transform: uppercase;
-      color: var(--text-muted);
-      transition: border-color .2s, color .2s, background .2s;
-      position: relative;
-      user-select: none;
-    }
-    .playstyle-badge:hover { border-color: var(--orange); color: var(--heading); background: rgba(var(--accent-rgb),.05); }
-    .playstyle-badge.active { border-color: var(--orange); color: var(--orange); background: rgba(var(--accent-rgb),.08); }
-    .playstyle-badge-icon { font-size: .9rem; line-height: 1; }
-    .playstyle-desc {
-      margin: 0 24px 20px;
-      padding: 18px 20px;
-      border: 1px solid var(--border);
-      border-top: 2px solid var(--orange);
-      background: rgba(35,26,165,.06);
-      display: none;
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 20px;
-      animation: fadeSlideUp .2s ease both;
-    }
-    .playstyle-desc.visible { display: flex; }
-    .playstyle-desc-icon {
-      font-size: 2.8rem;
-      line-height: 1;
-      flex-shrink: 0;
-      width: 52px;
-      text-align: center;
-      padding-top: 2px;
-    }
-    .playstyle-desc-body { flex: 1; min-width: 0; }
-    .playstyle-desc-label { font-family:var(--font-mono); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; color:var(--orange); margin-bottom:6px; display:block; }
-    .playstyle-desc-text { font-family: var(--font-body); font-size: .88rem; font-weight: 300; line-height: 1.65; color: var(--text); }
-    @media (max-width: 768px) {
-      .playstyle-desc { flex-direction: column; gap: 12px; }
-      .playstyle-desc-icon { font-size: 2.2rem; width: auto; }
-    }
-
-    /* ══ END PLAYSTYLE ══ */
-
     /* ══ PERCENTILE / SCOUTING REPORT ══ */
     .pct-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid var(--border-soft); cursor:crosshair; }
     .pct-row:last-child { border-bottom:none; }

@@ -752,7 +752,6 @@
     if (careerEl) careerEl.innerHTML='';
 
     // Render play style
-    renderPlaystyle(key);
     renderCareerOverview(key, avg, champs, stars, isRetired);
   }
 
@@ -844,44 +843,6 @@
       });
     }
   }
-  function renderPlaystyle(key) {
-    var ps = (typeof PLAYER_STATS !== 'undefined' && PLAYER_STATS[key]) ? PLAYER_STATS[key] : null;
-    var traits = ps ? (ps.playstyle || []) : [];
-    var card  = document.getElementById('bio-playstyle-card');
-    var grid  = document.getElementById('bio-playstyle-grid');
-    var desc  = document.getElementById('bio-playstyle-desc');
-    var dLabel= document.getElementById('bio-playstyle-desc-label');
-    var dText = document.getElementById('bio-playstyle-desc-text');
-    var dIcon = document.getElementById('bio-playstyle-desc-icon');
-    if (!card || !grid) return;
-
-    if (!traits.length) { card.style.display = 'none'; return; }
-    card.style.display = '';
-    grid.innerHTML = '';
-    desc.classList.remove('visible');
-
-    traits.forEach(function(trait, i) {
-      var btn = document.createElement('button');
-      btn.className = 'playstyle-badge';
-      btn.innerHTML = '<span class="playstyle-badge-icon">' + (trait.icon || '◆') + '</span>' + trait.label;
-      btn.addEventListener('click', function() {
-        var isActive = btn.classList.contains('active');
-        // close all
-        grid.querySelectorAll('.playstyle-badge').forEach(function(b){ b.classList.remove('active'); });
-        if (isActive) {
-          desc.classList.remove('visible');
-        } else {
-          btn.classList.add('active');
-          if (dIcon) dIcon.textContent = trait.icon || '◆';
-          dLabel.textContent = trait.label;
-          dText.textContent  = trait.desc;
-          desc.classList.add('visible');
-        }
-      });
-      grid.appendChild(btn);
-    });
-  }
-
   /* ── TEAM ABBR → SLUG MAP (for linking team cells to teams.html) ── */
   var ABBR_TO_SLUG = {
     'ATL':'atlantahawks',      'BOS':'bostonceltics',       'BKN':'brooklynnets',
