@@ -753,11 +753,11 @@
 
     // Render play style
     renderPlaystyle(key);
-    renderCareerOverview(key, avg, champs, stars);
+    renderCareerOverview(key, avg, champs, stars, isRetired);
   }
 
   /* ── CAREER OVERVIEW ── */
-  function renderCareerOverview(key, avg, champs, stars) {
+  function renderCareerOverview(key, avg, champs, stars, isRetired) {
     var el = document.getElementById('bio-overview-rows');
     if (!el) return;
     el.innerHTML = '';
@@ -770,12 +770,14 @@
       return;
     }
 
-    // Seasons span, e.g. "2016–17 – 2036–37"
+    var lastRow = proRegular[proRegular.length-1];
+
+    // Seasons span, e.g. "2016–17 – 2036–37" — active players show "..." for the open-ended final year
     var firstSeason = proRegular[0].season;
-    var lastSeason  = proRegular[proRegular.length-1].season;
-    var span = fmtSeason(firstSeason) === fmtSeason(lastSeason)
+    var lastLabel = isRetired ? fmtSeason(lastRow.season) : '...';
+    var span = (isRetired && fmtSeason(firstSeason) === fmtSeason(lastRow.season))
       ? fmtSeason(firstSeason)
-      : fmtSeason(firstSeason) + ' – ' + fmtSeason(lastSeason);
+      : fmtSeason(firstSeason) + ' – ' + lastLabel;
 
     // Distinct teams, in order first played
     var teams = [];
@@ -808,7 +810,7 @@
 
     var rows = [
       { key:'Seasons',          val: avg.seasons + ' (' + span + ')' },
-      { key:'Teams',            val: teams.join(', ') || '—' },
+      { key:'Teams',            val: '<span class="bio-icon-row" id="bio-teams-logos"></span>', raw:true },
       { key:'Career Points',    val: careerPts.toLocaleString() },
       { key:'Career Rebounds',  val: careerReb.toLocaleString() },
       { key:'Career Assists',   val: careerAst.toLocaleString() },
@@ -819,10 +821,77 @@
 
     rows.forEach(function(r){
       var d = document.createElement('div'); d.className='bio-row';
-      var valEl = r.icons ? '<span class="bio-icon-row">'+r.val+'</span>' : '<span class="bio-row-val">'+r.val+'</span>';
+      var valEl = r.raw ? r.val : (r.icons ? '<span class="bio-icon-row">'+r.val+'</span>' : '<span class="bio-row-val">'+r.val+'</span>');
       d.innerHTML='<span class="bio-row-key">'+r.key+'</span>'+valEl;
       el.appendChild(d);
     });
+
+    // Populate team logos with hover tooltips showing per-team career stats
+    var logosEl = document.getElementById('bio-teams-logos');
+    if (logosEl) {
+      if (!teams.length) {
+        logosEl.innerHTML = '<span class="bio-icon-empty">—</span>';
+      } else {
+        var pieTooltip = document.getElementById('pie-tooltip');
+        teams.forEach(function(team){
+          var teamRows = proRegular.filter(function(r){ return r.team === team; });
+          var tGp = teamRows.reduce(function(s,r){ return s+r.gp; }, 0);
+          var tPpg = fmt1(teamRows.reduce(function(s,r){ return s+r.ppg*r.gp; }, 0)/tGp);
+          var tRpg = fmt1(teamRows.reduce(function(s,r){ return s+r.rpg*r.gp; }, 0)/tGp);
+          var tApg = fmt1(teamRows.reduce(function(s,r){ return s+r.apg*r.gp; }, 0)/tGp);
+          var tFirstSeason = teamRows[0].season;
+          var tLastRow = teamRows[teamRows.length-1];
+          var isOngoing = !isRetired && tLastRow === lastRow;
+          var tLastLabel = isOngoing ? '...' : fmtSeason(tLastRow.season);
+          var tSpan = (!isOngoing && fmtSeason(tFirstSeason) === fmtSeason(tLastRow.season))
+            ? fmtSeason(tFirstSeason)
+            : fmtSeason(tFirstSeason) + ' – ' + tLastLabel;
+          var teamName = teamFull(team) || team;
+          var logoUrl = TEAM_LOGOS[team] || TEAM_LOGOS[teamName] || '';
+
+          var img = document.createElement('img');
+          img.className = 'bio-team-logo';
+          if (logoUrl) img.src = logoUrl;
+          img.alt = teamName;
+          img.loading = 'lazy';
+
+          img.addEventListener('mouseenter', function(e){
+            if (!pieTooltip) return;
+            var isLightNow = document.documentElement.classList.contains('light');
+            var bg        = isLightNow ? '#ffffff' : '#0e0b2e';
+            var border    = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
+            var textMain  = isLightNow ? '#0e0b2e' : '#ffffff';
+            var textMuted = isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+            function statBlock(lbl,val){
+              return '<div style="text-align:center;"><div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:'+textMain+';line-height:1;">'+val+'</div><div style="font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;color:'+textMuted+';margin-top:3px;">'+lbl+'</div></div>';
+            }
+            pieTooltip.style.background = bg;
+            pieTooltip.style.border = '1px solid ' + border;
+            pieTooltip.style.color = textMain;
+            pieTooltip.style.padding = '10px 14px';
+            pieTooltip.style.boxShadow = '0 4px 18px rgba(0,0,0,.35)';
+            pieTooltip.style.minWidth = '150px';
+            pieTooltip.innerHTML =
+              '<div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMain+';margin-bottom:2px;">'+teamName+'</div>' +
+              '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-bottom:8px;">'+tSpan+' · '+tGp+' GP</div>' +
+              '<div style="display:flex;gap:14px;">' + statBlock('PPG',tPpg) + statBlock('RPG',tRpg) + statBlock('APG',tApg) + '</div>';
+            pieTooltip.style.display = 'block';
+            pieTooltip.style.left = (e.clientX + 16) + 'px';
+            pieTooltip.style.top  = (e.clientY - 16) + 'px';
+          });
+          img.addEventListener('mousemove', function(e){
+            if (!pieTooltip) return;
+            pieTooltip.style.left = (e.clientX + 16) + 'px';
+            pieTooltip.style.top  = (e.clientY - 16) + 'px';
+          });
+          img.addEventListener('mouseleave', function(){
+            if (pieTooltip) pieTooltip.style.display = 'none';
+          });
+
+          logosEl.appendChild(img);
+        });
+      }
+    }
   }
   function renderPlaystyle(key) {
     var ps = (typeof PLAYER_STATS !== 'undefined' && PLAYER_STATS[key]) ? PLAYER_STATS[key] : null;

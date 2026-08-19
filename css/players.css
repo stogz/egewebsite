@@ -353,6 +353,11 @@
       animation:bioIconGlow 2.6s ease-in-out infinite;
     }
     .bio-icon-star { color:var(--orange); }
+    .bio-team-logo {
+      width:26px; height:26px; object-fit:contain; cursor:default;
+      transition:transform .15s;
+    }
+    .bio-team-logo:hover { transform:scale(1.18); }
     @keyframes bioIconGlow {
       0%, 100% { filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.65)) drop-shadow(0 0 6px rgba(var(--accent-rgb),.35)); }
       50%      { filter:drop-shadow(0 0 6px rgba(var(--accent-rgb),1))   drop-shadow(0 0 13px rgba(var(--accent-rgb),.65)); }
