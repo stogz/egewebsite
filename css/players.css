@@ -143,6 +143,7 @@
       .sel26-cell { animation:none; }
       .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow,
       .sel26-team-mark img { transition:none; }
+      .bio-icon-star, .bio-icon-trophy { animation:none; }
     }
 
     /* responsive: 5 → 3 → 2 → 1 */
@@ -344,6 +345,39 @@
     .bio-row-key { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); }
     .bio-row-val { font-family:var(--font-body); font-weight:600; font-size:1rem; letter-spacing:.04em; color:var(--heading); text-align:right; transition:color .35s; }
     .bio-row-val.orange { color:var(--orange); }
+    .bio-icon-row { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; align-items:center; }
+    .bio-icon-row .bio-icon-empty { font-family:var(--font-body); font-weight:600; font-size:1rem; color:var(--heading); }
+    .bio-icon-star {
+      display:inline-block; font-size:1.15rem; line-height:1; color:#ffffff;
+      /* thin warm outline keeps the white fill readable against light-mode cards */
+      text-shadow:
+        -1px 0 0 rgba(214,158,46,.6), 1px 0 0 rgba(214,158,46,.6),
+        0 -1px 0 rgba(214,158,46,.6), 0 1px 0 rgba(214,158,46,.6);
+      filter:drop-shadow(0 0 3px rgba(255,255,255,.8)) drop-shadow(0 0 7px rgba(255,196,84,.45));
+      animation:bioStarGlow 2.6s ease-in-out infinite;
+    }
+    @keyframes bioStarGlow {
+      0%, 100% { filter:drop-shadow(0 0 3px rgba(255,255,255,.7))  drop-shadow(0 0 6px rgba(255,196,84,.35)); }
+      50%      { filter:drop-shadow(0 0 6px rgba(255,255,255,1))   drop-shadow(0 0 13px rgba(255,196,84,.7)); }
+    }
+    .bio-icon-trophy {
+      display:inline-block; height:20px; width:auto; vertical-align:middle;
+      filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.6)) drop-shadow(0 0 7px rgba(var(--accent-rgb),.4));
+      animation:bioTrophyGlow 2.6s ease-in-out infinite;
+    }
+    @keyframes bioTrophyGlow {
+      0%, 100% { filter:drop-shadow(0 0 2px rgba(var(--accent-rgb),.55)) drop-shadow(0 0 5px rgba(var(--accent-rgb),.3)); }
+      50%      { filter:drop-shadow(0 0 5px rgba(var(--accent-rgb),.9))  drop-shadow(0 0 11px rgba(var(--accent-rgb),.6)); }
+    }
+    .bio-teams-strip {
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+      gap:32px; padding:28px 20px 8px;
+    }
+    .bio-teams-strip img {
+      height:44px; width:auto; max-width:64px; object-fit:contain;
+      transition:transform .15s;
+    }
+    .bio-teams-strip img:hover { transform:scale(1.12); }
     .stat-snapshot { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border-radius:0; overflow:hidden; border:1px solid var(--border); margin-bottom:24px; }
     .snapshot-cell { background:var(--bg-card); padding:22px 16px; text-align:center; transition:background .35s; }
     .snapshot-cell:hover { background:rgba(var(--accent-rgb),.05); }

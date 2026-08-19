@@ -753,11 +753,11 @@
 
     // Render play style
     renderPlaystyle(key);
-    renderCareerOverview(key, avg, champs, stars);
+    renderCareerOverview(key, avg, champs, stars, isRetired);
   }
 
   /* ── CAREER OVERVIEW ── */
-  function renderCareerOverview(key, avg, champs, stars) {
+  function renderCareerOverview(key, avg, champs, stars, isRetired) {
     var el = document.getElementById('bio-overview-rows');
     if (!el) return;
     el.innerHTML = '';
@@ -770,12 +770,14 @@
       return;
     }
 
-    // Seasons span, e.g. "2016–17 – 2036–37"
+    var lastRow = proRegular[proRegular.length-1];
+
+    // Seasons span, e.g. "2016–17 – 2036–37" — active players show "..." for the open-ended final year
     var firstSeason = proRegular[0].season;
-    var lastSeason  = proRegular[proRegular.length-1].season;
-    var span = fmtSeason(firstSeason) === fmtSeason(lastSeason)
+    var lastLabel = isRetired ? fmtSeason(lastRow.season) : '...';
+    var span = (isRetired && fmtSeason(firstSeason) === fmtSeason(lastRow.season))
       ? fmtSeason(firstSeason)
-      : fmtSeason(firstSeason) + ' – ' + fmtSeason(lastSeason);
+      : fmtSeason(firstSeason) + ' – ' + lastLabel;
 
     // Distinct teams, in order first played
     var teams = [];
@@ -796,22 +798,51 @@
     // Peak season by PPG
     var peak = proRegular.reduce(function(best,r){ return (!best || r.ppg > best.ppg) ? r : best; }, null);
 
+    // Repeat a glyph once per count, each with a staggered glow, or an em dash if zero
+    function iconRow(count, render) {
+      if (!count) return '<span class="bio-icon-empty">—</span>';
+      var html = '';
+      for (var i = 0; i < count; i++) html += render(i);
+      return html;
+    }
+    var TROPHY_URL = 'https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png';
+
     var rows = [
       { key:'Seasons',          val: avg.seasons + ' (' + span + ')' },
-      { key:'Teams',            val: teams.join(', ') || '—' },
       { key:'Career Points',    val: careerPts.toLocaleString() },
       { key:'Career Rebounds',  val: careerReb.toLocaleString() },
       { key:'Career Assists',   val: careerAst.toLocaleString() },
       { key:'Peak Season',      val: peak ? (fmtSeason(peak.season) + ' · ' + fmt1(peak.ppg) + ' PPG') : '—' },
-      { key:'All-Star Selections', val: String(stars) },
-      { key:'Championships',    val: String(champs) },
+      { key:'All-Star Selections', val: iconRow(stars, function(i){
+          return '<span class="bio-icon-star" style="animation-delay:'+(i*0.18)+'s">★</span>';
+        }), icons:true },
+      { key:'Championships',    val: iconRow(champs, function(i){
+          return '<img class="bio-icon-trophy" src="'+TROPHY_URL+'" alt="Championship" style="animation-delay:'+(i*0.18)+'s">';
+        }), icons:true },
     ];
 
     rows.forEach(function(r){
       var d = document.createElement('div'); d.className='bio-row';
-      d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val">'+r.val+'</span>';
+      var valEl = r.icons ? '<span class="bio-icon-row">'+r.val+'</span>' : '<span class="bio-row-val">'+r.val+'</span>';
+      d.innerHTML='<span class="bio-row-key">'+r.key+'</span>'+valEl;
       el.appendChild(d);
     });
+
+    // Team logo strip — centered, full-width, below the two-column bio grid
+    var stripEl = document.getElementById('bio-teams-strip');
+    if (stripEl) {
+      stripEl.innerHTML = '';
+      teams.forEach(function(team){
+        var teamName = teamFull(team) || team;
+        var logoUrl = TEAM_LOGOS[team] || TEAM_LOGOS[teamName] || '';
+        if (!logoUrl) return;
+        var img = document.createElement('img');
+        img.src = logoUrl;
+        img.alt = teamName;
+        img.loading = 'lazy';
+        stripEl.appendChild(img);
+      });
+    }
   }
   function renderPlaystyle(key) {
     var ps = (typeof PLAYER_STATS !== 'undefined' && PLAYER_STATS[key]) ? PLAYER_STATS[key] : null;
