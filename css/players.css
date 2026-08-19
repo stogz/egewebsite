@@ -143,6 +143,7 @@
       .sel26-cell { animation:none; }
       .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow,
       .sel26-team-mark img { transition:none; }
+      .bio-icon-star, .bio-icon-trophy { animation:none; }
     }
 
     /* responsive: 5 → 3 → 2 → 1 */
@@ -344,6 +345,18 @@
     .bio-row-key { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); }
     .bio-row-val { font-family:var(--font-body); font-weight:600; font-size:1rem; letter-spacing:.04em; color:var(--heading); text-align:right; transition:color .35s; }
     .bio-row-val.orange { color:var(--orange); }
+    .bio-icon-row { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
+    .bio-icon-row .bio-icon-empty { font-family:var(--font-body); font-weight:600; font-size:1rem; color:var(--heading); }
+    .bio-icon-star, .bio-icon-trophy {
+      display:inline-block; font-size:1.05rem; line-height:1;
+      filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.7)) drop-shadow(0 0 7px rgba(var(--accent-rgb),.4));
+      animation:bioIconGlow 2.6s ease-in-out infinite;
+    }
+    .bio-icon-star { color:var(--orange); }
+    @keyframes bioIconGlow {
+      0%, 100% { filter:drop-shadow(0 0 3px rgba(var(--accent-rgb),.65)) drop-shadow(0 0 6px rgba(var(--accent-rgb),.35)); }
+      50%      { filter:drop-shadow(0 0 6px rgba(var(--accent-rgb),1))   drop-shadow(0 0 13px rgba(var(--accent-rgb),.65)); }
+    }
     .stat-snapshot { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border-radius:0; overflow:hidden; border:1px solid var(--border); margin-bottom:24px; }
     .snapshot-cell { background:var(--bg-card); padding:22px 16px; text-align:center; transition:background .35s; }
     .snapshot-cell:hover { background:rgba(var(--accent-rgb),.05); }

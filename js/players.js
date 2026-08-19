@@ -796,6 +796,16 @@
     // Peak season by PPG
     var peak = proRegular.reduce(function(best,r){ return (!best || r.ppg > best.ppg) ? r : best; }, null);
 
+    // Repeat an emoji icon once per count, each with a staggered glow, or an em dash if zero
+    function iconRow(count, iconClass, glyph) {
+      if (!count) return '<span class="bio-icon-empty">—</span>';
+      var html = '';
+      for (var i = 0; i < count; i++) {
+        html += '<span class="'+iconClass+'" style="animation-delay:'+(i*0.18)+'s">'+glyph+'</span>';
+      }
+      return html;
+    }
+
     var rows = [
       { key:'Seasons',          val: avg.seasons + ' (' + span + ')' },
       { key:'Teams',            val: teams.join(', ') || '—' },
@@ -803,13 +813,14 @@
       { key:'Career Rebounds',  val: careerReb.toLocaleString() },
       { key:'Career Assists',   val: careerAst.toLocaleString() },
       { key:'Peak Season',      val: peak ? (fmtSeason(peak.season) + ' · ' + fmt1(peak.ppg) + ' PPG') : '—' },
-      { key:'All-Star Selections', val: String(stars) },
-      { key:'Championships',    val: String(champs) },
+      { key:'All-Star Selections', val: iconRow(stars, 'bio-icon-star', '★'), icons:true },
+      { key:'Championships',    val: iconRow(champs, 'bio-icon-trophy', '🏆'), icons:true },
     ];
 
     rows.forEach(function(r){
       var d = document.createElement('div'); d.className='bio-row';
-      d.innerHTML='<span class="bio-row-key">'+r.key+'</span><span class="bio-row-val">'+r.val+'</span>';
+      var valEl = r.icons ? '<span class="bio-icon-row">'+r.val+'</span>' : '<span class="bio-row-val">'+r.val+'</span>';
+      d.innerHTML='<span class="bio-row-key">'+r.key+'</span>'+valEl;
       el.appendChild(d);
     });
   }
