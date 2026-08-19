@@ -39,9 +39,11 @@ window.PLAYER_STATS = {
     playoffs: [],
     totals:   [],
     awards: {
-      nba: [],
+      nba: [
+         
+      ],
       college: [
-        { title:'NCAA Champion',                         years:[2017], icon:'🏆' },
+        { title:'NCAA Champion',                         years:[2012], icon:'🏆' },
       ],
       misc: []
     },
