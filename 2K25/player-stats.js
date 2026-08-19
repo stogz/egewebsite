@@ -31,7 +31,8 @@
                    { url:'https://example.com/clark_lakers.jpg', caption:'2026 NBA Finals' },
                    { url:'https://example.com/clark_draft.jpg',  caption:'2018 NBA Draft' }
 
-     playstyle → array of play-style trait badges shown on the Bio tab
+     playstyle → array of play-style trait badges (data kept, no longer
+                 rendered — the Bio tab Play Style box was removed)
                  Each entry:
                    icon  : emoji or symbol shown on the badge  e.g. '🎯'
                    label : short trait name  e.g. 'Elite Shooter'
@@ -58,7 +59,10 @@
                  and totals rows (pts, reb, ast, stl, blk).
 
    Each player now also has:
-     info    → { height, weight, age, college, draftYear, draftPick, nickname }
+     info    → { height, weight, age, birthPlace, highSchool, college,
+                 draftYear, draftPick, draftTeam, nickname }
+                 birthPlace, highSchool, and draftTeam default to '—' —
+                 edit those values on each player below to fill them in.
      retired → true | false  (controls active player count and profile badge)
 ═══════════════════════════════════════════════════════════ */
 

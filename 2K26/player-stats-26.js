@@ -3,6 +3,10 @@
 
    Same five players as 2K25.
    info{}   → player bio shown on the profile Bio tab
+              { height, weight, age, birthPlace, highSchool, college,
+                draftYear, draftPick, draftTeam, nickname, position }
+              birthPlace, highSchool, and draftTeam default to '—' —
+              edit those values on each player below to fill them in.
               info.position (optional) overrides the position shown in
               the player banner for this sim, e.g. a different college
               position than their default NBA position in 2K25
