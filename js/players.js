@@ -3718,13 +3718,15 @@
        width, hidden tabs (Shoes), or horizontal scroll position. */
   function positionSubnavIndicator() {
     var indicator = document.getElementById('subnav-indicator');
-    var island = document.getElementById('subnav-island');
     var active = document.querySelector('.subnav-tab.active');
-    if (!indicator || !island || !active || active.offsetParent === null) return;
-    var islandRect = island.getBoundingClientRect();
-    var activeRect  = active.getBoundingClientRect();
-    indicator.style.width = activeRect.width + 'px';
-    indicator.style.transform = 'translateX(' + (activeRect.left - islandRect.left) + 'px)';
+    // offsetLeft/offsetWidth (relative to .subnav-island, the offsetParent)
+    // are layout-coordinate values that don't shift with the island's own
+    // horizontal scroll position — unlike getBoundingClientRect, which is
+    // viewport-relative and would go stale mid-scroll (e.g. right after a
+    // click triggers both this and an animated scrollIntoView).
+    if (!indicator || !active || active.offsetParent === null) return;
+    indicator.style.width = active.offsetWidth + 'px';
+    indicator.style.transform = 'translateX(' + active.offsetLeft + 'px)';
   }
 
     /* ── TAB SWITCH ── */
