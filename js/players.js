@@ -836,11 +836,14 @@
         var teamName = teamFull(team) || team;
         var logoUrl = TEAM_LOGOS[team] || TEAM_LOGOS[teamName] || '';
         if (!logoUrl) return;
+        var box = document.createElement('span');
+        box.className = 'logo-box';
         var img = document.createElement('img');
         img.src = logoUrl;
         img.alt = teamName;
         img.loading = 'lazy';
-        stripEl.appendChild(img);
+        box.appendChild(img);
+        stripEl.appendChild(box);
       });
     }
   }
@@ -2430,11 +2433,13 @@
   }
 
     /* ── CAREER HIGHS SNAPSHOT (Bio tab) ──
-       Regular-season career highs only, styled to match the PPG/RPG/APG
-       snapshot: label, value, and just the season + opponent below. */
+       Styled to match the PPG/RPG/APG snapshot: label, value, and just
+       the season + opponent logo below. Regular season / playoffs toggle
+       mirrors the traditional-splits per-game toggle. */
   var CH_SNAPSHOT_LABELS = { pts:'PTS', reb:'REB', ast:'AST', stl:'STL', blk:'BLK', tpm:'3PM' };
   var CH_SNAPSHOT_ORDER  = ['pts','reb','ast','stl','blk','tpm'];
   var CH_MONTHS = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
+  var chSnapMode = 'regular'; // 'regular' | 'playoffs'
 
   /* 'Feb 11, 2029' → '2028-29' (NBA seasons span Aug–Jul, labeled by the starting year) */
   function chDateToSeason(dateStr) {
@@ -2447,14 +2452,11 @@
     return startYear + '-' + String(startYear + 1).slice(-2);
   }
 
-  function renderCareerHighSnapshot(key) {
-    var el = document.getElementById('bio-careerhigh-snapshot');
-    if (!el) return;
-    var highs = (PLAYER_STATS[key]||{}).careerHighs || [];
+  function buildCareerHighSnapshotCards(highs) {
     var byStat = {};
     highs.forEach(function(item){ byStat[item.stat] = item; });
 
-    el.innerHTML = CH_SNAPSHOT_ORDER.map(function(statKey){
+    return CH_SNAPSHOT_ORDER.map(function(statKey){
       var item = byStat[statKey];
       var label = CH_SNAPSHOT_LABELS[statKey];
       if (!item) {
@@ -2465,14 +2467,53 @@
       }
       var season = fmtSeason(chDateToSeason(item.date));
       var opp    = item.opp || '';
-      var logoHtml = (opp && TEAM_LOGOS[opp]) ? '<img src="' + TEAM_LOGOS[opp] + '">' : '';
-      var subtitle = [season, opp ? ('vs ' + opp) : ''].filter(Boolean).join(' · ');
+      var logoHtml = (opp && TEAM_LOGOS[opp])
+        ? '<span class="logo-box"><img src="' + TEAM_LOGOS[opp] + '" alt="' + opp + '"></span>'
+        : opp;
+      var subtitle = season ? (season + ' vs. ' + logoHtml) : '';
       return '<div class="ch-snapshot-cell">'
         + '<div class="ch-snapshot-label">' + label + '</div>'
         + '<div class="ch-snapshot-val">' + item.value + '</div>'
-        + (subtitle ? '<div class="ch-snapshot-sub">' + logoHtml + subtitle + '</div>' : '')
+        + (subtitle ? '<div class="ch-snapshot-sub">' + subtitle + '</div>' : '')
         + '</div>';
     }).join('');
+  }
+
+  function renderCareerHighSnapshot(key) {
+    var el = document.getElementById('bio-careerhigh-snapshot');
+    var toggleWrap = document.getElementById('bio-careerhigh-toggle');
+    if (!el) return;
+
+    var regularHighs = (PLAYER_STATS[key]||{}).careerHighs || [];
+    var playoffHighs = (PLAYER_STATS[key]||{}).playoffCareerHighs || [];
+    var hasPlayoffs  = playoffHighs.length > 0;
+
+    // Reset to regular season whenever we load a new player
+    var currentKey = el.dataset.playerKey;
+    if (currentKey !== key) {
+      chSnapMode = 'regular';
+    }
+    el.dataset.playerKey = key;
+
+    if (toggleWrap) {
+      toggleWrap.style.display = hasPlayoffs ? '' : 'none';
+      toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(b){
+        b.classList.toggle('active', b.dataset.chSnapMode === chSnapMode);
+      });
+      if (!toggleWrap.dataset.wired) {
+        toggleWrap.dataset.wired = '1';
+        toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            if (btn.dataset.chSnapMode === chSnapMode) return;
+            chSnapMode = btn.dataset.chSnapMode;
+            renderCareerHighSnapshot(el.dataset.playerKey);
+          });
+        });
+      }
+    }
+
+    var highs = (chSnapMode === 'playoffs' && hasPlayoffs) ? playoffHighs : regularHighs;
+    el.innerHTML = buildCareerHighSnapshotCards(highs);
   }
   /* ── SHOES PANEL ── */
   /* ── SHOE LIGHTBOX ── */
