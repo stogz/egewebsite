@@ -287,38 +287,45 @@
     .player-banner-meta { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
 
     /* Subnav */
-    /* ── PROFILE NAVIGATION — sliding-pill island ──
-       Sticks below the 64px site nav. Tabs sit inside a dark "island"
-       with a sliding indicator (JS: positionSubnavIndicator) behind the
-       active one, filled with the team color (--nav-tc, set in
-       renderBanner) with matching contrast text (--nav-tc-text, set in
-       renderTeamBadges) — same theming the banner badges use. Sharp
-       corners throughout to match the site's blocky look rather than
-       the fully-rounded pill this pattern is usually built with. Island
-       scrolls horizontally as a unit when it can't fit. */
+    /* ── PROFILE NAVIGATION — floating pill island ──
+       The one rounded element on this page — everywhere else is sharp
+       corners by design, this pill is the deliberate exception. It's
+       position:fixed and centered, floating free of the page rather than
+       spanning a full-width bar. Docked at viewport y:64 (the site nav's
+       own height) with a -50% vertical translate so it straddles the
+       exact line that divides the fixed header from the page content —
+       both on initial load and for the rest of the scroll, since that
+       line never moves. The wrapper elements it used to sit in are now
+       just an inert anchor (kept in the DOM for the legacy mobile
+       <select>); all real layout lives on .subnav-island itself.
+       Tabs sit inside the dark island with a sliding indicator (JS:
+       positionSubnavIndicator) behind the active one, filled with the
+       team color (--nav-tc, set in renderBanner) with matching contrast
+       text (--nav-tc-text, set in renderTeamBadges) — same theming the
+       banner badges use. */
     .player-subnav {
-      position:sticky; top:64px; z-index:500;
-      background:var(--bg-nav); backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--border);
-      padding:10px 0; margin-top:0; display:block; transition:none;
+      position:static; height:0; overflow:visible;
+      background:none; border:none; padding:0; margin:0;
     }
-    .player-subnav-inner {
-      display:flex; gap:6px; align-items:stretch;
-      max-width:1400px; width:100%; margin:0 auto; padding:0 60px;
-      box-sizing:border-box; overflow-x:auto;
-      scrollbar-width:none; -webkit-overflow-scrolling:touch;
-    }
-    .player-subnav-inner::-webkit-scrollbar { display:none; }
+    .player-subnav-inner { display:contents; }
     .subnav-island {
-      position:relative; display:inline-flex; gap:2px;
-      background:rgba(0,0,0,.28); border:1px solid var(--border);
-      padding:4px; flex-shrink:0;
+      position:fixed; top:64px; left:50%;
+      transform:translate(-50%,-50%);
+      z-index:10000;
+      display:inline-flex; gap:2px;
+      max-width:calc(100vw - 32px);
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:999px; padding:4px;
+      box-shadow:0 10px 30px rgba(0,0,0,.4);
+      overflow-x:auto; scrollbar-width:none;
     }
-    html.light .subnav-island { background:rgba(0,0,0,.05); }
+    .subnav-island::-webkit-scrollbar { display:none; }
+    html.light .subnav-island { box-shadow:0 8px 22px rgba(35,26,165,.15); }
     .subnav-indicator {
       position:absolute; top:4px; left:0;
       height:calc(100% - 8px); width:0;
       background:var(--nav-tc, var(--orange));
+      border-radius:999px;
       transition:transform .4s cubic-bezier(.4,0,.2,1), width .4s cubic-bezier(.4,0,.2,1);
       z-index:1;
     }
@@ -326,7 +333,7 @@
       position:relative; z-index:2;
       font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
       color:var(--text-muted); padding:11px 18px;
-      background:transparent; border:none; border-radius:0;
+      background:transparent; border:none; border-radius:999px;
       cursor:pointer; white-space:nowrap; user-select:none; flex-shrink:0;
       transition:color .25s;
     }
@@ -584,9 +591,8 @@
       .banner-badge { padding:4px 10px; }
       .player-banner-meta { gap:12px; margin-top:14px; }
       .player-banner-num { font-size:4.4rem; -webkit-text-stroke-width:1px; }
-      /* Mobile nav = same scrollable underline tabs (nav is relative on mobile → stick to top) */
-      .player-subnav { margin-top:0; top:0; }
-      .player-subnav-inner { padding:0 12px; }
+      /* Mobile site nav shrinks to 56px — re-dock the floating pill to match */
+      .subnav-island { top:56px; }
       .subnav-tab { font-size:.62rem; padding:10px 13px; letter-spacing:.1em; }
       .player-select-card { flex-direction:row !important; align-items:center; padding:14px 16px; gap:14px; text-align:left; }
       .player-select-card .psc-avatar { margin-bottom:0; flex-shrink:0; width:56px; height:70px; border-radius: 0; }
