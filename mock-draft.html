@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
+  <script src="logos/teaminfo26.js"></script>
   <link rel="stylesheet" href="css/mock-draft.css" />
 </head>
 <body>
@@ -34,11 +35,62 @@
   <div class="mock-draft-wrap">
     <p class="mock-draft-eyebrow">other · draft</p>
     <h1 class="mock-draft-title">Mock Draft</h1>
+    <p class="mock-draft-sub">2012 NBA Draft Class &middot; altered to include five EGE Simulation originals</p>
 
-    <div class="panel-placeholder">
-      <div class="panel-placeholder-icon">🎙️</div>
-      <div class="panel-placeholder-title">Coming Soon</div>
-      <p class="panel-placeholder-sub">The mock draft board is being built. Check back soon.</p>
+    <!-- ON THE CLOCK / DRAFT COMPLETE -->
+    <div id="md-onclock" class="md-onclock"></div>
+
+    <!-- PROSPECT POOL -->
+    <div id="md-pool-section" class="md-pool-section" style="display:none;">
+      <div class="md-pool-header">
+        <div class="md-pool-dot"></div>
+        <span class="md-pool-title">Draft Pool</span>
+        <span class="md-pool-hint">Click a column to sort &middot; gold = class leader</span>
+      </div>
+      <div class="md-pool-scroll">
+        <table id="md-pool-table" class="md-pool-table"></table>
+      </div>
+    </div>
+
+    <!-- DRAFT LOG -->
+    <div id="md-app" class="md-log-section" style="display:none;">
+      <div class="md-pool-header">
+        <div class="md-pool-dot"></div>
+        <span class="md-pool-title">Draft Log</span>
+      </div>
+      <div id="md-log" class="md-log"></div>
+    </div>
+
+  </div>
+
+  <!-- SETUP MODAL -->
+  <div id="md-setup-backdrop" class="md-modal-backdrop">
+    <div class="md-modal">
+      <p class="md-modal-eyebrow">2012 mock draft</p>
+      <h2 class="md-modal-title">Choose Your Sim</h2>
+      <p class="md-modal-sub">How much of the draft do you want to run?</p>
+      <div class="md-modal-options">
+        <button class="md-modal-btn" data-length="14">
+          <span class="md-modal-btn-title">Lottery</span>
+          <span class="md-modal-btn-desc">Picks 1&ndash;14</span>
+        </button>
+        <button class="md-modal-btn" data-length="30">
+          <span class="md-modal-btn-title">First Round</span>
+          <span class="md-modal-btn-desc">Picks 1&ndash;30</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div id="md-confirm-backdrop" class="md-modal-backdrop">
+    <div class="md-modal md-modal-confirm">
+      <p class="md-modal-eyebrow">confirm pick</p>
+      <p id="md-confirm-text" class="md-confirm-text"></p>
+      <div class="md-confirm-actions">
+        <button id="md-confirm-no" class="md-confirm-btn md-confirm-no">No</button>
+        <button id="md-confirm-yes" class="md-confirm-btn md-confirm-yes">Yes</button>
+      </div>
     </div>
   </div>
 
@@ -52,5 +104,7 @@
   </footer>
 
   <script src="shared.js"></script>
+  <script src="js/mock-draft-data.js"></script>
+  <script src="js/mock-draft.js"></script>
 </body>
 </html>
