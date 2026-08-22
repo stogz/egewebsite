@@ -144,6 +144,7 @@
       .sel26-card, .sel26-ghost, .sel26-stage img.sel26-hs, .sel26-cta, .sel26-cta .sel26-cta-arrow,
       .sel26-team-mark img { transition:none; }
       .bio-icon-star, .bio-icon-trophy { animation:none; }
+      .subnav-indicator { transition:none; }
     }
 
     /* responsive: 5 → 3 → 2 → 1 */
@@ -286,15 +287,20 @@
     .player-banner-meta { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
 
     /* Subnav */
-    /* ── PROFILE NAVIGATION — sticky underline tabs ──
-       Sticks below the 64px site nav; active tab gets a team-color
-       underline (via --nav-tc on #player-profile). Scrolls horizontally
-       when it can't fit, on every screen size. */
+    /* ── PROFILE NAVIGATION — sliding-pill island ──
+       Sticks below the 64px site nav. Tabs sit inside a dark "island"
+       with a sliding indicator (JS: positionSubnavIndicator) behind the
+       active one, filled with the team color (--nav-tc, set in
+       renderBanner) with matching contrast text (--nav-tc-text, set in
+       renderTeamBadges) — same theming the banner badges use. Sharp
+       corners throughout to match the site's blocky look rather than
+       the fully-rounded pill this pattern is usually built with. Island
+       scrolls horizontally as a unit when it can't fit. */
     .player-subnav {
       position:sticky; top:64px; z-index:500;
       background:var(--bg-nav); backdrop-filter:blur(14px);
       border-bottom:1px solid var(--border);
-      padding:0; margin-top:0; display:block; transition:none;
+      padding:10px 0; margin-top:0; display:block; transition:none;
     }
     .player-subnav-inner {
       display:flex; gap:6px; align-items:stretch;
@@ -303,18 +309,29 @@
       scrollbar-width:none; -webkit-overflow-scrolling:touch;
     }
     .player-subnav-inner::-webkit-scrollbar { display:none; }
-    .subnav-tab {
-      font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
-      color:var(--text-muted); padding:15px 18px 13px;
-      background:transparent; border:none; border-bottom:2px solid transparent; border-radius:0;
-      cursor:pointer; white-space:nowrap; user-select:none; flex-shrink:0;
-      transition:color .2s, border-color .2s, background .2s;
-      --nav-accent: var(--nav-tc, var(--orange));
-      --nav-accent: color-mix(in srgb, var(--nav-tc, var(--orange)) 60%, #ffffff);
+    .subnav-island {
+      position:relative; display:inline-flex; gap:2px;
+      background:rgba(0,0,0,.28); border:1px solid var(--border);
+      padding:4px; flex-shrink:0;
     }
-    html.light .subnav-tab { --nav-accent: var(--nav-tc, var(--orange)); }
-    .subnav-tab:hover { color:var(--text); background:rgba(var(--accent-rgb),.05); }
-    .subnav-tab.active { color:var(--nav-accent); border-bottom-color:var(--nav-accent); background:rgba(var(--accent-rgb),.05); }
+    html.light .subnav-island { background:rgba(0,0,0,.05); }
+    .subnav-indicator {
+      position:absolute; top:4px; left:0;
+      height:calc(100% - 8px); width:0;
+      background:var(--nav-tc, var(--orange));
+      transition:transform .4s cubic-bezier(.4,0,.2,1), width .4s cubic-bezier(.4,0,.2,1);
+      z-index:1;
+    }
+    .subnav-tab {
+      position:relative; z-index:2;
+      font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--text-muted); padding:11px 18px;
+      background:transparent; border:none; border-radius:0;
+      cursor:pointer; white-space:nowrap; user-select:none; flex-shrink:0;
+      transition:color .25s;
+    }
+    .subnav-tab:hover { color:var(--text); }
+    .subnav-tab.active { color:var(--nav-tc-text, #ffffff); }
     .subnav-tab::after { display:none; }
     /* Legacy mobile dropdown — retired; element kept for JS compatibility */
     .subnav-mobile-select { display:none !important; }
@@ -514,8 +531,6 @@
     .bio-card              { animation:fadeSlideUp .3s ease both; }
     .splits-card           { animation:fadeSlideUp .28s ease both; }
     .chart-card            { animation:fadeSlideUp .3s ease both; }
-    /* Subnav active indicator slides in */
-    .subnav-tab { transition:color .18s, border-color .18s; }
     /* Hover lift on bio cards */
     .bio-card { transition:background .35s; }
     /* Smooth row hover */
@@ -572,7 +587,7 @@
       /* Mobile nav = same scrollable underline tabs (nav is relative on mobile → stick to top) */
       .player-subnav { margin-top:0; top:0; }
       .player-subnav-inner { padding:0 12px; }
-      .subnav-tab { font-size:.62rem; padding:13px 13px 11px; letter-spacing:.1em; }
+      .subnav-tab { font-size:.62rem; padding:10px 13px; letter-spacing:.1em; }
       .player-select-card { flex-direction:row !important; align-items:center; padding:14px 16px; gap:14px; text-align:left; }
       .player-select-card .psc-avatar { margin-bottom:0; flex-shrink:0; width:56px; height:70px; border-radius: 0; }
       .player-select-card .psc-num { margin-bottom:0; }

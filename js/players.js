@@ -670,6 +670,10 @@
     var textColor = isReallyBright ? 'var(--navy)' : '#ffffff';
     var badgeStyle = 'background:'+badgeColor+';color:'+textColor+';';
 
+    // Same contrast check drives the subnav's sliding indicator text color
+    var profEl2 = document.getElementById('player-profile');
+    if (profEl2) profEl2.style.setProperty('--nav-tc-text', textColor);
+
     var teamLabel = isRetired ? 'Retired' : (team || '');
     var posLabel = p.position || '';
     var badgesHtml = '';
@@ -3708,11 +3712,27 @@
     renderPerformancesTable(key, games);
   }
 
+    /* ── SUBNAV SLIDING INDICATOR ──
+       Slides the pill behind whichever tab is active. Measured with
+       getBoundingClientRect so it's correct regardless of tab label
+       width, hidden tabs (Shoes), or horizontal scroll position. */
+  function positionSubnavIndicator() {
+    var indicator = document.getElementById('subnav-indicator');
+    var island = document.getElementById('subnav-island');
+    var active = document.querySelector('.subnav-tab.active');
+    if (!indicator || !island || !active || active.offsetParent === null) return;
+    var islandRect = island.getBoundingClientRect();
+    var activeRect  = active.getBoundingClientRect();
+    indicator.style.width = activeRect.width + 'px';
+    indicator.style.transform = 'translateX(' + (activeRect.left - islandRect.left) + 'px)';
+  }
+
     /* ── TAB SWITCH ── */
   function switchTab(tab, key, push) {
     // Fade out current panel briefly before switching
     document.querySelectorAll('.content-panel.active').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.subnav-tab').forEach(function(b){ b.classList.toggle('active',b.dataset.tab===tab); });
+    positionSubnavIndicator();
     // Keep the active tab visible when the tab row overflows
     var activeTab = document.querySelector('.subnav-tab.active');
     if (activeTab && activeTab.scrollIntoView) {
@@ -3808,6 +3828,17 @@
         if (currentKey) switchTab(mobileSelect.value, currentKey, true);
       });
     }
+
+    // Re-measure the subnav indicator after fonts finish loading and on resize
+    // (mobile breakpoint shrinks tab padding/font-size, changing button widths)
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(positionSubnavIndicator);
+    }
+    var subnavResizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(subnavResizeTimer);
+      subnavResizeTimer = setTimeout(positionSubnavIndicator, 100);
+    });
 
     // Cards are built by renderRosterGrid() — just wire back button here
     var backBtn = document.getElementById('back-btn');
