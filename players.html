@@ -84,7 +84,6 @@
         <button class="subnav-tab" data-tab="traditional-splits">Stats</button>
         <button class="subnav-tab" data-tab="awards">Awards</button>
         <button class="subnav-tab" data-tab="contracts">Contracts</button>
-        <button class="subnav-tab" data-tab="career-high">Career-High</button>
         <button class="subnav-tab" data-tab="performances">Performances</button>
         <button class="subnav-tab" data-tab="shoes">Shoes</button>
         <select class="subnav-mobile-select" id="subnav-mobile-select" aria-label="Select section">
@@ -92,7 +91,6 @@
           <option value="traditional-splits">Stats</option>
           <option value="awards">Awards</option>
           <option value="contracts">Contracts</option>
-          <option value="career-high">Career-High</option>
           <option value="performances">Performances</option>
           <option value="shoes">Shoes</option>
         </select>
@@ -110,6 +108,11 @@
             <div class="bio-card" id="bio-overview-card" style="margin-top:14px;">
               <div class="bio-card-header"><div class="bio-card-dot"></div><span class="bio-card-title">Career Overview</span></div>
               <div id="bio-overview-rows"></div>
+            </div>
+            <!-- CAREER HIGHS -->
+            <div class="bio-card" id="bio-careerhigh-card" style="margin-top:14px;">
+              <div class="bio-card-header"><div class="bio-card-dot"></div><span class="bio-card-title">Career Highs</span></div>
+              <div class="ch-snapshot" id="bio-careerhigh-snapshot"></div>
             </div>
           </div>
           <div>
@@ -223,9 +226,6 @@
       </div>
       <div class="content-panel" id="panel-contracts">
         <!-- Rendered by renderContracts(key) -->
-      </div>
-      <div class="content-panel" id="panel-career-high">
-        <!-- Rendered by renderCareerHigh(key) -->
       </div>
       <div class="content-panel" id="panel-performances">
         <!-- Rendered by renderPerformances(key) -->
