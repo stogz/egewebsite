@@ -45,7 +45,8 @@
       <div class="md-pool-header">
         <div class="md-pool-dot"></div>
         <span class="md-pool-title">Draft Pool</span>
-        <span class="md-pool-hint">Click a column to sort &middot; gold = class leader</span>
+        <span class="md-pool-hint">Click a column to sort</span>
+        <button id="md-color-toggle" class="md-toggle-btn">Color: Off</button>
       </div>
       <div class="md-pool-scroll">
         <table id="md-pool-table" class="md-pool-table"></table>
@@ -78,6 +79,18 @@
           <span class="md-modal-btn-title">First Round</span>
           <span class="md-modal-btn-desc">Picks 1&ndash;30</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD PROMPT MODAL -->
+  <div id="md-download-backdrop" class="md-modal-backdrop">
+    <div class="md-modal md-modal-confirm">
+      <p class="md-modal-eyebrow">draft complete</p>
+      <p class="md-confirm-text">Nice work! Want a PNG recap of the draft board you just simulated?</p>
+      <div class="md-confirm-actions">
+        <button id="md-download-no" class="md-confirm-btn md-confirm-no">No Thanks</button>
+        <button id="md-download-yes" class="md-confirm-btn md-confirm-yes">Download PNG</button>
       </div>
     </div>
   </div>
