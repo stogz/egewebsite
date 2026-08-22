@@ -3647,28 +3647,6 @@
 
     /* ── TAB SWITCH ── */
   function switchTab(tab, key, push) {
-    // Determine scroll behavior before anything else moves: once the
-    // floating subnav is "stuck" (scrolled past its natural resting spot
-    // right under the banner), switching tabs should jump to the top of
-    // the new tab's content instead of scrolling all the way up past the
-    // banner — unless that content is too short to fill the viewport, in
-    // which case scrolling to the very top avoids stranding the user over
-    // blank space below a half-empty panel.
-    //
-    // targetY is captured NOW, before activeTab.scrollIntoView() runs
-    // below — scrollIntoView on a sticky element can reset the page's
-    // scroll position back toward the element's un-stuck flow position as
-    // a side effect, which would corrupt a later re-measurement.
-    var subnavEl = document.querySelector('.player-subnav');
-    var subnavStuck = false;
-    var targetY = 0;
-    if (subnavEl) {
-      var subnavRect0 = subnavEl.getBoundingClientRect();
-      var stickyTop0 = parseFloat(getComputedStyle(subnavEl).top) || 0;
-      subnavStuck = Math.abs(subnavRect0.top - stickyTop0) < 2;
-      targetY = subnavRect0.bottom + window.scrollY;
-    }
-
     // Fade out current panel briefly before switching
     document.querySelectorAll('.content-panel.active').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.subnav-tab').forEach(function(b){ b.classList.toggle('active',b.dataset.tab===tab); });
@@ -3698,16 +3676,8 @@
       setTimeout(function(){ buildCharts(key); }, 80);
     }
     if(push!==false) history.pushState(null,'','#'+key+'-'+tab);
-
-    if (subnavStuck) {
-      // Land just below the floating subnav (banner stays scrolled out of
-      // view) — but only if the new tab's content is tall enough to fill
-      // the screen from there; otherwise fall back to the very top.
-      var wouldFillScreen = (document.documentElement.scrollHeight - targetY) >= window.innerHeight;
-      window.scrollTo({ top: wouldFillScreen ? targetY : 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Always scroll to the very top of the page on every tab switch
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ── SHOW PROFILE ── */
