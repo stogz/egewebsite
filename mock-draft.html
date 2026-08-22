@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="EGE_Logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Draft · EGE NBA Simulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <script src="sim-config.js"></script>
+  <link rel="stylesheet" href="css/mock-draft.css" />
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="scanline"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="EGE_Logo.png" alt="EGE Logo" class="logo-img" />
+      <span>EGE <span class="accent">NBA</span> Simulation</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-num="01">Home</a></li>
+      <li><a href="players.html" data-num="02">Players</a></li>
+      <li><a href="teams.html" data-num="03">Teams</a></li>
+      <li><a href="history.html" data-num="04">History</a></li>
+      <li><a href="other.html" data-num="05" class="active">Other</a></li>
+      <li id="sim-toggle-li"></li>
+      <li><button id="mode-toggle" title="Toggle light/dark mode">☀</button></li>
+    </ul>
+  </nav>
+
+  <div class="mock-draft-wrap">
+    <p class="mock-draft-eyebrow">other · draft</p>
+    <h1 class="mock-draft-title">Mock Draft</h1>
+
+    <div class="panel-placeholder">
+      <div class="panel-placeholder-icon">🎙️</div>
+      <div class="panel-placeholder-title">Coming Soon</div>
+      <p class="panel-placeholder-sub">The mock draft board is being built. Check back soon.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">EGE <span>NBA</span> Simulation</div>
+    <p class="footer-copy">© 2025 EGE Simulation · All data fictional</p>
+    <ul class="footer-links">
+      <li><a href="index.html">Home</a></li><li><a href="teams.html">Teams</a></li>
+      <li><a href="history.html">History</a></li><li><a href="other.html">Other</a></li>
+    </ul>
+  </footer>
+
+  <script src="shared.js"></script>
+</body>
+</html>
