@@ -287,35 +287,39 @@
     .player-banner-meta { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
 
     /* Subnav */
-    /* ── PROFILE NAVIGATION — floating pill island ──
+    /* ── PROFILE NAVIGATION — floating island ──
        The one rounded element on this page — everywhere else is sharp
-       corners by design, this pill is the deliberate exception. It's
-       position:fixed and centered, floating free of the page rather than
-       spanning a full-width bar. Docked at viewport y:64 (the site nav's
-       own height) with a -50% vertical translate so it straddles the
-       exact line that divides the fixed header from the page content —
-       both on initial load and for the rest of the scroll, since that
-       line never moves. The wrapper elements it used to sit in are now
-       just an inert anchor (kept in the DOM for the legacy mobile
-       <select>); all real layout lives on .subnav-island itself.
-       Tabs sit inside the dark island with a sliding indicator (JS:
+       corners by design, this is the deliberate exception, and only
+       barely rounded (10px), not a full pill.
+
+       .player-subnav is the next sibling right after .player-banner, so
+       its natural in-flow position starts exactly at the line dividing
+       the banner (photo, team/status badge, position) from the page
+       content below — a negative margin-top pulls the island up so it
+       visually straddles that exact line. position:sticky + top:64px
+       (the site nav's height) then means: once you scroll past that
+       point, the island detaches and floats, pinned just below the site
+       nav, for the rest of the scroll — no JS scroll-tracking needed,
+       since sticky handles both states natively.
+
+       Tabs sit inside the island with a sliding indicator (JS:
        positionSubnavIndicator) behind the active one, filled with the
        team color (--nav-tc, set in renderBanner) with matching contrast
        text (--nav-tc-text, set in renderTeamBadges) — same theming the
        banner badges use. */
     .player-subnav {
-      position:static; height:0; overflow:visible;
-      background:none; border:none; padding:0; margin:0;
+      position:sticky; top:64px; z-index:10000;
+      display:flex; justify-content:center;
+      margin-top:-22px; padding:0 20px;
+      background:none; border:none;
     }
     .player-subnav-inner { display:contents; }
     .subnav-island {
-      position:fixed; top:64px; left:50%;
-      transform:translate(-50%,-50%);
-      z-index:10000;
+      position:relative;
       display:inline-flex; gap:2px;
-      max-width:calc(100vw - 32px);
+      max-width:100%;
       background:var(--bg-card); border:1px solid var(--border);
-      border-radius:999px; padding:4px;
+      border-radius:10px; padding:4px;
       box-shadow:0 10px 30px rgba(0,0,0,.4);
       overflow-x:auto; scrollbar-width:none;
     }
@@ -325,7 +329,7 @@
       position:absolute; top:4px; left:0;
       height:calc(100% - 8px); width:0;
       background:var(--nav-tc, var(--orange));
-      border-radius:999px;
+      border-radius:7px;
       transition:transform .4s cubic-bezier(.4,0,.2,1), width .4s cubic-bezier(.4,0,.2,1);
       z-index:1;
     }
@@ -333,7 +337,7 @@
       position:relative; z-index:2;
       font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
       color:var(--text-muted); padding:11px 18px;
-      background:transparent; border:none; border-radius:999px;
+      background:transparent; border:none; border-radius:7px;
       cursor:pointer; white-space:nowrap; user-select:none; flex-shrink:0;
       transition:color .25s;
     }
@@ -591,8 +595,10 @@
       .banner-badge { padding:4px 10px; }
       .player-banner-meta { gap:12px; margin-top:14px; }
       .player-banner-num { font-size:4.4rem; -webkit-text-stroke-width:1px; }
-      /* Mobile site nav shrinks to 56px — re-dock the floating pill to match */
-      .subnav-island { top:56px; }
+      /* Mobile site nav shrinks to 56px — re-dock the floating island to
+         match, with a gentler pull-up since the banner's bottom padding
+         is shorter on mobile */
+      .player-subnav { top:56px; margin-top:-14px; padding:0 12px; }
       .subnav-tab { font-size:.62rem; padding:10px 13px; letter-spacing:.1em; }
       .player-select-card { flex-direction:row !important; align-items:center; padding:14px 16px; gap:14px; text-align:left; }
       .player-select-card .psc-avatar { margin-bottom:0; flex-shrink:0; width:56px; height:70px; border-radius: 0; }
