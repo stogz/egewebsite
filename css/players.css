@@ -306,12 +306,13 @@
        positionSubnavIndicator) behind the active one, filled with the
        team color (--nav-tc, set in renderBanner) with matching contrast
        text (--nav-tc-text, set in renderTeamBadges) — same theming the
-       banner badges use. The island itself always stays dark navy
-       (--navy), regardless of site theme, and its own tab text/hover
-       colors are hardcoded to match rather than following
-       --text/--text-muted, which flip to dark in light mode. */
+       banner badges use. The island's background is theme-aware: solid
+       --navy (darker/more opaque than the translucent --bg-card it used
+       to be) in dark mode, and --bg-card (white) in light mode — so tab
+       text/hover colors follow --text/--text-muted like everywhere else
+       on the page, rather than a hardcoded value. */
     .player-subnav {
-      position:sticky; top:76px; z-index:10000;
+      position:sticky; top:76px; z-index:600;
       display:flex; justify-content:center;
       margin-top:-22px; padding:0 20px;
       background:none; border:none;
@@ -325,6 +326,7 @@
       border-radius:10px; padding:4px;
       overflow-x:auto; scrollbar-width:none;
     }
+    html.light .subnav-island { background:var(--bg-card); }
     .subnav-island::-webkit-scrollbar { display:none; }
     .subnav-indicator {
       position:absolute; top:4px; left:0;
@@ -337,12 +339,12 @@
     .subnav-tab {
       position:relative; z-index:2;
       font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
-      color:rgba(255,255,255,.55); padding:11px 18px;
+      color:var(--text-muted); padding:11px 18px;
       background:transparent; border:none; border-radius:7px;
       cursor:pointer; white-space:nowrap; user-select:none; flex-shrink:0;
       transition:color .25s;
     }
-    .subnav-tab:hover { color:rgba(255,255,255,.85); }
+    .subnav-tab:hover { color:var(--text); }
     .subnav-tab.active { color:var(--nav-tc-text, #ffffff); }
     .subnav-tab::after { display:none; }
     /* Legacy mobile dropdown — retired; element kept for JS compatibility */
@@ -583,7 +585,11 @@
       .player-select-grid { gap:10px; }
       .player-banner { padding: 20px 0 30px; }
       .player-banner-inner { padding: 0 16px; }
-      .player-banner-card { gap: 20px; }
+      /* Mobile-only: stack portrait → name → team/position instead of the
+         desktop side-by-side layout, and drop the ghost jersey number —
+         one less competing element, less squished overall. */
+      .player-banner-card { flex-direction:column; align-items:center; text-align:center; gap:14px; }
+      .player-banner-num { display:none; }
       .player-headshot-bracket { padding: 0; }
       .player-headshot-box { width: 130px; height: 130px; border-width: 3px; border-radius: 0; }
       .player-headshot-team-logo { width:53px; height:53px; bottom:-15px; right:-15px; }
@@ -592,10 +598,9 @@
       .player-select-grid .player-select-card:last-child { grid-column:auto; max-width:100%; margin:0; }
       .player-banner-info { padding: 0; }
       .player-banner-name { font-size:clamp(1.4rem,5.5vw,2.2rem); margin-bottom:6px; }
-      .player-banner-team { font-size:.58rem; letter-spacing:.16em; gap:8px; }
+      .player-banner-team { font-size:.58rem; letter-spacing:.16em; gap:8px; justify-content:center; }
       .banner-badge { padding:4px 10px; }
-      .player-banner-meta { gap:12px; margin-top:14px; }
-      .player-banner-num { font-size:4.4rem; -webkit-text-stroke-width:1px; }
+      .player-banner-meta { gap:12px; margin-top:14px; justify-content:center; }
       /* Mobile site nav shrinks to 56px — re-dock the floating island to
          match, with a gentler pull-up since the banner's bottom padding
          is shorter on mobile */
