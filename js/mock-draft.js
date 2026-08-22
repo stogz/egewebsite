@@ -75,6 +75,7 @@
     state.pickIdx = 0;
     sortState = { key: 'estPick', dir: 'asc' };
     document.getElementById('md-app').style.display = '';
+    preloadLogos(state.order.map(function (s) { return s.team; }));
     renderHeader();
     renderPool();
     renderLog();
@@ -307,7 +308,25 @@
     });
   }
 
-  /* ── DOWNLOAD PROMPT + PNG RECAP ── */
+  /* ── DOWNLOAD PROMPT + PNG RECAP ──
+     Logos are preloaded into logoCache the moment a draft starts (see
+     startDraft), so by the time the user clicks "Download PNG" the canvas
+     can be built and exported entirely synchronously inside that click
+     handler. Waiting on image onload / canvas.toBlob callbacks here would
+     push the actual download past the click's user-activation window,
+     which browsers (Safari in particular) silently block. */
+  var logoCache = {};
+
+  function preloadLogos(teams) {
+    teams.forEach(function (team) {
+      if (logoCache[team]) return;
+      var info = teamInfo(team);
+      var img = new Image();
+      img.src = LOGOS_DIR + info.teamLogoCLR;
+      logoCache[team] = img;
+    });
+  }
+
   function openDownloadPrompt() {
     document.getElementById('md-download-backdrop').classList.add('active');
   }
@@ -315,7 +334,7 @@
     document.getElementById('md-download-backdrop').classList.remove('active');
   }
 
-  function buildDraftPNG(callback) {
+  function buildDraftPNG() {
     var rows = state.log;
     var W = 960, rowH = 46, headerH = 96, padX = 28;
     var H = headerH + rows.length * rowH + 24;
@@ -323,65 +342,52 @@
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
 
-    var uniqueTeams = [];
-    rows.forEach(function (r) { if (uniqueTeams.indexOf(r.team) === -1) uniqueTeams.push(r.team); });
-    var logoImgs = {};
+    ctx.fillStyle = '#08052f';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#e75719';
+    ctx.font = '700 13px monospace';
+    ctx.fillText('EGE NBA SIMULATION', padX, 30);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 26px sans-serif';
+    ctx.fillText('2012 Mock Draft Results', padX, 62);
+    ctx.strokeStyle = 'rgba(120,110,220,.4)';
+    ctx.beginPath(); ctx.moveTo(padX, headerH - 16); ctx.lineTo(W - padX, headerH - 16); ctx.stroke();
 
-    function draw() {
-      ctx.fillStyle = '#08052f';
-      ctx.fillRect(0, 0, W, H);
+    rows.forEach(function (entry, i) {
+      var y = headerH + i * rowH;
+      if (i % 2 === 1) { ctx.fillStyle = 'rgba(255,255,255,.03)'; ctx.fillRect(0, y, W, rowH); }
+      var img = logoCache[entry.team];
+      if (img && img.complete && img.naturalWidth) ctx.drawImage(img, padX, y + 6, 34, 34);
       ctx.fillStyle = '#e75719';
       ctx.font = '700 13px monospace';
-      ctx.fillText('EGE NBA SIMULATION', padX, 30);
+      ctx.fillText(String(entry.pick), padX + 46, y + 20);
+      var info = teamInfo(entry.team);
+      ctx.fillStyle = 'rgba(255,255,255,.5)';
+      ctx.font = '400 11px monospace';
+      ctx.fillText(info.name, padX + 46, y + 34);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 26px sans-serif';
-      ctx.fillText('2012 Mock Draft Results', padX, 62);
-      ctx.strokeStyle = 'rgba(120,110,220,.4)';
-      ctx.beginPath(); ctx.moveTo(padX, headerH - 16); ctx.lineTo(W - padX, headerH - 16); ctx.stroke();
-
-      rows.forEach(function (entry, i) {
-        var y = headerH + i * rowH;
-        if (i % 2 === 1) { ctx.fillStyle = 'rgba(255,255,255,.03)'; ctx.fillRect(0, y, W, rowH); }
-        var img = logoImgs[entry.team];
-        if (img && img.complete && img.naturalWidth) ctx.drawImage(img, padX, y + 6, 34, 34);
-        ctx.fillStyle = '#e75719';
-        ctx.font = '700 13px monospace';
-        ctx.fillText(String(entry.pick), padX + 46, y + 20);
-        var info = teamInfo(entry.team);
-        ctx.fillStyle = 'rgba(255,255,255,.5)';
-        ctx.font = '400 11px monospace';
-        ctx.fillText(info.name, padX + 46, y + 34);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '700 15px sans-serif';
-        ctx.fillText(entry.prospect.name + (entry.prospect.fictional ? '  [EGE]' : ''), padX + 230, y + 22);
-        ctx.fillStyle = 'rgba(255,255,255,.55)';
-        ctx.font = '400 12px sans-serif';
-        ctx.fillText(entry.prospect.college, padX + 230, y + 38);
-      });
-      callback(canvas);
-    }
-
-    if (!uniqueTeams.length) { draw(); return; }
-    var loaded = 0;
-    uniqueTeams.forEach(function (team) {
-      var info = teamInfo(team);
-      var img = new Image();
-      img.onload = img.onerror = function () { loaded++; if (loaded === uniqueTeams.length) draw(); };
-      img.src = LOGOS_DIR + info.teamLogoCLR;
-      logoImgs[team] = img;
+      ctx.font = '700 15px sans-serif';
+      ctx.fillText(entry.prospect.name + (entry.prospect.fictional ? '  [EGE]' : ''), padX + 230, y + 22);
+      ctx.fillStyle = 'rgba(255,255,255,.55)';
+      ctx.font = '400 12px sans-serif';
+      ctx.fillText(entry.prospect.college, padX + 230, y + 38);
     });
+
+    return canvas;
   }
 
   function downloadDraftPNG() {
-    buildDraftPNG(function (canvas) {
-      canvas.toBlob(function (blob) {
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url; a.download = 'ege-mock-draft-2012.png';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      }, 'image/png');
-    });
+    try {
+      var canvas = buildDraftPNG();
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'ege-mock-draft-2012.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      console.error('Mock draft PNG export failed:', e);
+    }
   }
 
   function initDownloadModal() {
