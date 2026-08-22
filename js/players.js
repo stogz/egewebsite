@@ -2,9 +2,9 @@
      PLAYERS PAGE LOGIC (players.html)
 
      Two views: a roster-select grid, and a single player's profile
-     (bio, stats/charts, awards, contracts, career-high, performances,
-     shoes — each a tab, switchable and deep-linkable via URL hash,
-     e.g. #clark-traditional-splits).
+     (bio, stats/charts, awards, contracts, performances, shoes — each
+     a tab, switchable and deep-linkable via URL hash, e.g.
+     #clark-traditional-splits). Career highs live on the Bio tab.
 
      Loads player-stats.js + player-games.js for the active sim, then
      everything below runs inside window.__EGE_PLAYERS_BOOT (called
@@ -124,7 +124,7 @@
     Object.assign(PLAYERS, newPlayers);
   })();
 
-  var TABS = ['bio','traditional-splits','awards','contracts','career-high','performances','shoes'];
+  var TABS = ['bio','traditional-splits','awards','contracts','performances','shoes'];
 
   /* ── HEADSHOT IMAGES ── */
   /* ── TEAM LOGOS ── */
@@ -753,6 +753,7 @@
 
     // Render play style
     renderCareerOverview(key, avg, champs, stars, isRetired);
+    renderCareerHighSnapshot(key);
   }
 
   /* ── CAREER OVERVIEW ── */
@@ -835,11 +836,14 @@
         var teamName = teamFull(team) || team;
         var logoUrl = TEAM_LOGOS[team] || TEAM_LOGOS[teamName] || '';
         if (!logoUrl) return;
+        var box = document.createElement('span');
+        box.className = 'logo-box';
         var img = document.createElement('img');
         img.src = logoUrl;
         img.alt = teamName;
         img.loading = 'lazy';
-        stripEl.appendChild(img);
+        box.appendChild(img);
+        stripEl.appendChild(box);
       });
     }
   }
@@ -2428,129 +2432,88 @@
     ctx.onmouseleave = function() { salTooltipEl.style.display = 'none'; };
   }
 
-    /* ── CAREER HIGH PANEL ── */
-  // Stat bar reference maximums (NBA all-time context)
-  var CH_MAX         = { pts:100, reb:55, ast:30, stl:11, blk:17, tpm:14, min:60 };
-  var CH_MAX_PLAYOFFS = { pts:61,  reb:41, ast:24, stl:8,  blk:10, tpm:11, min:58 };
-  var CH_LABELS = { pts:'Points', reb:'Rebounds', ast:'Assists', stl:'Steals', blk:'Blocks', tpm:'3-Pointers Made', min:'Minutes' };
+    /* ── CAREER HIGHS SNAPSHOT (Bio tab) ──
+       Styled to match the PPG/RPG/APG snapshot: label, value, and just
+       the season + opponent logo below. Regular season / playoffs toggle
+       mirrors the traditional-splits per-game toggle. */
+  var CH_SNAPSHOT_LABELS = { pts:'PTS', reb:'REB', ast:'AST', stl:'STL', blk:'BLK', tpm:'3PM' };
+  var CH_SNAPSHOT_ORDER  = ['pts','reb','ast','stl','blk','tpm'];
+  var CH_MONTHS = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
+  var chSnapMode = 'regular'; // 'regular' | 'playoffs'
 
-  /* career high view mode */
-  var chMode = 'regular';
+  /* 'Feb 11, 2029' → '2028-29' (NBA seasons span Aug–Jul, labeled by the starting year) */
+  function chDateToSeason(dateStr) {
+    var m = String(dateStr||'').match(/([A-Za-z]{3})\w*\s+\d{1,2},\s*(\d{4})/);
+    if (!m) return '';
+    var month = CH_MONTHS[m[1]];
+    var year  = parseInt(m[2], 10);
+    if (month === undefined || isNaN(year)) return '';
+    var startYear = month >= 7 ? year : year - 1;
+    return startYear + '-' + String(startYear + 1).slice(-2);
+  }
 
-  function renderCareerHigh(key) {
-    var panel = document.getElementById('panel-career-high');
-    if (!panel) return;
+  function buildCareerHighSnapshotCards(highs) {
+    var byStat = {};
+    highs.forEach(function(item){ byStat[item.stat] = item; });
+
+    return CH_SNAPSHOT_ORDER.map(function(statKey){
+      var item = byStat[statKey];
+      var label = CH_SNAPSHOT_LABELS[statKey];
+      if (!item) {
+        return '<div class="ch-snapshot-cell">'
+          + '<div class="ch-snapshot-label">' + label + '</div>'
+          + '<div class="ch-snapshot-val">—</div>'
+          + '</div>';
+      }
+      var season = fmtSeason(chDateToSeason(item.date));
+      var opp    = item.opp || '';
+      var logoHtml = (opp && TEAM_LOGOS[opp])
+        ? '<span class="logo-box"><img src="' + TEAM_LOGOS[opp] + '" alt="' + opp + '"></span>'
+        : opp;
+      var subtitle = season ? (season + ' vs. ' + logoHtml) : '';
+      return '<div class="ch-snapshot-cell">'
+        + '<div class="ch-snapshot-label">' + label + '</div>'
+        + '<div class="ch-snapshot-val">' + item.value + '</div>'
+        + (subtitle ? '<div class="ch-snapshot-sub">' + subtitle + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  function renderCareerHighSnapshot(key) {
+    var el = document.getElementById('bio-careerhigh-snapshot');
+    var toggleWrap = document.getElementById('bio-careerhigh-toggle');
+    if (!el) return;
 
     var regularHighs = (PLAYER_STATS[key]||{}).careerHighs || [];
     var playoffHighs = (PLAYER_STATS[key]||{}).playoffCareerHighs || [];
     var hasPlayoffs  = playoffHighs.length > 0;
 
     // Reset to regular season whenever we load a new player
-    // (chMode is global — only keep it if we're toggling within the same player)
-    var currentPanelKey = panel.dataset.playerKey;
-    if (currentPanelKey !== key) {
-      chMode = 'regular';
-      panel.dataset.playerKey = key;
+    var currentKey = el.dataset.playerKey;
+    if (currentKey !== key) {
+      chSnapMode = 'regular';
     }
+    el.dataset.playerKey = key;
 
-    function buildCards(ch, maxLookup) {
-      if (!ch || !ch.length) {
-        return '<div class="panel-placeholder" style="border:none;background:none;padding:40px 0;">'
-          + '<div class="panel-placeholder-icon" style="font-size:1.8rem;">—</div>'
-          + '<p class="panel-placeholder-sub">No playoff career high data available yet.</p>'
-          + '</div>';
-      }
-      return ch.map(function(item, i) {
-        var statKey  = item.stat;
-        var label    = CH_LABELS[statKey] || item.label || statKey.toUpperCase();
-        var val      = item.value;
-        var date     = item.date || '';
-        var opp      = item.opp  || '';
-        var maxRef   = maxLookup[statKey] || val;
-        var pct      = Math.min((val / maxRef) * 100, 100);
-        var subtitle = [date, opp ? ('vs ' + opp) : ''].filter(Boolean).join(' · ');
-        var logoHtml = (opp && TEAM_LOGOS[opp])
-          ? '<img src="' + TEAM_LOGOS[opp] + '" style="height:.8rem;width:auto;vertical-align:middle;margin-right:4px;opacity:.7;">'
-          : '';
-        return '<div class="ch-card">'
-          + '<div class="ch-card-label">' + label + '</div>'
-          + '<div class="ch-card-value" data-target="' + val + '">' + val + '</div>'
-          + '<div class="ch-card-bar-track"><div class="ch-card-bar-fill" style="width:' + pct.toFixed(1) + '%;animation-delay:' + (i * 0.08).toFixed(2) + 's;"></div></div>'
-          + '<div class="ch-maxref">NBA All-Time Playoff High: ' + maxRef + '</div>'
-          + (subtitle ? '<div class="ch-card-date">' + logoHtml + subtitle + '</div>' : '')
-          + '</div>';
-      }).join('');
-    }
-
-    function animateCards() {
-      panel.querySelectorAll('.ch-card-value').forEach(function(el, i) {
-        var target = parseInt(el.dataset.target, 10);
-        el.textContent = '0';
-        setTimeout(function() {
-          el.classList.add('is-animating');
-          var start = null;
-          function step(ts) {
-            if (!start) start = ts;
-            var progress = Math.min((ts - start) / 600, 1);
-            var ease = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.round(ease * target);
-            if (progress < 1) requestAnimationFrame(step);
-            else el.textContent = target;
-          }
-          requestAnimationFrame(step);
-        }, i * 80);
+    if (toggleWrap) {
+      toggleWrap.style.display = hasPlayoffs ? '' : 'none';
+      toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(b){
+        b.classList.toggle('active', b.dataset.chSnapMode === chSnapMode);
       });
-    }
-
-    function renderCards() {
-      var isPlayoffs = chMode === 'playoffs';
-      var ch      = isPlayoffs ? playoffHighs : regularHighs;
-      var maxRef  = isPlayoffs ? CH_MAX_PLAYOFFS : CH_MAX;
-      var cardsEl = document.getElementById('ch-cards-grid');
-      if (cardsEl) {
-        // Update maxref label text per mode
-        var label = isPlayoffs ? 'NBA All-Time Playoff High' : 'NBA All-Time High';
-        cardsEl.innerHTML = buildCards(ch, maxRef).replace(/NBA All-Time Playoff High/g, label);
-        animateCards();
-      }
-    }
-
-    // Always fully rebuild the panel (fixes stale-player bug)
-    var toggleHtml = hasPlayoffs
-      ? '<div class="splits-toggle" style="margin-left:auto;">'
-          + '<button class="splits-toggle-btn' + (chMode==='regular'?' active':'') + '" data-ch-mode="regular">Regular Season</button>'
-          + '<button class="splits-toggle-btn' + (chMode==='playoffs'?' active':'') + '" data-ch-mode="playoffs">Playoffs</button>'
-        + '</div>'
-      : '';
-
-    var isPlayoffs0 = chMode === 'playoffs';
-    var ch0    = isPlayoffs0 ? playoffHighs : regularHighs;
-    var max0   = isPlayoffs0 ? CH_MAX_PLAYOFFS : CH_MAX;
-    var label0 = isPlayoffs0 ? 'NBA All-Time Playoff High' : 'NBA All-Time High';
-
-    panel.innerHTML = '<div class="ch-layout">'
-      + '<div class="ch-header" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">'
-        + '<div>'
-          + ''
-        + '</div>'
-        + toggleHtml
-      + '</div>'
-      + '<div class="ch-grid" id="ch-cards-grid">' + buildCards(ch0, max0).replace(/NBA All-Time Playoff High/g, label0) + '</div>'
-      + '</div>';
-
-    animateCards();
-
-    // Wire toggle clicks
-    panel.querySelectorAll('[data-ch-mode]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        if (btn.dataset.chMode === chMode) return;
-        chMode = btn.dataset.chMode;
-        panel.querySelectorAll('[data-ch-mode]').forEach(function(b) {
-          b.classList.toggle('active', b.dataset.chMode === chMode);
+      if (!toggleWrap.dataset.wired) {
+        toggleWrap.dataset.wired = '1';
+        toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            if (btn.dataset.chSnapMode === chSnapMode) return;
+            chSnapMode = btn.dataset.chSnapMode;
+            renderCareerHighSnapshot(el.dataset.playerKey);
+          });
         });
-        renderCards();
-      });
-    });
+      }
+    }
+
+    var highs = (chSnapMode === 'playoffs' && hasPlayoffs) ? playoffHighs : regularHighs;
+    el.innerHTML = buildCareerHighSnapshotCards(highs);
   }
   /* ── SHOES PANEL ── */
   /* ── SHOE LIGHTBOX ── */
@@ -3761,9 +3724,6 @@
     if(panel) panel.classList.add('active');
     if(tab==='shoes'){
       renderShoes(key);
-    }
-    if(tab==='career-high'){
-      renderCareerHigh(key);
     }
     if(tab==='performances'){
       renderPerformances(key);
