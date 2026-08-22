@@ -401,11 +401,11 @@
     }
     .bio-teams-strip {
       display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-      gap:48px; padding:28px 20px 8px;
+      gap:36px; padding:48px 20px 12px;
     }
     /* Fixed box so every logo — however wide/tall its native art is — is
        confined to the same footprint instead of overflowing (e.g. Pelicans). */
-    .bio-teams-strip .logo-box { width:52px; height:32px; display:flex; align-items:center; justify-content:center; }
+    .bio-teams-strip .logo-box { width:38px; height:24px; display:flex; align-items:center; justify-content:center; }
     .bio-teams-strip .logo-box img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
     .stat-snapshot { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); border-radius:0; overflow:hidden; border:1px solid var(--border); margin-bottom:24px; }
     .snapshot-cell { background:var(--bg-card); padding:22px 16px; text-align:center; transition:background .35s; }
@@ -591,13 +591,13 @@
       .player-banner-card { flex-direction:column; align-items:center; text-align:center; gap:14px; }
       .player-banner-num { display:none; }
       .player-headshot-bracket { padding: 0; }
-      .player-headshot-box { width: 130px; height: 130px; border-width: 3px; border-radius: 0; }
-      .player-headshot-team-logo { width:53px; height:53px; bottom:-15px; right:-15px; }
-      .player-headshot-team-logo img { width:53px; height:53px; }
+      .player-headshot-box { width: 80vw; height: 80vw; max-width: 320px; max-height: 320px; border-width: 4px; border-radius: 0; }
+      .player-headshot-team-logo { width:26vw; height:26vw; max-width:100px; max-height:100px; bottom:-18px; right:-18px; }
+      .player-headshot-team-logo img { width:100%; height:100%; }
       .player-select-grid { grid-template-columns:1fr; gap:12px; }
       .player-select-grid .player-select-card:last-child { grid-column:auto; max-width:100%; margin:0; }
       .player-banner-info { padding: 0; }
-      .player-banner-name { font-size:clamp(1.4rem,5.5vw,2.2rem); margin-bottom:6px; }
+      .player-banner-name { font-size:clamp(2.2rem,9vw,3.4rem); margin-bottom:6px; }
       .player-banner-team { font-size:.58rem; letter-spacing:.16em; gap:8px; justify-content:center; }
       .banner-badge { padding:4px 10px; }
       .player-banner-meta { gap:12px; margin-top:14px; justify-content:center; }
@@ -616,7 +616,6 @@
       .bio-grid { grid-template-columns:1fr; gap:14px; }
       .stat-snapshot { grid-template-columns:repeat(3,1fr); }
       .snapshot-val { font-size:1.35rem; }
-      .ch-snapshot-val { font-size:1.35rem; }
       .splits-controls { flex-direction:column; align-items:flex-start; }
       .charts-grid { grid-template-columns:1fr; gap:16px; }
       .chart-card.wide { grid-column:auto; }
@@ -771,19 +770,6 @@
       .ct-table { min-width:360px; }
       .ct-chart-inner { min-width:320px; }
     }
-
-    /* ══ CAREER HIGHS SNAPSHOT (Bio tab) ══ */
-    .ch-snapshot { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-soft); }
-    .ch-snapshot-cell { background:var(--bg-card); padding:20px 16px; text-align:center; transition:background .35s; }
-    .ch-snapshot-cell:hover { background:rgba(var(--accent-rgb),.05); }
-    .ch-snapshot-label { font-family:var(--font-mono); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
-    .ch-snapshot-val { font-family:var(--font-display); font-weight:900; font-size:2rem; color:var(--heading); line-height:1; transition:color .35s; }
-    .ch-snapshot-sub { font-family:var(--font-mono); font-size:.55rem; letter-spacing:.06em; color:var(--text-muted); margin-top:8px; display:flex; align-items:center; justify-content:center; gap:4px; }
-    /* Fixed box confines every opponent logo to the same footprint,
-       however wide its native art is (e.g. Pelicans), so it never overflows. */
-    .ch-snapshot-sub .logo-box { width:1.3rem; height:.9rem; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .ch-snapshot-sub .logo-box img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
-    @media (max-width:420px) { .ch-snapshot { grid-template-columns:repeat(3,1fr); } }
 
     /* ══ SHOES PANEL ══ */
     .shoes-layout { display:flex; flex-direction:column; gap:28px; }

@@ -757,7 +757,6 @@
 
     // Render play style
     renderCareerOverview(key, avg, champs, stars, isRetired);
-    renderCareerHighSnapshot(key);
   }
 
   /* ── CAREER OVERVIEW ── */
@@ -2436,89 +2435,6 @@
     ctx.onmouseleave = function() { salTooltipEl.style.display = 'none'; };
   }
 
-    /* ── CAREER HIGHS SNAPSHOT (Bio tab) ──
-       Styled to match the PPG/RPG/APG snapshot: label, value, and just
-       the season + opponent logo below. Regular season / playoffs toggle
-       mirrors the traditional-splits per-game toggle. */
-  var CH_SNAPSHOT_LABELS = { pts:'PTS', reb:'REB', ast:'AST', stl:'STL', blk:'BLK', tpm:'3PM' };
-  var CH_SNAPSHOT_ORDER  = ['pts','reb','ast','stl','blk','tpm'];
-  var CH_MONTHS = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 };
-  var chSnapMode = 'regular'; // 'regular' | 'playoffs'
-
-  /* 'Feb 11, 2029' → '2028-29' (NBA seasons span Aug–Jul, labeled by the starting year) */
-  function chDateToSeason(dateStr) {
-    var m = String(dateStr||'').match(/([A-Za-z]{3})\w*\s+\d{1,2},\s*(\d{4})/);
-    if (!m) return '';
-    var month = CH_MONTHS[m[1]];
-    var year  = parseInt(m[2], 10);
-    if (month === undefined || isNaN(year)) return '';
-    var startYear = month >= 7 ? year : year - 1;
-    return startYear + '-' + String(startYear + 1).slice(-2);
-  }
-
-  function buildCareerHighSnapshotCards(highs) {
-    var byStat = {};
-    highs.forEach(function(item){ byStat[item.stat] = item; });
-
-    return CH_SNAPSHOT_ORDER.map(function(statKey){
-      var item = byStat[statKey];
-      var label = CH_SNAPSHOT_LABELS[statKey];
-      if (!item) {
-        return '<div class="ch-snapshot-cell">'
-          + '<div class="ch-snapshot-label">' + label + '</div>'
-          + '<div class="ch-snapshot-val">—</div>'
-          + '</div>';
-      }
-      var season = fmtSeason(chDateToSeason(item.date));
-      var opp    = item.opp || '';
-      var logoHtml = (opp && TEAM_LOGOS[opp])
-        ? '<span class="logo-box"><img src="' + TEAM_LOGOS[opp] + '" alt="' + opp + '"></span>'
-        : opp;
-      var subtitle = season ? (season + ' vs. ' + logoHtml) : '';
-      return '<div class="ch-snapshot-cell">'
-        + '<div class="ch-snapshot-label">' + label + '</div>'
-        + '<div class="ch-snapshot-val">' + item.value + '</div>'
-        + (subtitle ? '<div class="ch-snapshot-sub">' + subtitle + '</div>' : '')
-        + '</div>';
-    }).join('');
-  }
-
-  function renderCareerHighSnapshot(key) {
-    var el = document.getElementById('bio-careerhigh-snapshot');
-    var toggleWrap = document.getElementById('bio-careerhigh-toggle');
-    if (!el) return;
-
-    var regularHighs = (PLAYER_STATS[key]||{}).careerHighs || [];
-    var playoffHighs = (PLAYER_STATS[key]||{}).playoffCareerHighs || [];
-    var hasPlayoffs  = playoffHighs.length > 0;
-
-    // Reset to regular season whenever we load a new player
-    var currentKey = el.dataset.playerKey;
-    if (currentKey !== key) {
-      chSnapMode = 'regular';
-    }
-    el.dataset.playerKey = key;
-
-    if (toggleWrap) {
-      toggleWrap.style.display = hasPlayoffs ? '' : 'none';
-      toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(b){
-        b.classList.toggle('active', b.dataset.chSnapMode === chSnapMode);
-      });
-      if (!toggleWrap.dataset.wired) {
-        toggleWrap.dataset.wired = '1';
-        toggleWrap.querySelectorAll('[data-ch-snap-mode]').forEach(function(btn){
-          btn.addEventListener('click', function(){
-            if (btn.dataset.chSnapMode === chSnapMode) return;
-            chSnapMode = btn.dataset.chSnapMode;
-            renderCareerHighSnapshot(el.dataset.playerKey);
-          });
-        });
-      }
-    }
-
-    var highs = (chSnapMode === 'playoffs' && hasPlayoffs) ? playoffHighs : regularHighs;
-    el.innerHTML = buildCareerHighSnapshotCards(highs);
-  }
   /* ── SHOES PANEL ── */
   /* ── SHOE LIGHTBOX ── */
   var _shoeLightbox = null;
@@ -3731,6 +3647,28 @@
 
     /* ── TAB SWITCH ── */
   function switchTab(tab, key, push) {
+    // Determine scroll behavior before anything else moves: once the
+    // floating subnav is "stuck" (scrolled past its natural resting spot
+    // right under the banner), switching tabs should jump to the top of
+    // the new tab's content instead of scrolling all the way up past the
+    // banner — unless that content is too short to fill the viewport, in
+    // which case scrolling to the very top avoids stranding the user over
+    // blank space below a half-empty panel.
+    //
+    // targetY is captured NOW, before activeTab.scrollIntoView() runs
+    // below — scrollIntoView on a sticky element can reset the page's
+    // scroll position back toward the element's un-stuck flow position as
+    // a side effect, which would corrupt a later re-measurement.
+    var subnavEl = document.querySelector('.player-subnav');
+    var subnavStuck = false;
+    var targetY = 0;
+    if (subnavEl) {
+      var subnavRect0 = subnavEl.getBoundingClientRect();
+      var stickyTop0 = parseFloat(getComputedStyle(subnavEl).top) || 0;
+      subnavStuck = Math.abs(subnavRect0.top - stickyTop0) < 2;
+      targetY = subnavRect0.bottom + window.scrollY;
+    }
+
     // Fade out current panel briefly before switching
     document.querySelectorAll('.content-panel.active').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.subnav-tab').forEach(function(b){ b.classList.toggle('active',b.dataset.tab===tab); });
@@ -3760,8 +3698,16 @@
       setTimeout(function(){ buildCharts(key); }, 80);
     }
     if(push!==false) history.pushState(null,'','#'+key+'-'+tab);
-    // Always scroll to the very top of the page on every tab switch
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (subnavStuck) {
+      // Land just below the floating subnav (banner stays scrolled out of
+      // view) — but only if the new tab's content is tall enough to fill
+      // the screen from there; otherwise fall back to the very top.
+      var wouldFillScreen = (document.documentElement.scrollHeight - targetY) >= window.innerHeight;
+      window.scrollTo({ top: wouldFillScreen ? targetY : 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /* ── SHOW PROFILE ── */
