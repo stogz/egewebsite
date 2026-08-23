@@ -137,7 +137,7 @@
         <div class="splits-card">
           <div class="splits-card-header">
             <div class="splits-card-dot"></div>
-            <span class="splits-card-title" id="pg-table-label">Regular Season · Per Game</span>
+            <span class="splits-card-title" id="pg-table-label">Per Game</span>
             <div style="margin-left:auto;">
               <div class="splits-toggle" id="pg-toggle">
                 <button class="splits-toggle-btn active" data-scope="pg" data-mode="regular">Regular Season</button>
@@ -147,14 +147,14 @@
           </div>
           <div class="splits-scroll"><table class="splits-table" id="pg-table"></table></div>
           <div class="college-footnote" id="pg-footnote" style="padding:8px 16px 10px;display:none;"><span>*</span> Non-NBA season, excluded from career averages.</div>
-          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led all tracked players that season.</div>
+          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led the NBA that season.</div>
         </div>
 
         <!-- TOTALS -->
         <div class="splits-card">
-          <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title">Regular Season · Totals</span></div>
+          <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title">Totals</span></div>
           <div class="splits-scroll"><table class="splits-table" id="totals-table"></table></div>
-          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led all tracked players that season.</div>
+          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led the NBA that season.</div>
         </div>
 
         <!-- CHARTS -->
@@ -191,11 +191,11 @@
                 <div class="chart-card-dot"></div>
                 <span class="chart-card-title">Time at Position</span>
               </div>
-              <div class="chart-card-body" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:24px 32px;height:auto;min-height:260px;">
+              <div class="chart-card-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 32px;height:auto;min-height:260px;">
                 <div style="position:relative;flex-shrink:0;width:200px;height:200px;">
                   <canvas id="chart-position-pie" width="200" height="200" style="display:block;cursor:crosshair;width:200px;height:200px;"></canvas>
                 </div>
-                <div id="position-pie-legend" style="display:flex;flex-direction:column;gap:14px;"></div>
+                <div id="position-pie-legend" class="position-pie-legend"></div>
               </div>
             </div>
 

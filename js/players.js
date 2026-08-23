@@ -455,53 +455,21 @@
   function isProRow(r) { return COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase()) === -1 && !r.dnq && r.gp > 0; }
 
   /* ── LEAGUE LEADER HELPERS ──
-     PLAYER_STATS is the entire tracked league, so "leads the league" means
-     posts the season's top value (among pro rows) across all players there.
-     Ties all get marked. Applies to every numeric stat column in both
-     tables — the leading value is simply italicized (see the * key under
-     each table), same treatment whether it's a "good" stat to lead (PPG)
-     or not (TOPG).
-
-     To force a specific stat to show as a league leader regardless of the
-     numbers (e.g. a real-world honor the data model can't compute), add a
-     `leaders` array of stat keys to that season row:
+     PLAYER_STATS only tracks five players, not the real NBA, so leading the
+     league can't be computed by comparing amongst them. Every league-leader
+     stat must be added by hand: put a `leaders` array of stat keys on the
+     season row that actually led the NBA that year, e.g.
        { season:'2022-23', ..., fgp:'48.3%', ..., leaders:['fgp'] }
      Works the same on 'regular'/'playoffs' rows (PG_LEADER_STATS keys) and
-     'totals' rows (TOTALS_LEADER_STATS keys). */
+     'totals' rows (TOTALS_LEADER_STATS keys). Nothing is marked until it's
+     added here — this list currently needs to be filled in per player. */
   var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa','gs','gp','mpg'];
   var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'];
 
-  function statNum(raw) {
-    var v = typeof raw === 'string' ? parseFloat(raw.replace('%','')) : raw;
-    return (v === undefined || v === null || isNaN(v)) ? null : v;
-  }
-
-  /* Best value per season/stat for dataKey ('regular'|'playoffs'|'totals') */
-  function seasonLeaders(dataKey, statList) {
-    var best = {};
-    Object.keys(PLAYER_STATS).forEach(function(key){
-      ((PLAYER_STATS[key]||{})[dataKey]||[]).filter(isProRow).forEach(function(row){
-        statList.forEach(function(stat){
-          var val = statNum(row[stat]);
-          if (val === null) return;
-          best[row.season] = best[row.season] || {};
-          if (best[row.season][stat] === undefined || val > best[row.season][stat]) {
-            best[row.season][stat] = val;
-          }
-        });
-      });
-    });
-    return best;
-  }
-
-  /* Wrap text in italics if row's value ties the league lead for that season/stat,
-     or if the row manually forces it via a `leaders` array (see above). */
-  function leadWrap(leaders, stat, row, text) {
-    var val = statNum(row[stat]);
-    var best = leaders[row.season] && leaders[row.season][stat];
-    var isAutoLeader = val !== null && best !== undefined && val === best;
-    var isManualLeader = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
-    var isLeader = isAutoLeader || isManualLeader;
+  /* Wrap text in italics if the row manually forces this stat as a league
+     leader (see above). */
+  function leadWrap(stat, row, text) {
+    var isLeader = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
     return isLeader ? '<em class="stat-leader">'+text+'</em>' : text;
   }
 
@@ -886,8 +854,7 @@
   function renderPGTable(key, mode) {
     pgMode = mode || 'regular';
     var data = (PLAYER_STATS[key]||{})[pgMode] || [];
-    var label = (pgMode==='regular' ? 'Regular Season' : 'Playoffs') + ' · Per Game';
-    document.getElementById('pg-table-label').textContent = label;
+    document.getElementById('pg-table-label').textContent = 'Per Game';
     document.querySelectorAll('[data-scope="pg"]').forEach(function(btn){
       btn.classList.toggle('active', btn.dataset.mode === pgMode);
     });
@@ -896,7 +863,6 @@
     var thead = '<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
-    var leaders = seasonLeaders(pgMode, PG_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       if(row.dnq){
@@ -918,10 +884,10 @@
       }
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
       tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+teamCell(row.team,row.season)+'</td>';
-      tbody+='<td class="hi">'+leadWrap(leaders,'ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap(leaders,'rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap(leaders,'apg',row,fmt1(row.apg))+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'spg',row,fmt1(row.spg))+'</td><td>'+leadWrap(leaders,'bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap(leaders,'topg',row,fmt1(row.topg))+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'fgp',row,row.fgp)+'</td><td>'+leadWrap(leaders,'tpp',row,row.tpp)+'</td><td>'+leadWrap(leaders,'ftp',row,row.ftp)+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap(leaders,'gs',row,row.gs)+'</td><td>'+leadWrap(leaders,'gp',row,row.gp)+'</td><td>'+leadWrap(leaders,'mpg',row,fmt1(row.mpg))+'</td></tr>';
+      tbody+='<td class="hi">'+leadWrap('ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap('rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap('apg',row,fmt1(row.apg))+'</td>';
+      tbody+='<td>'+leadWrap('spg',row,fmt1(row.spg))+'</td><td>'+leadWrap('bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap('topg',row,fmt1(row.topg))+'</td>';
+      tbody+='<td>'+leadWrap('fgp',row,row.fgp)+'</td><td>'+leadWrap('tpp',row,row.tpp)+'</td><td>'+leadWrap('ftp',row,row.ftp)+'</td>';
+      tbody+='<td>'+leadWrap('tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap('gs',row,row.gs)+'</td><td>'+leadWrap('gp',row,row.gp)+'</td><td>'+leadWrap('mpg',row,fmt1(row.mpg))+'</td></tr>';
     });
     // Career avg row
     var valid=data.filter(isProRow);
@@ -955,7 +921,6 @@
     var thead='<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
-    var leaders = seasonLeaders('totals', TOTALS_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       var isCollege = COLLEGE_TEAMS.indexOf((row.team||'').toUpperCase()) !== -1;
@@ -966,11 +931,11 @@
       tbody+='<tr'+trClass+' data-orig="'+idx+'"'+(isCollege?' data-college="1"':'')+'>'+
         '<td>'+(isCollege?'<span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span>':fmtSeason(row.season)+icons)+'</td>'+
         '<td>'+row.age+'</td><td>'+teamTd+'</td><td style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;">'+posVal+'</td>';
-      tbody+='<td class="hi">'+(isCollege?row.pts:leadWrap(leaders,'pts',row,row.pts))+'</td>';
+      tbody+='<td class="hi">'+(isCollege?row.pts:leadWrap('pts',row,row.pts))+'</td>';
       ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){
         var val = row[k]||0;
         var isLeaderStat = !isCollege && TOTALS_LEADER_STATS.indexOf(k)!==-1;
-        tbody+='<td>'+(isLeaderStat?leadWrap(leaders,k,row,val):val)+'</td>';
+        tbody+='<td>'+(isLeaderStat?leadWrap(k,row,val):val)+'</td>';
       });
       tbody+='</tr>';
     });
@@ -1293,8 +1258,12 @@
 
     var total = entries.reduce(function(s,e){ return s + e.gp; }, 0);
 
-    // Use site palette — orange first, then blue, then muted variants
-    var PALETTE = ['var(--orange)','#231aa5','#2dd4bf','#f59e0b','#a855f7','#ec4899'];
+    // Use site palette — orange first, then blue, then muted variants.
+    // Canvas fillStyle can't resolve CSS custom properties like var(--orange)
+    // directly (it silently ignores them, leaving the previous fillStyle in
+    // place) — resolve the current computed value instead.
+    var orangeHex = (getComputedStyle(document.documentElement).getPropertyValue('--orange') || '').trim() || '#e75719';
+    var PALETTE = [orangeHex,'#231aa5','#2dd4bf','#f59e0b','#a855f7','#ec4899'];
 
     // Store slice angles for hit-testing
     var slices = [];
@@ -1423,19 +1392,17 @@
       if (tooltip) tooltip.style.display = 'none';
     };
 
-    // Legend — styled like Chart.js legend in the other cards
+    // Legend — a compact horizontal key under the donut
     legend.innerHTML = '';
     entries.forEach(function(e, i) {
       var pct = ((e.gp / total) * 100).toFixed(1);
       var col = PALETTE[i % PALETTE.length];
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;cursor:default;';
+      row.className = 'position-pie-legend-item';
       row.innerHTML =
-        '<div style="width:3px;height:28px;flex-shrink:0;background:'+col+';"></div>' +
-        '<div style="display:flex;flex-direction:column;gap:2px;">' +
-          '<span style="font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.04em;color:var(--heading);">'+e.pos+'</span>' +
-          '<span style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);">'+e.gp+' GP &nbsp;·&nbsp; '+pct+'%</span>' +
-        '</div>';
+        '<span class="position-pie-legend-dot" style="background:'+col+';"></span>' +
+        '<span class="position-pie-legend-label">'+e.pos+'</span>' +
+        '<span class="position-pie-legend-meta">'+e.gp+' GP &middot; '+pct+'%</span>';
       // Hover on legend also highlights slice
       row.addEventListener('mouseenter', function() { drawPie(i); });
       row.addEventListener('mouseleave', function() { drawPie(-1); });
