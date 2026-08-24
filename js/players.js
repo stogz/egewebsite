@@ -1010,7 +1010,11 @@
             var aC=a.dataset.career==='1',bC=b.dataset.career==='1'; if(aC||bC) return aC?1:-1;
             var aD=a.dataset.dnq==='1',bD=b.dataset.dnq==='1';
             if(aD||bD){ if(aD&&bD) return Number(a.dataset.originalIndex)-Number(b.dataset.originalIndex); return aD?1:-1; }
-            var aT=(a.cells[colIdx]?.textContent||'').trim(), bT=(b.cells[colIdx]?.textContent||'').trim();
+            // data-sort-val wins when a cell carries one, so a column can sort
+            // on something other than its display text (e.g. 'MAR 15, 2012')
+            var aCell=a.cells[colIdx], bCell=b.cells[colIdx];
+            var aT=(aCell?.dataset.sortVal ?? (aCell?.textContent||'')).trim();
+            var bT=(bCell?.dataset.sortVal ?? (bCell?.textContent||'')).trim();
             var aN=parseFloat(aT.replace('%','').replace(',','')), bN=parseFloat(bT.replace('%','').replace(',',''));
             var cmp=(!isNaN(aN)&&!isNaN(bN))?aN-bN:aT.localeCompare(bT);
             return next==='asc'?cmp:-cmp;
@@ -2609,12 +2613,11 @@
     });
   }
 
-  /* ── PERFORMANCES LOG ── */
-  var gamesMode   = 'regular'; // 'regular' | 'playoffs'
-  var gamesSeason = 'all';
-  var gamesSort   = 'latest'; // 'latest' | 'oldest' | 'best' | 'worst'
-  var gamesPage   = 0;        // zero-based current page index
-  var PERF_PER_PAGE = 30;
+  /* ── PERFORMANCES LOG ──
+     One season is in view at a time; the log has no other view state.
+     (The parked card renderer further down also referenced gamesMode,
+     gamesSort, gamesPage and PERF_PER_PAGE — restore those alongside it.) */
+  var gamesSeason = '';
 
   /* ── Game Score formula ── */
   function calcGameScore(g) {
@@ -2761,576 +2764,835 @@
      series result and a footer with series averages.
      Regular season games in the same view appear under a simple header.
   ─────────────────────────────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════════
+     GAME LOG TABLES
+
+     The Logs tab is a table of every game, styled like the Stats tab's
+     splits tables. One season is shown at a time, split into a Regular
+     Season table and a postseason table ('March Madness' for a college
+     season, 'Playoffs' otherwise). Rows run oldest to latest; clicking a
+     column header re-sorts, same as on the Stats tab.
+
+     The game-card layout that used to live here is preserved, commented
+     out, under "PARKED: GAME CARD RENDERER" further down.
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Columns, in display order. `key` drives the cell value; `num` marks a
+     column whose blank state is '—' rather than an empty cell. */
+  var LOG_COLS = [
+    { lbl:'DATE' },   { lbl:'TEAM' },  { lbl:'OPP' },   { lbl:'H/A' },
+    { lbl:'RESULT' }, { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },
+    { lbl:'AST' },    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
+    { lbl:'FG' },     { lbl:'FGA' },   { lbl:'FG%' },   { lbl:'3P' },
+    { lbl:'3P%' },    { lbl:'FT' },    { lbl:'FTA' },   { lbl:'FT%' },
+    { lbl:'TS%' },    { lbl:'HOOP' },
+  ];
+
+  function pctOrDash(made, att) {
+    return att > 0 ? (made / att * 100).toFixed(1) + '%' : '—';
+  }
+
+  /* True Shooting — PTS / (2 * (FGA + 0.44 * FTA)) */
+  function tsPctOf(g) {
+    var denom = g.fga + 0.44 * g.fta;
+    return denom > 0 ? (g.pts / (2 * denom) * 100).toFixed(1) + '%' : '—';
+  }
+
+  /* One <tr> for one game */
+  function logRow(key, g) {
+    var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
+    var isWin    = (g.result || '').toUpperCase() === 'W';
+    var gs       = calcGameScore(g);
+    var gsText   = (gs < 0 ? '−' : '') + Math.abs(gs).toFixed(1);
+
+    // Date sorts on its numeric key so 'MAR 15, 2012' doesn't sort as text
+    var dKey  = dateSortKey(g.date);
+    var dCell = '<td' + (dKey !== null ? ' data-sort-val="' + dKey + '"' : '') + '>'
+      + (fmtGameDate(g.date) || '—') + '</td>';
+
+    var resultCell = '<td data-sort-val="' + (isWin ? 1 : 0) + '">'
+      + '<span class="log-res ' + (isWin ? 'log-res--w' : 'log-res--l') + '">'
+      + (isWin ? 'W' : 'L') + '</span> '
+      + '<span class="log-score">' + (g.score || '—') + '</span></td>';
+
+    return '<tr>'
+      + dCell
+      + '<td>' + (teamAbbr || '—') + '</td>'
+      + '<td>' + (g.opp || '—') + '</td>'
+      + '<td>' + (g.home ? 'HOME' : 'AWAY') + '</td>'
+      + resultCell
+      + '<td>' + g.min + '</td>'
+      + '<td class="hi">' + g.pts + '</td>'
+      + '<td>' + g.reb + '</td>'
+      + '<td>' + g.ast + '</td>'
+      + '<td>' + g.stl + '</td>'
+      + '<td>' + g.blk + '</td>'
+      + '<td>' + g.tov + '</td>'
+      + '<td>' + g.fgm + '</td>'
+      + '<td>' + g.fga + '</td>'
+      + '<td>' + pctOrDash(g.fgm, g.fga) + '</td>'
+      + '<td>' + g.tpm + '</td>'
+      + '<td>' + pctOrDash(g.tpm, g.tpa) + '</td>'
+      + '<td>' + g.ftm + '</td>'
+      + '<td>' + g.fta + '</td>'
+      + '<td>' + pctOrDash(g.ftm, g.fta) + '</td>'
+      + '<td>' + tsPctOf(g) + '</td>'
+      + '<td>' + gsText + '</td>'
+      + '</tr>';
+  }
+
+  /* Totals/averages footer row for one table */
+  function logTotalsRow(games) {
+    var n = games.length;
+    if (!n) return '';
+    var t = { pts:0, reb:0, ast:0, stl:0, blk:0, tov:0,
+              fgm:0, fga:0, tpm:0, tpa:0, ftm:0, fta:0, min:0, gs:0 };
+    games.forEach(function(g){
+      ['pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min'].forEach(function(f){
+        t[f] += (g[f] || 0);
+      });
+      t.gs += calcGameScore(g);
+    });
+    function avg(v){ return (Math.round(v / n * 10) / 10).toFixed(1); }
+    var tsDenom = t.fga + 0.44 * t.fta;
+
+    return '<tr class="career-row" data-career="1">'
+      + '<td>' + n + ' GP</td><td></td><td></td><td></td><td></td>'
+      + '<td>' + avg(t.min) + '</td>'
+      + '<td class="hi">' + avg(t.pts) + '</td>'
+      + '<td>' + avg(t.reb) + '</td>'
+      + '<td>' + avg(t.ast) + '</td>'
+      + '<td>' + avg(t.stl) + '</td>'
+      + '<td>' + avg(t.blk) + '</td>'
+      + '<td>' + avg(t.tov) + '</td>'
+      + '<td>' + avg(t.fgm) + '</td>'
+      + '<td>' + avg(t.fga) + '</td>'
+      + '<td>' + pctOrDash(t.fgm, t.fga) + '</td>'
+      + '<td>' + avg(t.tpm) + '</td>'
+      + '<td>' + pctOrDash(t.tpm, t.tpa) + '</td>'
+      + '<td>' + avg(t.ftm) + '</td>'
+      + '<td>' + avg(t.fta) + '</td>'
+      + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
+      + '<td>' + (tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—') + '</td>'
+      + '<td>' + avg(t.gs) + '</td>'
+      + '</tr>';
+  }
+
+  /* One titled table card. Returns '' when the season has no games of this type. */
+  function logTableCard(key, games, title, tableId) {
+    if (!games.length) return '';
+    var thead = '<thead><tr>';
+    LOG_COLS.forEach(function(c){
+      thead += '<th data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
+    });
+    thead += '</tr></thead>';
+
+    var tbody = '<tbody>';
+    games.forEach(function(g){ tbody += logRow(key, g); });
+    tbody += logTotalsRow(games);
+    tbody += '</tbody>';
+
+    return '<div class="splits-card">'
+      + '<div class="splits-card-header">'
+      + '<div class="splits-card-dot"></div>'
+      + '<span class="splits-card-title">' + title + '</span>'
+      + '<span class="log-card-count">' + games.length + (games.length === 1 ? ' game' : ' games') + '</span>'
+      + '</div>'
+      + '<div class="splits-scroll">'
+      + '<table class="splits-table log-table" id="' + tableId + '">' + thead + tbody + '</table>'
+      + '</div>'
+      + '</div>';
+  }
+
+  /* Postseason heading depends on whether the season was played in college */
+  function postseasonTitle(key, season) {
+    var abbr = teamForSeason(key, season, 'playoffs') || teamForSeason(key, season, 'regular');
+    return COLLEGE_TEAMS.indexOf((abbr || '').toUpperCase()) !== -1 ? 'March Madness' : 'Playoffs';
+  }
+
   function renderPerformancesTable(key, games) {
     var panel = document.getElementById('panel-performances');
     if (!panel) return;
-    var p = PLAYERS[key];
 
-    var filtered = games.filter(function(g){
-      if (gamesMode !== 'all' && g.type !== gamesMode) return false;
-      if (gamesSeason !== 'all' && g.season !== gamesSeason) return false;
-      return true;
-    });
-
-    // ── Sort ──
-    // Chronological sorts use each game's `date` when every game in view has
-    // one, so entries can be logged in any order. Where any game is undated
-    // (most of the 2K25 logs) the original entry order stands in for
-    // chronology, exactly as before dates existed.
-    var sorted = filtered.slice();
-    var allDated = sorted.length > 0 && sorted.every(function(g){ return dateSortKey(g.date) !== null; });
-
-    if (gamesSort === 'best') {
-      sorted.sort(function(a, b){ return calcGameScore(b) - calcGameScore(a); });
-    } else if (gamesSort === 'worst') {
-      sorted.sort(function(a, b){ return calcGameScore(a) - calcGameScore(b); });
-    } else if (allDated) {
-      sorted.sort(function(a, b){ return dateSortKey(a.date) - dateSortKey(b.date); });
-      if (gamesSort !== 'oldest') sorted.reverse(); // 'latest' — newest first
-    } else if (gamesSort !== 'oldest') {
-      sorted.reverse(); // 'latest' — reverse entry order
-    }
-    // 'oldest' with no dates keeps as-entered order (first entered = oldest)
-
-    // Season options from ALL games (both types) so switching type doesn't reset it
+    // Seasons that have any games, newest first
     var seasonSet = {};
     games.forEach(function(g){ seasonSet[g.season] = true; });
     var seasons = Object.keys(seasonSet).sort().reverse();
 
-    var html = '';
-
-    // Controls row: title on left, dropdowns + toggle on right
-    html += '<div class="perf-controls">'
-      + '<div></div>'
-      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
-
-    // Sort dropdown
-    html += '<select class="chart-select" id="perf-sort-select">'
-      + '<option value="latest"'  +(gamesSort==='latest' ?' selected':'')+'> Latest</option>'
-      + '<option value="oldest"'  +(gamesSort==='oldest' ?' selected':'')+'> Oldest</option>'
-      + '<option value="best"'    +(gamesSort==='best'   ?' selected':'')+'> Best</option>'
-      + '<option value="worst"'   +(gamesSort==='worst'  ?' selected':'')+'> Worst</option>'
-      + '</select>';
-
-    // Season dropdown with year arrows
-    var curSeasonIdx = gamesSeason === 'all' ? -1 : seasons.indexOf(gamesSeason);
-    var canPrev = curSeasonIdx < seasons.length - 1; // seasons is newest-first, so "prev" = higher index
-    var canNext = curSeasonIdx > 0 && curSeasonIdx !== -1;
-    html += '<div class="perf-year-nav">'
-      + '<button class="perf-year-arrow" id="perf-year-prev"'+(canPrev?'':' disabled')+' title="Previous season">&#8592;</button>'
-      + '<select class="chart-select" id="perf-season-select">'
-      + '<option value="all"'+(gamesSeason==='all'?' selected':'')+'>All Seasons</option>';
-    seasons.forEach(function(s){
-      html += '<option value="'+s+'"'+(gamesSeason===s?' selected':'')+'>'+s+'</option>';
-    });
-    html += '</select>'
-      + '<button class="perf-year-arrow" id="perf-year-next"'+(canNext?'':' disabled')+' title="Next season">&#8594;</button>'
-      + '</div>';
-
-    // Type dropdown
-    html += '<select class="chart-select" id="perf-type-select">'
-      + '<option value="all"'+(gamesMode==='all'?' selected':'')+'>All Games</option>'
-      + '<option value="regular"'+(gamesMode==='regular'?' selected':'')+'>Regular Season</option>'
-      + '<option value="playoffs"'+(gamesMode==='playoffs'?' selected':'')+'>Playoffs</option>'
-      + '</select>';
-
-    html += '</div></div>'; // close right flex + games-controls
-
-    if (!sorted.length) {
-      html += '<div class="perf-empty"><div class="perf-empty-icon">📋</div>'
+    if (!seasons.length) {
+      panel.innerHTML = '<div class="perf-empty"><div class="perf-empty-icon">📋</div>'
         + '<div class="perf-empty-title">No Performances Logged</div>'
         + '<div class="perf-empty-sub">Add performance data to player-games.js to populate this log</div>'
         + '</div>';
-      panel.innerHTML = html;
-      wirePerformancesControls(panel, key, games);
       return;
     }
 
-    // ── Pagination ──
-    var totalPages = Math.max(1, Math.ceil(sorted.length / PERF_PER_PAGE));
-    if (gamesPage >= totalPages) gamesPage = totalPages - 1;
-    var pageStart = gamesPage * PERF_PER_PAGE;
-    var pageSlice = sorted.slice(pageStart, pageStart + PERF_PER_PAGE);
+    // Keep the selected season valid (it can be stale after switching players)
+    if (seasons.indexOf(gamesSeason) === -1) gamesSeason = seasons[0];
 
-    html += '<div class="game-log-list">';
-    pageSlice.forEach(function(g) {
-      // ── Team lookup from season ──
-      var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
-      var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
-      var colors    = TEAM_BANNER_COLORS[teamName] || { primary:'#231aa5', secondary:'var(--orange)' };
-      var accent    = colors.primary;
-      var logoUrl   = TEAM_LOGOS[teamName] || '';
-      var headshot  = PLAYER_HEADSHOTS[key] || '';
+    // ── Controls: season arrows + season select, nothing else ──
+    var curIdx   = seasons.indexOf(gamesSeason);
+    var canPrev  = curIdx < seasons.length - 1;  // newest-first, so "prev" = older = higher index
+    var canNext  = curIdx > 0;
 
-      // ── Game score — always white ──
-      var gs = calcGameScore(g);
-      var gsAbs = Math.abs(gs).toFixed(1);
-      var gsSign = gs < 0 ? '−' : '';
+    var html = '<div class="perf-controls">'
+      + '<div></div>'
+      + '<div class="perf-year-nav">'
+      + '<button class="perf-year-arrow" id="perf-year-prev"' + (canPrev ? '' : ' disabled') + ' title="Previous season">&#8592;</button>'
+      + '<select class="chart-select" id="perf-season-select">';
+    seasons.forEach(function(s){
+      html += '<option value="' + s + '"' + (gamesSeason === s ? ' selected' : '') + '>' + s + '</option>';
+    });
+    html += '</select>'
+      + '<button class="perf-year-arrow" id="perf-year-next"' + (canNext ? '' : ' disabled') + ' title="Next season">&#8594;</button>'
+      + '</div></div>';
 
-      var ballHtml = '<img class="glc-ball-icon" src="bballwhite.png" alt="">';
+    // ── Split the season into regular and postseason, oldest first ──
+    var seasonGames = games.filter(function(g){ return g.season === gamesSeason; });
+    var ordered     = orderOldestFirst(seasonGames);
+    var regular     = ordered.filter(function(g){ return g.type !== 'playoffs'; });
+    var post        = ordered.filter(function(g){ return g.type === 'playoffs'; });
 
-      // ── Display stats ──
-      var displayStats = pickDisplayStats(g);
-
-      var isWin = (g.result||'').toUpperCase() === 'W';
-      var haHome = g.home ? 'vs' : '@';
-
-      // ── Shooting percentages for detail panel ──
-      var fgpStr = g.fga > 0 ? (g.fgm/g.fga*100).toFixed(1)+'%' : '—';
-      var tppStr = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
-      var ftpStr = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
-
-      // ── Card label (round name, series game, or 'Regular Season') and date ──
-      var gameTypeLabel = gameLabel(g);
-      var gameDateLabel = fmtGameDate(g.date);
-
-      // ── Opponent info ──
-      var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
-      var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
-
-      html += '<div class="game-log-card">';
-
-      // ── CLICKABLE SUMMARY ROW ──
-      html += '<div class="glc-summary">';
-
-      // Circle headshot
-      html += '<div class="glc-headshot-wrap">';
-      html += '<div class="glc-headshot-circle">';
-      html += '<div class="glc-headshot-circle-bg" style="background:'+accent+';"></div>';
-      if (headshot) {
-        html += '<img class="glc-headshot-img" src="'+headshot+'" alt="'+p.name+'">';
-      } else {
-        html += '<div class="glc-headshot-initials">'+p.initials+'</div>';
-      }
-      html += '</div>'; // .glc-headshot-circle
-      if (logoUrl) {
-        html += '<div class="glc-team-logo"><img src="'+logoUrl+'" alt="'+teamName+'"></div>';
-      }
-      html += '</div>'; // .glc-headshot-wrap
-
-      // Main content
-      html += '<div class="glc-main">';
-
-      // Top row: name · round/game type · date · ball icon + hoop score (top right)
-      html += '<div class="glc-top">'
-        + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
-        + '<span class="glc-dot-sep">·</span>'
-        + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
-        + (gameDateLabel
-            ? '<span class="glc-dot-sep">·</span><span class="glc-date">'+gameDateLabel+'</span>'
-            : '')
-        + '<span class="glc-score-right">'
-        + ballHtml
-        + '<span class="glc-gamescore">'+gsSign+gsAbs+'</span>'
-        + '</span>'
-        + '</div>';
-
-      // Big 3 stats
-      html += '<div class="glc-stats">';
-      displayStats.forEach(function(s){
-        html += '<div class="glc-stat-block">'
-          + '<span class="glc-stat-val">'+s.display+'</span>'
-          + '<span class="glc-stat-lbl">'+s.lbl+'</span>'
-          + '</div>';
-      });
-      html += '</div>';
-
-      // Bottom row: date · @ vs opp-abbr opp-logo · W/L · Details
-      // ── Unique storage key for this game's reactions ──
-      // ── Unique storage key for this performance's reactions ──
-      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.type + ':' + g.opp + ':' + (g.game || 'r');
-
-      var oppLogoHtml = oppLogoUrl
-        ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
-        : '';
-
-      // ── Final score for bottom row: away logo · score · home logo, winner orange ──
-      var finalScoreHtml = '';
-      if (g.score && g.score.indexOf('-') !== -1) {
-        var fsParts   = g.score.split('-');
-        var ourScore  = fsParts[0].trim();
-        var theirScore = fsParts[1].trim();
-        var awayLogo, homeLogo, awayScore, homeScore, awayWon, homeWon;
-        if (g.home) {
-          // we are home (right), opp is away (left)
-          awayLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          homeLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          awayScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
-          homeScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
-        } else {
-          // we are away (left), opp is home (right)
-          awayLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          homeLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          awayScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
-          homeScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
-        }
-        finalScoreHtml = awayLogo + '<span class="glc-final-score-text">'+awayScore+'-'+homeScore+'</span>' + homeLogo;
-      } else {
-        finalScoreHtml = '<span class="glc-final-score-text">'+(g.score||'')+'</span>';
-      }
-
-      html += '<div class="glc-bottom">'
-        + '<div class="glc-bottom-emojis">'
-        + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
-        + '<button class="glc-reaction-add" data-rkey="'+gameReactionKey+'" title="Add reaction">+</button>'
-        + '</div>'
-        + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
-        + '</div>';
-
-      html += '</div>'; // .glc-main
-      html += '</div>'; // .glc-summary
-
-      // ── EXPANDABLE DETAIL PANEL ──
-      // TS% = PTS / (2 * (FGA + 0.44 * FTA))
-      var tsPct = (g.fga + 0.44 * g.fta) > 0
-        ? (g.pts / (2 * (g.fga + 0.44 * g.fta)) * 100).toFixed(1) + '%'
-        : '—';
-
-      // Score display: away score on left, home score on right
-      // g.home = true means the player's team is home (right side)
-      // g.score stored as "ourScore-theirScore"
-      var scoreHtml = g.score || '—';
-      if (g.score && g.score.indexOf('-') !== -1) {
-        var scoreParts = g.score.split('-');
-        var ourScore  = scoreParts[0].trim();
-        var theirScore = scoreParts[1].trim();
-        var ourWon = isWin;
-        if (g.home) {
-          // home (right): our score on right, opp on left
-          scoreHtml = (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>')
-            + '-'
-            + (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore);
-        } else {
-          // away (left): our score on left, opp on right
-          scoreHtml = (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore)
-            + '-'
-            + (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>');
-        }
-      }
-
-      // stat helper — no hi class at all
-      function detStat(val, lbl) {
-        return '<div class="glc-detail-stat">'
-          + '<span class="glc-detail-stat-val">'+val+'</span>'
-          + '<span class="glc-detail-stat-lbl">'+lbl+'</span>'
-          + '</div>';
-      }
-
-      html += '<div class="glc-detail"><div class="glc-detail-inner">';
-
-      // Header: Final Stats left · season right
-      html += '<div class="glc-detail-header">';
-      html += '<span class="glc-detail-title">Final Stats</span>';
-      html += '<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.7;">'+(g.season||'')+'</span>';
-      html += '</div>'; // close header
-
-      // All stats on one flex-wrap row
-      html += '<div class="glc-detail-stat-row">';
-      html += detStat(g.min,            'MIN');
-      html += detStat(g.pts,            'PTS');
-      html += detStat(g.reb,            'REB');
-      html += detStat(g.ast,            'AST');
-      html += detStat(g.stl,            'STL');
-      html += detStat(g.blk,            'BLK');
-      html += detStat(fgpStr,           'FG%');
-      html += detStat(g.fgm+'/'+g.fga, 'FG');
-      html += detStat(g.tpm+'/'+g.tpa, '3FG');
-      html += detStat(g.ftm+'/'+g.fta, 'FTS');
-      html += detStat(g.tov,            'TO');
-      html += detStat(tsPct,            'TS%');
-      html += detStat(gsSign+gsAbs,     'HOOP SCORE');
-      html += '</div>';
-
-      html += '</div></div>'; // .glc-detail-inner / .glc-detail
-
-      html += '</div>'; // .game-log-card
-    }); // end pageSlice.forEach
-
-    html += '</div>'; // .game-log-list
-
-    // ── Pagination controls ──
-    if (totalPages > 1) {
-      html += '<div class="perf-pagination" id="perf-pagination">';
-      html += '<button class="perf-page-btn" id="perf-prev"' + (gamesPage === 0 ? ' disabled' : '') + '>← Prev</button>';
-
-      // Build page number buttons with ellipsis compression
-      var pages = [];
-      for (var pi = 0; pi < totalPages; pi++) {
-        var showBtn = pi === 0 || pi === totalPages - 1 || Math.abs(pi - gamesPage) <= 2;
-        if (showBtn) {
-          pages.push(pi);
-        } else if (pages[pages.length - 1] !== '…') {
-          pages.push('…');
-        }
-      }
-      pages.forEach(function(p) {
-        if (p === '…') {
-          html += '<span class="perf-page-ellipsis">…</span>';
-        } else {
-          html += '<button class="perf-page-btn' + (p === gamesPage ? ' active' : '') + '" data-page="' + p + '">' + (p + 1) + '</button>';
-        }
-      });
-
-      html += '<button class="perf-page-btn" id="perf-next"' + (gamesPage >= totalPages - 1 ? ' disabled' : '') + '>Next →</button>';
-      html += '<span class="perf-page-info">' + (pageStart + 1) + '–' + Math.min(pageStart + PERF_PER_PAGE, sorted.length) + ' of ' + sorted.length + '</span>';
-      html += '</div>';
-    } // end if totalPages > 1
+    html += logTableCard(key, regular, 'Regular Season', 'log-table-regular');
+    html += logTableCard(key, post, postseasonTitle(key, gamesSeason), 'log-table-playoffs');
 
     panel.innerHTML = html;
+
+    ['log-table-regular','log-table-playoffs'].forEach(function(id){
+      var t = document.getElementById(id);
+      if (t) initSort(t);
+    });
+
     wirePerformancesControls(panel, key, games);
   }
 
+  /* Oldest first: by date when every game has one, else as entered */
+  function orderOldestFirst(list) {
+    var out = list.slice();
+    var allDated = out.length > 0 && out.every(function(g){ return dateSortKey(g.date) !== null; });
+    if (allDated) out.sort(function(a, b){ return dateSortKey(a.date) - dateSortKey(b.date); });
+    return out;
+  }
+
   function wirePerformancesControls(panel, key, games) {
-    // Build sorted season list for arrow navigation (newest-first)
-    var seasonSet2 = {};
-    games.forEach(function(g){ seasonSet2[g.season] = true; });
-    var navSeasons = Object.keys(seasonSet2).sort().reverse(); // newest first
+    var seasonSet = {};
+    games.forEach(function(g){ seasonSet[g.season] = true; });
+    var navSeasons = Object.keys(seasonSet).sort().reverse(); // newest first
+
+    function goTo(season) {
+      if (!season) return;
+      gamesSeason = season;
+      renderPerformancesTable(key, games);
+    }
 
     var seasonSel = document.getElementById('perf-season-select');
-    if (seasonSel) {
-      seasonSel.addEventListener('change', function(){
-        gamesSeason = this.value;
-        gamesPage = 0;
-        renderPerformancesTable(key, games);
-      });
-    }
+    if (seasonSel) seasonSel.addEventListener('change', function(){ goTo(this.value); });
 
-    // Year arrow wiring
     var yearPrev = document.getElementById('perf-year-prev');
     var yearNext = document.getElementById('perf-year-next');
-    if (yearPrev) {
-      yearPrev.addEventListener('click', function(){
-        // navSeasons is newest-first; "prev" means older = higher index
-        var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
-        var nextIdx = idx + 1;
-        if (nextIdx < navSeasons.length) {
-          gamesSeason = navSeasons[nextIdx];
-          gamesPage = 0;
-          renderPerformancesTable(key, games);
-        }
-      });
-    }
-    if (yearNext) {
-      yearNext.addEventListener('click', function(){
-        // "next" means newer = lower index
-        var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
-        if (idx > 0) {
-          gamesSeason = navSeasons[idx - 1];
-          gamesPage = 0;
-          renderPerformancesTable(key, games);
-        }
-      });
-    }
-    var sortSel = document.getElementById('perf-sort-select');
-    if (sortSel) {
-      sortSel.addEventListener('change', function(){
-        gamesSort = this.value;
-        gamesPage = 0;
-        renderPerformancesTable(key, games);
-      });
-    }
-    var typeSel = document.getElementById('perf-type-select');
-    if (typeSel) {
-      typeSel.addEventListener('change', function(){
-        gamesMode = this.value;
-        gamesPage = 0;
-        renderPerformancesTable(key, games);
-      });
-    }
-
-    // ── Pagination wiring ──
-    var prevBtn = document.getElementById('perf-prev');
-    var nextBtn = document.getElementById('perf-next');
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function(){
-        if (gamesPage > 0) { gamesPage--; renderPerformancesTable(key, games); _scrollToPerf(); }
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function(){
-        gamesPage++; renderPerformancesTable(key, games); _scrollToPerf();
-      });
-    }
-    panel.querySelectorAll('.perf-page-btn[data-page]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        gamesPage = parseInt(this.dataset.page, 10);
-        renderPerformancesTable(key, games);
-        _scrollToPerf();
-      });
+    // navSeasons is newest-first: older seasons sit at higher indexes
+    if (yearPrev) yearPrev.addEventListener('click', function(){
+      goTo(navSeasons[navSeasons.indexOf(gamesSeason) + 1]);
     });
-    function _scrollToPerf() {
-      var perfPanel = document.getElementById('panel-performances');
-      if (perfPanel) perfPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // Wire card expand/collapse
-    panel.querySelectorAll('.glc-summary').forEach(function(summary){
-      summary.addEventListener('click', function(e){
-        // Don't toggle if clicking inside reaction area
-        if (e.target.closest('.glc-reactions') || e.target.closest('.glc-reaction-add')) return;
-        var card = summary.closest('.game-log-card');
-        if (!card) return;
-        var isOpen = card.classList.contains('is-open');
-        panel.querySelectorAll('.game-log-card.is-open').forEach(function(c){ c.classList.remove('is-open'); });
-        if (!isOpen) card.classList.add('is-open');
-      });
+    if (yearNext) yearNext.addEventListener('click', function(){
+      var idx = navSeasons.indexOf(gamesSeason);
+      if (idx > 0) goTo(navSeasons[idx - 1]);
     });
-
-    // ── REACTION SYSTEM (Supabase + localStorage for per-user tracking) ──
-    // localStorage key: 'ege_reactions' → { [rkey]: emoji | null }
-    // Stores which emoji THIS user reacted with on each game (one per game).
-
-    var SUPABASE_URL      = 'https://wspmprjqqhtxekzyensq.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
-
-    // ── localStorage helpers ──
-    var LS_KEY = 'ege_reactions';
-    function lsGet() {
-      try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e) { return {}; }
-    }
-    function lsSet(data) {
-      try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
-    }
-    function myReaction(rkey) { return lsGet()[rkey] || null; }
-    function setMyReaction(rkey, emoji) {
-      var d = lsGet(); d[rkey] = emoji; lsSet(d);
-    }
-    function clearMyReaction(rkey) {
-      var d = lsGet(); delete d[rkey]; lsSet(d);
-    }
-
-    function sbHeaders() {
-      return {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type':  'application/json',
-        'Prefer':        'return=representation'
-      };
-    }
-
-    function fetchReactions(rkey) {
-      return fetch(
-        SUPABASE_URL + '/rest/v1/game_reactions?id=eq.' + encodeURIComponent(rkey) + '&select=counts',
-        { headers: sbHeaders() }
-      )
-      .then(function(r){ return r.json(); })
-      .then(function(rows){ return (rows && rows[0] && rows[0].counts) ? rows[0].counts : {}; });
-    }
-
-    function saveReactions(rkey, counts) {
-      return fetch(
-        SUPABASE_URL + '/rest/v1/game_reactions',
-        {
-          method: 'POST',
-          headers: Object.assign({}, sbHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
-          body: JSON.stringify({ id: rkey, counts: counts })
-        }
-      ).then(function(r){ return r.json(); });
-    }
-
-    /* Render reaction pills — highlights the user's own, makes it clickable to remove */
-    function renderReactionPills(rkey, counts) {
-      var container = panel.querySelector('.glc-reactions[data-rkey="'+rkey+'"]');
-      if (!container) return;
-      var mine = myReaction(rkey);
-      var entries = Object.keys(counts).map(function(e){ return { emoji:e, count:counts[e] }; });
-      entries.sort(function(a,b){ return b.count - a.count; });
-      var top3 = entries.slice(0, 3);
-      container.innerHTML = top3.map(function(r){
-        var isMine = (r.emoji === mine);
-        return '<span class="glc-reaction-pill'+(isMine?' mine':'')+'" data-rkey="'+rkey+'" data-emoji="'+r.emoji+'" title="'+(isMine?'Remove your reaction':'Add this reaction')+'" style="cursor:pointer;">'
-          + r.emoji
-          + '<span class="glc-reaction-count">'+r.count+'</span>'
-          + (isMine ? '<span class="glc-reaction-remove-hint">✕</span>' : '')
-          + '</span>';
-      }).join('');
-
-      // Wire clicks on all pills — mine removes, others add
-      container.querySelectorAll('.glc-reaction-pill').forEach(function(pill){
-        pill.addEventListener('click', function(e){
-          e.stopPropagation();
-          if (pill.classList.contains('mine')) {
-            removeReaction(rkey, pill.dataset.emoji);
-          } else {
-            submitReaction(rkey, pill.dataset.emoji);
-          }
-        });
-      });
-    }
-
-    function loadAllReactions() {
-      panel.querySelectorAll('.glc-reactions[data-rkey]').forEach(function(container){
-        var rkey = container.dataset.rkey;
-        fetchReactions(rkey).then(function(counts){
-          renderReactionPills(rkey, counts);
-        }).catch(function(){});
-      });
-    }
-
-    /* Add a reaction — one per user per game (replaces previous if different) */
-    function submitReaction(rkey, emoji) {
-      if (!emoji || !emoji.trim()) return;
-      var trimmed = emoji.trim();
-      // Must contain at least one emoji — reject plain text/numbers
-      // Emoji regex: covers most emoji ranges including ZWJ sequences
-      var hasEmoji = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}]/u.test(trimmed)
-        || /[\u00A9\u00AE\u203C\u2049\u2122\u2139\u231A-\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]/u.test(trimmed);
-      if (!hasEmoji) return;
-      // Strip variation selectors and keep just the base emoji
-      trimmed = trimmed.replace(/\uFE0F/g, '').trim();
-      if (!trimmed) return;
-
-      var prev = myReaction(rkey);
-      fetchReactions(rkey).then(function(counts){
-        // Remove previous reaction if different emoji
-        if (prev && prev !== trimmed && counts[prev]) {
-          counts[prev] = Math.max(0, counts[prev] - 1);
-          if (counts[prev] === 0) delete counts[prev];
-        }
-        // Add new — only if not already reacted with same emoji
-        if (prev !== trimmed) {
-          counts[trimmed] = (counts[trimmed] || 0) + 1;
-          setMyReaction(rkey, trimmed);
-        }
-        return saveReactions(rkey, counts).then(function(){ return counts; });
-      }).then(function(counts){
-        renderReactionPills(rkey, counts);
-      }).catch(function(err){ console.warn('Reaction save failed:', err); });
-    }
-
-    /* Remove the user's own reaction */
-    function removeReaction(rkey, emoji) {
-      fetchReactions(rkey).then(function(counts){
-        if (counts[emoji]) {
-          counts[emoji] = Math.max(0, counts[emoji] - 1);
-          if (counts[emoji] === 0) delete counts[emoji];
-        }
-        clearMyReaction(rkey);
-        return saveReactions(rkey, counts).then(function(){ return counts; });
-      }).then(function(counts){
-        renderReactionPills(rkey, counts);
-      }).catch(function(err){ console.warn('Reaction remove failed:', err); });
-    }
-
-    // Wire "+" buttons to open the shared emoji modal
-    panel.querySelectorAll('.glc-reaction-add').forEach(function(btn){
-      btn.addEventListener('click', function(e){
-        e.stopPropagation();
-        openEmojiModal(btn.dataset.rkey);
-      });
-    });
-
-    // Listen for confirmed reactions from the shared modal
-    if (!panel._emojiReactListenerAttached) {
-      panel._emojiReactListenerAttached = true;
-      document.addEventListener('ege:react', function(e){
-        submitReaction(e.detail.rkey, e.detail.emoji);
-      });
-    }
-
-    // Load reactions on render
-    loadAllReactions();
   }
+
+  /* ══════════════════════════════════════════════════════════════
+     PARKED: GAME CARD RENDERER  (+ emoji reaction system)
+
+     The Logs tab used to render each game as a card — circle headshot in
+     team colors, the three best stats, hoop score, final score with team
+     logos, and an expandable panel of full splits. Cards also carried
+     emoji reactions backed by Supabase, with per-user state in
+     localStorage under 'ege_reactions'.
+
+     Parked on purpose, not dead code: the table above replaced it as the
+     primary view, and this is kept verbatim so the card can come back
+     (most likely as a preview panel opened by clicking a table row).
+
+     To revive: uncomment, then call the card builder from
+     renderPerformancesTable and re-wire .glc-summary clicks. The card CSS
+     (.game-log-card, .glc-*, .perf-page-*) is still live in
+     css/players.css, and the shared emoji modal below is still in use.
+
+     ── original source ──
+
+       function renderPerformancesTable(key, games) {
+         var panel = document.getElementById('panel-performances');
+         if (!panel) return;
+         var p = PLAYERS[key];
+     
+         var filtered = games.filter(function(g){
+           if (gamesMode !== 'all' && g.type !== gamesMode) return false;
+           if (gamesSeason !== 'all' && g.season !== gamesSeason) return false;
+           return true;
+         });
+     
+         // ── Sort ──
+         // Chronological sorts use each game's `date` when every game in view has
+         // one, so entries can be logged in any order. Where any game is undated
+         // (most of the 2K25 logs) the original entry order stands in for
+         // chronology, exactly as before dates existed.
+         var sorted = filtered.slice();
+         var allDated = sorted.length > 0 && sorted.every(function(g){ return dateSortKey(g.date) !== null; });
+     
+         if (gamesSort === 'best') {
+           sorted.sort(function(a, b){ return calcGameScore(b) - calcGameScore(a); });
+         } else if (gamesSort === 'worst') {
+           sorted.sort(function(a, b){ return calcGameScore(a) - calcGameScore(b); });
+         } else if (allDated) {
+           sorted.sort(function(a, b){ return dateSortKey(a.date) - dateSortKey(b.date); });
+           if (gamesSort !== 'oldest') sorted.reverse(); // 'latest' — newest first
+         } else if (gamesSort !== 'oldest') {
+           sorted.reverse(); // 'latest' — reverse entry order
+         }
+         // 'oldest' with no dates keeps as-entered order (first entered = oldest)
+     
+         // Season options from ALL games (both types) so switching type doesn't reset it
+         var seasonSet = {};
+         games.forEach(function(g){ seasonSet[g.season] = true; });
+         var seasons = Object.keys(seasonSet).sort().reverse();
+     
+         var html = '';
+     
+         // Controls row: title on left, dropdowns + toggle on right
+         html += '<div class="perf-controls">'
+           + '<div></div>'
+           + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+     
+         // Sort dropdown
+         html += '<select class="chart-select" id="perf-sort-select">'
+           + '<option value="latest"'  +(gamesSort==='latest' ?' selected':'')+'> Latest</option>'
+           + '<option value="oldest"'  +(gamesSort==='oldest' ?' selected':'')+'> Oldest</option>'
+           + '<option value="best"'    +(gamesSort==='best'   ?' selected':'')+'> Best</option>'
+           + '<option value="worst"'   +(gamesSort==='worst'  ?' selected':'')+'> Worst</option>'
+           + '</select>';
+     
+         // Season dropdown with year arrows
+         var curSeasonIdx = gamesSeason === 'all' ? -1 : seasons.indexOf(gamesSeason);
+         var canPrev = curSeasonIdx < seasons.length - 1; // seasons is newest-first, so "prev" = higher index
+         var canNext = curSeasonIdx > 0 && curSeasonIdx !== -1;
+         html += '<div class="perf-year-nav">'
+           + '<button class="perf-year-arrow" id="perf-year-prev"'+(canPrev?'':' disabled')+' title="Previous season">&#8592;</button>'
+           + '<select class="chart-select" id="perf-season-select">'
+           + '<option value="all"'+(gamesSeason==='all'?' selected':'')+'>All Seasons</option>';
+         seasons.forEach(function(s){
+           html += '<option value="'+s+'"'+(gamesSeason===s?' selected':'')+'>'+s+'</option>';
+         });
+         html += '</select>'
+           + '<button class="perf-year-arrow" id="perf-year-next"'+(canNext?'':' disabled')+' title="Next season">&#8594;</button>'
+           + '</div>';
+     
+         // Type dropdown
+         html += '<select class="chart-select" id="perf-type-select">'
+           + '<option value="all"'+(gamesMode==='all'?' selected':'')+'>All Games</option>'
+           + '<option value="regular"'+(gamesMode==='regular'?' selected':'')+'>Regular Season</option>'
+           + '<option value="playoffs"'+(gamesMode==='playoffs'?' selected':'')+'>Playoffs</option>'
+           + '</select>';
+     
+         html += '</div></div>'; // close right flex + games-controls
+     
+         if (!sorted.length) {
+           html += '<div class="perf-empty"><div class="perf-empty-icon">📋</div>'
+             + '<div class="perf-empty-title">No Performances Logged</div>'
+             + '<div class="perf-empty-sub">Add performance data to player-games.js to populate this log</div>'
+             + '</div>';
+           panel.innerHTML = html;
+           wirePerformancesControls(panel, key, games);
+           return;
+         }
+     
+         // ── Pagination ──
+         var totalPages = Math.max(1, Math.ceil(sorted.length / PERF_PER_PAGE));
+         if (gamesPage >= totalPages) gamesPage = totalPages - 1;
+         var pageStart = gamesPage * PERF_PER_PAGE;
+         var pageSlice = sorted.slice(pageStart, pageStart + PERF_PER_PAGE);
+     
+         html += '<div class="game-log-list">';
+         pageSlice.forEach(function(g) {
+           // ── Team lookup from season ──
+           var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
+           var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
+           var colors    = TEAM_BANNER_COLORS[teamName] || { primary:'#231aa5', secondary:'var(--orange)' };
+           var accent    = colors.primary;
+           var logoUrl   = TEAM_LOGOS[teamName] || '';
+           var headshot  = PLAYER_HEADSHOTS[key] || '';
+     
+           // ── Game score — always white ──
+           var gs = calcGameScore(g);
+           var gsAbs = Math.abs(gs).toFixed(1);
+           var gsSign = gs < 0 ? '−' : '';
+     
+           var ballHtml = '<img class="glc-ball-icon" src="bballwhite.png" alt="">';
+     
+           // ── Display stats ──
+           var displayStats = pickDisplayStats(g);
+     
+           var isWin = (g.result||'').toUpperCase() === 'W';
+           var haHome = g.home ? 'vs' : '@';
+     
+           // ── Shooting percentages for detail panel ──
+           var fgpStr = g.fga > 0 ? (g.fgm/g.fga*100).toFixed(1)+'%' : '—';
+           var tppStr = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
+           var ftpStr = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
+     
+           // ── Card label (round name, series game, or 'Regular Season') and date ──
+           var gameTypeLabel = gameLabel(g);
+           var gameDateLabel = fmtGameDate(g.date);
+     
+           // ── Opponent info ──
+           var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
+           var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
+     
+           html += '<div class="game-log-card">';
+     
+           // ── CLICKABLE SUMMARY ROW ──
+           html += '<div class="glc-summary">';
+     
+           // Circle headshot
+           html += '<div class="glc-headshot-wrap">';
+           html += '<div class="glc-headshot-circle">';
+           html += '<div class="glc-headshot-circle-bg" style="background:'+accent+';"></div>';
+           if (headshot) {
+             html += '<img class="glc-headshot-img" src="'+headshot+'" alt="'+p.name+'">';
+           } else {
+             html += '<div class="glc-headshot-initials">'+p.initials+'</div>';
+           }
+           html += '</div>'; // .glc-headshot-circle
+           if (logoUrl) {
+             html += '<div class="glc-team-logo"><img src="'+logoUrl+'" alt="'+teamName+'"></div>';
+           }
+           html += '</div>'; // .glc-headshot-wrap
+     
+           // Main content
+           html += '<div class="glc-main">';
+     
+           // Top row: name · round/game type · date · ball icon + hoop score (top right)
+           html += '<div class="glc-top">'
+             + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
+             + '<span class="glc-dot-sep">·</span>'
+             + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
+             + (gameDateLabel
+                 ? '<span class="glc-dot-sep">·</span><span class="glc-date">'+gameDateLabel+'</span>'
+                 : '')
+             + '<span class="glc-score-right">'
+             + ballHtml
+             + '<span class="glc-gamescore">'+gsSign+gsAbs+'</span>'
+             + '</span>'
+             + '</div>';
+     
+           // Big 3 stats
+           html += '<div class="glc-stats">';
+           displayStats.forEach(function(s){
+             html += '<div class="glc-stat-block">'
+               + '<span class="glc-stat-val">'+s.display+'</span>'
+               + '<span class="glc-stat-lbl">'+s.lbl+'</span>'
+               + '</div>';
+           });
+           html += '</div>';
+     
+           // Bottom row: date · @ vs opp-abbr opp-logo · W/L · Details
+           // ── Unique storage key for this game's reactions ──
+           // ── Unique storage key for this performance's reactions ──
+           var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.type + ':' + g.opp + ':' + (g.game || 'r');
+     
+           var oppLogoHtml = oppLogoUrl
+             ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">'
+             : '';
+     
+           // ── Final score for bottom row: away logo · score · home logo, winner orange ──
+           var finalScoreHtml = '';
+           if (g.score && g.score.indexOf('-') !== -1) {
+             var fsParts   = g.score.split('-');
+             var ourScore  = fsParts[0].trim();
+             var theirScore = fsParts[1].trim();
+             var awayLogo, homeLogo, awayScore, homeScore, awayWon, homeWon;
+             if (g.home) {
+               // we are home (right), opp is away (left)
+               awayLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+               homeLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+               awayScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+               homeScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+             } else {
+               // we are away (left), opp is home (right)
+               awayLogo  = logoUrl     ? '<img src="'+logoUrl+'"     alt="'+teamName+'"    style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+               homeLogo  = oppLogoUrl  ? '<img src="'+oppLogoUrl+'"  alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
+               awayScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
+               homeScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
+             }
+             finalScoreHtml = awayLogo + '<span class="glc-final-score-text">'+awayScore+'-'+homeScore+'</span>' + homeLogo;
+           } else {
+             finalScoreHtml = '<span class="glc-final-score-text">'+(g.score||'')+'</span>';
+           }
+     
+           html += '<div class="glc-bottom">'
+             + '<div class="glc-bottom-emojis">'
+             + '<span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
+             + '<button class="glc-reaction-add" data-rkey="'+gameReactionKey+'" title="Add reaction">+</button>'
+             + '</div>'
+             + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
+             + '</div>';
+     
+           html += '</div>'; // .glc-main
+           html += '</div>'; // .glc-summary
+     
+           // ── EXPANDABLE DETAIL PANEL ──
+           // TS% = PTS / (2 * (FGA + 0.44 * FTA))
+           var tsPct = (g.fga + 0.44 * g.fta) > 0
+             ? (g.pts / (2 * (g.fga + 0.44 * g.fta)) * 100).toFixed(1) + '%'
+             : '—';
+     
+           // Score display: away score on left, home score on right
+           // g.home = true means the player's team is home (right side)
+           // g.score stored as "ourScore-theirScore"
+           var scoreHtml = g.score || '—';
+           if (g.score && g.score.indexOf('-') !== -1) {
+             var scoreParts = g.score.split('-');
+             var ourScore  = scoreParts[0].trim();
+             var theirScore = scoreParts[1].trim();
+             var ourWon = isWin;
+             if (g.home) {
+               // home (right): our score on right, opp on left
+               scoreHtml = (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>')
+                 + '-'
+                 + (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore);
+             } else {
+               // away (left): our score on left, opp on right
+               scoreHtml = (ourWon ? '<span class="win">'+ourScore+'</span>' : ourScore)
+                 + '-'
+                 + (ourWon ? theirScore : '<span class="win">'+theirScore+'</span>');
+             }
+           }
+     
+           // stat helper — no hi class at all
+           function detStat(val, lbl) {
+             return '<div class="glc-detail-stat">'
+               + '<span class="glc-detail-stat-val">'+val+'</span>'
+               + '<span class="glc-detail-stat-lbl">'+lbl+'</span>'
+               + '</div>';
+           }
+     
+           html += '<div class="glc-detail"><div class="glc-detail-inner">';
+     
+           // Header: Final Stats left · season right
+           html += '<div class="glc-detail-header">';
+           html += '<span class="glc-detail-title">Final Stats</span>';
+           html += '<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.7;">'+(g.season||'')+'</span>';
+           html += '</div>'; // close header
+     
+           // All stats on one flex-wrap row
+           html += '<div class="glc-detail-stat-row">';
+           html += detStat(g.min,            'MIN');
+           html += detStat(g.pts,            'PTS');
+           html += detStat(g.reb,            'REB');
+           html += detStat(g.ast,            'AST');
+           html += detStat(g.stl,            'STL');
+           html += detStat(g.blk,            'BLK');
+           html += detStat(fgpStr,           'FG%');
+           html += detStat(g.fgm+'/'+g.fga, 'FG');
+           html += detStat(g.tpm+'/'+g.tpa, '3FG');
+           html += detStat(g.ftm+'/'+g.fta, 'FTS');
+           html += detStat(g.tov,            'TO');
+           html += detStat(tsPct,            'TS%');
+           html += detStat(gsSign+gsAbs,     'HOOP SCORE');
+           html += '</div>';
+     
+           html += '</div></div>'; // .glc-detail-inner / .glc-detail
+     
+           html += '</div>'; // .game-log-card
+         }); // end pageSlice.forEach
+     
+         html += '</div>'; // .game-log-list
+     
+         // ── Pagination controls ──
+         if (totalPages > 1) {
+           html += '<div class="perf-pagination" id="perf-pagination">';
+           html += '<button class="perf-page-btn" id="perf-prev"' + (gamesPage === 0 ? ' disabled' : '') + '>← Prev</button>';
+     
+           // Build page number buttons with ellipsis compression
+           var pages = [];
+           for (var pi = 0; pi < totalPages; pi++) {
+             var showBtn = pi === 0 || pi === totalPages - 1 || Math.abs(pi - gamesPage) <= 2;
+             if (showBtn) {
+               pages.push(pi);
+             } else if (pages[pages.length - 1] !== '…') {
+               pages.push('…');
+             }
+           }
+           pages.forEach(function(p) {
+             if (p === '…') {
+               html += '<span class="perf-page-ellipsis">…</span>';
+             } else {
+               html += '<button class="perf-page-btn' + (p === gamesPage ? ' active' : '') + '" data-page="' + p + '">' + (p + 1) + '</button>';
+             }
+           });
+     
+           html += '<button class="perf-page-btn" id="perf-next"' + (gamesPage >= totalPages - 1 ? ' disabled' : '') + '>Next →</button>';
+           html += '<span class="perf-page-info">' + (pageStart + 1) + '–' + Math.min(pageStart + PERF_PER_PAGE, sorted.length) + ' of ' + sorted.length + '</span>';
+           html += '</div>';
+         } // end if totalPages > 1
+     
+         panel.innerHTML = html;
+         wirePerformancesControls(panel, key, games);
+       }
+     
+       function wirePerformancesControls(panel, key, games) {
+         // Build sorted season list for arrow navigation (newest-first)
+         var seasonSet2 = {};
+         games.forEach(function(g){ seasonSet2[g.season] = true; });
+         var navSeasons = Object.keys(seasonSet2).sort().reverse(); // newest first
+     
+         var seasonSel = document.getElementById('perf-season-select');
+         if (seasonSel) {
+           seasonSel.addEventListener('change', function(){
+             gamesSeason = this.value;
+             gamesPage = 0;
+             renderPerformancesTable(key, games);
+           });
+         }
+     
+         // Year arrow wiring
+         var yearPrev = document.getElementById('perf-year-prev');
+         var yearNext = document.getElementById('perf-year-next');
+         if (yearPrev) {
+           yearPrev.addEventListener('click', function(){
+             // navSeasons is newest-first; "prev" means older = higher index
+             var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
+             var nextIdx = idx + 1;
+             if (nextIdx < navSeasons.length) {
+               gamesSeason = navSeasons[nextIdx];
+               gamesPage = 0;
+               renderPerformancesTable(key, games);
+             }
+           });
+         }
+         if (yearNext) {
+           yearNext.addEventListener('click', function(){
+             // "next" means newer = lower index
+             var idx = gamesSeason === 'all' ? -1 : navSeasons.indexOf(gamesSeason);
+             if (idx > 0) {
+               gamesSeason = navSeasons[idx - 1];
+               gamesPage = 0;
+               renderPerformancesTable(key, games);
+             }
+           });
+         }
+         var sortSel = document.getElementById('perf-sort-select');
+         if (sortSel) {
+           sortSel.addEventListener('change', function(){
+             gamesSort = this.value;
+             gamesPage = 0;
+             renderPerformancesTable(key, games);
+           });
+         }
+         var typeSel = document.getElementById('perf-type-select');
+         if (typeSel) {
+           typeSel.addEventListener('change', function(){
+             gamesMode = this.value;
+             gamesPage = 0;
+             renderPerformancesTable(key, games);
+           });
+         }
+     
+         // ── Pagination wiring ──
+         var prevBtn = document.getElementById('perf-prev');
+         var nextBtn = document.getElementById('perf-next');
+         if (prevBtn) {
+           prevBtn.addEventListener('click', function(){
+             if (gamesPage > 0) { gamesPage--; renderPerformancesTable(key, games); _scrollToPerf(); }
+           });
+         }
+         if (nextBtn) {
+           nextBtn.addEventListener('click', function(){
+             gamesPage++; renderPerformancesTable(key, games); _scrollToPerf();
+           });
+         }
+         panel.querySelectorAll('.perf-page-btn[data-page]').forEach(function(btn){
+           btn.addEventListener('click', function(){
+             gamesPage = parseInt(this.dataset.page, 10);
+             renderPerformancesTable(key, games);
+             _scrollToPerf();
+           });
+         });
+         function _scrollToPerf() {
+           var perfPanel = document.getElementById('panel-performances');
+           if (perfPanel) perfPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+         }
+     
+         // Wire card expand/collapse
+         panel.querySelectorAll('.glc-summary').forEach(function(summary){
+           summary.addEventListener('click', function(e){
+             // Don't toggle if clicking inside reaction area
+             if (e.target.closest('.glc-reactions') || e.target.closest('.glc-reaction-add')) return;
+             var card = summary.closest('.game-log-card');
+             if (!card) return;
+             var isOpen = card.classList.contains('is-open');
+             panel.querySelectorAll('.game-log-card.is-open').forEach(function(c){ c.classList.remove('is-open'); });
+             if (!isOpen) card.classList.add('is-open');
+           });
+         });
+     
+         // ── REACTION SYSTEM (Supabase + localStorage for per-user tracking) ──
+         // localStorage key: 'ege_reactions' → { [rkey]: emoji | null }
+         // Stores which emoji THIS user reacted with on each game (one per game).
+     
+         var SUPABASE_URL      = 'https://wspmprjqqhtxekzyensq.supabase.co';
+         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcG1wcmpxcWh0eGVrenllbnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjQ3MDMsImV4cCI6MjA5MDI0MDcwM30.UrPDj26pC7P5D6grI6LGCzhC76-U0IYibQAbwycWE-Y';
+     
+         // ── localStorage helpers ──
+         var LS_KEY = 'ege_reactions';
+         function lsGet() {
+           try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e) { return {}; }
+         }
+         function lsSet(data) {
+           try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+         }
+         function myReaction(rkey) { return lsGet()[rkey] || null; }
+         function setMyReaction(rkey, emoji) {
+           var d = lsGet(); d[rkey] = emoji; lsSet(d);
+         }
+         function clearMyReaction(rkey) {
+           var d = lsGet(); delete d[rkey]; lsSet(d);
+         }
+     
+         function sbHeaders() {
+           return {
+             'apikey':        SUPABASE_ANON_KEY,
+             'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+             'Content-Type':  'application/json',
+             'Prefer':        'return=representation'
+           };
+         }
+     
+         function fetchReactions(rkey) {
+           return fetch(
+             SUPABASE_URL + '/rest/v1/game_reactions?id=eq.' + encodeURIComponent(rkey) + '&select=counts',
+             { headers: sbHeaders() }
+           )
+           .then(function(r){ return r.json(); })
+           .then(function(rows){ return (rows && rows[0] && rows[0].counts) ? rows[0].counts : {}; });
+         }
+     
+         function saveReactions(rkey, counts) {
+           return fetch(
+             SUPABASE_URL + '/rest/v1/game_reactions',
+             {
+               method: 'POST',
+               headers: Object.assign({}, sbHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+               body: JSON.stringify({ id: rkey, counts: counts })
+             }
+           ).then(function(r){ return r.json(); });
+         }
+     
+         /* Render reaction pills — highlights the user's own, makes it clickable to remove *\/
+         function renderReactionPills(rkey, counts) {
+           var container = panel.querySelector('.glc-reactions[data-rkey="'+rkey+'"]');
+           if (!container) return;
+           var mine = myReaction(rkey);
+           var entries = Object.keys(counts).map(function(e){ return { emoji:e, count:counts[e] }; });
+           entries.sort(function(a,b){ return b.count - a.count; });
+           var top3 = entries.slice(0, 3);
+           container.innerHTML = top3.map(function(r){
+             var isMine = (r.emoji === mine);
+             return '<span class="glc-reaction-pill'+(isMine?' mine':'')+'" data-rkey="'+rkey+'" data-emoji="'+r.emoji+'" title="'+(isMine?'Remove your reaction':'Add this reaction')+'" style="cursor:pointer;">'
+               + r.emoji
+               + '<span class="glc-reaction-count">'+r.count+'</span>'
+               + (isMine ? '<span class="glc-reaction-remove-hint">✕</span>' : '')
+               + '</span>';
+           }).join('');
+     
+           // Wire clicks on all pills — mine removes, others add
+           container.querySelectorAll('.glc-reaction-pill').forEach(function(pill){
+             pill.addEventListener('click', function(e){
+               e.stopPropagation();
+               if (pill.classList.contains('mine')) {
+                 removeReaction(rkey, pill.dataset.emoji);
+               } else {
+                 submitReaction(rkey, pill.dataset.emoji);
+               }
+             });
+           });
+         }
+     
+         function loadAllReactions() {
+           panel.querySelectorAll('.glc-reactions[data-rkey]').forEach(function(container){
+             var rkey = container.dataset.rkey;
+             fetchReactions(rkey).then(function(counts){
+               renderReactionPills(rkey, counts);
+             }).catch(function(){});
+           });
+         }
+     
+         /* Add a reaction — one per user per game (replaces previous if different) *\/
+         function submitReaction(rkey, emoji) {
+           if (!emoji || !emoji.trim()) return;
+           var trimmed = emoji.trim();
+           // Must contain at least one emoji — reject plain text/numbers
+           // Emoji regex: covers most emoji ranges including ZWJ sequences
+           var hasEmoji = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}]/u.test(trimmed)
+             || /[\u00A9\u00AE\u203C\u2049\u2122\u2139\u231A-\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]/u.test(trimmed);
+           if (!hasEmoji) return;
+           // Strip variation selectors and keep just the base emoji
+           trimmed = trimmed.replace(/\uFE0F/g, '').trim();
+           if (!trimmed) return;
+     
+           var prev = myReaction(rkey);
+           fetchReactions(rkey).then(function(counts){
+             // Remove previous reaction if different emoji
+             if (prev && prev !== trimmed && counts[prev]) {
+               counts[prev] = Math.max(0, counts[prev] - 1);
+               if (counts[prev] === 0) delete counts[prev];
+             }
+             // Add new — only if not already reacted with same emoji
+             if (prev !== trimmed) {
+               counts[trimmed] = (counts[trimmed] || 0) + 1;
+               setMyReaction(rkey, trimmed);
+             }
+             return saveReactions(rkey, counts).then(function(){ return counts; });
+           }).then(function(counts){
+             renderReactionPills(rkey, counts);
+           }).catch(function(err){ console.warn('Reaction save failed:', err); });
+         }
+     
+         /* Remove the user's own reaction *\/
+         function removeReaction(rkey, emoji) {
+           fetchReactions(rkey).then(function(counts){
+             if (counts[emoji]) {
+               counts[emoji] = Math.max(0, counts[emoji] - 1);
+               if (counts[emoji] === 0) delete counts[emoji];
+             }
+             clearMyReaction(rkey);
+             return saveReactions(rkey, counts).then(function(){ return counts; });
+           }).then(function(counts){
+             renderReactionPills(rkey, counts);
+           }).catch(function(err){ console.warn('Reaction remove failed:', err); });
+         }
+     
+         // Wire "+" buttons to open the shared emoji modal
+         panel.querySelectorAll('.glc-reaction-add').forEach(function(btn){
+           btn.addEventListener('click', function(e){
+             e.stopPropagation();
+             openEmojiModal(btn.dataset.rkey);
+           });
+         });
+     
+         // Listen for confirmed reactions from the shared modal
+         if (!panel._emojiReactListenerAttached) {
+           panel._emojiReactListenerAttached = true;
+           document.addEventListener('ege:react', function(e){
+             submitReaction(e.detail.rkey, e.detail.emoji);
+           });
+         }
+     
+         // Load reactions on render
+         loadAllReactions();
+       }
+
+     ══════════════════════════════════════════════════════════════ */
+
 
   /* ── SHARED EMOJI MODAL ── */
   document.addEventListener('DOMContentLoaded', function() {
@@ -3398,21 +3660,12 @@
   function renderPerformances(key) {
     var games = (window.PLAYER_GAMES && window.PLAYER_GAMES[key]) || [];
 
-    // Default: most recent season that has playoff games, falling back year by year.
-    // If none have playoffs, pick the most recent season with any games.
+    // Open on the most recent season with games
     var seasonSet = {};
-    games.forEach(function(g){ seasonSet[g.season] = (seasonSet[g.season] || {}); seasonSet[g.season][g.type] = true; });
+    games.forEach(function(g){ seasonSet[g.season] = true; });
     var allSeasons = Object.keys(seasonSet).sort().reverse();
-    var defaultSeason = 'all';
-    for (var si = 0; si < allSeasons.length; si++) {
-      if (seasonSet[allSeasons[si]].playoffs) { defaultSeason = allSeasons[si]; break; }
-    }
-    if (defaultSeason === 'all' && allSeasons.length) defaultSeason = allSeasons[0];
 
-    gamesMode   = 'all';
-    gamesSeason = defaultSeason;
-    gamesSort   = 'latest';
-    gamesPage   = 0;
+    gamesSeason = allSeasons[0] || '';
     renderPerformancesTable(key, games);
   }
 

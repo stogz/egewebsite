@@ -896,6 +896,33 @@
     }
     .perf-year-arrow:disabled { opacity: .3; cursor: default; }
 
+    /* ── GAME LOG TABLES ──
+       Built on .splits-table (Stats tab) — these rules only cover what the
+       log adds: a wider min-width for its 22 columns, the win/loss result
+       cell, and the game count in each card header. */
+    .log-table { min-width: 1500px; }
+    /* DATE, TEAM, OPP, H/A and RESULT read as labels, not figures */
+    .log-table td:nth-child(-n+5) {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .08em;
+      font-weight: 500;
+      text-align: left;
+    }
+    .log-table th:nth-child(-n+5) { text-align: left; }
+    .log-res { font-weight: 700; }
+    .log-res--w { color: var(--orange); }
+    .log-res--l { color: var(--text-muted); }
+    .log-score { color: var(--text); }
+    .log-card-count {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
     /* ── PERFORMANCE CARDS ── */
     .game-log-list { display:flex; flex-direction:column; gap:14px; }
 
