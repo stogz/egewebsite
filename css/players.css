@@ -896,20 +896,129 @@
     }
     .perf-year-arrow:disabled { opacity: .3; cursor: default; }
 
+    /* ── LOG SETTINGS (gear + dropdown) ── */
+    .perf-controls-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .log-settings { position: relative; }
+    .log-settings-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color .18s, border-color .18s, background .18s, transform .3s;
+    }
+    .log-settings-btn:hover,
+    .log-settings-btn.is-active {
+      color: var(--orange);
+      border-color: var(--orange);
+      background: rgba(var(--accent-rgb), .08);
+    }
+    .log-settings-btn.is-active svg { transform: rotate(60deg); }
+    .log-settings-btn svg { transition: transform .3s ease; }
+    .log-settings-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 60;
+      width: 290px;
+      padding: 6px;
+      /* --bg-card is translucent; the panel floats over the table so it
+         needs the opaque page background instead */
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 44px rgba(0,0,0,.4);
+      animation: fadeSlideUp .16s ease both;
+    }
+    .log-settings-panel.open { display: block; }
+    .log-settings-title {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: 10px 12px 8px;
+    }
+    .log-settings-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      padding: 11px 12px;
+      background: transparent;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .log-settings-row:hover { background: rgba(var(--accent-rgb), .07); }
+    .log-settings-switch {
+      flex-shrink: 0;
+      position: relative;
+      width: 30px;
+      height: 16px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: rgba(var(--accent-rgb), .18);
+      border: 1px solid var(--border);
+      transition: background .18s, border-color .18s;
+    }
+    .log-settings-row.is-on .log-settings-switch {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+    .log-settings-knob {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: transform .18s, background .18s;
+    }
+    .log-settings-row.is-on .log-settings-knob {
+      background: #fff;
+      transform: translateX(14px);
+    }
+    .log-settings-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .log-settings-label {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .88rem;
+      color: var(--heading);
+      line-height: 1.2;
+    }
+    .log-settings-hint {
+      font-family: var(--font-body);
+      font-size: .72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
     /* ── GAME LOG TABLES ──
        Built on .splits-table (Stats tab) — these rules only cover what the
        log adds: a wider min-width for its 22 columns, the win/loss result
        cell, and the game count in each card header. */
     .log-table { min-width: 1500px; }
-    /* DATE, TEAM, OPP, H/A and RESULT read as labels, not figures */
-    .log-table td:nth-child(-n+5) {
+    /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
+       than column position — the range modal drops these five, and a
+       positional rule restyled MIN/PTS/REB/AST there instead. */
+    .log-table td.log-lbl {
       font-family: var(--font-mono);
       font-size: .65rem;
       letter-spacing: .08em;
       font-weight: 500;
       text-align: left;
     }
-    .log-table th:nth-child(-n+5) { text-align: left; }
+    .log-table th.log-lbl { text-align: left; }
+    /* Field Goal Data off — made/attempted hidden, percentages kept */
+    .log-table.log-hide-fg .col-fg { display: none; }
+    .log-hoop { font-variant-numeric: tabular-nums; }
     .log-res { font-weight: 700; }
     .log-res--w { color: #22c55e; }
     .log-res--l { color: #ef4444; }
@@ -952,32 +1061,30 @@
     /* Stops the page behind the modal scrolling under it */
     body.range-modal-open { overflow: hidden; }
     #range-modal {
-      background: var(--bg-card);
+      background: var(--bg);
       border: 1px solid var(--border);
       box-shadow: 0 24px 70px rgba(0,0,0,.5);
-      width: min(1100px, 100%);
-      max-height: 88vh;
+      width: min(1340px, 100%);
+      max-height: 90vh;
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
     }
-    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg-card); }
-    #range-modal .splits-card-title { color: var(--heading); font-size: .7rem; }
-    /* The summary drops the five per-game identity columns, so it fits */
-    #range-modal .log-table { min-width: 900px; }
-    #range-modal .log-table td:nth-child(-n+5),
-    #range-modal .log-table th:nth-child(-n+5) { text-align: right; }
-    #range-modal .log-table td:first-child,
-    #range-modal .log-table th:first-child { text-align: left; }
-    #range-modal .log-table td:first-child {
-      font-family: var(--font-mono);
-      font-size: .65rem;
+    /* Opaque, so rows don't show through while the summary scrolls */
+    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
+    #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
+    /* The summary drops the five identity columns, so it needs less width */
+    #range-modal .log-table { min-width: 940px; }
+    #range-modal .log-table th { padding: 14px 16px; }
+    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
+    #range-modal .log-table td.log-lbl {
+      font-size: .68rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--orange);
     }
     tr.range-row-total td {
       font-weight: 700;
-      background: var(--bg-card) !important;
+      background: var(--bg) !important;
       height: 3rem;
       font-size: .92rem;
     }

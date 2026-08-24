@@ -2777,16 +2777,75 @@
      out, under "PARKED: GAME CARD RENDERER" further down.
      ══════════════════════════════════════════════════════════════ */
 
-  /* Columns, in display order. `key` drives the cell value; `num` marks a
-     column whose blank state is '—' rather than an empty cell. */
+  /* Columns, in display order.
+       cls 'log-lbl' — an identity column (mono label type, left aligned)
+                       rather than a figure. Marked explicitly rather than by
+                       position, because the range modal drops these five and
+                       a positional rule would then restyle MIN/PTS/REB/AST.
+       grp 'fg'      — made/attempted counts, hidden by the Field Goal Data
+                       setting. The percentages are deliberately not in the
+                       group, so turning it off narrows the table without
+                       losing shooting efficiency. */
   var LOG_COLS = [
-    { lbl:'DATE' },   { lbl:'TEAM' },  { lbl:'OPP' },   { lbl:'H/A' },
-    { lbl:'RESULT' }, { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },
-    { lbl:'AST' },    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
-    { lbl:'FG' },     { lbl:'FGA' },   { lbl:'FG%' },   { lbl:'3P' },
-    { lbl:'3PA' },    { lbl:'3P%' },   { lbl:'FT' },    { lbl:'FTA' },
-    { lbl:'FT%' },    { lbl:'TS%' },   { lbl:'HOOP' },
+    { lbl:'DATE', cls:'log-lbl' },  { lbl:'TEAM', cls:'log-lbl' },
+    { lbl:'OPP',  cls:'log-lbl' },  { lbl:'H/A',  cls:'log-lbl' },
+    { lbl:'RESULT', cls:'log-lbl' },
+    { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },   { lbl:'AST' },
+    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
+    { lbl:'FG',  grp:'fg' }, { lbl:'FGA', grp:'fg' }, { lbl:'FG%' },
+    { lbl:'3P',  grp:'fg' }, { lbl:'3PA', grp:'fg' }, { lbl:'3P%' },
+    { lbl:'FT',  grp:'fg' }, { lbl:'FTA', grp:'fg' }, { lbl:'FT%' },
+    { lbl:'TS%' },   { lbl:'HOOP' },
   ];
+
+  function colClass(c) {
+    return ((c.cls || '') + (c.grp === 'fg' ? ' col-fg' : '')).trim();
+  }
+  function clsAttr(c) {
+    var v = colClass(c);
+    return v ? ' class="' + v + '"' : '';
+  }
+
+  /* ── LOG SETTINGS ──
+     Persisted so the choice survives navigation, like the theme and sim. */
+  var LOG_SETTINGS_KEY = 'ege-log-settings';
+  var logSettings = (function(){
+    var d = { fgData: true, colorSystem: false };
+    try {
+      var raw = JSON.parse(localStorage.getItem(LOG_SETTINGS_KEY) || '{}');
+      if (typeof raw.fgData === 'boolean') d.fgData = raw.fgData;
+      if (typeof raw.colorSystem === 'boolean') d.colorSystem = raw.colorSystem;
+    } catch(e) {}
+    return d;
+  })();
+  function saveLogSettings() {
+    try { localStorage.setItem(LOG_SETTINGS_KEY, JSON.stringify(logSettings)); } catch(e) {}
+  }
+
+  /* ── HOOP SCORE HEAT ──
+     5 or below is a bright red, 25 a bright green, 35 and up gold, with a
+     continuous ramp between. Matches the mock draft's filled-cell heatmap:
+     an HSL background under white text. */
+  function hoopHeatStyle(gs) {
+    // Segments meet at matching values so the ramp has no visible seam:
+    //   <=5  red   hsl(0,82,46)  ·  25 green hsl(140,68,40)  ·  >=35 gold hsl(45,92,48)
+    var h, sat, lum;
+    if (gs >= 35)      { h = 45;  sat = 92; lum = 48; }                // gold
+    else if (gs >= 25) { var a = (gs - 25) / 10;                       // green → gold
+                         h = 140 - a * 95; sat = 68 + a * 24; lum = 40 + a * 8; }
+    else if (gs > 5)   { var b = (gs - 5) / 20;                        // red → green
+                         h = b * 140; sat = 82 - b * 14; lum = 46 - b * 6; }
+    else               { h = 0;   sat = 82; lum = 46; }                // bright red
+    return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%);color:#fff;';
+  }
+
+  /* Hoop cell, tinted when the Color System setting is on. `perGame` guards
+     the range modal's Totals row, where a summed score would always read gold. */
+  function hoopCell(gs, perGame) {
+    var txt = (gs < 0 ? '−' : '') + Math.abs(gs).toFixed(1);
+    var style = (logSettings.colorSystem && perGame !== false) ? hoopHeatStyle(gs) : '';
+    return '<td class="log-hoop"' + (style ? ' style="' + style + '"' : '') + '>' + txt + '</td>';
+  }
 
   function pctOrDash(made, att) {
     return att > 0 ? (made / att * 100).toFixed(1) + '%' : '—';
@@ -2808,19 +2867,19 @@
 
     // Date sorts on its numeric key so 'MAR 15, 2012' doesn't sort as text
     var dKey  = dateSortKey(g.date);
-    var dCell = '<td' + (dKey !== null ? ' data-sort-val="' + dKey + '"' : '') + '>'
+    var dCell = '<td class="log-lbl"' + (dKey !== null ? ' data-sort-val="' + dKey + '"' : '') + '>'
       + (fmtGameDate(g.date) || '—') + '</td>';
 
-    var resultCell = '<td data-sort-val="' + (isWin ? 1 : 0) + '">'
+    var resultCell = '<td class="log-lbl" data-sort-val="' + (isWin ? 1 : 0) + '">'
       + '<span class="log-res ' + (isWin ? 'log-res--w' : 'log-res--l') + '">'
       + (isWin ? 'W' : 'L') + '</span> '
       + '<span class="log-score">' + (g.score || '—') + '</span></td>';
 
     return '<tr class="log-row" data-gi="' + idx + '">'
       + dCell
-      + '<td>' + (teamAbbr || '—') + '</td>'
-      + '<td>' + (g.opp || '—') + '</td>'
-      + '<td>' + (g.home ? 'HOME' : 'AWAY') + '</td>'
+      + '<td class="log-lbl">' + (teamAbbr || '—') + '</td>'
+      + '<td class="log-lbl">' + (g.opp || '—') + '</td>'
+      + '<td class="log-lbl">' + (g.home ? 'HOME' : 'AWAY') + '</td>'
       + resultCell
       + '<td>' + g.min + '</td>'
       + '<td class="hi">' + g.pts + '</td>'
@@ -2829,17 +2888,17 @@
       + '<td>' + g.stl + '</td>'
       + '<td>' + g.blk + '</td>'
       + '<td>' + g.tov + '</td>'
-      + '<td>' + g.fgm + '</td>'
-      + '<td>' + g.fga + '</td>'
+      + '<td class="col-fg">' + g.fgm + '</td>'
+      + '<td class="col-fg">' + g.fga + '</td>'
       + '<td>' + pctOrDash(g.fgm, g.fga) + '</td>'
-      + '<td>' + g.tpm + '</td>'
-      + '<td>' + g.tpa + '</td>'
+      + '<td class="col-fg">' + g.tpm + '</td>'
+      + '<td class="col-fg">' + g.tpa + '</td>'
       + '<td>' + pctOrDash(g.tpm, g.tpa) + '</td>'
-      + '<td>' + g.ftm + '</td>'
-      + '<td>' + g.fta + '</td>'
+      + '<td class="col-fg">' + g.ftm + '</td>'
+      + '<td class="col-fg">' + g.fta + '</td>'
       + '<td>' + pctOrDash(g.ftm, g.fta) + '</td>'
       + '<td>' + tsPctOf(g) + '</td>'
-      + '<td>' + gsText + '</td>'
+      + hoopCell(gs, true)
       + '</tr>';
   }
 
@@ -2859,7 +2918,9 @@
     var tsDenom = t.fga + 0.44 * t.fta;
 
     return '<tr class="career-row" data-career="1">'
-      + '<td>' + n + ' GP</td><td></td><td></td><td></td><td></td>'
+      + '<td class="log-lbl">' + n + ' GP</td>'
+      + '<td class="log-lbl"></td><td class="log-lbl"></td>'
+      + '<td class="log-lbl"></td><td class="log-lbl"></td>'
       + '<td>' + avg(t.min) + '</td>'
       + '<td class="hi">' + avg(t.pts) + '</td>'
       + '<td>' + avg(t.reb) + '</td>'
@@ -2867,17 +2928,17 @@
       + '<td>' + avg(t.stl) + '</td>'
       + '<td>' + avg(t.blk) + '</td>'
       + '<td>' + avg(t.tov) + '</td>'
-      + '<td>' + avg(t.fgm) + '</td>'
-      + '<td>' + avg(t.fga) + '</td>'
+      + '<td class="col-fg">' + avg(t.fgm) + '</td>'
+      + '<td class="col-fg">' + avg(t.fga) + '</td>'
       + '<td>' + pctOrDash(t.fgm, t.fga) + '</td>'
-      + '<td>' + avg(t.tpm) + '</td>'
-      + '<td>' + avg(t.tpa) + '</td>'
+      + '<td class="col-fg">' + avg(t.tpm) + '</td>'
+      + '<td class="col-fg">' + avg(t.tpa) + '</td>'
       + '<td>' + pctOrDash(t.tpm, t.tpa) + '</td>'
-      + '<td>' + avg(t.ftm) + '</td>'
-      + '<td>' + avg(t.fta) + '</td>'
+      + '<td class="col-fg">' + avg(t.ftm) + '</td>'
+      + '<td class="col-fg">' + avg(t.fta) + '</td>'
       + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
       + '<td>' + (tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—') + '</td>'
-      + '<td>' + avg(t.gs) + '</td>'
+      + hoopCell(t.gs / n, true)
       + '</tr>';
   }
 
@@ -2886,7 +2947,7 @@
     if (!games.length) return '';
     var thead = '<thead><tr>';
     LOG_COLS.forEach(function(c){
-      thead += '<th data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
+      thead += '<th' + clsAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
     });
     thead += '</tr></thead>';
 
@@ -2902,7 +2963,8 @@
       + '<span class="log-card-count">' + games.length + (games.length === 1 ? ' game' : ' games') + '</span>'
       + '</div>'
       + '<div class="splits-scroll">'
-      + '<table class="splits-table log-table" id="' + tableId + '">' + thead + tbody + '</table>'
+      + '<table class="splits-table log-table' + (logSettings.fgData ? '' : ' log-hide-fg')
+      + '" id="' + tableId + '">' + thead + tbody + '</table>'
       + '</div>'
       + '</div>';
   }
@@ -2940,6 +3002,7 @@
 
     var html = '<div class="perf-controls">'
       + '<div></div>'
+      + '<div class="perf-controls-right">'
       + '<div class="perf-year-nav">'
       + '<button class="perf-year-arrow" id="perf-year-prev"' + (canPrev ? '' : ' disabled') + ' title="Previous season">&#8592;</button>'
       + '<select class="chart-select" id="perf-season-select">';
@@ -2948,6 +3011,8 @@
     });
     html += '</select>'
       + '<button class="perf-year-arrow" id="perf-year-next"' + (canNext ? '' : ' disabled') + ' title="Next season">&#8594;</button>'
+      + '</div>'
+      + logSettingsMenu()
       + '</div></div>';
 
     // ── Split the season into regular and postseason, oldest first ──
@@ -3032,15 +3097,16 @@
     document.getElementById('range-modal-count').textContent =
       span.length + (span.length === 1 ? ' game · ' : ' games · ') + wins + '-' + (span.length - wins);
 
-    var thead = '<thead><tr>';
+    // The five identity columns describe a single game, so the summary
+    // replaces them with one label column
+    var thead = '<thead><tr><th class="log-lbl"></th>';
     LOG_COLS.forEach(function(c){
-      // Date/Team/Opp/H-A/Result describe a single game, so the summary
-      // replaces those five with one label column
-      if (['DATE','TEAM','OPP','H/A','RESULT'].indexOf(c.lbl) !== -1) return;
-      thead += '<th>' + c.lbl + '</th>';
+      if (c.cls === 'log-lbl') return;
+      thead += '<th' + clsAttr(c) + '>' + c.lbl + '</th>';
     });
-    thead = '<thead><tr><th></th>' + thead.slice('<thead><tr>'.length) + '</tr></thead>';
+    thead += '</tr></thead>';
 
+    table.className = 'splits-table log-table' + (logSettings.fgData ? '' : ' log-hide-fg');
     table.innerHTML = thead + '<tbody>' + rangeSummaryRows(span) + '</tbody>';
     backdrop.classList.add('open');
     document.body.classList.add('range-modal-open');
@@ -3061,8 +3127,8 @@
     var tsPct   = tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—';
 
     // Percentages are the span's own made/attempted, identical in both rows
-    function row(label, cls, f) {
-      return '<tr class="' + cls + '"><td>' + label + '</td>'
+    function row(label, cls, f, perGame) {
+      return '<tr class="' + cls + '"><td class="log-lbl">' + label + '</td>'
         + '<td>' + f(t.min) + '</td>'
         + '<td class="hi">' + f(t.pts) + '</td>'
         + '<td>' + f(t.reb) + '</td>'
@@ -3070,26 +3136,26 @@
         + '<td>' + f(t.stl) + '</td>'
         + '<td>' + f(t.blk) + '</td>'
         + '<td>' + f(t.tov) + '</td>'
-        + '<td>' + f(t.fgm) + '</td>'
-        + '<td>' + f(t.fga) + '</td>'
+        + '<td class="col-fg">' + f(t.fgm) + '</td>'
+        + '<td class="col-fg">' + f(t.fga) + '</td>'
         + '<td>' + pctOrDash(t.fgm, t.fga) + '</td>'
-        + '<td>' + f(t.tpm) + '</td>'
-        + '<td>' + f(t.tpa) + '</td>'
+        + '<td class="col-fg">' + f(t.tpm) + '</td>'
+        + '<td class="col-fg">' + f(t.tpa) + '</td>'
         + '<td>' + pctOrDash(t.tpm, t.tpa) + '</td>'
-        + '<td>' + f(t.ftm) + '</td>'
-        + '<td>' + f(t.fta) + '</td>'
+        + '<td class="col-fg">' + f(t.ftm) + '</td>'
+        + '<td class="col-fg">' + f(t.fta) + '</td>'
         + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
         + '<td>' + tsPct + '</td>'
-        + '<td>' + f(t.gs) + '</td>'
+        + hoopCell(perGame ? t.gs / n : t.gs, perGame)
         + '</tr>';
     }
 
     var totals = row('Totals', 'range-row-total', function(v){
       return (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '');
-    });
+    }, false);
     var avgs = row('Per Game', 'career-row', function(v){
       return (Math.round(v / n * 10) / 10).toFixed(1);
-    });
+    }, true);
     return totals + avgs;
   }
 
@@ -3149,6 +3215,76 @@
     }
   })();
 
+  /* ── LOG SETTINGS MENU ──
+     Gear at the top right of the Logs tab. Both toggles re-render the
+     tables, which is also what re-applies them to a freshly opened range
+     modal. */
+  var LOG_TOGGLES = [
+    { id:'fgData', label:'Field Goal Data',
+      hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
+    { id:'colorSystem', label:'Color System',
+      hint:'Shade the Hoop Score by performance — red through green to gold.' },
+  ];
+
+  function logSettingsMenu() {
+    var html = '<div class="log-settings">'
+      + '<button class="log-settings-btn" id="log-settings-btn" title="Log settings" aria-label="Log settings" aria-expanded="false">'
+      + '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+      + '<circle cx="12" cy="12" r="3"/>'
+      + '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.63.71 1.09 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+      + '</svg></button>'
+      + '<div class="log-settings-panel" id="log-settings-panel">'
+      + '<div class="log-settings-title">// log settings</div>';
+    LOG_TOGGLES.forEach(function(t){
+      var on = !!logSettings[t.id];
+      html += '<button class="log-settings-row' + (on ? ' is-on' : '') + '" data-setting="' + t.id + '" role="switch" aria-checked="' + on + '">'
+        + '<span class="log-settings-switch"><span class="log-settings-knob"></span></span>'
+        + '<span class="log-settings-text">'
+        + '<span class="log-settings-label">' + t.label + '</span>'
+        + '<span class="log-settings-hint">' + t.hint + '</span>'
+        + '</span></button>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function wireLogSettings(key, games) {
+    var btn   = document.getElementById('log-settings-btn');
+    var panel = document.getElementById('log-settings-panel');
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = panel.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.classList.toggle('is-active', open);
+    });
+    // Keep the panel open while toggling, so several can be flipped at once
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+    document.addEventListener('click', closeLogSettingsPanel);
+
+    panel.querySelectorAll('.log-settings-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        var id = row.dataset.setting;
+        logSettings[id] = !logSettings[id];
+        saveLogSettings();
+        renderPerformancesTable(key, games);
+        // Re-render replaced the panel — reopen it at the same place
+        var newPanel = document.getElementById('log-settings-panel');
+        var newBtn   = document.getElementById('log-settings-btn');
+        if (newPanel) newPanel.classList.add('open');
+        if (newBtn) { newBtn.classList.add('is-active'); newBtn.setAttribute('aria-expanded','true'); }
+      });
+    });
+  }
+
+  function closeLogSettingsPanel() {
+    var panel = document.getElementById('log-settings-panel');
+    var btn   = document.getElementById('log-settings-btn');
+    if (panel) panel.classList.remove('open');
+    if (btn) { btn.classList.remove('is-active'); btn.setAttribute('aria-expanded','false'); }
+  }
+
   /* Oldest first: by date when every game has one, else as entered */
   function orderOldestFirst(list) {
     var out = list.slice();
@@ -3170,6 +3306,8 @@
 
     var seasonSel = document.getElementById('perf-season-select');
     if (seasonSel) seasonSel.addEventListener('change', function(){ goTo(this.value); });
+
+    wireLogSettings(key, games);
 
     var yearPrev = document.getElementById('perf-year-prev');
     var yearNext = document.getElementById('perf-year-next');
