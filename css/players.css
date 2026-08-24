@@ -864,20 +864,39 @@
       .player-select-card:active { border-color:rgba(var(--accent-rgb),.5); background:rgba(var(--accent-rgb),.04); }
     }
     /* ══ PERFORMANCES PANEL ══ */
-    .perf-controls { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    /* Empty | season nav | gear. The 1fr side columns are what keeps the
+       nav centered on the page rather than centered in the leftover space. */
+    .perf-controls {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 12px;
+    }
+    .perf-controls-side { display: flex; align-items: center; min-width: 0; }
+    .perf-controls-side--right { justify-content: flex-end; }
 
     /* Year arrow buttons flanking the season select */
     .perf-year-nav {
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 6px;
+    }
+    /* Larger than the chart selects elsewhere — it is the only control here */
+    .perf-year-nav .chart-select {
+      font-size: .78rem;
+      letter-spacing: .12em;
+      padding: 9px 30px 9px 14px;
+      background-position: calc(100% - 13px) 57%, calc(100% - 8px) 57%;
+      background-size: 5px 5px, 5px 5px;
     }
     .perf-year-arrow {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 0;
@@ -885,7 +904,7 @@
       cursor: pointer;
       transition: border-color .15s, color .15s, background .15s;
       flex-shrink: 0;
-      font-size: .7rem;
+      font-size: .85rem;
       line-height: 1;
       padding: 0;
     }
@@ -897,7 +916,6 @@
     .perf-year-arrow:disabled { opacity: .3; cursor: default; }
 
     /* ── LOG SETTINGS (gear + dropdown) ── */
-    .perf-controls-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .log-settings { position: relative; }
     .log-settings-btn {
       display: flex;
@@ -1004,7 +1022,27 @@
        Built on .splits-table (Stats tab) — these rules only cover what the
        log adds: a wider min-width for its 22 columns, the win/loss result
        cell, and the game count in each card header. */
-    .log-table { min-width: 1500px; }
+    /* Width follows the columns actually shown, not a fixed floor. A hard
+       min-width (it was 1500px) meant hiding the Field Goal columns just
+       spread the survivors wider and the table still overflowed — the
+       opposite of the point. max-content asks for exactly what the cells
+       need, while the inherited width:100% still lets it fill the card when
+       there is room to spare. */
+    /* The card shrinks to whatever the visible columns need, and the table
+       inside keeps its natural column widths rather than stretching to fill.
+       Hiding the Field Goal columns therefore makes the box narrower — with
+       a fixed min-width and width:100% it stayed put and just fattened the
+       surviving cells, which is the opposite of what hiding them is for. */
+    /* Centered, so a narrowed box stays balanced under the centered season
+       nav instead of leaving all the slack on one side. */
+    .log-card { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+    .log-table { width: max-content; min-width: 0; }
+    /* Tighter gutters than the Stats tables: 23 columns at 14px a side spent
+       ~640px on padding alone. */
+    .log-table th { padding: 12px 9px; }
+    .log-table td { padding: 0 9px; }
+    .log-table th:first-child, .log-table td:first-child { padding-left: 16px; }
+    .log-table th:last-child,  .log-table td:last-child  { padding-right: 16px; }
     /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
        than column position — the range modal drops these five, and a
        positional rule restyled MIN/PTS/REB/AST there instead. */
@@ -1064,7 +1102,8 @@
       background: var(--bg);
       border: 1px solid var(--border);
       box-shadow: 0 24px 70px rgba(0,0,0,.5);
-      width: min(1340px, 100%);
+      width: fit-content;
+      max-width: min(1340px, 100%);
       max-height: 90vh;
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
@@ -1073,9 +1112,9 @@
     #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
     #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
     /* The summary drops the five identity columns, so it needs less width */
-    #range-modal .log-table { min-width: 940px; }
-    #range-modal .log-table th { padding: 14px 16px; }
-    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
+    #range-modal .log-table { min-width: max-content; }
+    #range-modal .log-table th { padding: 14px 14px; }
+    #range-modal .log-table td { height: 3.4rem; padding: 0 14px; font-size: 1rem; }
     #range-modal .log-table td.log-lbl {
       font-size: .68rem;
       letter-spacing: .12em;
@@ -1573,7 +1612,7 @@
     }
 
     @media (max-width:768px) {
-      .perf-controls { flex-direction:column; align-items:flex-start; }
+      .perf-controls { gap:8px; }
       .glc-summary { padding: 14px 16px 14px 14px; gap: 14px; }
       .glc-headshot-wrap { width: 90px; height: 90px; }
       .glc-team-logo { width: 34px; height: 34px; bottom: -4px; right: -4px; }

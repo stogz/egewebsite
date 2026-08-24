@@ -2956,7 +2956,7 @@
     tbody += logTotalsRow(games);
     tbody += '</tbody>';
 
-    return '<div class="splits-card">'
+    return '<div class="splits-card log-card">'
       + '<div class="splits-card-header">'
       + '<div class="splits-card-dot"></div>'
       + '<span class="splits-card-title">' + title + '</span>'
@@ -3000,9 +3000,9 @@
     var canPrev  = curIdx < seasons.length - 1;  // newest-first, so "prev" = older = higher index
     var canNext  = curIdx > 0;
 
+    // Three zones: empty | season nav (centered) | settings gear (right)
     var html = '<div class="perf-controls">'
-      + '<div></div>'
-      + '<div class="perf-controls-right">'
+      + '<div class="perf-controls-side"></div>'
       + '<div class="perf-year-nav">'
       + '<button class="perf-year-arrow" id="perf-year-prev"' + (canPrev ? '' : ' disabled') + ' title="Previous season">&#8592;</button>'
       + '<select class="chart-select" id="perf-season-select">';
@@ -3012,8 +3012,8 @@
     html += '</select>'
       + '<button class="perf-year-arrow" id="perf-year-next"' + (canNext ? '' : ' disabled') + ' title="Next season">&#8594;</button>'
       + '</div>'
-      + logSettingsMenu()
-      + '</div></div>';
+      + '<div class="perf-controls-side perf-controls-side--right">' + logSettingsMenu() + '</div>'
+      + '</div>';
 
     // ── Split the season into regular and postseason, oldest first ──
     var seasonGames = games.filter(function(g){ return g.season === gamesSeason; });
