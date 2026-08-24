@@ -2629,18 +2629,66 @@
     return (parts[0].charAt(0) + '. ' + parts.slice(1).join(' ')).toUpperCase();
   }
 
-  /* ── Derive team abbreviation from PLAYER_STATS for a given season ── */
+  /* ── Derive team abbreviation from PLAYER_STATS for a given season ──
+     Looks in the rows for the requested type first, then falls back to the
+     'regular' rows. The fallback matters for postseason games in a sim that
+     only tracks a regular-season row for the year (e.g. the 2K26 college
+     seasons, where the March Madness games are logged as playoffs but the
+     player's school only appears in `regular`). Without it those cards
+     would render with no team name, logo, or colors. */
   function teamForSeason(key, season, type) {
-    var rows = ((PLAYER_STATS[key]||{})[type||'regular']||[]);
+    var abbr = teamFromRows((PLAYER_STATS[key]||{})[type||'regular'], season);
+    if (!abbr && type && type !== 'regular') {
+      abbr = teamFromRows((PLAYER_STATS[key]||{}).regular, season);
+    }
+    return abbr;
+  }
+
+  /* Exact season match if there is one, else the nearest earlier season */
+  function teamFromRows(rows, season) {
+    rows = rows || [];
     for (var i=0; i<rows.length; i++) {
       if (rows[i].season === season) return rows[i].team || '';
     }
-    // fall back to nearest season before
     var best = null;
     rows.forEach(function(r){
       if (r.season <= season) best = r.team;
     });
     return best || '';
+  }
+
+  /* ── Game date ──
+     Games carry an optional ISO `date` ('2012-03-15'). Rendered as
+     'MAR 15, 2012' in the card's top row; games without one simply omit it.
+     Parsed field-by-field rather than with new Date(str), which reads a
+     bare ISO date as UTC midnight and can land on the previous day for
+     viewers west of Greenwich. */
+  var MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  function fmtGameDate(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d||'').trim());
+    if (!m) return '';
+    var mon = parseInt(m[2], 10);
+    if (mon < 1 || mon > 12) return '';
+    return MONTH_ABBR[mon-1] + ' ' + parseInt(m[3], 10) + ', ' + m[1];
+  }
+
+  /* Sortable number for a date, or null when absent/malformed */
+  function dateSortKey(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d||'').trim());
+    return m ? (parseInt(m[1],10)*10000 + parseInt(m[2],10)*100 + parseInt(m[3],10)) : null;
+  }
+
+  /* ── Card label — what sits next to the player's name ──
+     A game's own `round` wins ('Sweet Sixteen', 'National Championship',
+     'Conference Finals' — any string). Otherwise playoff games fall back to
+     'Game One'-style numbering and everything else reads 'Regular Season'. */
+  var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
+  function gameLabel(g) {
+    if (g.round) return String(g.round);
+    if (g.type === 'playoffs') {
+      return g.game ? 'Game ' + (NUM_WORDS[parseInt(g.game,10)-1] || g.game) : 'Playoffs';
+    }
+    return 'Regular Season';
   }
 
   /* ── Pick the 3 best highlight stats for a game ──
@@ -2713,254 +2761,6 @@
      series result and a footer with series averages.
      Regular season games in the same view appear under a simple header.
   ─────────────────────────────────────────────────────────────── */
-  function buildSeriesGroupedList(sorted, key, p) {
-    var html = '';
-
-    // Separate regular and playoff games
-    var regGames     = sorted.filter(function(g){ return g.type !== 'playoffs'; });
-    var playoffGames = sorted.filter(function(g){ return g.type === 'playoffs'; });
-
-    // Group playoff games by opponent (opp = series identifier)
-    var seriesOrder = [];
-    var seriesMap   = {};
-    playoffGames.forEach(function(g) {
-      var key2 = g.opp;
-      if (!seriesMap[key2]) {
-        seriesMap[key2] = [];
-        seriesOrder.push(key2);
-      }
-      seriesMap[key2].push(g);
-    });
-
-    // Helper: build one game card HTML (same as main loop)
-    function buildCard(g) {
-      var teamAbbr  = teamForSeason(key, g.season, g.type || 'regular');
-      var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
-      var colors    = TEAM_BANNER_COLORS[teamName] || { primary:'#231aa5', secondary:'var(--orange)' };
-      var accent    = colors.primary;
-      var logoUrl   = TEAM_LOGOS[teamName] || '';
-      var headshot  = PLAYER_HEADSHOTS[key] || '';
-      var gs        = calcGameScore(g);
-      var gsAbs     = Math.abs(gs).toFixed(1);
-      var gsSign    = gs < 0 ? '−' : '';
-      var ballHtml  = '<img class="glc-ball-icon" src="bballwhite.png" alt="">';
-      var displayStats = pickDisplayStats(g);
-      var isWin     = (g.result||'').toUpperCase() === 'W';
-      var fgpStr    = g.fga > 0 ? (g.fgm/g.fga*100).toFixed(1)+'%' : '—';
-      var tppStr    = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
-      var ftpStr    = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
-      var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
-      var oppLogoUrl  = TEAM_LOGOS[oppTeamName] || '';
-      var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
-      var gameTypeLabel;
-      if (g.type === 'playoffs') {
-        gameTypeLabel = g.game ? 'Game ' + (NUM_WORDS[parseInt(g.game,10)-1] || g.game) : 'Playoffs';
-      } else {
-        gameTypeLabel = 'Regular Season';
-      }
-
-      var cardHtml = '<div class="game-log-card">';
-      cardHtml += '<div class="glc-summary">';
-      cardHtml += '<div class="glc-headshot-wrap">';
-      cardHtml += '<div class="glc-headshot-circle">';
-      cardHtml += '<div class="glc-headshot-circle-bg" style="background:'+accent+';"></div>';
-      if (headshot) {
-        cardHtml += '<img class="glc-headshot-img" src="'+headshot+'" alt="'+p.name+'">';
-      } else {
-        cardHtml += '<div class="glc-headshot-initials">'+p.initials+'</div>';
-      }
-      cardHtml += '</div>';
-      if (logoUrl) cardHtml += '<div class="glc-team-logo"><img src="'+logoUrl+'" alt="'+teamName+'"></div>';
-      cardHtml += '</div>';
-
-      cardHtml += '<div class="glc-main">';
-      cardHtml += '<div class="glc-top">'
-        + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
-        + '<span class="glc-dot-sep">·</span>'
-        + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
-        + '<span class="glc-score-right">'+ballHtml+'<span class="glc-gamescore">'+gsSign+gsAbs+'</span></span>'
-        + '</div>';
-
-      cardHtml += '<div class="glc-stats">';
-      displayStats.forEach(function(s){
-        cardHtml += '<div class="glc-stat-block"><span class="glc-stat-val">'+s.display+'</span><span class="glc-stat-lbl">'+s.lbl+'</span></div>';
-      });
-      cardHtml += '</div>';
-
-      var gameReactionKey = 'reactions:' + key + ':' + g.season + ':' + g.type + ':' + g.opp + ':' + (g.game || 'r');
-      var oppLogoHtml = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'">' : '';
-
-      var finalScoreHtml = '';
-      if (g.score && g.score.indexOf('-') !== -1) {
-        var fsParts = g.score.split('-');
-        var ourScore = fsParts[0].trim();
-        var theirScore = fsParts[1].trim();
-        var awayLogo, homeLogo, awayScore, homeScore;
-        if (g.home) {
-          awayLogo  = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          homeLogo  = logoUrl    ? '<img src="'+logoUrl+'" alt="'+teamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          awayScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
-          homeScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
-        } else {
-          awayLogo  = logoUrl    ? '<img src="'+logoUrl+'" alt="'+teamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          homeLogo  = oppLogoUrl ? '<img src="'+oppLogoUrl+'" alt="'+oppTeamName+'" style="width:18px;height:18px;object-fit:contain;display:block;">' : '';
-          awayScore = isWin ? '<span style="color:var(--orange);font-weight:700;">'+ourScore+'</span>' : ourScore;
-          homeScore = isWin ? theirScore : '<span style="color:var(--orange);font-weight:700;">'+theirScore+'</span>';
-        }
-        finalScoreHtml = awayLogo + '<span class="glc-final-score-text">'+awayScore+'-'+homeScore+'</span>' + homeLogo;
-      } else {
-        finalScoreHtml = '<span class="glc-final-score-text">'+(g.score||'')+'</span>';
-      }
-
-      cardHtml += '<div class="glc-bottom">'
-        + '<div class="glc-bottom-emojis"><span class="glc-reactions" data-rkey="'+gameReactionKey+'"></span>'
-        + '<button class="glc-reaction-add" data-rkey="'+gameReactionKey+'" title="Add reaction">+</button></div>'
-        + '<span class="glc-final-score">'+finalScoreHtml+'</span>'
-        + '</div>';
-      cardHtml += '</div>'; // .glc-main
-      cardHtml += '</div>'; // .glc-summary
-
-      // Detail panel
-      var tsPct = (g.fga + 0.44 * g.fta) > 0
-        ? (g.pts / (2 * (g.fga + 0.44 * g.fta)) * 100).toFixed(1) + '%' : '—';
-      function detStat(val, lbl) {
-        return '<div class="glc-detail-stat"><span class="glc-detail-stat-val">'+val+'</span><span class="glc-detail-stat-lbl">'+lbl+'</span></div>';
-      }
-      cardHtml += '<div class="glc-detail"><div class="glc-detail-inner">';
-      cardHtml += '<div class="glc-detail-header"><span class="glc-detail-title">Final Stats</span>'
-        + '<span style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);opacity:.7;">'+(g.season||'')+'</span>'
-        + '</div>';
-      cardHtml += '<div class="glc-detail-stat-row">';
-      cardHtml += detStat(g.min,'MIN') + detStat(g.pts,'PTS') + detStat(g.reb,'REB')
-        + detStat(g.ast,'AST') + detStat(g.stl,'STL') + detStat(g.blk,'BLK')
-        + detStat(fgpStr,'FG%') + detStat(g.fgm+'/'+g.fga,'FG')
-        + detStat(g.tpm+'/'+g.tpa,'3FG') + detStat(g.ftm+'/'+g.fta,'FTS')
-        + detStat(g.tov,'TO') + detStat(tsPct,'TS%') + detStat(gsSign+gsAbs,'HOOP SCORE');
-      cardHtml += '</div></div></div>'; // stat-row / detail-inner / detail
-      cardHtml += '</div>'; // .game-log-card
-      return cardHtml;
-    }
-
-    // Helper: series averages footer
-    function buildSeriesFooter(games) {
-      var n = games.length;
-      if (!n) return '';
-      var totals = { pts:0, reb:0, ast:0, stl:0, blk:0, tov:0 };
-      games.forEach(function(g){
-        totals.pts += g.pts||0; totals.reb += g.reb||0; totals.ast += g.ast||0;
-        totals.stl += g.stl||0; totals.blk += g.blk||0; totals.tov += g.tov||0;
-      });
-      function avg(v){ return (v/n).toFixed(1); }
-      var footerHtml = '<div class="perf-series-footer">'
-        + '<span class="perf-series-avg-label">Series Avg</span>'
-        + '<div class="perf-series-avg-stats">';
-      [
-        { val: avg(totals.pts), lbl:'PTS', orange:true },
-        { val: avg(totals.reb), lbl:'REB' },
-        { val: avg(totals.ast), lbl:'AST' },
-        { val: avg(totals.stl), lbl:'STL' },
-        { val: avg(totals.blk), lbl:'BLK' },
-        { val: avg(totals.tov), lbl:'TO'  },
-      ].forEach(function(s){
-        footerHtml += '<div class="perf-series-avg-stat">'
-          + '<span class="perf-series-avg-val'+(s.orange?' orange':'')+'">'+s.val+'</span>'
-          + '<span class="perf-series-avg-lbl">'+s.lbl+'</span>'
-          + '</div>';
-      });
-      footerHtml += '</div></div>';
-      return footerHtml;
-    }
-
-    // ── Round names — ordered First Round → NBA Finals ──
-    var ROUND_NAMES = ['FIRST ROUND', 'CONFERENCE SEMI-FINALS', 'CONFERENCE FINALS', 'NBA FINALS'];
-
-    // ── Render playoff series ──
-    // For 'latest': reverse so NBA Finals (deepest run) appears at top.
-    // For 'oldest': keep as-entered order (First Round first).
-    var orderedSeries = gamesSort === 'latest' ? seriesOrder.slice().reverse() : seriesOrder;
-    // Round index is always based on original position (entry order = chronological round)
-    var totalSeries = seriesOrder.length;
-
-    if (orderedSeries.length) {
-      orderedSeries.forEach(function(oppAbbr) {
-        // Get the original index to determine the correct round name
-        var seriesIdx = seriesOrder.indexOf(oppAbbr);
-        var seriesGames = seriesMap[oppAbbr];
-        var oppName     = TEAM_ABBR[oppAbbr] || oppAbbr;
-        var season      = gamesSeason; // set by the controls before grouping runs
-
-        // Round label — fallback gracefully beyond 4 rounds
-        var roundLabel  = ROUND_NAMES[seriesIdx] || ('ROUND ' + (seriesIdx + 1));
-
-        // W/L record
-        var seriesWins   = seriesGames.filter(function(g){ return (g.result||'').toUpperCase()==='W'; }).length;
-        var seriesLosses = seriesGames.length - seriesWins;
-        var wonSeries    = seriesWins > seriesLosses;
-        var resultText   = seriesWins + '–' + seriesLosses + ' ' + (wonSeries ? 'Win' : 'Loss');
-        var resultClass  = wonSeries ? 'perf-series-result--win' : 'perf-series-result--loss';
-
-        // Player's own team for this season
-        var ownAbbr   = teamForSeason(key, season, 'playoffs');
-        var ownName   = TEAM_ABBR[ownAbbr] || ownAbbr;
-        var ownLogo   = TEAM_LOGOS[ownName]  || '';
-        var oppLogo   = TEAM_LOGOS[oppName]  || '';
-
-        // Build team slugs for links
-        var yy      = seasonSuffix(season);
-        var ownSlug = ABBR_TO_SLUG[ownAbbr] || '';
-        var oppSlug = ABBR_TO_SLUG[oppAbbr] || '';
-        var ownHref = ownSlug && yy ? 'teams.html#' + ownSlug + yy : '';
-        var oppHref = oppSlug && yy ? 'teams.html#' + oppSlug + yy : '';
-
-        // Team chip helper
-        function teamChip(name, logo, href, isOwn) {
-          var inner = (logo ? '<img class="perf-series-team-logo" src="'+logo+'" alt="'+name+'">' : '')
-            + '<span class="perf-series-team-name">'+name+'</span>';
-          var cls = 'perf-series-team' + (isOwn ? ' perf-series-team--own' : '');
-          if (href) {
-            return '<a class="'+cls+'" href="'+href+'">'+inner+'</a>';
-          }
-          return '<span class="'+cls+'">'+inner+'</span>';
-        }
-
-        html += '<div class="perf-series-group">';
-        html += '<div class="perf-series-header">'
-          + '<div class="perf-series-header-inner">'
-          + '<div>'
-          + '<div class="perf-series-round">// ' + roundLabel + '</div>'
-          + '<div class="perf-series-matchup">'
-          + teamChip(ownName, ownLogo, ownHref, true)
-          + '<span class="perf-series-vs">vs</span>'
-          + teamChip(oppName, oppLogo, oppHref, false)
-          + '</div>'
-          + '</div>'
-          + '<span class="perf-series-result ' + resultClass + '">' + resultText + '</span>'
-          + '</div>'
-          + '</div>';
-
-        html += '<div class="game-log-list">';
-        seriesGames.forEach(function(g){ html += buildCard(g); });
-        html += '</div>';
-        html += buildSeriesFooter(seriesGames);
-        html += '</div>'; // .perf-series-group
-      });
-    }
-
-    // ── Render regular season games (simpler header, no footer) ──
-    if (regGames.length) {
-      html += '<div class="perf-series-group">';
-      html += '<div class="perf-reg-header">'
-        + '<span class="perf-reg-header-label">// regular season</span>'
-        + '</div>';
-      html += '<div class="game-log-list">';
-      regGames.forEach(function(g){ html += buildCard(g); });
-      html += '</div>';
-      html += '</div>';
-    }
-
-    return html;
-  }
-
   function renderPerformancesTable(key, games) {
     var panel = document.getElementById('panel-performances');
     if (!panel) return;
@@ -2972,17 +2772,25 @@
       return true;
     });
 
-    // Sort based on gamesSort — no date, so use array index as entry order
+    // ── Sort ──
+    // Chronological sorts use each game's `date` when every game in view has
+    // one, so entries can be logged in any order. Where any game is undated
+    // (most of the 2K25 logs) the original entry order stands in for
+    // chronology, exactly as before dates existed.
     var sorted = filtered.slice();
-    if (gamesSort === 'oldest') {
-      // keep as-entered order (first entered = oldest)
-    } else if (gamesSort === 'best') {
+    var allDated = sorted.length > 0 && sorted.every(function(g){ return dateSortKey(g.date) !== null; });
+
+    if (gamesSort === 'best') {
       sorted.sort(function(a, b){ return calcGameScore(b) - calcGameScore(a); });
     } else if (gamesSort === 'worst') {
       sorted.sort(function(a, b){ return calcGameScore(a) - calcGameScore(b); });
-    } else { // latest — reverse entry order
-      sorted.reverse();
+    } else if (allDated) {
+      sorted.sort(function(a, b){ return dateSortKey(a.date) - dateSortKey(b.date); });
+      if (gamesSort !== 'oldest') sorted.reverse(); // 'latest' — newest first
+    } else if (gamesSort !== 'oldest') {
+      sorted.reverse(); // 'latest' — reverse entry order
     }
+    // 'oldest' with no dates keeps as-entered order (first entered = oldest)
 
     // Season options from ALL games (both types) so switching type doesn't reset it
     var seasonSet = {};
@@ -3044,17 +2852,8 @@
     var pageStart = gamesPage * PERF_PER_PAGE;
     var pageSlice = sorted.slice(pageStart, pageStart + PERF_PER_PAGE);
 
-    // ── Determine if series grouping applies ──
-    // Series grouping: specific season selected, sort is latest or oldest, includes playoff games
-    var useSeriesGrouping = (gamesSeason !== 'all') && (gamesSort === 'latest' || gamesSort === 'oldest');
-
-    if (useSeriesGrouping) {
-      // Build series groups from ALL filtered+sorted games (no pagination when grouped)
-      html += buildSeriesGroupedList(sorted, key, p);
-    } else {
-      // Standard paginated list
-      html += '<div class="game-log-list">';
-      pageSlice.forEach(function(g) {
+    html += '<div class="game-log-list">';
+    pageSlice.forEach(function(g) {
       // ── Team lookup from season ──
       var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
       var teamName  = TEAM_ABBR[teamAbbr] || teamAbbr;
@@ -3081,19 +2880,9 @@
       var tppStr = g.tpa > 0 ? (g.tpm/g.tpa*100).toFixed(1)+'%' : '—';
       var ftpStr = g.fta > 0 ? (g.ftm/g.fta*100).toFixed(1)+'%' : '—';
 
-      // ── Game type label ──
-      var NUM_WORDS = ['One','Two','Three','Four','Five','Six','Seven'];
-      var gameTypeLabel;
-      if (g.type === 'playoffs') {
-        if (g.game) {
-          var gIdx = parseInt(g.game, 10);
-          gameTypeLabel = 'Game ' + (NUM_WORDS[gIdx - 1] || g.game);
-        } else {
-          gameTypeLabel = 'Playoffs';
-        }
-      } else {
-        gameTypeLabel = 'Regular Season';
-      }
+      // ── Card label (round name, series game, or 'Regular Season') and date ──
+      var gameTypeLabel = gameLabel(g);
+      var gameDateLabel = fmtGameDate(g.date);
 
       // ── Opponent info ──
       var oppTeamName = TEAM_ABBR[g.opp] || g.opp;
@@ -3122,11 +2911,14 @@
       // Main content
       html += '<div class="glc-main">';
 
-      // Top row: abbreviated name · game type · ball icon + hoop score (top right)
+      // Top row: name · round/game type · date · ball icon + hoop score (top right)
       html += '<div class="glc-top">'
         + '<span class="glc-name">'+abbrevName(p.name)+'</span>'
         + '<span class="glc-dot-sep">·</span>'
         + '<span class="glc-game-type">'+gameTypeLabel+'</span>'
+        + (gameDateLabel
+            ? '<span class="glc-dot-sep">·</span><span class="glc-date">'+gameDateLabel+'</span>'
+            : '')
         + '<span class="glc-score-right">'
         + ballHtml
         + '<span class="glc-gamescore">'+gsSign+gsAbs+'</span>'
@@ -3253,15 +3045,11 @@
 
       html += '</div>'; // .game-log-card
     }); // end pageSlice.forEach
-    } // end else (standard paginated list)
 
-    // Close game-log-list div only for standard list
-    if (!useSeriesGrouping) {
-      html += '</div>'; // .game-log-list
-    }
+    html += '</div>'; // .game-log-list
 
     // ── Pagination controls ──
-    if (!useSeriesGrouping && totalPages > 1) {
+    if (totalPages > 1) {
       html += '<div class="perf-pagination" id="perf-pagination">';
       html += '<button class="perf-page-btn" id="perf-prev"' + (gamesPage === 0 ? ' disabled' : '') + '>← Prev</button>';
 
