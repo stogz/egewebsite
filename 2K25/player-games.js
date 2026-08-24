@@ -6,6 +6,8 @@
    {
      season:  '20XX-XX',              // season string (e.g. '2033-34')
      type:    'regular'|'playoffs',   // game type
+     date:    '2034-01-18',          // OPTIONAL — ISO date, see note below
+     round:   'Conference Finals',   // OPTIONAL — label shown on the card
      opp:     'ABBR',                 // opponent abbreviation e.g. 'LAL', 'GSW'
      result:  'W'|'L',               // win or loss
      score:   '110-105',             // final score (your score first)
@@ -42,6 +44,20 @@
      pts:39, reb:1, ast:13, stl:1, blk:0, tov:2,
      fgm:14, fga:19, tpm:8, tpa:11, ftm:3, fta:3, min:37,
    }
+
+   ── date ──
+   Optional, and none of the games in this file have one yet. When EVERY
+   game shown in the log has a date, the Latest/Oldest sorts order by the
+   date itself, so entries can be added in any order. While any game in
+   view is undated the log falls back to entry order for chronology —
+   first entered reads as oldest — exactly as it behaved before dates
+   existed. So this file is unaffected until dates are filled in, and
+   should be filled in a whole season at a time rather than piecemeal.
+
+   ── round ──
+   Optional label shown next to the player's name on the card, replacing
+   'Regular Season' or 'Game One' — e.g. 'Conference Finals', 'Play-In',
+   'Sweet Sixteen'. Leave it out to keep the default label.
    ═══════════════════════════════════════════════════════════════ */
 
 window.PLAYER_GAMES = {

@@ -864,20 +864,43 @@
       .player-select-card:active { border-color:rgba(var(--accent-rgb),.5); background:rgba(var(--accent-rgb),.04); }
     }
     /* ══ PERFORMANCES PANEL ══ */
-    .perf-controls { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    /* Empty | season nav | gear. The 1fr side columns are what keeps the
+       nav centered on the page rather than centered in the leftover space. */
+    .perf-controls {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 12px;
+    }
+    .perf-controls-side { display: flex; align-items: center; min-width: 0; }
+    .perf-controls-side--right { justify-content: flex-end; }
 
     /* Year arrow buttons flanking the season select */
     .perf-year-nav {
       display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 6px;
+    }
+    /* Larger than the chart selects elsewhere — it is the only control here.
+       min-width buys slack the browser does not: with appearance:none it
+       sizes the select to exactly text + padding, which left '2011-12' with
+       64px of room and a 64px render, so rounding clipped the last digit. */
+    .perf-year-nav .chart-select {
+      font-size: .78rem;
+      letter-spacing: .12em;
+      min-width: 124px;
+      padding: 9px 30px 9px 14px;
+      background-position: calc(100% - 13px) 57%, calc(100% - 8px) 57%;
+      background-size: 5px 5px, 5px 5px;
     }
     .perf-year-arrow {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 0;
@@ -885,7 +908,7 @@
       cursor: pointer;
       transition: border-color .15s, color .15s, background .15s;
       flex-shrink: 0;
-      font-size: .7rem;
+      font-size: .85rem;
       line-height: 1;
       padding: 0;
     }
@@ -895,6 +918,235 @@
       background: rgba(var(--accent-rgb),.06);
     }
     .perf-year-arrow:disabled { opacity: .3; cursor: default; }
+
+    /* ── LOG SETTINGS (gear + dropdown) ── */
+    .log-settings { position: relative; }
+    .log-settings-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color .18s, border-color .18s, background .18s, transform .3s;
+    }
+    .log-settings-btn:hover,
+    .log-settings-btn.is-active {
+      color: var(--orange);
+      border-color: var(--orange);
+      background: rgba(var(--accent-rgb), .08);
+    }
+    .log-settings-btn.is-active svg { transform: rotate(60deg); }
+    .log-settings-btn svg { transition: transform .3s ease; }
+    .log-settings-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 60;
+      width: 290px;
+      padding: 6px;
+      /* --bg-card is translucent; the panel floats over the table so it
+         needs the opaque page background instead */
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 44px rgba(0,0,0,.4);
+      animation: fadeSlideUp .16s ease both;
+    }
+    .log-settings-panel.open { display: block; }
+    .log-settings-title {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: 10px 12px 8px;
+    }
+    .log-settings-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+      padding: 11px 12px;
+      background: transparent;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .log-settings-row:hover { background: rgba(var(--accent-rgb), .07); }
+    .log-settings-switch {
+      flex-shrink: 0;
+      position: relative;
+      width: 30px;
+      height: 16px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: rgba(var(--accent-rgb), .18);
+      border: 1px solid var(--border);
+      transition: background .18s, border-color .18s;
+    }
+    .log-settings-row.is-on .log-settings-switch {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+    .log-settings-knob {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: transform .18s, background .18s;
+    }
+    .log-settings-row.is-on .log-settings-knob {
+      background: #fff;
+      transform: translateX(14px);
+    }
+    .log-settings-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .log-settings-label {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .88rem;
+      color: var(--heading);
+      line-height: 1.2;
+    }
+    .log-settings-hint {
+      font-family: var(--font-body);
+      font-size: .72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* ── GAME LOG TABLES ──
+       Built on .splits-table (Stats tab) — these rules only cover what the
+       log adds: a wider min-width for its 22 columns, the win/loss result
+       cell, and the game count in each card header. */
+    /* Width follows the columns actually shown, not a fixed floor. A hard
+       min-width (it was 1500px) meant hiding the Field Goal columns just
+       spread the survivors wider and the table still overflowed — the
+       opposite of the point. max-content asks for exactly what the cells
+       need, while the inherited width:100% still lets it fill the card when
+       there is room to spare. */
+    /* Styled exactly like the Stats tab's splits tables — same padding, type
+       and row height, inherited from .splits-table.
+       Width works differently though. The floor is the card's own width
+       rather than a fixed pixel figure, so the table always spans the card
+       edge to edge and only grows past it when the columns genuinely need
+       more room. Hiding the Field Goal columns therefore takes ~280px off
+       the table instead of handing that space to the columns that remain.
+       (1280px hard-coded overflowed the 1278px card by 2px and raised a
+       scrollbar over nothing.) */
+    .log-table { min-width: 100%; }
+    /* Wider gutters than the Stats tables. Tuned so the 17-column minimum
+       comes to 1245px against a 1278px card — near enough that it fills edge
+       to edge with only ~2px per column of stretch, instead of the ~17px the
+       columns picked up back when the table stayed a fixed 1500px wide. */
+    .log-table th { padding: 12px 18px; }
+    .log-table td { padding: 0 18px; }
+    /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
+       than column position — the range modal drops these five, and a
+       positional rule restyled MIN/PTS/REB/AST there instead. */
+    .log-table td.log-lbl {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .08em;
+      font-weight: 500;
+      text-align: left;
+    }
+    .log-table th.log-lbl { text-align: left; }
+    /* Field Goal Data off — made/attempted hidden, percentages kept */
+    .log-table.log-hide-fg .col-fg { display: none; }
+    .log-hoop { font-variant-numeric: tabular-nums; }
+    .log-res { font-weight: 700; }
+    .log-res--w { color: #22c55e; }
+    .log-res--l { color: #ef4444; }
+    .log-score { color: var(--text); }
+    .log-card-count {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    /* ── RANGE SELECTION ──
+       Rows are clickable to anchor a range; the anchored row stays lit
+       until a second row closes the span or it is clicked again. */
+    .log-table tbody tr.log-row { cursor: pointer; }
+    .log-table tbody tr.log-row.is-anchor td {
+      background: rgba(var(--accent-rgb), .16) !important;
+      box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .45);
+    }
+    .log-table tbody tr.log-row.is-anchor td:first-child { color: var(--orange); }
+
+    /* ── RANGE MODAL ── */
+    #range-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      /* Above the fixed nav (z-index 9999) so the whole page blurs behind
+         the modal and a click anywhere outside the box dismisses it */
+      z-index: 10000;
+      background: rgba(8,5,47,.6);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #range-modal-backdrop.open { display: flex; }
+    /* Stops the page behind the modal scrolling under it */
+    body.range-modal-open { overflow: hidden; }
+    #range-modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 70px rgba(0,0,0,.5);
+      /* Same rule as the log tables: size to the columns shown, up to the
+         cap, so hiding a group narrows the box instead of fattening its
+         columns. */
+      width: fit-content;
+      max-width: min(1340px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      animation: fadeSlideUp .2s ease both;
+    }
+    /* Opaque, so rows don't show through while the summary scrolls */
+    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
+    #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
+    /* The summary drops the five identity columns, so it needs less width */
+    #range-modal .log-table { min-width: 0; }
+    #range-modal .log-table th { padding: 14px 16px; }
+    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
+    #range-modal .log-table td.log-lbl {
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    tr.range-row-total td {
+      font-weight: 700;
+      background: var(--bg) !important;
+      height: 3rem;
+      font-size: .92rem;
+    }
+    #range-modal-close {
+      margin-left: 14px;
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 2px;
+      transition: transform .15s, opacity .15s;
+    }
+    #range-modal-close:hover { transform: scale(1.15); opacity: .8; }
 
     /* ── PERFORMANCE CARDS ── */
     .game-log-list { display:flex; flex-direction:column; gap:14px; }
@@ -908,214 +1160,6 @@
       transition: border-color .22s, background .35s;
     }
     .game-log-card:hover { border-color: rgba(var(--accent-rgb),.4); }
-
-    /* ── SERIES GROUP ── */
-    .perf-series-group {
-      margin-bottom: 40px;
-      animation: seriesGroupIn .45s cubic-bezier(.22,1,.36,1) both;
-    }
-    .perf-series-group:nth-child(1) { animation-delay: .05s; }
-    .perf-series-group:nth-child(2) { animation-delay: .12s; }
-    .perf-series-group:nth-child(3) { animation-delay: .19s; }
-    .perf-series-group:nth-child(4) { animation-delay: .26s; }
-    @keyframes seriesGroupIn {
-      from { opacity:0; transform:translateY(18px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    /* Header card */
-    .perf-series-header {
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 14px;
-      border-radius: 0;
-      background: rgba(8,5,47,.85);
-      border: 1px solid rgba(35,26,165,.35);
-    }
-    /* Animated shimmer sweep */
-    .perf-series-header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(105deg,
-        transparent 30%,
-        rgba(var(--accent-rgb),.06) 50%,
-        transparent 70%);
-      background-size: 200% 100%;
-      animation: seriesShimmer 3.5s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes seriesShimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    /* Top accent line — animates in */
-    .perf-series-header::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--orange), rgba(35,26,165,.8), var(--orange));
-      background-size: 200% 100%;
-      animation: seriesLineSlide 4s linear infinite;
-    }
-    @keyframes seriesLineSlide {
-      0%   { background-position: 0% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    .perf-series-header-inner {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 22px;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    /* Round label */
-    .perf-series-round {
-      font-family: var(--font-mono);
-      font-size: .58rem;
-      letter-spacing: .26em;
-      text-transform: uppercase;
-      color: var(--orange);
-      margin-bottom: 8px;
-    }
-
-    /* Matchup: team logo + name vs team logo + name */
-    .perf-series-matchup {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .perf-series-team {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      text-decoration: none;
-      transition: opacity .18s;
-    }
-    .perf-series-team:hover { opacity: .75; }
-    .perf-series-team-logo {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      display: block;
-      flex-shrink: 0;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,.45));
-    }
-    .perf-series-team-name {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 1.15rem;
-      text-transform: uppercase;
-      letter-spacing: .02em;
-      color: var(--heading);
-      transition: color .35s;
-      white-space: nowrap;
-    }
-    .perf-series-team--own .perf-series-team-name { color: var(--orange); }
-    .perf-series-vs {
-      font-family: var(--font-mono);
-      font-size: .65rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    /* Result badge */
-    .perf-series-result {
-      font-family: var(--font-mono);
-      font-size: .65rem;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      border-radius: 0;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .perf-series-result--win  {
-      background: rgba(34,197,94,.12);
-      color: #4ade80;
-      border: 1px solid rgba(34,197,94,.3);
-      box-shadow: 0 0 12px rgba(34,197,94,.08);
-    }
-    .perf-series-result--loss {
-      background: rgba(239,68,68,.1);
-      color: #f87171;
-      border: 1px solid rgba(239,68,68,.2);
-    }
-
-    /* ── SERIES AVERAGES FOOTER ── */
-    .perf-series-footer {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      padding: 12px 20px;
-      margin-top: 10px;
-      border-radius: 0;
-      background: rgba(35,26,165,.05);
-      border: 1px solid rgba(35,26,165,.15);
-    }
-    .perf-series-avg-label {
-      font-family: var(--font-mono);
-      font-size: .58rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-right: 24px;
-      flex-shrink: 0;
-    }
-    .perf-series-avg-stats {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .perf-series-avg-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .perf-series-avg-val {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--heading);
-      transition: color .35s;
-    }
-    .perf-series-avg-val.orange { color: var(--orange); }
-    .perf-series-avg-lbl {
-      font-family: var(--font-mono);
-      font-size: .52rem;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    /* Regular season section header */
-    .perf-reg-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0;
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .perf-reg-header-label {
-      font-family: var(--font-mono);
-      font-size: .62rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-
 
     /* Clickable summary row */
     .glc-summary {
@@ -1219,13 +1263,23 @@
       white-space: nowrap;
     }
     .glc-dot-sep { color: var(--text-muted); font-size: .8rem; flex-shrink: 0; }
-    /* Game type label in top row (Regular Season / Game 1 etc) */
+    /* Round / game type label in top row
+       (Regular Season / Game One / Sweet Sixteen etc) */
     .glc-game-type {
       font-family: var(--font-mono);
       font-size: .68rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--text-muted);
+      white-space: nowrap;
+    }
+    /* Game date in top row — only rendered when the game has one */
+    .glc-date {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
       white-space: nowrap;
     }
     /* Game score — top right, always white */
@@ -1566,7 +1620,7 @@
     }
 
     @media (max-width:768px) {
-      .perf-controls { flex-direction:column; align-items:flex-start; }
+      .perf-controls { gap:8px; }
       .glc-summary { padding: 14px 16px 14px 14px; gap: 14px; }
       .glc-headshot-wrap { width: 90px; height: 90px; }
       .glc-team-logo { width: 34px; height: 34px; bottom: -4px; right: -4px; }
