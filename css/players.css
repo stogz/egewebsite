@@ -1028,21 +1028,43 @@
        opposite of the point. max-content asks for exactly what the cells
        need, while the inherited width:100% still lets it fill the card when
        there is room to spare. */
-    /* The card shrinks to whatever the visible columns need, and the table
-       inside keeps its natural column widths rather than stretching to fill.
-       Hiding the Field Goal columns therefore makes the box narrower — with
-       a fixed min-width and width:100% it stayed put and just fattened the
-       surviving cells, which is the opposite of what hiding them is for. */
-    /* Centered, so a narrowed box stays balanced under the centered season
-       nav instead of leaving all the slack on one side. */
-    .log-card { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
-    .log-table { width: max-content; min-width: 0; }
-    /* Tighter gutters than the Stats tables: 23 columns at 14px a side spent
-       ~640px on padding alone. */
-    .log-table th { padding: 12px 9px; }
-    .log-table td { padding: 0 9px; }
-    .log-table th:first-child, .log-table td:first-child { padding-left: 16px; }
-    .log-table th:last-child,  .log-table td:last-child  { padding-right: 16px; }
+    /* The card always spans the full width; the columns are what condense.
+       min-width is 0 rather than a fixed floor (it was 1500px) so the table
+       never forces overflow on its own — cells are nowrap, so the natural
+       content width is the real limit, and the rules below shrink that. */
+    .log-card { width: 100%; }
+    .log-table { width: 100%; min-width: 0; }
+    /* Condensed gutters and type. The Stats tables use 14px a side and
+       .92rem figures; across 23 columns that spent ~640px on padding alone
+       and pushed the natural width past most screens. */
+    .log-table th {
+      padding: 11px 6px;
+      font-size: .55rem;
+      letter-spacing: .09em;
+    }
+    .log-table td {
+      padding: 0 6px;
+      font-size: .84rem;
+      height: 2.85rem;
+    }
+    .log-table td.hi { font-size: .84rem; }
+    .log-table td.log-lbl { font-size: .62rem; letter-spacing: .04em; }
+    /* Figures share a single glyph width, so columns stop jostling as the
+       numbers change and each one only needs its widest digit count. */
+    .log-table td { font-variant-numeric: tabular-nums; }
+    /* Breathing room at the card edges only */
+    .log-table th:first-child, .log-table td:first-child { padding-left: 14px; }
+    .log-table th:last-child,  .log-table td:last-child  { padding-right: 14px; }
+    /* A second condensing step for narrower screens, where the columns need
+       every pixel before the table starts scrolling sideways. */
+    @media (max-width: 1100px) {
+      .log-table th { padding: 10px 3px; font-size: .5rem; letter-spacing: .03em; }
+      .log-table td { padding: 0 3px; font-size: .78rem; height: 2.7rem; }
+      .log-table td.hi { font-size: .78rem; }
+      .log-table td.log-lbl { font-size: .55rem; letter-spacing: 0; }
+      .log-table th:first-child, .log-table td:first-child { padding-left: 8px; }
+      .log-table th:last-child,  .log-table td:last-child  { padding-right: 8px; }
+    }
     /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
        than column position — the range modal drops these five, and a
        positional rule restyled MIN/PTS/REB/AST there instead. */
@@ -1102,8 +1124,7 @@
       background: var(--bg);
       border: 1px solid var(--border);
       box-shadow: 0 24px 70px rgba(0,0,0,.5);
-      width: fit-content;
-      max-width: min(1340px, 100%);
+      width: min(1340px, 100%);
       max-height: 90vh;
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
@@ -1112,7 +1133,7 @@
     #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
     #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
     /* The summary drops the five identity columns, so it needs less width */
-    #range-modal .log-table { min-width: max-content; }
+    #range-modal .log-table { min-width: 0; }
     #range-modal .log-table th { padding: 14px 14px; }
     #range-modal .log-table td { height: 3.4rem; padding: 0 14px; font-size: 1rem; }
     #range-modal .log-table td.log-lbl {
