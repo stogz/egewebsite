@@ -883,10 +883,14 @@
       justify-content: center;
       gap: 6px;
     }
-    /* Larger than the chart selects elsewhere — it is the only control here */
+    /* Larger than the chart selects elsewhere — it is the only control here.
+       min-width buys slack the browser does not: with appearance:none it
+       sizes the select to exactly text + padding, which left '2011-12' with
+       64px of room and a 64px render, so rounding clipped the last digit. */
     .perf-year-nav .chart-select {
       font-size: .78rem;
       letter-spacing: .12em;
+      min-width: 124px;
       padding: 9px 30px 9px 14px;
       background-position: calc(100% - 13px) 57%, calc(100% - 8px) 57%;
       background-size: 5px 5px, 5px 5px;

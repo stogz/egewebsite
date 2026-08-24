@@ -2807,10 +2807,13 @@
   }
 
   /* ── LOG SETTINGS ──
-     Persisted so the choice survives navigation, like the theme and sim. */
-  var LOG_SETTINGS_KEY = 'ege-log-settings';
+     Both default off, and persisted so the choice survives navigation, like
+     the theme and sim. The key is versioned: changing a default only reaches
+     someone with nothing stored yet, so the suffix retires older saved
+     settings and lets the new defaults apply to everyone once. */
+  var LOG_SETTINGS_KEY = 'ege-log-settings-v2';
   var logSettings = (function(){
-    var d = { fgData: true, colorSystem: false };
+    var d = { fgData: false, colorSystem: false };
     try {
       var raw = JSON.parse(localStorage.getItem(LOG_SETTINGS_KEY) || '{}');
       if (typeof raw.fgData === 'boolean') d.fgData = raw.fgData;
