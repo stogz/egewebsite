@@ -2784,8 +2784,8 @@
     { lbl:'RESULT' }, { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },
     { lbl:'AST' },    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
     { lbl:'FG' },     { lbl:'FGA' },   { lbl:'FG%' },   { lbl:'3P' },
-    { lbl:'3P%' },    { lbl:'FT' },    { lbl:'FTA' },   { lbl:'FT%' },
-    { lbl:'TS%' },    { lbl:'HOOP' },
+    { lbl:'3PA' },    { lbl:'3P%' },   { lbl:'FT' },    { lbl:'FTA' },
+    { lbl:'FT%' },    { lbl:'TS%' },   { lbl:'HOOP' },
   ];
 
   function pctOrDash(made, att) {
@@ -2798,8 +2798,9 @@
     return denom > 0 ? (g.pts / (2 * denom) * 100).toFixed(1) + '%' : '—';
   }
 
-  /* One <tr> for one game */
-  function logRow(key, g) {
+  /* One <tr> for one game. `idx` is the game's position in the table's own
+     games array, so a selected range can map rows back to game objects. */
+  function logRow(key, g, idx) {
     var teamAbbr = teamForSeason(key, g.season, g.type || 'regular');
     var isWin    = (g.result || '').toUpperCase() === 'W';
     var gs       = calcGameScore(g);
@@ -2815,7 +2816,7 @@
       + (isWin ? 'W' : 'L') + '</span> '
       + '<span class="log-score">' + (g.score || '—') + '</span></td>';
 
-    return '<tr>'
+    return '<tr class="log-row" data-gi="' + idx + '">'
       + dCell
       + '<td>' + (teamAbbr || '—') + '</td>'
       + '<td>' + (g.opp || '—') + '</td>'
@@ -2832,6 +2833,7 @@
       + '<td>' + g.fga + '</td>'
       + '<td>' + pctOrDash(g.fgm, g.fga) + '</td>'
       + '<td>' + g.tpm + '</td>'
+      + '<td>' + g.tpa + '</td>'
       + '<td>' + pctOrDash(g.tpm, g.tpa) + '</td>'
       + '<td>' + g.ftm + '</td>'
       + '<td>' + g.fta + '</td>'
@@ -2869,6 +2871,7 @@
       + '<td>' + avg(t.fga) + '</td>'
       + '<td>' + pctOrDash(t.fgm, t.fga) + '</td>'
       + '<td>' + avg(t.tpm) + '</td>'
+      + '<td>' + avg(t.tpa) + '</td>'
       + '<td>' + pctOrDash(t.tpm, t.tpa) + '</td>'
       + '<td>' + avg(t.ftm) + '</td>'
       + '<td>' + avg(t.fta) + '</td>'
@@ -2888,7 +2891,7 @@
     thead += '</tr></thead>';
 
     var tbody = '<tbody>';
-    games.forEach(function(g){ tbody += logRow(key, g); });
+    games.forEach(function(g, i){ tbody += logRow(key, g, i); });
     tbody += logTotalsRow(games);
     tbody += '</tbody>';
 
@@ -2958,13 +2961,193 @@
 
     panel.innerHTML = html;
 
-    ['log-table-regular','log-table-playoffs'].forEach(function(id){
-      var t = document.getElementById(id);
-      if (t) initSort(t);
+    clearRangeSelection();
+    [['log-table-regular', regular], ['log-table-playoffs', post]].forEach(function(pair){
+      var t = document.getElementById(pair[0]);
+      if (!t) return;
+      initSort(t);
+      wireRangeSelection(t, key, pair[1]);
     });
 
     wirePerformancesControls(panel, key, games);
   }
+
+
+  /* ══════════════════════════════════════════════════════════════
+     GAME RANGE SELECTION
+
+     Click a row to anchor a range, click a second row to total and average
+     every game between them (inclusive) in a centered modal. Clicking the
+     anchored row again clears it. Selection lives in one table at a time —
+     anchoring in the other table moves the anchor there — since a range
+     spanning the regular season and the postseason has no clear meaning.
+
+     The range follows what is on screen, not entry order: rows are read in
+     current DOM order, so re-sorting by a column and then picking two rows
+     spans the games between them as displayed.
+     ══════════════════════════════════════════════════════════════ */
+
+  var logSel = null;  // { tableId, gi } — the anchored row, or null
+
+  function clearRangeSelection() {
+    logSel = null;
+    document.querySelectorAll('.log-row.is-anchor').forEach(function(r){
+      r.classList.remove('is-anchor');
+    });
+  }
+
+  /* Games between two rows of one table, in the order they are displayed */
+  function gamesBetween(table, giA, giB, games) {
+    var rows = Array.from(table.tBodies[0].rows).filter(function(r){
+      return r.classList.contains('log-row');
+    });
+    var posA = rows.findIndex(function(r){ return r.dataset.gi === String(giA); });
+    var posB = rows.findIndex(function(r){ return r.dataset.gi === String(giB); });
+    if (posA === -1 || posB === -1) return [];
+    var lo = Math.min(posA, posB), hi = Math.max(posA, posB);
+    return rows.slice(lo, hi + 1).map(function(r){ return games[parseInt(r.dataset.gi, 10)]; });
+  }
+
+  /* Title reads '{Date} through {Date}' when both ends are dated. Undated
+     games (the 2K25 logs) have no date to name, so those fall back to the
+     span's size and season. */
+  function rangeTitle(span) {
+    var first = fmtGameDate(span[0].date);
+    var last  = fmtGameDate(span[span.length - 1].date);
+    if (first && last) {
+      return first === last ? first : first + ' through ' + last;
+    }
+    return span.length + ' Games · ' + (span[0].season || '');
+  }
+
+  function openRangeModal(span) {
+    if (!span.length) return;
+    var backdrop = document.getElementById('range-modal-backdrop');
+    var table    = document.getElementById('range-modal-table');
+    if (!backdrop || !table) return;
+
+    var wins = span.filter(function(g){ return (g.result||'').toUpperCase() === 'W'; }).length;
+
+    document.getElementById('range-modal-title').textContent = rangeTitle(span);
+    document.getElementById('range-modal-count').textContent =
+      span.length + (span.length === 1 ? ' game · ' : ' games · ') + wins + '-' + (span.length - wins);
+
+    var thead = '<thead><tr>';
+    LOG_COLS.forEach(function(c){
+      // Date/Team/Opp/H-A/Result describe a single game, so the summary
+      // replaces those five with one label column
+      if (['DATE','TEAM','OPP','H/A','RESULT'].indexOf(c.lbl) !== -1) return;
+      thead += '<th>' + c.lbl + '</th>';
+    });
+    thead = '<thead><tr><th></th>' + thead.slice('<thead><tr>'.length) + '</tr></thead>';
+
+    table.innerHTML = thead + '<tbody>' + rangeSummaryRows(span) + '</tbody>';
+    backdrop.classList.add('open');
+    document.body.classList.add('range-modal-open');
+  }
+
+  /* TOTALS and AVG rows for the selected span */
+  function rangeSummaryRows(span) {
+    var n = span.length;
+    var t = { pts:0, reb:0, ast:0, stl:0, blk:0, tov:0,
+              fgm:0, fga:0, tpm:0, tpa:0, ftm:0, fta:0, min:0, gs:0 };
+    span.forEach(function(g){
+      ['pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min'].forEach(function(f){
+        t[f] += (g[f] || 0);
+      });
+      t.gs += calcGameScore(g);
+    });
+    var tsDenom = t.fga + 0.44 * t.fta;
+    var tsPct   = tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—';
+
+    // Percentages are the span's own made/attempted, identical in both rows
+    function row(label, cls, f) {
+      return '<tr class="' + cls + '"><td>' + label + '</td>'
+        + '<td>' + f(t.min) + '</td>'
+        + '<td class="hi">' + f(t.pts) + '</td>'
+        + '<td>' + f(t.reb) + '</td>'
+        + '<td>' + f(t.ast) + '</td>'
+        + '<td>' + f(t.stl) + '</td>'
+        + '<td>' + f(t.blk) + '</td>'
+        + '<td>' + f(t.tov) + '</td>'
+        + '<td>' + f(t.fgm) + '</td>'
+        + '<td>' + f(t.fga) + '</td>'
+        + '<td>' + pctOrDash(t.fgm, t.fga) + '</td>'
+        + '<td>' + f(t.tpm) + '</td>'
+        + '<td>' + f(t.tpa) + '</td>'
+        + '<td>' + pctOrDash(t.tpm, t.tpa) + '</td>'
+        + '<td>' + f(t.ftm) + '</td>'
+        + '<td>' + f(t.fta) + '</td>'
+        + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
+        + '<td>' + tsPct + '</td>'
+        + '<td>' + f(t.gs) + '</td>'
+        + '</tr>';
+    }
+
+    var totals = row('Totals', 'range-row-total', function(v){
+      return (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    });
+    var avgs = row('Per Game', 'career-row', function(v){
+      return (Math.round(v / n * 10) / 10).toFixed(1);
+    });
+    return totals + avgs;
+  }
+
+  function closeRangeModal() {
+    var backdrop = document.getElementById('range-modal-backdrop');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.classList.remove('range-modal-open');
+    clearRangeSelection();
+  }
+
+  /* Wire row clicks for one rendered table */
+  function wireRangeSelection(table, key, games) {
+    if (!table) return;
+    table.querySelectorAll('tbody tr.log-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        var gi = parseInt(row.dataset.gi, 10);
+
+        // Same row again — unselect
+        if (logSel && logSel.tableId === table.id && logSel.gi === gi) {
+          clearRangeSelection();
+          return;
+        }
+        // Second row in the same table — summarize the span between them
+        if (logSel && logSel.tableId === table.id) {
+          var span = gamesBetween(table, logSel.gi, gi, games);
+          clearRangeSelection();
+          openRangeModal(span);
+          return;
+        }
+        // Anchor here (moving the anchor if it was in the other table)
+        clearRangeSelection();
+        logSel = { tableId: table.id, gi: gi };
+        row.classList.add('is-anchor');
+      });
+    });
+  }
+
+  /* One-time modal wiring — close button, backdrop click, Escape */
+  (function initRangeModal(){
+    function ready() {
+      var backdrop = document.getElementById('range-modal-backdrop');
+      if (!backdrop) return;
+      var closeBtn = document.getElementById('range-modal-close');
+      if (closeBtn) closeBtn.addEventListener('click', closeRangeModal);
+      // Only a click on the backdrop itself counts as "outside the box"
+      backdrop.addEventListener('click', function(e){
+        if (e.target === backdrop) closeRangeModal();
+      });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && backdrop.classList.contains('open')) closeRangeModal();
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ready);
+    } else {
+      ready();
+    }
+  })();
 
   /* Oldest first: by date when every game has one, else as entered */
   function orderOldestFirst(list) {

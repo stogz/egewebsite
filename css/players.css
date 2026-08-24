@@ -911,8 +911,8 @@
     }
     .log-table th:nth-child(-n+5) { text-align: left; }
     .log-res { font-weight: 700; }
-    .log-res--w { color: var(--orange); }
-    .log-res--l { color: var(--text-muted); }
+    .log-res--w { color: #22c55e; }
+    .log-res--l { color: #ef4444; }
     .log-score { color: var(--text); }
     .log-card-count {
       margin-left: auto;
@@ -922,6 +922,77 @@
       text-transform: uppercase;
       color: var(--text-faint);
     }
+
+    /* ── RANGE SELECTION ──
+       Rows are clickable to anchor a range; the anchored row stays lit
+       until a second row closes the span or it is clicked again. */
+    .log-table tbody tr.log-row { cursor: pointer; }
+    .log-table tbody tr.log-row.is-anchor td {
+      background: rgba(var(--accent-rgb), .16) !important;
+      box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .45);
+    }
+    .log-table tbody tr.log-row.is-anchor td:first-child { color: var(--orange); }
+
+    /* ── RANGE MODAL ── */
+    #range-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      /* Above the fixed nav (z-index 9999) so the whole page blurs behind
+         the modal and a click anywhere outside the box dismisses it */
+      z-index: 10000;
+      background: rgba(8,5,47,.6);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #range-modal-backdrop.open { display: flex; }
+    /* Stops the page behind the modal scrolling under it */
+    body.range-modal-open { overflow: hidden; }
+    #range-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 70px rgba(0,0,0,.5);
+      width: min(1100px, 100%);
+      max-height: 88vh;
+      overflow: auto;
+      animation: fadeSlideUp .2s ease both;
+    }
+    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg-card); }
+    #range-modal .splits-card-title { color: var(--heading); font-size: .7rem; }
+    /* The summary drops the five per-game identity columns, so it fits */
+    #range-modal .log-table { min-width: 900px; }
+    #range-modal .log-table td:nth-child(-n+5),
+    #range-modal .log-table th:nth-child(-n+5) { text-align: right; }
+    #range-modal .log-table td:first-child,
+    #range-modal .log-table th:first-child { text-align: left; }
+    #range-modal .log-table td:first-child {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    tr.range-row-total td {
+      font-weight: 700;
+      background: var(--bg-card) !important;
+      height: 3rem;
+      font-size: .92rem;
+    }
+    #range-modal-close {
+      margin-left: 14px;
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 2px;
+      transition: transform .15s, opacity .15s;
+    }
+    #range-modal-close:hover { transform: scale(1.15); opacity: .8; }
 
     /* ── PERFORMANCE CARDS ── */
     .game-log-list { display:flex; flex-direction:column; gap:14px; }

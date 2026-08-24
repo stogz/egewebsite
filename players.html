@@ -262,5 +262,20 @@
     </div>
   </div>
 
+  <!-- GAME RANGE MODAL — totals/averages for a span of games picked in the log -->
+  <div id="range-modal-backdrop">
+    <div id="range-modal" role="dialog" aria-modal="true" aria-labelledby="range-modal-title">
+      <div class="splits-card-header">
+        <div class="splits-card-dot"></div>
+        <span class="splits-card-title" id="range-modal-title"></span>
+        <span class="log-card-count" id="range-modal-count"></span>
+        <button id="range-modal-close" title="Close" aria-label="Close">&times;</button>
+      </div>
+      <div class="splits-scroll">
+        <table class="splits-table log-table" id="range-modal-table"></table>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
