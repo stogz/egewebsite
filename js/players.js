@@ -2956,7 +2956,7 @@
     tbody += logTotalsRow(games);
     tbody += '</tbody>';
 
-    return '<div class="splits-card log-card">'
+    return '<div class="splits-card">'
       + '<div class="splits-card-header">'
       + '<div class="splits-card-dot"></div>'
       + '<span class="splits-card-title">' + title + '</span>'
