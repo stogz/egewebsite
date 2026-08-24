@@ -44,7 +44,7 @@ window.PLAYER_STATS = {
        { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
     ],
     playoffs: [
-       { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'LOU',  ppg:21.5, rpg:6.0, apg:2.8,  spg:2.2, bpg:0.7, topg:2.8, fgp:'51.6%', tpp:'25.0%', ftp:'82.4%', tpa:2.0, gs:6, gp:6, mpg:36.3, star:false, dnq:false },
     ],
     totals:   [],
     awards: {
@@ -81,7 +81,9 @@ window.PLAYER_STATS = {
     regular:  [
        { season:'2011-12', age:18, team:'TU',  ppg:15.6, rpg:9.0, apg:1.4,  spg:0.8, bpg:2.5, topg:1.9, fgp:'54.8%', tpp:'32.7%', ftp:'78.3%', tpa:1.3, gs:33, gp:33, mpg:31.9, star:false, dnq:false },
     ],
-    playoffs: [],
+    playoffs: [
+       { season:'2011-12', age:18, team:'TU',  ppg:17.3, rpg:10.7, apg:1.3,  spg:0.3, bpg:2.7, topg:2.3, fgp:'52.5%', tpp:'40.0%', ftp:'85.7%', tpa:3.3, gs:3, gp:3, mpg:35.0, star:false, dnq:false },
+    ],
     totals:   [],
   },
 
@@ -137,7 +139,9 @@ window.PLAYER_STATS = {
     regular:  [
        { season:'2011-12', age:18, team:'MA',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false },
     ],
-    playoffs: [],
+    playoffs: [
+       { season:'2011-12', age:18, team:'MA',  ppg:10.5, rpg:10.5, apg:2.0,  spg:1.5, bpg:1.5, topg:1.5, fgp:'64.3%', tpp:'0.0%', ftp:'50.0%', tpa:0.0, gs:2, gp:2, mpg:32.5, star:false, dnq:false },
+    ],
     totals:   [],
   },
 
@@ -164,7 +168,9 @@ window.PLAYER_STATS = {
     regular:  [
        { season:'2011-12', age:18, team:'IU',  ppg:16.9, rpg:4.3, apg:4.1,  spg:1.8, bpg:0.3, topg:2.2, fgp:'48.1%', tpp:'42.1%', ftp:'86.2%', tpa:5.6, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
     ],
-    playoffs: [],
+    playoffs: [
+       { season:'2011-12', age:18, team:'IU',  ppg:19.8, rpg:4.5, apg:5.0,  spg:1.8, bpg:0.0, topg:2.2, fgp:'51.9%', tpp:'54.3%', ftp:'80.0%', tpa:7.7, gs:6, gp:6, mpg:37.0, star:false, dnq:false },
+    ],
     totals:   [],
   },
 
