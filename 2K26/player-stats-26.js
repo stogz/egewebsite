@@ -43,7 +43,9 @@ window.PLAYER_STATS = {
     regular:  [
        { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
     ],
-    playoffs: [],
+    playoffs: [
+       { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
+    ],
     totals:   [],
     awards: {
       nba: [
@@ -106,7 +108,9 @@ window.PLAYER_STATS = {
     regular:  [
        { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false, leaders:['ppg'] },
     ],
-    playoffs: [],
+    playoffs: [
+       { season:'2011-12', age:18, team:'BU',  ppg:25.5, rpg:10.5, apg:7.5,  spg:1.5, bpg:1.5, topg:2.3, fgp:'71.0%', tpp:'0.0%', ftp:'77.8%', tpa:0.5, gs:2, gp:2, mpg:38.5, star:false, dnq:false },
+    ],
     totals:   [],
   },
 
