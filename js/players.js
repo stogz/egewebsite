@@ -2823,28 +2823,40 @@
   }
 
   /* ── HOOP SCORE HEAT ──
-     5 or below is a bright red, 25 a bright green, 35 and up gold, with a
-     continuous ramp between. Matches the mock draft's filled-cell heatmap:
-     an HSL background under white text. */
+     Anchors, with a continuous ramp between each pair:
+       <=5  bright red    hsl(0,82,46)
+        25  bright green  hsl(140,68,40)
+        35  blue          hsl(215,80,48)
+       >=50 purple        hsl(280,62,48)
+     Each segment starts on the previous one's end values, so the ramp has no
+     seam at a boundary. Matches the mock draft's filled-cell heatmap: an HSL
+     background under white text, and every lightness stays in the 40-48 band
+     so white stays legible the whole way up. */
   function hoopHeatStyle(gs) {
-    // Segments meet at matching values so the ramp has no visible seam:
-    //   <=5  red   hsl(0,82,46)  ·  25 green hsl(140,68,40)  ·  >=35 gold hsl(45,92,48)
     var h, sat, lum;
-    if (gs >= 35)      { h = 45;  sat = 92; lum = 48; }                // gold
-    else if (gs >= 25) { var a = (gs - 25) / 10;                       // green → gold
-                         h = 140 - a * 95; sat = 68 + a * 24; lum = 40 + a * 8; }
-    else if (gs > 5)   { var b = (gs - 5) / 20;                        // red → green
-                         h = b * 140; sat = 82 - b * 14; lum = 46 - b * 6; }
+    if (gs >= 50)      { h = 280; sat = 62; lum = 48; }                // purple
+    else if (gs >= 35) { var a = (gs - 35) / 15;                       // blue → purple
+                         h = 215 + a * 65; sat = 80 - a * 18; lum = 48; }
+    else if (gs >= 25) { var b = (gs - 25) / 10;                       // green → blue
+                         h = 140 + b * 75; sat = 68 + b * 12; lum = 40 + b * 8; }
+    else if (gs > 5)   { var c = (gs - 5) / 20;                        // red → green
+                         h = c * 140; sat = 82 - c * 14; lum = 46 - c * 6; }
     else               { h = 0;   sat = 82; lum = 46; }                // bright red
-    return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%);color:#fff;';
+    return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%)!important;color:#fff!important;';
   }
 
   /* Hoop cell, tinted when the Color System setting is on. `perGame` guards
-     the range modal's Totals row, where a summed score would always read gold. */
+     the range modal's Totals row, where a summed score would always peg the
+     top of the scale.
+     The tint carries !important because the averages rows are .career-row,
+     whose own `background: var(--bg-card) !important` would otherwise win
+     over an inline style and leave those cells untinted. */
   function hoopCell(gs, perGame) {
     var txt = (gs < 0 ? '−' : '') + Math.abs(gs).toFixed(1);
-    var style = (logSettings.colorSystem && perGame !== false) ? hoopHeatStyle(gs) : '';
-    return '<td class="log-hoop"' + (style ? ' style="' + style + '"' : '') + '>' + txt + '</td>';
+    if (!logSettings.colorSystem || perGame === false) {
+      return '<td class="log-hoop">' + txt + '</td>';
+    }
+    return '<td class="log-hoop" style="' + hoopHeatStyle(gs) + '">' + txt + '</td>';
   }
 
   function pctOrDash(made, att) {
@@ -3227,7 +3239,7 @@
     { id:'fgData', label:'Field Goal Data',
       hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
     { id:'colorSystem', label:'Color System',
-      hint:'Shade the Hoop Score by performance — red through green to gold.' },
+      hint:'Shade the Hoop Score by performance — red through green and blue to purple.' },
   ];
 
   function logSettingsMenu() {
