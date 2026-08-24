@@ -992,6 +992,7 @@
     Array.from(tbody.rows).forEach(function(r,i){ if(!r.dataset.originalIndex) r.dataset.originalIndex=String(i); });
     var headers=table.querySelectorAll('thead th');
     headers.forEach(function(th,colIdx){
+      if (th.classList.contains('log-spacer')) return; // slack column, not data
       th.dataset.sortState='none';
       th.addEventListener('click',function(){
         var curr=th.dataset.sortState;
@@ -2899,6 +2900,7 @@
       + '<td>' + pctOrDash(g.ftm, g.fta) + '</td>'
       + '<td>' + tsPctOf(g) + '</td>'
       + hoopCell(gs, true)
+      + '<td class="log-spacer"></td>'
       + '</tr>';
   }
 
@@ -2939,6 +2941,7 @@
       + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
       + '<td>' + (tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—') + '</td>'
       + hoopCell(t.gs / n, true)
+      + '<td class="log-spacer"></td>'
       + '</tr>';
   }
 
@@ -2949,6 +2952,10 @@
     LOG_COLS.forEach(function(c){
       thead += '<th' + clsAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
     });
+    // Trailing spacer — see .log-spacer in players.css. It takes whatever
+    // width is left over so the real columns keep their natural size instead
+    // of splitting the slack between them.
+    thead += '<th class="log-spacer" aria-hidden="true"></th>';
     thead += '</tr></thead>';
 
     var tbody = '<tbody>';
@@ -3077,10 +3084,14 @@
      games (the 2K25 logs) have no date to name, so those fall back to the
      span's size and season. */
   function rangeTitle(span) {
-    var first = fmtGameDate(span[0].date);
-    var last  = fmtGameDate(span[span.length - 1].date);
-    if (first && last) {
-      return first === last ? first : first + ' through ' + last;
+    // Endpoints run earliest → latest whatever order the table is sorted in,
+    // so a descending sort doesn't title the span 'MAR 17 through MAR 15'.
+    var keys = span.map(function(g){ return dateSortKey(g.date); });
+    if (keys.every(function(k){ return k !== null; })) {
+      var lo = span[keys.indexOf(Math.min.apply(null, keys))];
+      var hi = span[keys.indexOf(Math.max.apply(null, keys))];
+      var a = fmtGameDate(lo.date), b = fmtGameDate(hi.date);
+      return a === b ? a : a + ' through ' + b;
     }
     return span.length + ' Games · ' + (span[0].season || '');
   }
@@ -3104,6 +3115,7 @@
       if (c.cls === 'log-lbl') return;
       thead += '<th' + clsAttr(c) + '>' + c.lbl + '</th>';
     });
+    thead += '<th class="log-spacer" aria-hidden="true"></th>';
     thead += '</tr></thead>';
 
     table.className = 'splits-table log-table' + (logSettings.fgData ? '' : ' log-hide-fg');
@@ -3147,6 +3159,7 @@
         + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
         + '<td>' + tsPct + '</td>'
         + hoopCell(perGame ? t.gs / n : t.gs, perGame)
+        + '<td class="log-spacer"></td>'
         + '</tr>';
     }
 

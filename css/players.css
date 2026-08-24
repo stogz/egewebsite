@@ -1029,9 +1029,22 @@
        need, while the inherited width:100% still lets it fill the card when
        there is room to spare. */
     /* Styled exactly like the Stats tab's splits tables — same padding, type
-       and row height, inherited from .splits-table. The only difference is a
-       wider min-width, because the log carries more columns. */
-    .log-table { min-width: 1500px; }
+       and row height, inherited from .splits-table.
+       Width works differently though. 1280px is a floor, not a fixed size:
+       the table sizes to whatever columns are shown and only stops shrinking
+       there, so hiding the Field Goal columns takes ~300px off the table
+       rather than handing that space to the columns that remain. */
+    .log-table { min-width: 1280px; }
+    /* Where the leftover width goes. A cell at width:100% is served last in
+       auto table layout, so it swallows the slack and every real column keeps
+       its natural size. Without it the browser splits the surplus across all
+       the columns, which is what widened them when a group was hidden. */
+    .log-table .log-spacer {
+      width: 100%;
+      padding: 0;
+      cursor: default;
+    }
+    .log-table th.log-spacer:hover { background: none; }
     /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
        than column position — the range modal drops these five, and a
        positional rule restyled MIN/PTS/REB/AST there instead. */
