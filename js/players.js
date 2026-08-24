@@ -992,7 +992,6 @@
     Array.from(tbody.rows).forEach(function(r,i){ if(!r.dataset.originalIndex) r.dataset.originalIndex=String(i); });
     var headers=table.querySelectorAll('thead th');
     headers.forEach(function(th,colIdx){
-      if (th.classList.contains('log-spacer')) return; // slack column, not data
       th.dataset.sortState='none';
       th.addEventListener('click',function(){
         var curr=th.dataset.sortState;
@@ -2900,7 +2899,6 @@
       + '<td>' + pctOrDash(g.ftm, g.fta) + '</td>'
       + '<td>' + tsPctOf(g) + '</td>'
       + hoopCell(gs, true)
-      + '<td class="log-spacer"></td>'
       + '</tr>';
   }
 
@@ -2941,7 +2939,6 @@
       + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
       + '<td>' + (tsDenom > 0 ? (t.pts / (2 * tsDenom) * 100).toFixed(1) + '%' : '—') + '</td>'
       + hoopCell(t.gs / n, true)
-      + '<td class="log-spacer"></td>'
       + '</tr>';
   }
 
@@ -2952,10 +2949,6 @@
     LOG_COLS.forEach(function(c){
       thead += '<th' + clsAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
     });
-    // Trailing spacer — see .log-spacer in players.css. It takes whatever
-    // width is left over so the real columns keep their natural size instead
-    // of splitting the slack between them.
-    thead += '<th class="log-spacer" aria-hidden="true"></th>';
     thead += '</tr></thead>';
 
     var tbody = '<tbody>';
@@ -3115,7 +3108,6 @@
       if (c.cls === 'log-lbl') return;
       thead += '<th' + clsAttr(c) + '>' + c.lbl + '</th>';
     });
-    thead += '<th class="log-spacer" aria-hidden="true"></th>';
     thead += '</tr></thead>';
 
     table.className = 'splits-table log-table' + (logSettings.fgData ? '' : ' log-hide-fg');
@@ -3159,7 +3151,6 @@
         + '<td>' + pctOrDash(t.ftm, t.fta) + '</td>'
         + '<td>' + tsPct + '</td>'
         + hoopCell(perGame ? t.gs / n : t.gs, perGame)
-        + '<td class="log-spacer"></td>'
         + '</tr>';
     }
 

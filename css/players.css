@@ -1030,21 +1030,20 @@
        there is room to spare. */
     /* Styled exactly like the Stats tab's splits tables — same padding, type
        and row height, inherited from .splits-table.
-       Width works differently though. 1280px is a floor, not a fixed size:
-       the table sizes to whatever columns are shown and only stops shrinking
-       there, so hiding the Field Goal columns takes ~300px off the table
-       rather than handing that space to the columns that remain. */
-    .log-table { min-width: 1280px; }
-    /* Where the leftover width goes. A cell at width:100% is served last in
-       auto table layout, so it swallows the slack and every real column keeps
-       its natural size. Without it the browser splits the surplus across all
-       the columns, which is what widened them when a group was hidden. */
-    .log-table .log-spacer {
-      width: 100%;
-      padding: 0;
-      cursor: default;
-    }
-    .log-table th.log-spacer:hover { background: none; }
+       Width works differently though. The floor is the card's own width
+       rather than a fixed pixel figure, so the table always spans the card
+       edge to edge and only grows past it when the columns genuinely need
+       more room. Hiding the Field Goal columns therefore takes ~280px off
+       the table instead of handing that space to the columns that remain.
+       (1280px hard-coded overflowed the 1278px card by 2px and raised a
+       scrollbar over nothing.) */
+    .log-table { min-width: 100%; }
+    /* Wider gutters than the Stats tables. Tuned so the 17-column minimum
+       comes to 1245px against a 1278px card — near enough that it fills edge
+       to edge with only ~2px per column of stretch, instead of the ~17px the
+       columns picked up back when the table stayed a fixed 1500px wide. */
+    .log-table th { padding: 12px 18px; }
+    .log-table td { padding: 0 18px; }
     /* Identity columns read as labels, not figures. Keyed off .log-lbl rather
        than column position — the range modal drops these five, and a
        positional rule restyled MIN/PTS/REB/AST there instead. */
@@ -1104,7 +1103,11 @@
       background: var(--bg);
       border: 1px solid var(--border);
       box-shadow: 0 24px 70px rgba(0,0,0,.5);
-      width: min(1340px, 100%);
+      /* Same rule as the log tables: size to the columns shown, up to the
+         cap, so hiding a group narrows the box instead of fattening its
+         columns. */
+      width: fit-content;
+      max-width: min(1340px, 100%);
       max-height: 90vh;
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
@@ -1113,7 +1116,7 @@
     #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
     #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
     /* The summary drops the five identity columns, so it needs less width */
-    #range-modal .log-table { min-width: 940px; }
+    #range-modal .log-table { min-width: 0; }
     #range-modal .log-table th { padding: 14px 16px; }
     #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
     #range-modal .log-table td.log-lbl {
