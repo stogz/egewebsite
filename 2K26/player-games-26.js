@@ -794,6 +794,214 @@ window.PLAYER_GAMES = {
   ──────────────────────────────────────── */
   vitel: [
 
+/* ─────────── REGULAR SEASON — 34 games, Indiana 28-6 ───────────
+   Non-conference play and the Big Ten slate, ahead of the tournament run
+   logged below. The last three are Big Ten Tournament games at a neutral
+   site, which the schema has no flag for, so they carry home:false like
+   the NCAA Tournament entries do.
+
+   Indiana's 2011-11-27 win over Butler is the same game as the loss in
+   Stogsdill's log: same date, mirrored score, opposite result and home
+   flag. The two logs agree without having been written together.
+
+   ── THREE SEASON FIGURES RUN HIGH ──
+   Nine of the twelve averages on Vitel's row in player-stats-26.js
+   reproduce exactly from these games, including all four shooting
+   figures. Three do not, and the gaps are larger than a rounding choice:
+     ppg  log 578 pts / 34 = 17.0    row says 16.9
+     rpg  log 150 reb / 34 =  4.4    row says  4.3
+     mpg  log 1159 min / 34 = 34.1   row says 33.8  (~10 minutes apart)
+   Left exactly as supplied. The shooting totals are what the row's own
+   percentages were computed from, so the per-game data looks sound and
+   the row appears to predate it.
+   ────────────────────────────────────────────────────────────── */
+
+// -- NOVEMBER 2011 --
+{ season:'2011-12', type:'regular', date:'2011-11-11',
+  opp:'SBU', result:'W', score:'94-68', home:true,
+  pts:18, reb:6, ast:8, stl:3, blk:0, tov:2,
+  fgm:6, fga:11, tpm:4, tpa:7, ftm:2, fta:2, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-13',
+  opp:'CHAT', result:'W', score:'82-61', home:true,
+  pts:15, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:5, fga:10, tpm:2, tpa:5, ftm:3, fta:4, min:31,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-16',
+  opp:'EVAN', result:'W', score:'78-64', home:false,
+  pts:16, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:12, tpm:2, tpa:5, ftm:2, fta:2, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-19',
+  opp:'SAV', result:'W', score:'88-56', home:true,
+  pts:13, reb:5, ast:5, stl:1, blk:1, tov:2,
+  fgm:4, fga:10, tpm:2, tpa:5, ftm:3, fta:4, min:29,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-21',
+  opp:'GWEB', result:'W', score:'84-62', home:true,
+  pts:17, reb:4, ast:3, stl:2, blk:0, tov:2,
+  fgm:6, fga:11, tpm:3, tpa:6, ftm:2, fta:2, min:32,
+},
+// Same game as Stogsdill's 2011-11-27 loss - see his log
+{ season:'2011-12', type:'regular', date:'2011-11-27',
+  opp:'BU', result:'W', score:'78-74', home:true,
+  pts:14, reb:3, ast:3, stl:1, blk:0, tov:3,
+  fgm:6, fga:13, tpm:0, tpa:4, ftm:2, fta:3, min:36,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-30',
+  opp:'NCST', result:'W', score:'81-76', home:false,
+  pts:21, reb:6, ast:4, stl:2, blk:1, tov:2,
+  fgm:7, fga:13, tpm:3, tpa:6, ftm:4, fta:5, min:36,
+},
+
+// -- DECEMBER 2011 --
+{ season:'2011-12', type:'regular', date:'2011-12-04',
+  opp:'STET', result:'W', score:'86-59', home:true,
+  pts:12, reb:4, ast:4, stl:2, blk:0, tov:1,
+  fgm:4, fga:10, tpm:2, tpa:5, ftm:2, fta:2, min:28,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-10',
+  opp:'UK', result:'W', score:'76-73', home:true,
+  pts:19, reb:6, ast:6, stl:2, blk:0, tov:2,
+  fgm:7, fga:14, tpm:3, tpa:6, ftm:2, fta:2, min:37,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-17',
+  opp:'ND', result:'W', score:'80-71', home:true,
+  pts:18, reb:4, ast:4, stl:2, blk:1, tov:2,
+  fgm:5, fga:11, tpm:3, tpa:6, ftm:5, fta:6, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-19',
+  opp:'HOW', result:'W', score:'89-63', home:true,
+  pts:20, reb:5, ast:5, stl:2, blk:0, tov:2,
+  fgm:7, fga:11, tpm:3, tpa:6, ftm:3, fta:3, min:31,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-22',
+  opp:'UMBC', result:'W', score:'77-58', home:true,
+  pts:11, reb:3, ast:3, stl:1, blk:0, tov:3,
+  fgm:4, fga:11, tpm:0, tpa:5, ftm:3, fta:4, min:25,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-28',
+  opp:'MSU', result:'L', score:'69-75', home:false,
+  pts:13, reb:4, ast:3, stl:1, blk:0, tov:3,
+  fgm:5, fga:12, tpm:1, tpa:6, ftm:2, fta:3, min:36,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-31',
+  opp:'OSU', result:'W', score:'78-74', home:true,
+  pts:22, reb:5, ast:4, stl:3, blk:1, tov:2,
+  fgm:7, fga:13, tpm:4, tpa:7, ftm:4, fta:4, min:39,
+},
+
+// -- JANUARY 2012 --
+{ season:'2011-12', type:'regular', date:'2012-01-05',
+  opp:'MICH', result:'W', score:'76-70', home:true,
+  pts:16, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:12, tpm:2, tpa:5, ftm:2, fta:2, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-08',
+  opp:'PSU', result:'W', score:'73-64', home:false,
+  pts:17, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:13, tpm:2, tpa:5, ftm:3, fta:3, min:35,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-12',
+  opp:'MINN', result:'L', score:'68-72', home:true,
+  pts:12, reb:3, ast:3, stl:1, blk:0, tov:3,
+  fgm:5, fga:12, tpm:0, tpa:4, ftm:2, fta:3, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-15',
+  opp:'OSU', result:'L', score:'71-77', home:false,
+  pts:18, reb:5, ast:4, stl:2, blk:0, tov:3,
+  fgm:6, fga:13, tpm:3, tpa:6, ftm:3, fta:4, min:37,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-18',
+  opp:'NEB', result:'W', score:'74-62', home:false,
+  pts:15, reb:4, ast:4, stl:2, blk:1, tov:2,
+  fgm:5, fga:12, tpm:2, tpa:5, ftm:3, fta:3, min:32,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-22',
+  opp:'PSU', result:'W', score:'82-66', home:true,
+  pts:20, reb:5, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:12, tpm:3, tpa:6, ftm:5, fta:5, min:35,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-26',
+  opp:'WIS', result:'L', score:'65-70', home:false,
+  pts:14, reb:4, ast:3, stl:1, blk:0, tov:3,
+  fgm:5, fga:13, tpm:2, tpa:5, ftm:2, fta:3, min:36,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-29',
+  opp:'IOWA', result:'W', score:'83-72', home:true,
+  pts:22, reb:5, ast:4, stl:2, blk:1, tov:2,
+  fgm:7, fga:13, tpm:3, tpa:6, ftm:5, fta:5, min:35,
+},
+
+// -- FEBRUARY 2012 --
+{ season:'2011-12', type:'regular', date:'2012-02-01',
+  opp:'MICH', result:'L', score:'72-76', home:false,
+  pts:19, reb:5, ast:4, stl:2, blk:0, tov:3,
+  fgm:6, fga:13, tpm:3, tpa:6, ftm:4, fta:5, min:38,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-04',
+  opp:'PUR', result:'W', score:'79-73', home:false,
+  pts:16, reb:4, ast:4, stl:2, blk:1, tov:2,
+  fgm:6, fga:11, tpm:2, tpa:5, ftm:2, fta:2, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-09',
+  opp:'ILL', result:'W', score:'81-69', home:true,
+  pts:17, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:14, tpm:3, tpa:6, ftm:2, fta:2, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-15',
+  opp:'NW', result:'W', score:'70-64', home:true,
+  pts:10, reb:3, ast:3, stl:1, blk:0, tov:3,
+  fgm:4, fga:11, tpm:0, tpa:5, ftm:2, fta:3, min:27,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-19',
+  opp:'IOWA', result:'W', score:'84-74', home:false,
+  pts:21, reb:5, ast:4, stl:2, blk:1, tov:2,
+  fgm:7, fga:14, tpm:3, tpa:6, ftm:4, fta:4, min:35,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-22',
+  opp:'NCCU', result:'W', score:'85-60', home:true,
+  pts:15, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:5, fga:12, tpm:2, tpa:5, ftm:3, fta:4, min:31,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-26',
+  opp:'MINN', result:'W', score:'77-68', home:false,
+  pts:17, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:6, fga:12, tpm:3, tpa:6, ftm:2, fta:2, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-28',
+  opp:'MSU', result:'W', score:'75-70', home:true,
+  pts:21, reb:5, ast:5, stl:2, blk:1, tov:2,
+  fgm:6, fga:13, tpm:4, tpa:7, ftm:5, fta:5, min:37,
+},
+
+// -- MARCH 2012 --
+{ season:'2011-12', type:'regular', date:'2012-03-04',
+  opp:'PUR', result:'W', score:'82-74', home:true,
+  pts:22, reb:6, ast:4, stl:1, blk:0, tov:2,
+  fgm:8, fga:14, tpm:4, tpa:7, ftm:2, fta:3, min:39,
+},
+// Big Ten Tournament - neutral site
+{ season:'2011-12', type:'regular', date:'2012-03-09',
+  opp:'PUR', result:'W', score:'79-72', home:false,
+  pts:18, reb:4, ast:4, stl:2, blk:0, tov:2,
+  fgm:7, fga:11, tpm:2, tpa:5, ftm:2, fta:3, min:36,
+},
+// Big Ten Tournament - neutral site
+{ season:'2011-12', type:'regular', date:'2012-03-10',
+  opp:'OSU', result:'W', score:'75-71', home:false,
+  pts:22, reb:5, ast:5, stl:2, blk:1, tov:2,
+  fgm:7, fga:13, tpm:3, tpa:6, ftm:5, fta:5, min:38,
+},
+// Big Ten Tournament - neutral site
+{ season:'2011-12', type:'regular', date:'2012-03-11',
+  opp:'MSU', result:'L', score:'70-74', home:false,
+  pts:17, reb:4, ast:4, stl:1, blk:0, tov:2,
+  fgm:6, fga:14, tpm:2, tpa:5, ftm:3, fta:4, min:39,
+},
+
+/* ─────────── NCAA TOURNAMENT ─────────── */
+
 // ── ROUND OF 64 — (2) Indiana 86, (15) Norfolk State 67 ──
 { season:'2011-12', type:'playoffs', date:'2012-03-16', round:'Round of 64',
   opp:'NORF', result:'W', score:'86-67', home:false,
