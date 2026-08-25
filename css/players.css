@@ -467,8 +467,11 @@
     tr.college-row td { color:var(--text) !important; font-style:normal !important; opacity:1 !important; }
     .college-tag { cursor:help; border-bottom:1px dashed var(--text-muted); text-decoration:none; }
     /* college footnote */
-    .college-footnote { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.1em; color:var(--text-muted); margin-top:10px; padding:8px 0 0; border-top:1px solid var(--border-soft); }
-    .college-footnote span { color:var(--blue); margin-right:4px; }
+    /* Table key — one bordered box holding every note for that table, rather
+       than a separate rule and margin per line. */
+    .splits-key { margin-top:10px; padding:9px 16px 11px; border-top:1px solid var(--border-soft); }
+    .splits-key-line { font-family:var(--font-mono); font-size:.6rem; letter-spacing:.1em; color:var(--text-muted); line-height:1.9; }
+    .splits-key-line span { color:var(--blue); margin-right:4px; }
     .dnq-note { margin-left:.5rem; opacity:.6; font-weight:400; }
 
     /* Totals / Career row */

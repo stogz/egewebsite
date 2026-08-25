@@ -454,55 +454,21 @@
   /* isProRow — exclude college seasons, dnq rows, and zero-GP rows */
   function isProRow(r) { return COLLEGE_TEAMS.indexOf((r.team||'').toUpperCase()) === -1 && !r.dnq && r.gp > 0; }
 
-  /* ── LEAGUE LEADER HELPERS ──
-     PLAYER_STATS is the entire tracked league, so "leads the league" means
-     posts the season's top value (among pro rows) across all players there.
-     Ties all get marked. Applies to every numeric stat column in both
-     tables — the leading value is simply italicized (see the * key under
-     each table), same treatment whether it's a "good" stat to lead (PPG)
-     or not (TOPG).
-
-     To force a specific stat to show as a league leader regardless of the
-     numbers (e.g. a real-world honor the data model can't compute), add a
-     `leaders` array of stat keys to that season row:
+  /* ── LEAGUE LEADERS ──
+     Leaders are declared by hand, never computed. Add a `leaders` array of
+     stat keys to a season row and exactly those cells italicize:
        { season:'2022-23', ..., fgp:'48.3%', ..., leaders:['fgp'] }
-     Works the same on 'regular'/'playoffs' rows (PG_LEADER_STATS keys) and
-     'totals' rows (TOTALS_LEADER_STATS keys). */
-  var PG_LEADER_STATS = ['ppg','rpg','apg','spg','bpg','topg','fgp','tpp','ftp','tpa','gs','gp','mpg'];
-  var TOTALS_LEADER_STATS = ['pts','reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'];
+     Keys are the row's own field names — ppg, rpg, apg, spg, bpg, topg, fgp,
+     tpp, ftp, tpa, gs, gp, mpg on a regular or playoffs row.
 
-  function statNum(raw) {
-    var v = typeof raw === 'string' ? parseFloat(raw.replace('%','')) : raw;
-    return (v === undefined || v === null || isNaN(v)) ? null : v;
-  }
-
-  /* Best value per season/stat for dataKey ('regular'|'playoffs'|'totals') */
-  function seasonLeaders(dataKey, statList) {
-    var best = {};
-    Object.keys(PLAYER_STATS).forEach(function(key){
-      ((PLAYER_STATS[key]||{})[dataKey]||[]).filter(isProRow).forEach(function(row){
-        statList.forEach(function(stat){
-          var val = statNum(row[stat]);
-          if (val === null) return;
-          best[row.season] = best[row.season] || {};
-          if (best[row.season][stat] === undefined || val > best[row.season][stat]) {
-            best[row.season][stat] = val;
-          }
-        });
-      });
-    });
-    return best;
-  }
-
-  /* Wrap text in italics if row's value ties the league lead for that season/stat,
-     or if the row manually forces it via a `leaders` array (see above). */
-  function leadWrap(leaders, stat, row, text) {
-    var val = statNum(row[stat]);
-    var best = leaders[row.season] && leaders[row.season][stat];
-    var isAutoLeader = val !== null && best !== undefined && val === best;
-    var isManualLeader = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
-    var isLeader = isAutoLeader || isManualLeader;
-    return isLeader ? '<em class="stat-leader">'+text+'</em>' : text;
+     This used to also scan every tracked player and italicize whichever value
+     topped each season. That is gone: with season totals entered by hand there
+     is no dependable league to compare against, and a computed leader would
+     contradict the one written on the row. Only the Per Game table italicizes;
+     Totals never does. */
+  function leadWrap(stat, row, text) {
+    var flagged = Array.isArray(row.leaders) && row.leaders.indexOf(stat) !== -1;
+    return flagged ? '<em class="stat-leader">'+text+'</em>' : text;
   }
 
   /* ── COMPUTE CAREER AVERAGES FROM PLAYER_STATS ── */
@@ -886,8 +852,7 @@
   function renderPGTable(key, mode) {
     pgMode = mode || 'regular';
     var data = (PLAYER_STATS[key]||{})[pgMode] || [];
-    var label = (pgMode==='regular' ? 'Regular Season' : 'Playoffs') + ' · Per Game';
-    document.getElementById('pg-table-label').textContent = label;
+    document.getElementById('pg-table-label').textContent = 'Per Game';
     document.querySelectorAll('[data-scope="pg"]').forEach(function(btn){
       btn.classList.toggle('active', btn.dataset.mode === pgMode);
     });
@@ -896,7 +861,6 @@
     var thead = '<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
-    var leaders = seasonLeaders(pgMode, PG_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       if(row.dnq){
@@ -909,19 +873,23 @@
         tbody+='<tr class="college-row" data-orig="'+idx+'" data-college="1">';
         tbody+='<td><span title="Non-NBA season, excluded from career averages." class="college-tag">'+fmtSeason(row.season)+' *</span></td>';
         tbody+='<td>'+row.age+'</td><td>'+row.team+'</td>';
-        tbody+='<td>'+fmt1(row.ppg)+'</td><td>'+fmt1(row.rpg)+'</td><td>'+fmt1(row.apg)+'</td>';
-        tbody+='<td>'+fmt1(row.spg)+'</td><td>'+fmt1(row.bpg)+'</td><td>'+fmt1(row.topg)+'</td>';
-        tbody+='<td>'+row.fgp+'</td><td>'+row.tpp+'</td><td>'+row.ftp+'</td>';
-        tbody+='<td>'+fmt1(row.tpa)+'</td><td>'+row.gs+'</td><td>'+row.gp+'</td><td>'+fmt1(row.mpg)+'</td>';
+        // College rows honour `leaders` too. They used to skip leadWrap, which
+        // mattered little while leaders were computed from the pro rows, but
+        // now that they are hand-declared it would leave the whole 2K26 sim
+        // unable to mark one — every player there is on a college team.
+        tbody+='<td>'+leadWrap('ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap('rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap('apg',row,fmt1(row.apg))+'</td>';
+        tbody+='<td>'+leadWrap('spg',row,fmt1(row.spg))+'</td><td>'+leadWrap('bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap('topg',row,fmt1(row.topg))+'</td>';
+        tbody+='<td>'+leadWrap('fgp',row,row.fgp)+'</td><td>'+leadWrap('tpp',row,row.tpp)+'</td><td>'+leadWrap('ftp',row,row.ftp)+'</td>';
+        tbody+='<td>'+leadWrap('tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap('gs',row,row.gs)+'</td><td>'+leadWrap('gp',row,row.gp)+'</td><td>'+leadWrap('mpg',row,fmt1(row.mpg))+'</td>';
         tbody+='</tr>';
         return;
       }
       var icons=(row.star?'<span class="season-icon">⭐</span>':'')+(row.champ?'<span class="season-icon">🏆</span>':'');
       tbody+='<tr data-orig="'+idx+'"><td>'+fmtSeason(row.season)+icons+'</td><td>'+row.age+'</td><td>'+teamCell(row.team,row.season)+'</td>';
-      tbody+='<td class="hi">'+leadWrap(leaders,'ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap(leaders,'rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap(leaders,'apg',row,fmt1(row.apg))+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'spg',row,fmt1(row.spg))+'</td><td>'+leadWrap(leaders,'bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap(leaders,'topg',row,fmt1(row.topg))+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'fgp',row,row.fgp)+'</td><td>'+leadWrap(leaders,'tpp',row,row.tpp)+'</td><td>'+leadWrap(leaders,'ftp',row,row.ftp)+'</td>';
-      tbody+='<td>'+leadWrap(leaders,'tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap(leaders,'gs',row,row.gs)+'</td><td>'+leadWrap(leaders,'gp',row,row.gp)+'</td><td>'+leadWrap(leaders,'mpg',row,fmt1(row.mpg))+'</td></tr>';
+      tbody+='<td class="hi">'+leadWrap('ppg',row,fmt1(row.ppg))+'</td><td>'+leadWrap('rpg',row,fmt1(row.rpg))+'</td><td>'+leadWrap('apg',row,fmt1(row.apg))+'</td>';
+      tbody+='<td>'+leadWrap('spg',row,fmt1(row.spg))+'</td><td>'+leadWrap('bpg',row,fmt1(row.bpg))+'</td><td>'+leadWrap('topg',row,fmt1(row.topg))+'</td>';
+      tbody+='<td>'+leadWrap('fgp',row,row.fgp)+'</td><td>'+leadWrap('tpp',row,row.tpp)+'</td><td>'+leadWrap('ftp',row,row.ftp)+'</td>';
+      tbody+='<td>'+leadWrap('tpa',row,fmt1(row.tpa))+'</td><td>'+leadWrap('gs',row,row.gs)+'</td><td>'+leadWrap('gp',row,row.gp)+'</td><td>'+leadWrap('mpg',row,fmt1(row.mpg))+'</td></tr>';
     });
     // Career avg row
     var valid=data.filter(isProRow);
@@ -955,7 +923,6 @@
     var thead='<thead><tr>';
     COLS.forEach(function(col){ thead+='<th data-col="'+col+'">'+col+'<span class="sort-arrow"></span></th>'; });
     thead+='</tr></thead>';
-    var leaders = seasonLeaders('totals', TOTALS_LEADER_STATS);
     var tbody='<tbody>';
     data.forEach(function(row,idx){
       var isCollege = COLLEGE_TEAMS.indexOf((row.team||'').toUpperCase()) !== -1;
@@ -966,11 +933,10 @@
       tbody+='<tr'+trClass+' data-orig="'+idx+'"'+(isCollege?' data-college="1"':'')+'>'+
         '<td>'+(isCollege?'<span title="College season — excluded from career stats" class="college-tag">'+fmtSeason(row.season)+' *</span>':fmtSeason(row.season)+icons)+'</td>'+
         '<td>'+row.age+'</td><td>'+teamTd+'</td><td style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;">'+posVal+'</td>';
-      tbody+='<td class="hi">'+(isCollege?row.pts:leadWrap(leaders,'pts',row,row.pts))+'</td>';
+      // Totals are never italicized, so this card carries no key.
+      tbody+='<td class="hi">'+row.pts+'</td>';
       ['reb','ast','stl','blk','tov','fgm','fga','tpm','tpa','ftm','fta','min','gs','gp','dd','td'].forEach(function(k){
-        var val = row[k]||0;
-        var isLeaderStat = !isCollege && TOTALS_LEADER_STATS.indexOf(k)!==-1;
-        tbody+='<td>'+(isLeaderStat?leadWrap(leaders,k,row,val):val)+'</td>';
+        tbody+='<td>'+(row[k]||0)+'</td>';
       });
       tbody+='</tr>';
     });
@@ -1297,8 +1263,32 @@
 
     var total = entries.reduce(function(s,e){ return s + e.gp; }, 0);
 
-    // Use site palette — orange first, then blue, then muted variants
+    // Use site palette — accent first, then blue, then muted variants.
+    // The accent is a CSS custom property so it follows the active sim, but a
+    // canvas context cannot parse one: assigning 'var(--orange)' to fillStyle
+    // is invalid, and the spec says invalid assignments are ignored, leaving
+    // whatever colour was set last. That was the donut-hole fill — the card
+    // background — so the first slice painted itself invisible. Resolve the
+    // property to a real colour before it reaches the canvas.
     var PALETTE = ['var(--orange)','#231aa5','#2dd4bf','#f59e0b','#a855f7','#ec4899'];
+
+    function resolveColor(col) {
+      var m = /^var\((--[\w-]+)\)$/.exec(String(col).trim());
+      if (!m) return col;
+      var v = getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
+      return v || '#e75719';
+    }
+    /* rgba() rather than an 8-digit hex, so this holds for any colour form
+       the palette or the stylesheet might use. */
+    function withAlpha(col, alpha) {
+      var c = resolveColor(col);
+      var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c);
+      if (!m) return c;
+      var h = m[1];
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16)
+           + ',' + parseInt(h.slice(4,6),16) + ',' + alpha + ')';
+    }
 
     // Store slice angles for hit-testing
     var slices = [];
@@ -1334,8 +1324,8 @@
         ctx.closePath();
 
         // Slightly lighter on hover
-        var col = PALETTE[i % PALETTE.length];
-        ctx.fillStyle = isHovered ? col : col + 'cc';
+        var col = resolveColor(PALETTE[i % PALETTE.length]);
+        ctx.fillStyle = isHovered ? col : withAlpha(col, 0.8);
         ctx.shadowBlur = 0;
         ctx.fill();
 
@@ -1431,7 +1421,7 @@
     legend.innerHTML = '';
     entries.forEach(function(e, i) {
       var pct = ((e.gp / total) * 100).toFixed(1);
-      var col = PALETTE[i % PALETTE.length];
+      var col = resolveColor(PALETTE[i % PALETTE.length]);
       var row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;cursor:default;';
       row.innerHTML =

@@ -137,7 +137,7 @@
         <div class="splits-card">
           <div class="splits-card-header">
             <div class="splits-card-dot"></div>
-            <span class="splits-card-title" id="pg-table-label">Regular Season · Per Game</span>
+            <span class="splits-card-title" id="pg-table-label">Per Game</span>
             <div style="margin-left:auto;">
               <div class="splits-toggle" id="pg-toggle">
                 <button class="splits-toggle-btn active" data-scope="pg" data-mode="regular">Regular Season</button>
@@ -146,15 +146,18 @@
             </div>
           </div>
           <div class="splits-scroll"><table class="splits-table" id="pg-table"></table></div>
-          <div class="college-footnote" id="pg-footnote" style="padding:8px 16px 10px;display:none;"><span>*</span> Non-NBA season, excluded from career averages.</div>
-          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led all tracked players that season.</div>
+          <!-- One key box for the table. The college line is shown only when the
+               player actually has a non-NBA season; the italics line is always on. -->
+          <div class="splits-key">
+            <div class="splits-key-line" id="pg-footnote" style="display:none;"><span>*</span> Non-NBA season, excluded from career averages.</div>
+            <div class="splits-key-line"><span>*</span> <em>Italicized</em> stat led all tracked players that season.</div>
+          </div>
         </div>
 
         <!-- TOTALS -->
         <div class="splits-card">
-          <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title">Regular Season · Totals</span></div>
+          <div class="splits-card-header"><div class="splits-card-dot"></div><span class="splits-card-title">Totals</span></div>
           <div class="splits-scroll"><table class="splits-table" id="totals-table"></table></div>
-          <div class="college-footnote" style="padding:8px 16px 10px;"><span>*</span> <em>Italicized</em> stat led all tracked players that season.</div>
         </div>
 
         <!-- CHARTS -->
