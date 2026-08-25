@@ -1263,8 +1263,32 @@
 
     var total = entries.reduce(function(s,e){ return s + e.gp; }, 0);
 
-    // Use site palette — orange first, then blue, then muted variants
+    // Use site palette — accent first, then blue, then muted variants.
+    // The accent is a CSS custom property so it follows the active sim, but a
+    // canvas context cannot parse one: assigning 'var(--orange)' to fillStyle
+    // is invalid, and the spec says invalid assignments are ignored, leaving
+    // whatever colour was set last. That was the donut-hole fill — the card
+    // background — so the first slice painted itself invisible. Resolve the
+    // property to a real colour before it reaches the canvas.
     var PALETTE = ['var(--orange)','#231aa5','#2dd4bf','#f59e0b','#a855f7','#ec4899'];
+
+    function resolveColor(col) {
+      var m = /^var\((--[\w-]+)\)$/.exec(String(col).trim());
+      if (!m) return col;
+      var v = getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
+      return v || '#e75719';
+    }
+    /* rgba() rather than an 8-digit hex, so this holds for any colour form
+       the palette or the stylesheet might use. */
+    function withAlpha(col, alpha) {
+      var c = resolveColor(col);
+      var m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c);
+      if (!m) return c;
+      var h = m[1];
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16)
+           + ',' + parseInt(h.slice(4,6),16) + ',' + alpha + ')';
+    }
 
     // Store slice angles for hit-testing
     var slices = [];
@@ -1300,8 +1324,8 @@
         ctx.closePath();
 
         // Slightly lighter on hover
-        var col = PALETTE[i % PALETTE.length];
-        ctx.fillStyle = isHovered ? col : col + 'cc';
+        var col = resolveColor(PALETTE[i % PALETTE.length]);
+        ctx.fillStyle = isHovered ? col : withAlpha(col, 0.8);
         ctx.shadowBlur = 0;
         ctx.fill();
 
@@ -1397,7 +1421,7 @@
     legend.innerHTML = '';
     entries.forEach(function(e, i) {
       var pct = ((e.gp / total) * 100).toFixed(1);
-      var col = PALETTE[i % PALETTE.length];
+      var col = resolveColor(PALETTE[i % PALETTE.length]);
       var row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;cursor:default;';
       row.innerHTML =
