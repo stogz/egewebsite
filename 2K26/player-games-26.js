@@ -767,6 +767,207 @@ window.PLAYER_GAMES = {
   ──────────────────────────────────────── */
   stewart: [
 
+/* ─────────── REGULAR SEASON — 33 games, Marquette 26-7 ───────────
+   Non-conference play and the Big East slate, ahead of the tournament
+   games logged below. The last two are Big East Tournament games at a
+   neutral site, which the schema has no flag for, so they carry
+   home:false like the NCAA Tournament entries do.
+
+   Both Louisville games are the same games as entries in Clark's log —
+   2012-01-16 and 2012-03-09, mirrored score and result each time. The
+   third such agreement between independently supplied logs.
+
+   ── THREE SEASON FIGURES DIFFER ──
+   Nine of the twelve averages on Stewart's row in player-stats-26.js
+   reproduce exactly from these games. Three do not:
+     apg  log 59 assists / 33 = 1.8   row says 1.3 (16 assists apart)
+     ftp  log 70/100 = 70.0           row says 70.4 (that is 69/98)
+     tpa  log 14 attempts / 33 = 0.4  row says 0.2
+   tpa looks wrong in the row: 3P-pct there reads 21.4, which is exactly
+   3/14, so 14 attempts is what produced it. Left exactly as supplied.
+   ─────────────────────────────────────────────────────────────── */
+
+// -- NOVEMBER 2011 --
+{ season:'2011-12', type:'regular', date:'2011-11-11',
+  opp:'MSM', result:'W', score:'83-57', home:true,
+  pts:12, reb:10, ast:3, stl:4, blk:3, tov:1,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:2, fta:4, min:32,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-14',
+  opp:'NORF', result:'W', score:'78-61', home:true,
+  pts:8, reb:6, ast:1, stl:2, blk:1, tov:2,
+  fgm:4, fga:6, tpm:0, tpa:0, ftm:0, fta:1, min:28,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-18',
+  opp:'WIN', result:'W', score:'81-60', home:true,
+  pts:11, reb:9, ast:2, stl:2, blk:2, tov:1,
+  fgm:4, fga:6, tpm:0, tpa:0, ftm:3, fta:4, min:30,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-20',
+  opp:'MISS', result:'W', score:'74-66', home:true,
+  pts:9, reb:8, ast:1, stl:1, blk:1, tov:2,
+  fgm:4, fga:6, tpm:0, tpa:0, ftm:1, fta:2, min:29,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-21',
+  opp:'NORF', result:'W', score:'79-63', home:true,
+  pts:13, reb:8, ast:2, stl:2, blk:2, tov:1,
+  fgm:5, fga:8, tpm:0, tpa:1, ftm:3, fta:4, min:31,
+},
+{ season:'2011-12', type:'regular', date:'2011-11-28',
+  opp:'JAX', result:'W', score:'86-62', home:true,
+  pts:12, reb:9, ast:2, stl:2, blk:2, tov:2,
+  fgm:5, fga:7, tpm:0, tpa:0, ftm:2, fta:3, min:32,
+},
+
+// -- DECEMBER 2011 --
+{ season:'2011-12', type:'regular', date:'2011-12-03',
+  opp:'WIS', result:'W', score:'64-59', home:false,
+  pts:10, reb:12, ast:3, stl:2, blk:1, tov:2,
+  fgm:4, fga:8, tpm:0, tpa:0, ftm:2, fta:4, min:24,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-06',
+  opp:'WASH', result:'W', score:'79-72', home:true,
+  pts:12, reb:8, ast:2, stl:3, blk:2, tov:1,
+  fgm:5, fga:9, tpm:0, tpa:0, ftm:2, fta:2, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-10',
+  opp:'GB', result:'W', score:'77-60', home:true,
+  pts:7, reb:6, ast:1, stl:2, blk:1, tov:2,
+  fgm:3, fga:5, tpm:0, tpa:0, ftm:1, fta:2, min:27,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-17',
+  opp:'UNCO', result:'W', score:'82-58', home:true,
+  pts:13, reb:10, ast:2, stl:2, blk:3, tov:1,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:3, fta:4, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-19',
+  opp:'LSU', result:'L', score:'68-72', home:false,
+  pts:13, reb:9, ast:2, stl:2, blk:2, tov:3,
+  fgm:5, fga:10, tpm:0, tpa:1, ftm:3, fta:4, min:35,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-22',
+  opp:'UWM', result:'W', score:'76-63', home:true,
+  pts:10, reb:8, ast:1, stl:2, blk:1, tov:2,
+  fgm:4, fga:6, tpm:0, tpa:0, ftm:2, fta:3, min:29,
+},
+{ season:'2011-12', type:'regular', date:'2011-12-29',
+  opp:'VANDY', result:'L', score:'66-71', home:true,
+  pts:9, reb:7, ast:1, stl:2, blk:1, tov:2,
+  fgm:4, fga:8, tpm:0, tpa:1, ftm:1, fta:2, min:30,
+},
+
+// -- JANUARY 2012 --
+{ season:'2011-12', type:'regular', date:'2012-01-01',
+  opp:'NOVA', result:'W', score:'81-70', home:true,
+  pts:13, reb:9, ast:2, stl:3, blk:2, tov:1,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:3, fta:4, min:32,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-04',
+  opp:'GTWN', result:'L', score:'65-73', home:false,
+  pts:8, reb:8, ast:1, stl:2, blk:1, tov:2,
+  fgm:4, fga:9, tpm:0, tpa:1, ftm:0, fta:1, min:31,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-07',
+  opp:'SYR', result:'L', score:'69-75', home:false,
+  pts:13, reb:7, ast:2, stl:3, blk:1, tov:2,
+  fgm:5, fga:11, tpm:1, tpa:3, ftm:2, fta:2, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-11',
+  opp:'SJU', result:'W', score:'82-68', home:true,
+  pts:11, reb:10, ast:2, stl:2, blk:2, tov:1,
+  fgm:4, fga:7, tpm:0, tpa:0, ftm:3, fta:4, min:30,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-14',
+  opp:'PITT', result:'W', score:'77-65', home:true,
+  pts:12, reb:8, ast:1, stl:2, blk:2, tov:2,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:2, fta:3, min:32,
+},
+// Same game as Clark's 2012-01-16 entry - see his log
+{ season:'2011-12', type:'regular', date:'2012-01-16',
+  opp:'LOU', result:'W', score:'78-72', home:true,
+  pts:18, reb:10, ast:4, stl:2, blk:2, tov:2,
+  fgm:7, fga:13, tpm:1, tpa:3, ftm:3, fta:4, min:36,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-21',
+  opp:'PROV', result:'W', score:'74-67', home:false,
+  pts:10, reb:9, ast:2, stl:2, blk:2, tov:1,
+  fgm:4, fga:7, tpm:0, tpa:1, ftm:2, fta:3, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-24',
+  opp:'USF', result:'W', score:'72-61', home:true,
+  pts:9, reb:6, ast:1, stl:1, blk:1, tov:2,
+  fgm:3, fga:5, tpm:0, tpa:0, ftm:3, fta:4, min:28,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-28',
+  opp:'NOVA', result:'W', score:'79-70', home:false,
+  pts:14, reb:9, ast:2, stl:3, blk:2, tov:1,
+  fgm:6, fga:8, tpm:0, tpa:0, ftm:2, fta:3, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-01-31',
+  opp:'HALL', result:'W', score:'75-66', home:true,
+  pts:12, reb:8, ast:2, stl:2, blk:2, tov:2,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:2, fta:3, min:32,
+},
+
+// -- FEBRUARY 2012 --
+{ season:'2011-12', type:'regular', date:'2012-02-04',
+  opp:'ND', result:'L', score:'64-70', home:false,
+  pts:10, reb:10, ast:1, stl:2, blk:2, tov:2,
+  fgm:4, fga:8, tpm:0, tpa:1, ftm:2, fta:3, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-06',
+  opp:'DEP', result:'W', score:'80-65', home:false,
+  pts:7, reb:5, ast:1, stl:1, blk:1, tov:2,
+  fgm:3, fga:5, tpm:0, tpa:0, ftm:1, fta:2, min:26,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-11',
+  opp:'CIN', result:'W', score:'73-66', home:true,
+  pts:13, reb:8, ast:2, stl:2, blk:2, tov:1,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:3, fta:4, min:33,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-18',
+  opp:'UCONN', result:'W', score:'76-69', home:false,
+  pts:13, reb:11, ast:2, stl:4, blk:3, tov:2,
+  fgm:5, fga:8, tpm:0, tpa:0, ftm:3, fta:4, min:35,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-22',
+  opp:'RUT', result:'W', score:'78-64', home:true,
+  pts:8, reb:7, ast:1, stl:2, blk:1, tov:2,
+  fgm:3, fga:5, tpm:0, tpa:0, ftm:2, fta:3, min:28,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-24',
+  opp:'WVU', result:'W', score:'71-67', home:false,
+  pts:14, reb:9, ast:2, stl:3, blk:3, tov:1,
+  fgm:6, fga:9, tpm:0, tpa:0, ftm:2, fta:3, min:34,
+},
+{ season:'2011-12', type:'regular', date:'2012-02-29',
+  opp:'CIN', result:'L', score:'65-70', home:false,
+  pts:12, reb:8, ast:1, stl:2, blk:1, tov:3,
+  fgm:5, fga:10, tpm:0, tpa:1, ftm:2, fta:3, min:33,
+},
+
+// -- MARCH 2012 --
+{ season:'2011-12', type:'regular', date:'2012-03-03',
+  opp:'GTWN', result:'W', score:'76-69', home:true,
+  pts:17, reb:11, ast:2, stl:3, blk:3, tov:2,
+  fgm:7, fga:10, tpm:1, tpa:1, ftm:2, fta:2, min:35,
+},
+// Big East Tournament - neutral site
+{ season:'2011-12', type:'regular', date:'2012-03-08',
+  opp:'GTWN', result:'W', score:'74-68', home:false,
+  pts:11, reb:9, ast:3, stl:2, blk:2, tov:1,
+  fgm:4, fga:7, tpm:0, tpa:0, ftm:3, fta:3, min:34,
+},
+// Big East Tournament - neutral site
+// Same game as Clark's 2012-03-09 entry - see his log
+{ season:'2011-12', type:'regular', date:'2012-03-09',
+  opp:'LOU', result:'L', score:'70-76', home:false,
+  pts:15, reb:8, ast:2, stl:2, blk:2, tov:2,
+  fgm:6, fga:10, tpm:0, tpa:0, ftm:3, fta:3, min:36,
+},
+
+/* ─────────── NCAA TOURNAMENT ─────────── */
+
 // ── ROUND OF 64 — (3) Marquette 79, (14) Iona 65 ──
 { season:'2011-12', type:'playoffs', date:'2012-03-15', round:'Round of 64',
   opp:'IONA', result:'W', score:'79-65', home:false,
