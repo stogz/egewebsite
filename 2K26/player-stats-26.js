@@ -41,7 +41,7 @@ window.PLAYER_STATS = {
         { team:'Louisville Cardinals', name:'Home',  number:'5', bg:'#ff0000', stroke:'#050505', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'LOU',  ppg:19.4, rpg:5.5, apg:2.1,  spg:2.2, bpg:0.8, topg:2.3, fgp:'51.2%', tpp:'20.4%', ftp:'81.3%', tpa:1.4, gs:34, gp:34, mpg:33.8, star:false, dnq:false},
     ],
     playoffs: [
        { season:'2011-12', age:18, team:'LOU',  ppg:21.5, rpg:6.0, apg:2.8,  spg:2.2, bpg:0.7, topg:2.8, fgp:'51.6%', tpp:'25.0%', ftp:'82.4%', tpa:2.0, gs:6, gp:6, mpg:36.3, star:false, dnq:false },
@@ -108,7 +108,7 @@ window.PLAYER_STATS = {
         { team:'Butler Bulldogs', name:'Home',  number:'1', bg:'#0000ff', stroke:'#ffffff', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false, leaders:['ppg'] },
+       { season:'2011-12', age:18, team:'BU',  ppg:19.6, rpg:8.1, apg:6.2,  spg:1.6, bpg:1.3, topg:3.0, fgp:'54.0%', tpp:'19.2%', ftp:'78.5%', tpa:0.2, gs:33, gp:33, mpg:35.0, star:false, dnq:false, leaders:['ppg', 'fgp'] },
     ],
     playoffs: [
        { season:'2011-12', age:18, team:'BU',  ppg:25.5, rpg:10.5, apg:7.5,  spg:1.5, bpg:1.5, topg:2.3, fgp:'71.0%', tpp:'0.0%', ftp:'77.8%', tpa:0.5, gs:2, gp:2, mpg:38.5, star:false, dnq:false },
@@ -137,7 +137,7 @@ window.PLAYER_STATS = {
         { team:'Marquette Golden Eagles', name:'Home',  number:'2', bg:'#0000ff', stroke:'#ffd700', num:'#ffffff', seasons:'2011–2012', img:'' },
     ],
     regular:  [
-       { season:'2011-12', age:18, team:'MA',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false },
+       { season:'2011-12', age:18, team:'MA',  ppg:11.5, rpg:8.5, apg:1.3,  spg:2.2, bpg:1.8, topg:1.7, fgp:'59.1%', tpp:'21.4%', ftp:'70.4%', tpa:0.2, gs:33, gp:33, mpg:31.6, star:false, dnq:false, leaders:['fgp'] },
     ],
     playoffs: [
        { season:'2011-12', age:18, team:'MA',  ppg:10.5, rpg:10.5, apg:2.0,  spg:1.5, bpg:1.5, topg:1.5, fgp:'64.3%', tpp:'0.0%', ftp:'50.0%', tpa:0.0, gs:2, gp:2, mpg:32.5, star:false, dnq:false },
