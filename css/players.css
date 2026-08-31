@@ -423,19 +423,6 @@
 
     /* Table card */
     .splits-card { border:1px solid var(--border); border-radius:0; overflow:hidden; background:var(--bg-card); transition:background .35s; margin-bottom:32px; }
-
-    /* ── LIGHT MODE: one white across the card ──
-       --bg-card is rgba(255,255,255,.85), so it composites against the page
-       rather than painting white. The card, the header's blue tint and the
-       career row each landed on a different shade of off-white, and the
-       career row painted the translucent white a second time over the card,
-       leaving a visible band. Opaque white in all three places settles it;
-       the header keeps its bottom border, so it still reads as a header. */
-    html.light .splits-card,
-    html.light .splits-card-header,
-    html.light .splits-key { background: #ffffff; }
-    html.light tr.career-row td,
-    html.light tr.career-row:hover td { background: #ffffff !important; }
     .splits-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .splits-card-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:blink 1.8s ease-in-out infinite; }
     .splits-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
