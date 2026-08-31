@@ -998,6 +998,119 @@
     });
   }
 
+  /* ══════════════════════════════════════════════════════════════
+     TOOLTIP
+
+     One element, one set of styles, shared by the progression chart, the
+     position pie and the scouting rows. Each of those used to build its own
+     div with its own inline colours, padding and shadow, which is why they
+     never quite matched.
+
+     Behaviour worth knowing:
+     · Positioned with transform, so following the cursor does not force a
+       layout on every mouse move.
+     · Kept inside the viewport, flipping to the other side of the cursor
+       when it would overflow rather than being cut off at the edge.
+     · Hidden on scroll, wheel and resize. It is position:fixed, so without
+       that it hangs in place while the page moves underneath.
+     · On touch, CSS docks it to the bottom of the screen — there is no
+       cursor to follow and anything at the finger sits under the finger.
+     ══════════════════════════════════════════════════════════════ */
+  var Tooltip = (function () {
+    var el = null;
+    var OFFSET_X = 16, OFFSET_Y = 18, EDGE = 10;
+
+    function isCoarse() {
+      return window.matchMedia
+        && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    }
+
+    /* Built once up front rather than on first hover: place() measures the
+       element straight after setting its content, and a div appended in the
+       same tick can still report a width of zero. */
+    function node() {
+      if (el && el.isConnected) return el;
+      el = document.getElementById('ege-tooltip');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'ege-tooltip';
+        el.className = 'ege-tooltip';
+        el.setAttribute('role', 'tooltip');
+        el.setAttribute('aria-hidden', 'true');
+      }
+      if (!el.isConnected && document.body) document.body.appendChild(el);
+      return el;
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', node);
+    } else {
+      node();
+    }
+
+    /* Place near (x, y) in viewport coordinates, staying on screen. */
+    function place(x, y) {
+      var t = node();
+      if (isCoarse()) return;            // CSS docks it; nothing to position
+      var w = t.offsetWidth, h = t.offsetHeight;
+      var left = x + OFFSET_X;
+      var top  = y - OFFSET_Y;
+      if (left + w > window.innerWidth - EDGE) left = x - w - OFFSET_X;
+      if (left < EDGE) left = EDGE;
+      if (top + h > window.innerHeight - EDGE) top = y - h - OFFSET_Y;
+      if (top < EDGE) top = EDGE;
+      t.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(top) + 'px)';
+    }
+
+    function show(html, x, y) {
+      var t = node();
+      t.innerHTML = html;
+      t.classList.add('is-open');
+      t.setAttribute('aria-hidden', 'false');
+      place(x, y);                        // after paint, so offsetWidth is real
+    }
+
+    function move(x, y) {
+      if (el && el.classList.contains('is-open')) place(x, y);
+    }
+
+    function hide() {
+      if (!el) return;
+      el.classList.remove('is-open');
+      el.setAttribute('aria-hidden', 'true');
+    }
+
+    /* A fixed-position tooltip does not move with the page, so anything that
+       scrolls or resizes the viewport has to dismiss it. Capture phase picks
+       up scrolling inside the tables and chart panes too, not just the page. */
+    ['scroll', 'wheel'].forEach(function (evt) {
+      window.addEventListener(evt, hide, { passive: true, capture: true });
+    });
+    window.addEventListener('resize', hide, { passive: true });
+    window.addEventListener('orientationchange', hide, { passive: true });
+    // A tap anywhere outside the thing that opened it closes it on touch.
+    document.addEventListener('touchstart', function (e) {
+      if (!el || !el.classList.contains('is-open')) return;
+      if (e.target && e.target.closest && e.target.closest('[data-tt-source]')) return;
+      hide();
+    }, { passive: true });
+
+    /* ── Shared markup builders, so every caller looks the same ── */
+    function body(opts) {
+      return '<div class="ege-tt-row">'
+        + (opts.logo ? '<img class="ege-tt-logo" src="' + opts.logo + '" alt="">' : '')
+        + '<div class="ege-tt-main">'
+        + '<div class="ege-tt-title">' + opts.title + '</div>'
+        + (opts.sub ? '<div class="ege-tt-sub">' + opts.sub + '</div>' : '')
+        + '</div>'
+        + '<div class="ege-tt-value"' + (opts.valueColor ? ' style="color:' + opts.valueColor + ';"' : '') + '>'
+        + opts.value
+        + (opts.unit ? '<span class="ege-tt-unit">' + opts.unit + '</span>' : '')
+        + '</div></div>';
+    }
+
+    return { show: show, move: move, hide: hide, body: body, isCoarse: isCoarse };
+  })();
+
   /* ── CHART HELPERS ── */
   function destroyCharts() {
     Object.keys(activeCharts).forEach(function(id){ if(activeCharts[id]){ activeCharts[id].destroy(); delete activeCharts[id]; } });
@@ -1094,62 +1207,29 @@
     var rowByLabel={};
     valid.forEach(function(r,i){ rowByLabel[fmtSeason(r.season)]={ row:r, idx:i }; });
 
-    // External tooltip element
-    var tooltipEl=document.getElementById('prog-tooltip');
-    if(!tooltipEl){
-      tooltipEl=document.createElement('div');
-      tooltipEl.id='prog-tooltip';
-      tooltipEl.style.cssText=
-        'position:fixed;pointer-events:none;z-index:9999;display:none;'+
-        'padding:8px 12px;min-width:120px;'+
-        'box-shadow:0 4px 18px rgba(0,0,0,.35);';
-      document.body.appendChild(tooltipEl);
-    }
-
     function externalTooltip(context){
       var tt=context.tooltip;
-      if(tt.opacity===0){ tooltipEl.style.display='none'; return; }
-
-      var isLightNow=document.documentElement.classList.contains('light');
-      var bg      = isLightNow ? '#ffffff' : '#0e0b2e';
-      var border  = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
-      var textMain= isLightNow ? '#0e0b2e' : '#ffffff';
-      var textMuted=isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
+      if(tt.opacity===0){ Tooltip.hide(); return; }
 
       var label = tt.dataPoints&&tt.dataPoints[0]?tt.dataPoints[0].label:'';
       var entry = rowByLabel[label];
       var row   = entry ? entry.row : null;
-      var idx   = entry ? entry.idx : 0;
       var rawVal= tt.dataPoints&&tt.dataPoints[0]?tt.dataPoints[0].raw:0;
       var isPct =(stat==='fgp'||stat==='tpp'||stat==='ftp');
       var displayVal=isPct?rawVal.toFixed(1)+'%':rawVal.toFixed(1);
       var teamRaw=row?row.team:'';
       var teamName=teamRaw?teamFull(teamRaw):'';
       var logoUrl=teamName?(TEAM_LOGOS[teamName]||''):'';
-      // Use team primary color for the value
-      var tn = teamName ? TEAM_BANNER_COLORS[teamName] : null;
-      var accentColor = tn ? tn.primary : c.orange;
 
-      tooltipEl.style.background=bg;
-      tooltipEl.style.border='1px solid '+border;
-      tooltipEl.innerHTML=
-        '<div style="display:flex;align-items:center;gap:8px;">'+
-          (logoUrl?'<img src="'+logoUrl+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">':'')+
-          '<div style="flex:1;min-width:0;">'+
-            '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMuted+';">'+label+'</div>'+
-            '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+teamName+'</div>'+
-          '</div>'+
-          '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:'+textMain+';line-height:1;flex-shrink:0;padding-left:8px;">'+displayVal+'</div>'+
-        '</div>';
-
-      tooltipEl.style.display='block';
-      var canvas=context.chart.canvas;
-      var rect=canvas.getBoundingClientRect();
-      var x=rect.left+tt.caretX+14;
-      var y=rect.top+tt.caretY-20;
-      if(x+180>window.innerWidth) x=rect.left+tt.caretX-180-14;
-      tooltipEl.style.left=x+'px';
-      tooltipEl.style.top=y+'px';
+      // Chart.js reports the caret in canvas space; the tooltip is fixed, so
+      // add the canvas position to get viewport coordinates.
+      var rect=context.chart.canvas.getBoundingClientRect();
+      Tooltip.show(Tooltip.body({
+        logo:  logoUrl,
+        title: label,
+        sub:   teamName,
+        value: displayVal
+      }), rect.left+tt.caretX, rect.top+tt.caretY);
     }
 
     var ctx2=document.getElementById('chart-progression').getContext('2d');
@@ -1196,7 +1276,7 @@
     });
 
     var canvasEl=document.getElementById('chart-progression');
-    canvasEl.onmouseleave=function(){ tooltipEl.style.display='none'; };
+    canvasEl.onmouseleave=function(){ Tooltip.hide(); };
   }
 
   /* ── BUILD ALL CHARTS ── */
@@ -1242,7 +1322,6 @@
     var canvas  = document.getElementById('chart-position-pie');
     var legend  = document.getElementById('position-pie-legend');
     var card    = document.getElementById('position-pie-card');
-    var tooltip = document.getElementById('pie-tooltip');
     if (!canvas || !legend || !card) return;
 
     // Count games per position from pro seasons only
@@ -1384,38 +1463,39 @@
       var my = (e.clientY - rect.top) * scaleY;
       var idx = getHoveredSlice(mx, my);
       drawPie(idx);
-      if (idx >= 0 && tooltip) {
-        var s = slices[idx];
-        var isLightNow = document.documentElement.classList.contains('light');
-        var bg       = isLightNow ? '#ffffff' : '#0e0b2e';
-        var border   = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
-        var textMain = isLightNow ? '#0e0b2e' : '#ffffff';
-        var textMuted= isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
-        tooltip.style.background = bg;
-        tooltip.style.border = '1px solid ' + border;
-        tooltip.style.color = textMain;
-        tooltip.innerHTML =
-          '<div style="display:flex;align-items:center;gap:8px;">' +
-            '<div style="flex:1;min-width:0;">' +
-              '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:' + textMain + ';">' + s.pos + '</div>' +
-              '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:' + textMuted + ';margin-top:1px;">' + s.gp + ' GP</div>' +
-            '</div>' +
-            '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:' + textMain + ';line-height:1;flex-shrink:0;padding-left:8px;">' + s.pct + '%</div>' +
-          '</div>';
-        tooltip.style.display = 'block';
-        tooltip.style.padding = '8px 12px';
-        tooltip.style.boxShadow = '0 4px 18px rgba(0,0,0,.35)';
-        tooltip.style.minWidth = '120px';
-        tooltip.style.left = (e.clientX + 16) + 'px';
-        tooltip.style.top  = (e.clientY - 12) + 'px';
-      } else if (tooltip) {
-        tooltip.style.display = 'none';
+      if (idx >= 0) {
+        var s2 = slices[idx];
+        Tooltip.show(Tooltip.body({
+          title: s2.pos,
+          sub:   s2.gp + ' GP',
+          value: s2.pct,
+          unit:  '%'
+        }), e.clientX, e.clientY);
+      } else {
+        Tooltip.hide();
       }
     };
     canvas.onmouseleave = function() {
       drawPie(-1);
-      if (tooltip) tooltip.style.display = 'none';
+      Tooltip.hide();
     };
+    // Touch: tapping a slice highlights it and opens the docked tooltip.
+    canvas.setAttribute('data-tt-source', '');
+    canvas.addEventListener('touchstart', function(e) {
+      var t = e.touches && e.touches[0];
+      if (!t) return;
+      var rect = canvas.getBoundingClientRect();
+      var idx = getHoveredSlice((t.clientX - rect.left) * (canvas.width / rect.width),
+                                (t.clientY - rect.top)  * (canvas.height / rect.height));
+      drawPie(idx);
+      if (idx >= 0) {
+        var sl = slices[idx];
+        Tooltip.show(Tooltip.body({ title: sl.pos, sub: sl.gp + ' GP', value: sl.pct, unit: '%' }),
+                     t.clientX, t.clientY);
+      } else {
+        Tooltip.hide();
+      }
+    }, { passive: true });
 
     // Legend — styled like Chart.js legend in the other cards
     legend.innerHTML = '';
@@ -1601,15 +1681,6 @@
       }
     }
 
-    // Get/create tooltip
-    var tooltip = document.getElementById('pct-tooltip');
-    if (!tooltip) {
-      tooltip = document.createElement('div');
-      tooltip.id = 'pct-tooltip';
-      tooltip.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;display:none;padding:8px 12px;min-width:140px;box-shadow:0 4px 18px rgba(0,0,0,.35);';
-      document.body.appendChild(tooltip);
-    }
-
     var PCT_STAT_FULL = {
       ppg:'Points Per Game', rpg:'Rebounds Per Game', apg:'Assists Per Game',
       spg:'Steals Per Game', bpg:'Blocks Per Game', topg:'Turnovers Per Game',
@@ -1640,34 +1711,25 @@
         '<div class="pct-bar-wrap"><div class="pct-bar" style="width:'+pct+'%;background:'+barCol+';"></div></div>'+
         '<span class="pct-num" style="color:'+pctTxtCol+';">'+pct+'</span>';
 
-      // Hover tooltip
-      rowEl.addEventListener('mouseenter', function(e) {
-        var isLightNow = document.documentElement.classList.contains('light');
-        var bg       = isLightNow ? '#ffffff' : '#0e0b2e';
-        var border   = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
-        var textMain = isLightNow ? '#0e0b2e' : '#ffffff';
-        var textMuted= isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
-        tooltip.style.background = bg;
-        tooltip.style.border = '1px solid ' + border;
-        tooltip.innerHTML =
-          '<div style="display:flex;align-items:center;gap:8px;">' +
-            '<div style="flex:1;min-width:0;">' +
-              '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMain+';">' + (PCT_STAT_FULL[s.key]||s.label) + '</div>' +
-              '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-top:1px;">vs '+benchPos+' avg · '+PCT_CONTEXT[s.key]+'</div>' +
-            '</div>' +
-            '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:'+pctTxtCol+';line-height:1;flex-shrink:0;padding-left:8px;">'+pct+'<span style="font-size:.6rem;font-family:var(--font-mono);color:'+textMuted+';margin-left:2px;">%ile</span></div>' +
-          '</div>';
-        tooltip.style.display = 'block';
-        tooltip.style.left = (e.clientX + 16) + 'px';
-        tooltip.style.top  = (e.clientY - 16) + 'px';
-      });
-      rowEl.addEventListener('mousemove', function(e) {
-        tooltip.style.left = (e.clientX + 16) + 'px';
-        tooltip.style.top  = (e.clientY - 16) + 'px';
-      });
-      rowEl.addEventListener('mouseleave', function() {
-        tooltip.style.display = 'none';
-      });
+      // Hover tooltip. data-tt-source marks this as a tooltip trigger so a
+      // tap on it does not immediately close what it just opened.
+      rowEl.setAttribute('data-tt-source', '');
+      function showRowTip(x, y) {
+        Tooltip.show(Tooltip.body({
+          title: PCT_STAT_FULL[s.key] || s.label,
+          sub:   'vs ' + benchPos + ' avg · ' + PCT_CONTEXT[s.key],
+          value: pct,
+          unit:  '%ile',
+          valueColor: pctTxtCol
+        }), x, y);
+      }
+      rowEl.addEventListener('mouseenter', function(e) { showRowTip(e.clientX, e.clientY); });
+      rowEl.addEventListener('mousemove',  function(e) { Tooltip.move(e.clientX, e.clientY); });
+      rowEl.addEventListener('mouseleave', function() { Tooltip.hide(); });
+      rowEl.addEventListener('touchstart', function(e) {
+        var t = e.touches && e.touches[0];
+        showRowTip(t ? t.clientX : 0, t ? t.clientY : 0);
+      }, { passive: true });
 
       body.appendChild(rowEl);
     });
@@ -2354,53 +2416,22 @@
 
     if (activeCharts['salary']) { activeCharts['salary'].destroy(); delete activeCharts['salary']; }
 
-    // External tooltip — matches stat progression style
-    var salTooltipEl = document.getElementById('salary-prog-tooltip');
-    if (!salTooltipEl) {
-      salTooltipEl = document.createElement('div');
-      salTooltipEl.id = 'salary-prog-tooltip';
-      salTooltipEl.style.cssText =
-        'position:fixed;pointer-events:none;z-index:9999;display:none;'+
-        'padding:8px 12px;min-width:140px;box-shadow:0 4px 18px rgba(0,0,0,.35);';
-      document.body.appendChild(salTooltipEl);
-    }
-
     function salaryExternalTooltip(context) {
       var tt = context.tooltip;
-      if (tt.opacity === 0) { salTooltipEl.style.display = 'none'; return; }
-      var isLightNow = document.documentElement.classList.contains('light');
-      var bg       = isLightNow ? '#ffffff' : '#0e0b2e';
-      var border   = isLightNow ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.12)';
-      var textMain = isLightNow ? '#0e0b2e' : '#ffffff';
-      var textMuted= isLightNow ? 'rgba(14,11,46,.5)' : 'rgba(255,255,255,.45)';
-      salTooltipEl.style.background = bg;
-      salTooltipEl.style.border = '1px solid ' + border;
+      if (tt.opacity === 0) { Tooltip.hide(); return; }
 
       var idx = tt.dataPoints && tt.dataPoints[0] ? tt.dataPoints[0].dataIndex : 0;
       var t   = chartTooltips[idx];
       var teamName = t.team || '';
-      var logoUrl  = TEAM_LOGOS[teamName] || '';
       var suffix   = t.waived ? ' · Waived' : t.future ? ' · Future' : '';
-      var displayVal = '$' + t.amount.toFixed(2) + 'M';
 
-      salTooltipEl.innerHTML =
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          (logoUrl ? '<img src="'+logoUrl+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0;" alt="">' : '') +
-          '<div style="flex:1;min-width:0;">' +
-            '<div style="font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:'+textMuted+';">'+t.season+'</div>' +
-            '<div style="font-family:var(--font-mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:'+textMuted+';margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+teamName+suffix+'</div>' +
-          '</div>' +
-          '<div style="font-family:var(--font-display);font-weight:400;font-size:1.3rem;color:'+textMain+';line-height:1;flex-shrink:0;padding-left:8px;">'+displayVal+'</div>' +
-        '</div>';
-
-      salTooltipEl.style.display = 'block';
-      var canv = context.chart.canvas;
-      var rect = canv.getBoundingClientRect();
-      var x = rect.left + tt.caretX + 14;
-      var y = rect.top  + tt.caretY - 20;
-      if (x + 200 > window.innerWidth) x = rect.left + tt.caretX - 200 - 14;
-      salTooltipEl.style.left = x + 'px';
-      salTooltipEl.style.top  = y + 'px';
+      var rect = context.chart.canvas.getBoundingClientRect();
+      Tooltip.show(Tooltip.body({
+        logo:  TEAM_LOGOS[teamName] || '',
+        title: t.season,
+        sub:   teamName + suffix,
+        value: '$' + t.amount.toFixed(2) + 'M'
+      }), rect.left + tt.caretX, rect.top + tt.caretY);
     }
 
     activeCharts['salary'] = new Chart(c2d, {
@@ -2426,7 +2457,7 @@
     });
 
     // Hide tooltip on mouse leave
-    ctx.onmouseleave = function() { salTooltipEl.style.display = 'none'; };
+    ctx.onmouseleave = function() { Tooltip.hide(); };
   }
 
   /* ── SHOES PANEL ── */

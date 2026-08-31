@@ -488,6 +488,58 @@
     .charts-section-header { margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid var(--border); }
     .charts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
     .chart-card { border:1px solid var(--border); border-radius:0; background:var(--bg-card); overflow:hidden; transition:background .35s; }
+
+    /* ── TOOLTIP ──
+       One element serves the progression chart, the position pie and the
+       scouting rows, so they cannot drift apart. Colours come from the same
+       tokens the cards use: --bg for the surface and --border for the edge,
+       matching every chart border on the page. Opaque on purpose — a chart
+       showing through a tooltip is what made the old ones hard to read. */
+    .ege-tooltip {
+      position: fixed;
+      z-index: 9999;
+      display: none;
+      pointer-events: none;
+      padding: 9px 13px;
+      min-width: 132px;
+      max-width: min(280px, calc(100vw - 24px));
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: 0 6px 22px rgba(0,0,0,.4);
+      color: var(--text);
+      /* Follows the cursor by transform, which the compositor can handle
+         without re-laying out the page on every mouse move. */
+      left: 0;
+      top: 0;
+      will-change: transform;
+    }
+    .ege-tooltip.is-open { display: block; }
+    .ege-tt-row   { display:flex; align-items:center; gap:8px; }
+    .ege-tt-main  { flex:1; min-width:0; }
+    .ege-tt-title { font-family:var(--font-mono); font-size:.55rem; letter-spacing:.14em; text-transform:uppercase; color:var(--heading); }
+    .ege-tt-sub   { font-family:var(--font-mono); font-size:.52rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ege-tt-value { font-family:var(--font-display); font-weight:400; font-size:1.3rem; line-height:1; flex-shrink:0; padding-left:8px; color:var(--heading); }
+    .ege-tt-value .ege-tt-unit { font-size:.6rem; font-family:var(--font-mono); color:var(--text-muted); margin-left:2px; }
+    .ege-tt-logo  { width:24px; height:24px; object-fit:contain; flex-shrink:0; }
+
+    /* Touch: no cursor to follow, so it docks to the bottom of the screen
+       rather than hiding under the finger or running off the edge. */
+    @media (hover: none), (pointer: coarse) {
+      .ege-tooltip {
+        transform: none !important;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        top: auto !important;
+        width: auto;
+        max-width: none;
+        padding: 12px 14px;
+      }
+      .ege-tt-title { font-size: .62rem; }
+      .ege-tt-sub   { font-size: .58rem; }
+      .ege-tt-value { font-size: 1.5rem; }
+    }
     .chart-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .chart-card-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); }
     .chart-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
