@@ -423,6 +423,19 @@
 
     /* Table card */
     .splits-card { border:1px solid var(--border); border-radius:0; overflow:hidden; background:var(--bg-card); transition:background .35s; margin-bottom:32px; }
+
+    /* ── LIGHT MODE: one white across the card ──
+       --bg-card is rgba(255,255,255,.85), so it composites against the page
+       rather than painting white. The card, the header's blue tint and the
+       career row each landed on a different shade of off-white, and the
+       career row painted the translucent white a second time over the card,
+       leaving a visible band. Opaque white in all three places settles it;
+       the header keeps its bottom border, so it still reads as a header. */
+    html.light .splits-card,
+    html.light .splits-card-header,
+    html.light .splits-key { background: #ffffff; }
+    html.light tr.career-row td,
+    html.light tr.career-row:hover td { background: #ffffff !important; }
     .splits-card-header { padding:14px 20px; border-bottom:1px solid var(--border-soft); background:rgba(35,26,165,.07); display:flex; align-items:center; gap:10px; }
     .splits-card-dot { width:6px; height:6px; border-radius:50%; background:var(--orange); animation:blink 1.8s ease-in-out infinite; }
     .splits-card-title { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
@@ -1170,18 +1183,27 @@
       height: 3rem;
       font-size: .92rem;
     }
+    /* Same square treatment as the settings gear, carrying an X instead. */
     #range-modal-close {
       margin-left: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      padding: 0;
       background: transparent;
-      border: none;
-      color: #ef4444;
-      font-size: 1.4rem;
-      line-height: 1;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       cursor: pointer;
-      padding: 0 2px;
-      transition: transform .15s, opacity .15s;
+      transition: color .18s, border-color .18s, background .18s;
     }
-    #range-modal-close:hover { transform: scale(1.15); opacity: .8; }
+    #range-modal-close:hover {
+      color: #ef4444;
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, .1);
+    }
 
     /* ── PERFORMANCE CARDS ── */
     .game-log-list { display:flex; flex-direction:column; gap:14px; }

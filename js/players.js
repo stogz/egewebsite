@@ -2817,24 +2817,21 @@
 
   /* ── HOOP SCORE HEAT ──
      Anchors, with a continuous ramp between each pair:
-       <=5  bright red    hsl(0,82,46)
-        25  bright green  hsl(140,68,40)
-        35  blue          hsl(215,80,48)
-       >=50 purple        hsl(280,62,48)
+       <=7  bright red    hsl(0,82,46)
+        17  orange        hsl(30,88,45)
+       >=32 bright green  hsl(140,68,40)
      Each segment starts on the previous one's end values, so the ramp has no
-     seam at a boundary. Matches the mock draft's filled-cell heatmap: an HSL
-     background under white text, and every lightness stays in the 40-48 band
-     so white stays legible the whole way up. */
+     seam at a boundary, and anything above 32 stays flat green. Matches the
+     mock draft's filled-cell heatmap: an HSL background under white text,
+     with every lightness in the 40-46 band so white stays legible throughout. */
   function hoopHeatStyle(gs) {
     var h, sat, lum;
-    if (gs >= 50)      { h = 280; sat = 62; lum = 48; }                // purple
-    else if (gs >= 35) { var a = (gs - 35) / 15;                       // blue → purple
-                         h = 215 + a * 65; sat = 80 - a * 18; lum = 48; }
-    else if (gs >= 25) { var b = (gs - 25) / 10;                       // green → blue
-                         h = 140 + b * 75; sat = 68 + b * 12; lum = 40 + b * 8; }
-    else if (gs > 5)   { var c = (gs - 5) / 20;                        // red → green
-                         h = c * 140; sat = 82 - c * 14; lum = 46 - c * 6; }
-    else               { h = 0;   sat = 82; lum = 46; }                // bright red
+    if (gs >= 32)     { h = 140; sat = 68; lum = 40; }                 // bright green
+    else if (gs > 17) { var a = (gs - 17) / 15;                        // orange → green
+                        h = 30 + a * 110; sat = 88 - a * 20; lum = 45 - a * 5; }
+    else if (gs > 7)  { var b = (gs - 7) / 10;                         // red → orange
+                        h = b * 30; sat = 82 + b * 6; lum = 46 - b * 1; }
+    else              { h = 0;   sat = 82; lum = 46; }                 // bright red
     return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%)!important;color:#fff!important;';
   }
 
@@ -2916,7 +2913,15 @@
     var dCell = '<td class="log-lbl"' + (dKey !== null ? ' data-sort-val="' + dKey + '"' : '') + '>'
       + (fmtGameDate(g.date) || '—') + '</td>';
 
-    var resultCell = '<td class="log-lbl" data-sort-val="' + (isWin ? 1 : 0) + '">'
+    // Sort the RESULT column by point margin rather than by W/L, so descending
+    // runs from the biggest blowout win down to the heaviest loss instead of
+    // lumping every win together in entry order.
+    var sParts = String(g.score || '').split('-');
+    var margin = sParts.length === 2
+      ? (parseInt(sParts[0], 10) - parseInt(sParts[1], 10)) : 0;
+    if (isNaN(margin)) margin = 0;
+
+    var resultCell = '<td class="log-lbl" data-sort-val="' + margin + '">'
       + '<span class="log-res ' + (isWin ? 'log-res--w' : 'log-res--l') + '">'
       + (isWin ? 'W' : 'L') + '</span> '
       + '<span class="log-score">' + (g.score || '—') + '</span></td>';
@@ -3274,7 +3279,7 @@
     { id:'fgData', label:'Field Goal Data',
       hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
     { id:'colorSystem', label:'Color System',
-      hint:'Shade the Hoop Score by performance — red through green and blue to purple.' },
+      hint:'Shade the Hoop Score by performance — red through orange to green.' },
   ];
 
   function logSettingsMenu() {
