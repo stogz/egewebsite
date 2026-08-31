@@ -2888,16 +2888,18 @@
     return (full && TEAM_LOGOS[full]) || TEAM_LOGOS[up] || '';
   }
 
-  /* Cell contents for a team column: crest if we have one, else the abbr.
-     The abbreviation stays in the cell's sort value either way, so sorting
-     the column still orders by name rather than by whether a logo exists. */
+  /* Cell contents for a team column: abbreviation first, then the crest
+     beside it where the site has one. The abbreviation is always present, so
+     a logo that fails to load just removes itself and the cell still reads
+     correctly. Sorting keys off the abbreviation either way. */
   function teamCellHtml(abbr, season) {
     var txt = abbr || '—';
     var src = teamLogoFor(abbr, season);
     if (!src) return '<td class="log-lbl">' + txt + '</td>';
     return '<td class="log-lbl log-team" data-sort-val="' + txt + '">'
-      + '<img class="log-team-logo" src="' + src + '" alt="' + txt + '" title="' + txt + '"'
-      + ' onerror="this.parentNode.textContent=this.alt;">'
+      + '<span class="log-team-abbr">' + txt + '</span>'
+      + '<img class="log-team-logo" src="' + src + '" alt="" title="' + txt + '"'
+      + ' onerror="this.remove();">'
       + '</td>';
   }
 
@@ -2923,7 +2925,7 @@
       + dCell
       + teamCellHtml(teamAbbr, g.season)
       + teamCellHtml(g.opp, g.season)
-      + '<td class="log-lbl">' + (g.home ? 'H' : 'A') + '</td>'
+      + '<td class="log-lbl">' + (g.home ? 'HOME' : 'AWAY') + '</td>'
       + resultCell
       + '<td>' + g.min + '</td>'
       + '<td class="hi">' + g.pts + '</td>'
@@ -3204,7 +3206,8 @@
     var avgs = row('Per Game', 'career-row', function(v){
       return (Math.round(v / n * 10) / 10).toFixed(1);
     }, true);
-    return totals + avgs;
+    // Per Game reads first — it is the line people compare against.
+    return avgs + totals;
   }
 
   function closeRangeModal() {

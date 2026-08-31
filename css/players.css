@@ -1075,7 +1075,13 @@
       font-size: .6rem;
       letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--text-faint);
+      color: var(--text-muted);
+    }
+    /* Stronger again in the range modal, where the count and W-L are the
+       only context for the numbers below and --text-faint was too dim. */
+    #range-modal .log-card-count {
+      color: var(--text);
+      font-size: .64rem;
     }
 
     /* ── RANGE SELECTION ──
@@ -1087,14 +1093,16 @@
     .log-table tbody tr.log-row.is-anchor td {
       background: rgba(var(--accent-rgb), .18) !important;
     }
-    /* Team crest in the TEAM / OPP columns */
-    .log-team { line-height: 0; }
+    /* TEAM / OPP cell: abbreviation, then the crest beside it */
+    .log-team { white-space: nowrap; }
+    .log-team-abbr { vertical-align: middle; }
     .log-team-logo {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       object-fit: contain;
       display: inline-block;
       vertical-align: middle;
+      margin-left: 7px;
     }
     .log-table tbody tr.log-row.is-anchor td:first-child { color: var(--orange); }
 
@@ -1129,8 +1137,17 @@
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
     }
-    /* Opaque, so rows don't show through while the summary scrolls */
-    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
+    /* Same tint as the table section headers (REGULAR SEASON / PLAYOFFS /
+       MARCH MADNESS). That tint is translucent, so it is layered over an
+       opaque base rather than used alone — the header is sticky and rows
+       would otherwise scroll visibly underneath it. */
+    #range-modal .splits-card-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: linear-gradient(rgba(35,26,165,.07), rgba(35,26,165,.07)), var(--bg);
+      border-bottom: 1px solid var(--border-soft);
+    }
     #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
     /* The summary drops the five identity columns, so it needs less width */
     #range-modal .log-table { min-width: 0; }
@@ -1142,6 +1159,11 @@
       text-transform: uppercase;
       color: var(--orange);
     }
+    /* The 2px rule on .career-row is right on the Stats tables, where it
+       separates a career line from many seasons. Here there are only two
+       rows, so a normal rule between them is enough. */
+    #range-modal tbody tr.career-row td { border-top: none; }
+    #range-modal tbody tr + tr td { border-top: 1px solid var(--border-soft); }
     tr.range-row-total td {
       font-weight: 700;
       background: var(--bg) !important;
