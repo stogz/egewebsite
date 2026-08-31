@@ -1082,9 +1082,19 @@
        Rows are clickable to anchor a range; the anchored row stays lit
        until a second row closes the span or it is clicked again. */
     .log-table tbody tr.log-row { cursor: pointer; }
+    /* Background only — the inset outline this used to draw read as a border
+       on every cell and fought the table's own rules. */
     .log-table tbody tr.log-row.is-anchor td {
-      background: rgba(var(--accent-rgb), .16) !important;
-      box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .45);
+      background: rgba(var(--accent-rgb), .18) !important;
+    }
+    /* Team crest in the TEAM / OPP columns */
+    .log-team { line-height: 0; }
+    .log-team-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: inline-block;
+      vertical-align: middle;
     }
     .log-table tbody tr.log-row.is-anchor td:first-child { color: var(--orange); }
 

@@ -60,9 +60,16 @@
 
   };
 
-  /* ── ACTIVE SIM ──────────────────────────────────────────────── */
+  /* ── ACTIVE SIM ──────────────────────────────────────────────────
+     A first-time visitor lands on the NEWEST sim, not the oldest. That is
+     the last entry in SIM_REGISTRY above, so adding a future sim to the
+     bottom of the registry makes it the default automatically — no change
+     needed here. Anyone who has picked a sim keeps their choice, since the
+     stored value still wins. */
+  var SIM_KEYS   = Object.keys(SIM_REGISTRY);
+  var DEFAULT_SIM = SIM_KEYS[SIM_KEYS.length - 1];
   var stored = localStorage.getItem('ege-sim');
-  var activeSim = (stored && SIM_REGISTRY[stored]) ? stored : 'sim-original';
+  var activeSim = (stored && SIM_REGISTRY[stored]) ? stored : DEFAULT_SIM;
 
   /* Expose globally */
   window.EGE_SIM          = SIM_REGISTRY[activeSim];

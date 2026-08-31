@@ -2862,6 +2862,45 @@
     return denom > 0 ? (g.pts / (2 * denom) * 100).toFixed(1) + '%' : '—';
   }
 
+  /* ── TEAM / OPP CELL ──
+     Show the crest when the site recognises the abbreviation, otherwise the
+     abbreviation itself. Two things make this fussier than it looks:
+
+     · Era accuracy. teaminfo26.js exposes getTeamInfoForSeason, which picks
+       the logo that was current in that season — a 2011-12 Brooklyn game
+       gets the New Jersey Nets mark, not today's. That file only loads for
+       the 2K26 sim, so elsewhere this falls back to the flat current-era
+       logo, which is all that sim has.
+
+     · Abbreviations collide across contexts. MEM means Memphis the college
+       in the 2K26 logs and the Grizzlies in teaminfo26, so the era lookup
+       runs only for abbreviations TEAM_ABBR already recognises as a site
+       team. MEM is not one, so it stays plain text rather than borrowing an
+       NBA crest. */
+  function teamLogoFor(abbr, season) {
+    if (!abbr) return '';
+    var up = String(abbr).toUpperCase();
+    var full = TEAM_ABBR[up];
+    if (full && typeof window.getTeamInfoForSeason === 'function') {
+      var info = window.getTeamInfoForSeason(up.toLowerCase(), season);
+      if (info && info.teamLogoCLR) return LOGOS_DIR + info.teamLogoCLR;
+    }
+    return (full && TEAM_LOGOS[full]) || TEAM_LOGOS[up] || '';
+  }
+
+  /* Cell contents for a team column: crest if we have one, else the abbr.
+     The abbreviation stays in the cell's sort value either way, so sorting
+     the column still orders by name rather than by whether a logo exists. */
+  function teamCellHtml(abbr, season) {
+    var txt = abbr || '—';
+    var src = teamLogoFor(abbr, season);
+    if (!src) return '<td class="log-lbl">' + txt + '</td>';
+    return '<td class="log-lbl log-team" data-sort-val="' + txt + '">'
+      + '<img class="log-team-logo" src="' + src + '" alt="' + txt + '" title="' + txt + '"'
+      + ' onerror="this.parentNode.textContent=this.alt;">'
+      + '</td>';
+  }
+
   /* One <tr> for one game. `idx` is the game's position in the table's own
      games array, so a selected range can map rows back to game objects. */
   function logRow(key, g, idx) {
@@ -2882,9 +2921,9 @@
 
     return '<tr class="log-row" data-gi="' + idx + '">'
       + dCell
-      + '<td class="log-lbl">' + (teamAbbr || '—') + '</td>'
-      + '<td class="log-lbl">' + (g.opp || '—') + '</td>'
-      + '<td class="log-lbl">' + (g.home ? 'HOME' : 'AWAY') + '</td>'
+      + teamCellHtml(teamAbbr, g.season)
+      + teamCellHtml(g.opp, g.season)
+      + '<td class="log-lbl">' + (g.home ? 'H' : 'A') + '</td>'
       + resultCell
       + '<td>' + g.min + '</td>'
       + '<td class="hi">' + g.pts + '</td>'
