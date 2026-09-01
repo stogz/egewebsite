@@ -1001,17 +1001,12 @@
           + '</div>'
         : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';
 
-      // Column header row (7 cols)
-      var westLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">WEST</div>';
-      var eastLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">EAST</div>';
-      var headers = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round']
-        .map(function(l){ return '<div class="bracket-col-label">'+l+'</div>'; }).join('');
-      headers = westLabel + headers.slice(headers.indexOf('</div>')+6, headers.lastIndexOf('<div')) + eastLabel;
-      // Rebuild properly
+      // Column header row (7 cols). WEST and EAST carry their conference's
+      // colour, the same two the standings card headers use.
       var roundLabels = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round'];
-      headers = roundLabels.map(function(l,i){
-        if (i===0) return '<div class="bracket-col-label"><span style="color:var(--orange);font-weight:700;">WEST · </span>'+l+'</div>';
-        if (i===6) return '<div class="bracket-col-label">'+l+' · <span style="color:var(--orange);font-weight:700;">EAST</span></div>';
+      var headers = roundLabels.map(function(l,i){
+        if (i===0) return '<div class="bracket-col-label"><span class="bracket-label-west">WEST · </span>'+l+'</div>';
+        if (i===6) return '<div class="bracket-col-label">'+l+' · <span class="bracket-label-east">EAST</span></div>';
         return '<div class="bracket-col-label">'+l+'</div>';
       }).join('');
 

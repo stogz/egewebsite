@@ -140,9 +140,14 @@
       background: rgba(35,26,165,.07);
     }
     /* Conference colours are fixed — west red, east blue — rather than drawn
-       from --accent-rgb, so they read the same in every sim. */
-    .standings-card--west { --conf-rgb: 214, 45, 45; }
-    .standings-card--east { --conf-rgb: 40, 110, 214; }
+       from --accent-rgb, so they read the same in every sim. Declared once
+       here for both the standings cards and the bracket's WEST/EAST labels. */
+    .teams-inner {
+      --conf-west-rgb: 214, 45, 45;
+      --conf-east-rgb: 40, 110, 214;
+    }
+    .standings-card--west { --conf-rgb: var(--conf-west-rgb); }
+    .standings-card--east { --conf-rgb: var(--conf-east-rgb); }
     .standings-card--west .standings-card__header,
     .standings-card--east .standings-card__header {
       background: rgba(var(--conf-rgb), .14);
@@ -222,8 +227,7 @@
 
     /* Cut lines, drawn centred in the gap below their row */
     .standings-list a:nth-child(6)::after,
-    .standings-list a:nth-child(8)::after,
-    .standings-list a:nth-child(10)::after {
+    .standings-list a:nth-child(8)::after {
       content: '';
       position: absolute;
       left: 0; right: 0;
@@ -232,7 +236,6 @@
       z-index: 2;
     }
     .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
-    .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(var(--accent-rgb),.25); }
     /* The playoff line: everything above it made the bracket. Its own gap,
        wider than the one between rows, keeps it clear of the eighth seed. */
     .standings-list a:nth-child(8) { margin-bottom: 16px; }
@@ -984,6 +987,8 @@
     }
 
     /* Column header labels */
+    .bracket-label-west { color: rgb(var(--conf-west-rgb)); font-weight: 700; }
+    .bracket-label-east { color: rgb(var(--conf-east-rgb)); font-weight: 700; }
     .bracket-col-label {
       font-family: var(--font-mono); font-size: .55rem;
       letter-spacing: .18em; text-transform: uppercase;
