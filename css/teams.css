@@ -151,6 +151,7 @@
     .standings-card--west .team-chart-card__dot,
     .standings-card--east .team-chart-card__dot {
       background: rgb(var(--conf-rgb));
+      animation: blink 1.8s ease-in-out infinite;
     }
     .standings-card--west .team-chart-card__title,
     .standings-card--east .team-chart-card__title {
@@ -167,26 +168,49 @@
     /* One set of measurements for the W / L / PCT columns, read by both the
        headings and the boxes in every row so they stay in line. */
     .standings-grid {
-      --rec-w:   clamp(34px, 5vw, 44px);
-      --pct-w:   clamp(46px, 6.4vw, 58px);
-      --rec-gap: clamp(4px, .7vw, 6px);
+      --rec-w:   clamp(40px, 5.6vw, 52px);
+      --pct-w:   clamp(52px, 7vw, 64px);
       --rec-pad-r: clamp(14px, 2vw, 18px);
+      /* Row geometry the headings copy so the two line up: the accent stripe
+         on the left, the hairline frame, and the gap between crest and seed. */
+      --row-accent-w: 4px;
+      --row-frame: 1px;
+      --row-gap: clamp(8px,1.6vw,13px);
+      --logo-w: clamp(24px,3.4vw,32px);
+      --seed-w: clamp(30px, 3.2vw, 40px);
     }
 
-    /* Column headings above each conference list */
+    /* Column headings above each conference list. Transparent borders match
+       the row's stripe and frame, so every heading sits over its column. */
     .standings-head {
       display: flex;
-      justify-content: flex-end;
-      gap: var(--rec-gap);
-      padding: 0 var(--rec-pad-r) 8px 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--row-gap);
+      border: var(--row-frame) solid transparent;
+      border-left: var(--row-accent-w) solid transparent;
+      padding: 0 var(--rec-pad-r) 8px;
       font-family: var(--font-mono);
       font-size: .55rem;
       letter-spacing: .18em;
       text-transform: uppercase;
       color: var(--text-muted);
     }
+    .standings-head__left {
+      display: flex; align-items: center;
+      gap: var(--row-gap);
+      min-width: 0; flex: 1;
+    }
+    .standings-head__logo { width: var(--logo-w); flex-shrink: 0; }
+    .standings-head__seed { width: var(--seed-w); flex-shrink: 0; }
+    .standings-head__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .standings-head__right { display: flex; flex-shrink: 0; }
     .standings-head__cell { width: var(--rec-w); text-align: center; }
     .standings-head__cell--pct { width: var(--pct-w); }
+    /* Dividers run through the headings and the values as one line */
+    .standings-head__cell + .standings-head__cell {
+      border-left: 1px solid var(--border);
+    }
 
     .standings-list {
       display: flex;
@@ -251,7 +275,7 @@
       letter-spacing: .06em;
       color: rgba(255,255,255,.45);
       flex-shrink: 0;
-      min-width: 22px;
+      min-width: var(--seed-w);
     }
     html.light .standings-row__seed {
       color: rgba(42,33,64,.5);
@@ -306,9 +330,11 @@
     }
     /* Wins, losses and win percentage each get their own box, sized from the
        shared column widths so they sit under the headings. */
+    /* Wins, losses and win percentage read as one figure split by dividers
+       rather than three boxes, under the headings they line up with. */
     .standings-row__record {
       display: flex;
-      gap: var(--rec-gap);
+      align-self: stretch;
       flex-shrink: 0;
     }
     .rec-box {
@@ -316,24 +342,20 @@
       align-items: center;
       justify-content: center;
       width: var(--rec-w);
-      padding: clamp(4px,.7vw,6px) 0;
       font-family: var(--font-mono);
       font-weight: 400;
       font-size: clamp(11px,1.6vw,13px);
       letter-spacing: .06em;
       white-space: nowrap;
       color: #ffffff;
-      border: 1px solid var(--border);
-      background: rgba(var(--accent-rgb),.05);
-      transition: color .35s, border-color .2s, background .35s;
+      transition: color .35s;
+    }
+    .rec-box + .rec-box {
+      border-left: 1px solid var(--border);
     }
     .rec-pct {
       width: var(--pct-w);
       color: var(--text-muted);
-    }
-    /* Picks up the row's accent on hover, like the row's own border does. */
-    .standings-row:hover .rec-box {
-      border-color: rgba(var(--accent-rgb),.45);
     }
     html.light .rec-box {
       color: #08052f;
@@ -1188,7 +1210,7 @@
       .standings-row__abbr { display: inline; font-family: var(--font-mono); font-weight: 400; font-size: clamp(12px,3.6vw,15px); letter-spacing: .1em; }
       .standings-row { padding: 6px 10px; min-height: 40px; }
       /* Rows use a tighter side padding here, so the headings match it. */
-      .standings-head { padding-right: 10px; }
+      .standings-head { padding-left: 10px; padding-right: 10px; }
 
       /* Team banner */
       .team-banner { padding: 18px 14px; min-height: auto; }
