@@ -2807,17 +2807,38 @@
                        setting. The percentages are deliberately not in the
                        group, so turning it off narrows the table without
                        losing shooting efficiency. */
+  /* `tip` is the plain-English name shown on hover, since the headers are
+     abbreviations. */
   var LOG_COLS = [
-    { lbl:'DATE', cls:'log-lbl' },  { lbl:'TEAM', cls:'log-lbl' },
-    { lbl:'OPP',  cls:'log-lbl' },  { lbl:'H/A',  cls:'log-lbl' },
-    { lbl:'RESULT', cls:'log-lbl' },
-    { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },   { lbl:'AST' },
-    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
-    { lbl:'FG',  grp:'fg' }, { lbl:'FGA', grp:'fg' }, { lbl:'FG%' },
-    { lbl:'3P',  grp:'fg' }, { lbl:'3PA', grp:'fg' }, { lbl:'3P%' },
-    { lbl:'FT',  grp:'fg' }, { lbl:'FTA', grp:'fg' }, { lbl:'FT%' },
-    { lbl:'TS%' },   { lbl:'HOOP' },
+    { lbl:'DATE',   cls:'log-lbl', tip:'Date' },
+    { lbl:'TEAM',   cls:'log-lbl', tip:'Team' },
+    { lbl:'OPP',    cls:'log-lbl', tip:'Opponent' },
+    { lbl:'H/A',    cls:'log-lbl', tip:'Home or Away' },
+    { lbl:'RESULT', cls:'log-lbl', tip:'Result and Final Score' },
+    { lbl:'MIN', tip:'Minutes Played' },
+    { lbl:'PTS', tip:'Points' },
+    { lbl:'REB', tip:'Rebounds' },
+    { lbl:'AST', tip:'Assists' },
+    { lbl:'STL', tip:'Steals' },
+    { lbl:'BLK', tip:'Blocks' },
+    { lbl:'TO',  tip:'Turnovers' },
+    { lbl:'FG',  grp:'fg', tip:'Field Goals Made' },
+    { lbl:'FGA', grp:'fg', tip:'Field Goals Attempted' },
+    { lbl:'FG%', tip:'Field Goal Percentage' },
+    { lbl:'3P',  grp:'fg', tip:'Three Pointers Made' },
+    { lbl:'3PA', grp:'fg', tip:'Three Pointers Attempted' },
+    { lbl:'3P%', tip:'Three Point Percentage' },
+    { lbl:'FT',  grp:'fg', tip:'Free Throws Made' },
+    { lbl:'FTA', grp:'fg', tip:'Free Throws Attempted' },
+    { lbl:'FT%', tip:'Free Throw Percentage' },
+    { lbl:'TS%', tip:'True Shooting Percentage' },
+    { lbl:'HOOP', tip:'Hoop Score' },
   ];
+
+  /* Plain title= so the browser draws its own tooltip — no custom bubble. */
+  function tipAttr(c) {
+    return c.tip ? ' title="' + c.tip + '"' : '';
+  }
 
   function colClass(c) {
     return ((c.cls || '') + (c.grp === 'fg' ? ' col-fg' : '')).trim();
@@ -2847,26 +2868,30 @@
   }
 
   /* ── HOOP SCORE HEAT ──
-     Anchors, with a continuous ramp between each pair:
-       <=5  bright red    hsl(0,82,46)
-        25  bright green  hsl(140,68,40)
-        35  blue          hsl(215,80,48)
-       >=50 purple        hsl(280,62,48)
-     Each segment starts on the previous one's end values, so the ramp has no
-     seam at a boundary. Matches the mock draft's filled-cell heatmap: an HSL
-     background under white text, and every lightness stays in the 40-48 band
-     so white stays legible the whole way up. */
+     Three anchors, with a ramp between each pair:
+       <=7  red            rgb(213,  21, 21)
+        15  muted yellow   rgb(171, 148, 58)
+        30  green          rgb( 33, 171, 79)
+       >=30 stays green
+     Mixed in RGB rather than by hue, so the ramp passes through the stops
+     given and nothing else. Every stop stays dark enough for white text. */
+  var HEAT_STOPS = [
+    { at:  7, rgb: [213,  21,  21] },  // red
+    { at: 15, rgb: [171, 148,  58] },  // muted yellow
+    { at: 30, rgb: [ 33, 171,  79] }   // green
+  ];
   function hoopHeatStyle(gs) {
-    var h, sat, lum;
-    if (gs >= 50)      { h = 280; sat = 62; lum = 48; }                // purple
-    else if (gs >= 35) { var a = (gs - 35) / 15;                       // blue → purple
-                         h = 215 + a * 65; sat = 80 - a * 18; lum = 48; }
-    else if (gs >= 25) { var b = (gs - 25) / 10;                       // green → blue
-                         h = 140 + b * 75; sat = 68 + b * 12; lum = 40 + b * 8; }
-    else if (gs > 5)   { var c = (gs - 5) / 20;                        // red → green
-                         h = c * 140; sat = 82 - c * 14; lum = 46 - c * 6; }
-    else               { h = 0;   sat = 82; lum = 46; }                // bright red
-    return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%)!important;color:#fff!important;';
+    var lo = HEAT_STOPS[0], hi = HEAT_STOPS[HEAT_STOPS.length - 1], rgb;
+    if (gs <= lo.at)      rgb = lo.rgb;
+    else if (gs >= hi.at) rgb = hi.rgb;
+    else {
+      var i = 1;
+      while (gs > HEAT_STOPS[i].at) i++;
+      var a = HEAT_STOPS[i - 1], b = HEAT_STOPS[i];
+      var t = (gs - a.at) / (b.at - a.at);
+      rgb = a.rgb.map(function(v, k){ return Math.round(v + (b.rgb[k] - v) * t); });
+    }
+    return 'background:rgb(' + rgb.join(',') + ')!important;color:#fff!important;';
   }
 
   /* Hoop cell, tinted when the Color System setting is on. `perGame` guards
@@ -2893,6 +2918,47 @@
     return denom > 0 ? (g.pts / (2 * denom) * 100).toFixed(1) + '%' : '—';
   }
 
+  /* ── TEAM / OPP CELL ──
+     Show the crest when the site recognises the abbreviation, otherwise the
+     abbreviation itself. Two things make this fussier than it looks:
+
+     · Era accuracy. teaminfo26.js exposes getTeamInfoForSeason, which picks
+       the logo that was current in that season — a 2011-12 Brooklyn game
+       gets the New Jersey Nets mark, not today's. That file only loads for
+       the 2K26 sim, so elsewhere this falls back to the flat current-era
+       logo, which is all that sim has.
+
+     · Abbreviations collide across contexts. MEM means Memphis the college
+       in the 2K26 logs and the Grizzlies in teaminfo26, so the era lookup
+       runs only for abbreviations TEAM_ABBR already recognises as a site
+       team. MEM is not one, so it stays plain text rather than borrowing an
+       NBA crest. */
+  function teamLogoFor(abbr, season) {
+    if (!abbr) return '';
+    var up = String(abbr).toUpperCase();
+    var full = TEAM_ABBR[up];
+    if (full && typeof window.getTeamInfoForSeason === 'function') {
+      var info = window.getTeamInfoForSeason(up.toLowerCase(), season);
+      if (info && info.teamLogoCLR) return LOGOS_DIR + info.teamLogoCLR;
+    }
+    return (full && TEAM_LOGOS[full]) || TEAM_LOGOS[up] || '';
+  }
+
+  /* Cell contents for a team column: abbreviation first, then the crest
+     beside it where the site has one. The abbreviation is always present, so
+     a logo that fails to load just removes itself and the cell still reads
+     correctly. Sorting keys off the abbreviation either way. */
+  function teamCellHtml(abbr, season) {
+    var txt = abbr || '—';
+    var src = teamLogoFor(abbr, season);
+    if (!src) return '<td class="log-lbl">' + txt + '</td>';
+    return '<td class="log-lbl log-team" data-sort-val="' + txt + '">'
+      + '<span class="log-team-abbr">' + txt + '</span>'
+      + '<img class="log-team-logo" src="' + src + '" alt="" title="' + txt + '"'
+      + ' onerror="this.remove();">'
+      + '</td>';
+  }
+
   /* One <tr> for one game. `idx` is the game's position in the table's own
      games array, so a selected range can map rows back to game objects. */
   function logRow(key, g, idx) {
@@ -2906,15 +2972,23 @@
     var dCell = '<td class="log-lbl"' + (dKey !== null ? ' data-sort-val="' + dKey + '"' : '') + '>'
       + (fmtGameDate(g.date) || '—') + '</td>';
 
-    var resultCell = '<td class="log-lbl" data-sort-val="' + (isWin ? 1 : 0) + '">'
+    // Sort the RESULT column by point margin rather than by W/L, so descending
+    // runs from the biggest blowout win down to the heaviest loss instead of
+    // lumping every win together in entry order.
+    var sParts = String(g.score || '').split('-');
+    var margin = sParts.length === 2
+      ? (parseInt(sParts[0], 10) - parseInt(sParts[1], 10)) : 0;
+    if (isNaN(margin)) margin = 0;
+
+    var resultCell = '<td class="log-lbl" data-sort-val="' + margin + '">'
       + '<span class="log-res ' + (isWin ? 'log-res--w' : 'log-res--l') + '">'
       + (isWin ? 'W' : 'L') + '</span> '
       + '<span class="log-score">' + (g.score || '—') + '</span></td>';
 
     return '<tr class="log-row" data-gi="' + idx + '">'
       + dCell
-      + '<td class="log-lbl">' + (teamAbbr || '—') + '</td>'
-      + '<td class="log-lbl">' + (g.opp || '—') + '</td>'
+      + teamCellHtml(teamAbbr, g.season)
+      + teamCellHtml(g.opp, g.season)
       + '<td class="log-lbl">' + (g.home ? 'HOME' : 'AWAY') + '</td>'
       + resultCell
       + '<td>' + g.min + '</td>'
@@ -2983,7 +3057,7 @@
     if (!games.length) return '';
     var thead = '<thead><tr>';
     LOG_COLS.forEach(function(c){
-      thead += '<th' + clsAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
+      thead += '<th' + clsAttr(c) + tipAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
     });
     thead += '</tr></thead>';
 
@@ -3109,20 +3183,10 @@
     return rows.slice(lo, hi + 1).map(function(r){ return games[parseInt(r.dataset.gi, 10)]; });
   }
 
-  /* Title reads '{Date} through {Date}' when both ends are dated. Undated
-     games (the 2K25 logs) have no date to name, so those fall back to the
-     span's size and season. */
+  /* The summary covers one season's table, so the season alone names it —
+     the games it spans are already listed in the row beside it. */
   function rangeTitle(span) {
-    // Endpoints run earliest → latest whatever order the table is sorted in,
-    // so a descending sort doesn't title the span 'MAR 17 through MAR 15'.
-    var keys = span.map(function(g){ return dateSortKey(g.date); });
-    if (keys.every(function(k){ return k !== null; })) {
-      var lo = span[keys.indexOf(Math.min.apply(null, keys))];
-      var hi = span[keys.indexOf(Math.max.apply(null, keys))];
-      var a = fmtGameDate(lo.date), b = fmtGameDate(hi.date);
-      return a === b ? a : a + ' through ' + b;
-    }
-    return span.length + ' Games · ' + (span[0].season || '');
+    return span[0] && span[0].season ? String(span[0].season) : '';
   }
 
   function openRangeModal(span) {
@@ -3142,7 +3206,7 @@
     var thead = '<thead><tr><th class="log-lbl"></th>';
     LOG_COLS.forEach(function(c){
       if (c.cls === 'log-lbl') return;
-      thead += '<th' + clsAttr(c) + '>' + c.lbl + '</th>';
+      thead += '<th' + clsAttr(c) + tipAttr(c) + '>' + c.lbl + '</th>';
     });
     thead += '</tr></thead>';
 
@@ -3196,7 +3260,8 @@
     var avgs = row('Per Game', 'career-row', function(v){
       return (Math.round(v / n * 10) / 10).toFixed(1);
     }, true);
-    return totals + avgs;
+    // Per Game reads first — it is the line people compare against.
+    return avgs + totals;
   }
 
   function closeRangeModal() {
@@ -3263,7 +3328,7 @@
     { id:'fgData', label:'Field Goal Data',
       hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
     { id:'colorSystem', label:'Color System',
-      hint:'Shade the Hoop Score by performance — red through green and blue to purple.' },
+      hint:'Shade the Hoop Score by performance — red at 7, yellow at 15, green at 30.' },
   ];
 
   function logSettingsMenu() {

@@ -634,8 +634,10 @@
 
     /* ── MOBILE PLAYER CONTENT PADDING ── */
     @media (max-width:768px) {
-      /* Nav is position:relative on mobile, so no offset needed */
-      #player-profile { padding-top:0; }
+      /* The nav is fixed here too, so the profile reserves its height —
+         without it the Back to Roster button sits under the bar and can't
+         be tapped. */
+      #player-profile { padding-top:var(--nav-h); }
       .player-select { padding:80px 16px 50px; }
       .player-select-grid { gap:10px; }
       .player-banner { padding: 20px 0 30px; }
@@ -1127,16 +1129,34 @@
       font-size: .6rem;
       letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--text-faint);
+      color: var(--text-muted);
+    }
+    /* Stronger again in the range modal, where the count and W-L are the
+       only context for the numbers below and --text-faint was too dim. */
+    #range-modal .log-card-count {
+      color: var(--text);
+      font-size: .64rem;
     }
 
     /* ── RANGE SELECTION ──
        Rows are clickable to anchor a range; the anchored row stays lit
        until a second row closes the span or it is clicked again. */
     .log-table tbody tr.log-row { cursor: pointer; }
+    /* Background only — the inset outline this used to draw read as a border
+       on every cell and fought the table's own rules. */
     .log-table tbody tr.log-row.is-anchor td {
-      background: rgba(var(--accent-rgb), .16) !important;
-      box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .45);
+      background: rgba(var(--accent-rgb), .18) !important;
+    }
+    /* TEAM / OPP cell: abbreviation, then the crest beside it */
+    .log-team { white-space: nowrap; }
+    .log-team-abbr { vertical-align: middle; }
+    .log-team-logo {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 7px;
     }
     .log-table tbody tr.log-row.is-anchor td:first-child { color: var(--orange); }
 
@@ -1171,37 +1191,63 @@
       overflow: auto;
       animation: fadeSlideUp .2s ease both;
     }
-    /* Opaque, so rows don't show through while the summary scrolls */
-    #range-modal .splits-card-header { position: sticky; top: 0; z-index: 1; background: var(--bg); }
+    /* Same tint as the table section headers (REGULAR SEASON / PLAYOFFS /
+       MARCH MADNESS). That tint is translucent, so it is layered over an
+       opaque base rather than used alone — the header is sticky and rows
+       would otherwise scroll visibly underneath it. */
+    #range-modal .splits-card-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: linear-gradient(rgba(35,26,165,.07), rgba(35,26,165,.07)), var(--bg);
+      border-bottom: 1px solid var(--border-soft);
+    }
     #range-modal .splits-card-title { color: var(--heading); font-size: .72rem; }
     /* The summary drops the five identity columns, so it needs less width */
     #range-modal .log-table { min-width: 0; }
     #range-modal .log-table th { padding: 14px 16px; }
-    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
+    /* Type is left alone so the numbers read exactly as they do in the log
+       itself — same face, size and weight. Only the box around them is
+       roomier. */
+    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; }
     #range-modal .log-table td.log-lbl {
       font-size: .68rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--orange);
     }
+    /* The 2px rule on .career-row is right on the Stats tables, where it
+       separates a career line from many seasons. Here there are only two
+       rows, so a normal rule between them is enough. */
+    #range-modal tbody tr.career-row td { border-top: none; }
+    #range-modal tbody tr + tr td { border-top: 1px solid var(--border-soft); }
     tr.range-row-total td {
       font-weight: 700;
       background: var(--bg) !important;
       height: 3rem;
       font-size: .92rem;
     }
+    /* Same square treatment as the settings gear, carrying an X instead. */
     #range-modal-close {
       margin-left: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      padding: 0;
       background: transparent;
-      border: none;
-      color: #ef4444;
-      font-size: 1.4rem;
-      line-height: 1;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       cursor: pointer;
-      padding: 0 2px;
-      transition: transform .15s, opacity .15s;
+      transition: color .18s, border-color .18s, background .18s;
     }
-    #range-modal-close:hover { transform: scale(1.15); opacity: .8; }
+    #range-modal-close:hover {
+      color: #ef4444;
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, .1);
+    }
 
     /* ── PERFORMANCE CARDS ── */
     .game-log-list { display:flex; flex-direction:column; gap:14px; }
