@@ -139,6 +139,24 @@
       border-bottom: 1px solid var(--border-soft);
       background: rgba(35,26,165,.07);
     }
+    /* Conference colours are fixed — west red, east blue — rather than drawn
+       from --accent-rgb, so they read the same in every sim. */
+    .standings-card--west { --conf-rgb: 214, 45, 45; }
+    .standings-card--east { --conf-rgb: 40, 110, 214; }
+    .standings-card--west .standings-card__header,
+    .standings-card--east .standings-card__header {
+      background: rgba(var(--conf-rgb), .14);
+      border-bottom-color: rgba(var(--conf-rgb), .35);
+    }
+    .standings-card--west .team-chart-card__dot,
+    .standings-card--east .team-chart-card__dot {
+      background: rgb(var(--conf-rgb));
+    }
+    .standings-card--west .team-chart-card__title,
+    .standings-card--east .team-chart-card__title {
+      color: rgb(var(--conf-rgb));
+    }
+
     .standings-card__body {
       padding: clamp(12px,1.6vw,16px) clamp(12px,1.6vw,16px) clamp(14px,1.8vw,18px);
     }
