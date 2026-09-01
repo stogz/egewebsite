@@ -1153,12 +1153,6 @@
     #range-modal .log-table { min-width: 0; }
     #range-modal .log-table th { padding: 14px 16px; }
     #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
-    /* The Stats tables lean on weight to pick a career line out of many
-       seasons. Here there are only two rows and nothing to pick out, so the
-       numbers read at normal weight — this overrides both the .splits-table
-       600 and the .career-row / .range-row-total 700. */
-    #range-modal .log-table td,
-    #range-modal .log-table td.hi { font-weight: 400; }
     #range-modal .log-table td.log-lbl {
       font-size: .68rem;
       letter-spacing: .12em;
@@ -1171,6 +1165,7 @@
     #range-modal tbody tr.career-row td { border-top: none; }
     #range-modal tbody tr + tr td { border-top: 1px solid var(--border-soft); }
     tr.range-row-total td {
+      font-weight: 700;
       background: var(--bg) !important;
       height: 3rem;
       font-size: .92rem;
@@ -1195,27 +1190,6 @@
       color: #ef4444;
       border-color: #ef4444;
       background: rgba(239, 68, 68, .1);
-    }
-
-    /* ── HEADER TOOLTIP ──
-       Page background inside the chart border, matching the rest of the
-       site's surfaces. Sits above the range modal (z-index 10000) so the
-       summary's own headers can be read too. */
-    .log-tip {
-      display: none;
-      position: fixed;
-      z-index: 10001;
-      pointer-events: none;
-      padding: 7px 11px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: .62rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      box-shadow: 0 6px 20px rgba(0,0,0,.35);
     }
 
     /* ── PERFORMANCE CARDS ── */

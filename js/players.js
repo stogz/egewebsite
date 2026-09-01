@@ -2804,55 +2804,10 @@
     { lbl:'HOOP', tip:'Hoop Score' },
   ];
 
+  /* Plain title= so the browser draws its own tooltip — no custom bubble. */
   function tipAttr(c) {
-    return c.tip ? ' data-tip="' + c.tip + '"' : '';
+    return c.tip ? ' title="' + c.tip + '"' : '';
   }
-
-  /* ── HEADER TOOLTIPS ──
-     The log headers are abbreviations, so hovering one names the stat in
-     full. The bubble lives on <body> rather than inside the header: the
-     tables scroll in their own overflow box and the range modal is its own
-     scroll container, either of which would clip a positioned child. Wired
-     by delegation because both theads are re-rendered on every season
-     change, sort and settings toggle. */
-  var logTipEl = null;
-  function logTipShow(th) {
-    var text = th.getAttribute('data-tip');
-    if (!text) return;
-    if (!logTipEl) {
-      logTipEl = document.createElement('div');
-      logTipEl.className = 'log-tip';
-      document.body.appendChild(logTipEl);
-    }
-    logTipEl.textContent = text;
-    logTipEl.style.display = 'block';
-
-    // Centred over the header, above it, and nudged inside the viewport.
-    var r = th.getBoundingClientRect(), t = logTipEl.getBoundingClientRect();
-    var x = r.left + r.width / 2 - t.width / 2;
-    x = Math.max(8, Math.min(x, window.innerWidth - t.width - 8));
-    var y = r.top - t.height - 8;
-    if (y < 8) y = r.bottom + 8;   // no room above — sit under the header
-    logTipEl.style.left = x + 'px';
-    logTipEl.style.top  = y + 'px';
-  }
-  function logTipHide() {
-    if (logTipEl) logTipEl.style.display = 'none';
-  }
-  function tipTarget(e) {
-    var n = e.target;
-    if (!n || n.nodeType !== 1 || !n.closest) return null;
-    return n.closest('th[data-tip]');
-  }
-  document.addEventListener('mouseover', function(e){
-    var th = tipTarget(e);
-    if (th) logTipShow(th);
-  });
-  document.addEventListener('mouseout', function(e){
-    if (tipTarget(e)) logTipHide();
-  });
-  // Scrolling moves the header out from under the bubble, so drop it.
-  window.addEventListener('scroll', logTipHide, true);
 
   function colClass(c) {
     return ((c.cls || '') + (c.grp === 'fg' ? ' col-fg' : '')).trim();
@@ -2882,19 +2837,17 @@
   }
 
   /* ── HOOP SCORE HEAT ──
-     Two anchors: 7 is red, 30 is green, with a ramp between them.
-       <=7  red         rgb(213, 21, 21)
-        30  green       rgb(33, 171, 79)
+     Three anchors, with a ramp between each pair:
+       <=7  red            rgb(213,  21, 21)
+        15  muted yellow   rgb(171, 148, 58)
+        30  green          rgb( 33, 171, 79)
        >=30 stays green
-     The ramp runs through a desaturated slate rather than blending hue
-     directly, because a straight red-to-green hue blend passes through
-     orange and yellow in the middle — the colours this scale is meant to
-     be rid of. Mixing through a neutral keeps the midrange plainly "in
-     between" instead. Every stop stays dark enough for white text. */
+     Mixed in RGB rather than by hue, so the ramp passes through the stops
+     given and nothing else. Every stop stays dark enough for white text. */
   var HEAT_STOPS = [
-    { at:  7,   rgb: [213,  21,  21] },  // red
-    { at: 18.5, rgb: [104, 106, 124] },  // neutral slate, the midpoint
-    { at: 30,   rgb: [ 33, 171,  79] }   // green
+    { at:  7, rgb: [213,  21,  21] },  // red
+    { at: 15, rgb: [171, 148,  58] },  // muted yellow
+    { at: 30, rgb: [ 33, 171,  79] }   // green
   ];
   function hoopHeatStyle(gs) {
     var lo = HEAT_STOPS[0], hi = HEAT_STOPS[HEAT_STOPS.length - 1], rgb;
@@ -3344,7 +3297,7 @@
     { id:'fgData', label:'Field Goal Data',
       hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
     { id:'colorSystem', label:'Color System',
-      hint:'Shade the Hoop Score by performance — red at 7 up to green at 30.' },
+      hint:'Shade the Hoop Score by performance — red at 7, yellow at 15, green at 30.' },
   ];
 
   function logSettingsMenu() {
