@@ -70,33 +70,49 @@
 
       <!-- PLAYOFF BRACKET VIEW -->
       <div id="teamsBracketView" style="display:none;">
-        <div class="bracket-scroll">
-          <div class="bracket-grid" id="bracketGrid"></div>
+        <div class="standings-card">
+          <div class="standings-card__header">
+            <div class="team-chart-card__dot"></div>
+            <span class="team-chart-card__title">Playoffs</span>
+          </div>
+          <div class="bracket-scroll">
+            <div class="bracket-grid" id="bracketGrid"></div>
+          </div>
         </div>
       </div>
 
       <!-- STANDINGS VIEW -->
       <div id="teamsStandingsView">
         <div class="standings-grid">
-          <div>
-            <div class="standings-conf-label">Western Conference</div>
-            <!-- Column headings sit outside .standings-list so they don't shift
-                 the nth-child counts the playoff cut lines are drawn from. -->
-            <div class="standings-head" aria-hidden="true">
-              <span class="standings-head__cell">W</span>
-              <span class="standings-head__cell">L</span>
-              <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+          <div class="standings-card">
+            <div class="standings-card__header">
+              <div class="team-chart-card__dot"></div>
+              <span class="team-chart-card__title">Western Conference</span>
             </div>
-            <div class="standings-list" id="standingsWest"></div>
+            <div class="standings-card__body">
+              <!-- Column headings sit outside .standings-list so they don't shift
+                   the nth-child counts the playoff cut lines are drawn from. -->
+              <div class="standings-head" aria-hidden="true">
+                <span class="standings-head__cell">W</span>
+                <span class="standings-head__cell">L</span>
+                <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+              </div>
+              <div class="standings-list" id="standingsWest"></div>
+            </div>
           </div>
-          <div>
-            <div class="standings-conf-label">Eastern Conference</div>
-            <div class="standings-head" aria-hidden="true">
-              <span class="standings-head__cell">W</span>
-              <span class="standings-head__cell">L</span>
-              <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+          <div class="standings-card">
+            <div class="standings-card__header">
+              <div class="team-chart-card__dot"></div>
+              <span class="team-chart-card__title">Eastern Conference</span>
             </div>
-            <div class="standings-list" id="standingsEast"></div>
+            <div class="standings-card__body">
+              <div class="standings-head" aria-hidden="true">
+                <span class="standings-head__cell">W</span>
+                <span class="standings-head__cell">L</span>
+                <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+              </div>
+              <div class="standings-list" id="standingsEast"></div>
+            </div>
           </div>
         </div>
       </div>

@@ -124,22 +124,27 @@
       gap: clamp(16px, 3vw, 28px);
       align-items: start;
     }
-    .standings-conf-label {
-      font-family: var(--font-mono);
-      font-size: .62rem;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-      color: var(--orange);
-      margin-bottom: 14px;
+    /* Each conference, and the bracket, sits in a card — same shell as the
+       cards on the team detail view, so the whole page reads as one set. */
+    .standings-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      overflow: hidden;
+      transition: background .35s;
+    }
+    .standings-card__header {
       display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
     }
-    .standings-conf-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+    .standings-card__body {
+      padding: clamp(12px,1.6vw,16px) clamp(12px,1.6vw,16px) clamp(14px,1.8vw,18px);
     }
-    .standings-conf-label { color: var(--orange); }
+    /* The bracket scrolls inside its card rather than under the page edge. */
+    #teamsBracketView .standings-card { margin-bottom: 28px; }
+    #teamsBracketView .bracket-scroll { padding: clamp(12px,1.6vw,18px); }
 
     /* One set of measurements for the W / L / PCT columns, read by both the
        headings and the boxes in every row so they stay in line. */
@@ -155,7 +160,7 @@
       display: flex;
       justify-content: flex-end;
       gap: var(--rec-gap);
-      padding: 0 var(--rec-pad-r) 6px 0;
+      padding: 0 var(--rec-pad-r) 8px 0;
       font-family: var(--font-mono);
       font-size: .55rem;
       letter-spacing: .18em;
@@ -197,8 +202,8 @@
       color: var(--text);
       cursor: pointer;
       position: relative;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: transparent;
+      border: 1px solid var(--border-soft);
       border-left: 4px solid var(--row-accent, var(--border));
       transition: border-color .2s, transform .18s ease, background .35s, color .35s;
       will-change: transform;
