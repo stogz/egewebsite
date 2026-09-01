@@ -966,24 +966,21 @@
       var westR3 = bData.west && bData.west.r3 || [];
       var finals = bData.finals;
 
-      // Vertical spacer helper — adds spacing to align later rounds
-      function spacers(n) {
-        var s = '';
-        for (var i=0;i<n;i++) s+='<div class="bracket-spacer" style="min-height:52px;"></div>';
-        return s;
-      }
-
-      // Build each column's HTML
+      // Build each column's HTML.
       // R1 order: [1v8, 4v5, 3v6, 2v7]
       // R2: matchup1 = winner of 1v8 vs winner of 4v5
       //     matchup2 = winner of 3v6 vs winner of 2v7
-      // Spacers align each R2 matchup between its two R1 feeder matchups
+      // The columns are all the same height and space their matchups evenly
+      // (justify-content:space-around), which puts 2 matchups exactly at the
+      // midpoints of 4, and 1 at the midpoint of 2 — the alignment a bracket
+      // needs, at any width. It used to be done with fixed-height spacers,
+      // which only held at one size.
       var eR1html = colHTML(eastR1, null, 'east', false);
-      var eR2html = spacers(1) + colHTML([eastR2[0]], null, 'east', false) + spacers(2) + colHTML([eastR2[1]], null, 'east', false) + spacers(1);
-      var eR3html = spacers(3) + colHTML(eastR3, null, 'east', false) + spacers(3);
+      var eR2html = colHTML(eastR2, null, 'east', false);
+      var eR3html = colHTML(eastR3, null, 'east', false);
       var wR1html = colHTML(westR1, null, 'west', false);
-      var wR2html = spacers(1) + colHTML([westR2[0]], null, 'west', false) + spacers(2) + colHTML([westR2[1]], null, 'west', false) + spacers(1);
-      var wR3html = spacers(3) + colHTML(westR3, null, 'west', false) + spacers(3);
+      var wR2html = colHTML(westR2, null, 'west', false);
+      var wR3html = colHTML(westR3, null, 'west', false);
 
       var finalsHtml = finals
         ? '<div class="bracket-finals-col">'
@@ -1012,9 +1009,9 @@
         + '<div class="bracket-col">'+wR2html+'</div>'
         + '<div class="bracket-col">'+wR3html+'</div>'
         + finalsHtml
-        + '<div class="bracket-col" style="direction:rtl;">'+eR3html+'</div>'
-        + '<div class="bracket-col" style="direction:rtl;">'+eR2html+'</div>'
-        + '<div class="bracket-col" style="direction:rtl;">'+eR1html+'</div>';
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR3html+'</div>'
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR2html+'</div>'
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR1html+'</div>';
 
       // Wire click-through to team detail
       grid.querySelectorAll('.bracket-team[data-slug]').forEach(function(el) {

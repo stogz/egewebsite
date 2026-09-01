@@ -213,24 +213,32 @@
     }
 
     .standings-list {
+      --list-gap: clamp(4px, .7vw, 6px);
       display: flex;
       flex-direction: column;
-      gap: clamp(4px, .7vw, 6px);
+      gap: var(--list-gap);
       position: relative;
     }
 
-    /* Cut lines */
+    /* Cut lines, drawn centred in the gap below their row */
     .standings-list a:nth-child(6)::after,
+    .standings-list a:nth-child(8)::after,
     .standings-list a:nth-child(10)::after {
       content: '';
       position: absolute;
       left: 0; right: 0;
-      bottom: calc(-1 * clamp(6px,1.2vw,9px) / 2);
+      bottom: calc(-1 * var(--list-gap) / 2);
       pointer-events: none;
       z-index: 2;
     }
     .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
     .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(var(--accent-rgb),.25); }
+    /* The playoff line: everything above it made the bracket. Drawn in the
+       conference's own colour so it ties back to the card header, and heavier
+       than the play-in marks either side of it. */
+    .standings-list a:nth-child(8)::after {
+      border-bottom: 2px solid rgba(var(--conf-rgb), .75);
+    }
 
     .standings-row {
       display: flex;
@@ -934,6 +942,13 @@
       letter-spacing: .1em; color: rgba(255,185,20,.3);
     }
 
+    /* Side-by-side conferences need about 1300px before the longest team names
+       start truncating ("Oklahoma City Thunder" is the binding one). Below
+       that they stack, which reads better than a column of ellipses. */
+    @media (max-width: 1299px) {
+      .standings-grid { grid-template-columns: 1fr; }
+    }
+
     /* ══════════════════════════════════════
        PLAYOFF BRACKET
     ══════════════════════════════════════ */
@@ -954,12 +969,17 @@
 
     /* Full bracket layout — 3 cols per conf + finals in centre */
     .bracket-grid {
+      --bk-gap: 12px;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 180px 1fr 1fr 1fr;
+      /* Round columns share what is left over; the finals column is fixed so
+         the centre of the bracket doesn't move as the page resizes. */
+      grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, 180px) repeat(3, minmax(0, 1fr));
       grid-template-rows: auto;
-      gap: 0 12px;
-      min-width: 900px;
-      align-items: center;
+      gap: 0 var(--bk-gap);
+      min-width: 880px;
+      /* Columns stretch to the row height so each one can space its matchups
+         evenly — that is what keeps the rounds aligned. */
+      align-items: stretch;
     }
 
     /* Column header labels */
@@ -970,9 +990,13 @@
       padding: 0 0 10px; opacity: .7;
     }
 
-    /* Each round column */
+    /* Each round column. space-around puts 4 matchups at 1/8, 3/8, 5/8, 7/8
+       of the column, 2 at 1/4 and 3/4, and 1 at 1/2 — so every later round
+       lands exactly on the midpoint of the two matchups that feed it, with
+       no fixed heights involved. */
     .bracket-col {
       display: flex; flex-direction: column;
+      justify-content: space-around;
       gap: 0;
     }
 
@@ -981,19 +1005,27 @@
       position: relative;
       margin: 6px 0;
     }
-    /* Connector lines drawn via pseudo on the right side */
+    /* Connector stubs reach across the column gap toward the next round —
+       rightward on the west side, leftward on the east, since the east
+       columns run inward toward the finals. Width is tied to the gap so the
+       two can't drift apart. */
     .bracket-matchup::after {
       content: '';
       position: absolute;
-      right: -12px; top: 50%;
-      width: 12px; height: 1px;
+      right: calc(-1 * var(--bk-gap)); top: 50%;
+      width: var(--bk-gap); height: 1px;
       background: var(--border);
     }
-    .bracket-col:last-child .bracket-matchup::after { display: none; }
+    .bracket-col--east .bracket-matchup::after {
+      right: auto;
+      left: calc(-1 * var(--bk-gap));
+    }
 
     .bracket-team {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 10px;
+      /* Tight enough that a three-letter abbreviation still fits at the
+         narrowest column the grid allows. */
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 8px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-left: 3px solid var(--border);
@@ -1032,7 +1064,7 @@
       z-index: 3;
     }
     /* Left-side columns hover goes right, right-side columns hover goes left */
-    .bracket-col[style*="direction:rtl"] .bracket-team:hover {
+    .bracket-col--east .bracket-team:hover {
       transform: translateX(-3px) scale(1.012);
     }
     .bracket-finals-col .bracket-team:hover {
@@ -1045,7 +1077,7 @@
     }
 
     .bracket-team__logo {
-      width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+      width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;
     }
     .bracket-team__seed {
       font-family: var(--font-mono); font-size: .52rem;
@@ -1067,15 +1099,13 @@
     .bracket-team.winner .bracket-team__wins { color: var(--orange); }
     .bracket-team.champion .bracket-team__wins { color: #ffc820; }
 
-    /* Spacers between matchups for R2/R3 vertical alignment */
-    .bracket-spacer { flex: 1; }
-
     /* Finals centre column */
     .bracket-finals-col {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 0;
       padding: 0 8px;
+      min-width: 0;
     }
     .bracket-finals-label {
       font-family: var(--font-mono); font-size: .58rem;
