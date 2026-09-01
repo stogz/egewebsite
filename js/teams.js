@@ -564,7 +564,20 @@
       var isLight    = document.documentElement.classList.contains('light');
       var labelColor = isLight ? 'rgba(42,33,64,.5)'   : 'rgba(208,208,208,.45)';
       var gridColor  = isLight ? 'rgba(35,26,165,.14)'  : 'rgba(35,26,165,.22)';
-      var ctx = document.getElementById('teamWinChart').getContext('2d');
+      /* Chart.js comes off a CDN, so it can simply not be there — blocked,
+         offline, an outage. Without this guard the ReferenceError aborted
+         the rest of this function and took the gauges, the roster and the
+         trends down with it, leaving nothing but the banner. */
+      var canvas = document.getElementById('teamWinChart');
+      var chartNote = document.getElementById('teamWinChartNote');
+      if (typeof Chart === 'undefined') {
+        canvas.style.display = 'none';
+        if (chartNote) chartNote.classList.add('visible');
+        return renderDetailRest();
+      }
+      canvas.style.display = '';
+      if (chartNote) chartNote.classList.remove('visible');
+      var ctx = canvas.getContext('2d');
       _winChart = new Chart(ctx, {
         type:'line',
         data:{ labels:labels, datasets:[{ data:data, tension:.4, borderColor:bg, backgroundColor:hexToRgba(bg,.3), fill:true, borderWidth:3, pointRadius:0, pointHoverRadius:6, hitRadius:18 }] },
@@ -587,6 +600,11 @@
         }
       });
 
+      renderDetailRest();
+
+      /* The parts of the detail view that come after the chart. Declared
+         here so it closes over slug/year/abbr, and called on both paths. */
+      function renderDetailRest() {
       // OFF/DEF gauges
       var ratingsYear = RATINGS()[year];
       var gaugesCard = document.getElementById('teamGaugesCard');
@@ -611,6 +629,7 @@
 
       // Trends
       renderTrends(slug, year, abbr);
+      }
     }
 
     /* ─── ROSTER HELPERS (outside renderDetail) ──────────────── */

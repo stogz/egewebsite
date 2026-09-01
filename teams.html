@@ -10,7 +10,7 @@
   <script src="sim-config.js"></script>
   <script src="logos/teaminfo.js"></script>
   <script>if(window.EGE_SIM&&window.EGE_SIM.id==='sim-26'){document.write('<scr'+('ipt src="logos/teaminfo26.js"><\/scr')+('ipt>'));}</script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <link rel="stylesheet" href="css/teams.css" />
 </head>
 <body>
@@ -52,7 +52,7 @@
 
         <!-- Year select -->
         <div class="ege-select-wrap">
-          <select id="yearSelect" class="ege-select" aria-label="Select year" style="min-width:110px;"><!-- populated by JS from EGE_SEASON_STATS --></select>
+          <select id="yearSelect" class="ege-select" aria-label="Select year"><!-- populated by JS from EGE_SEASON_STATS --></select>
           <svg class="ege-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>
         </div>
 
@@ -114,7 +114,6 @@
             <div class="team-stat-card__label">// Conf Rank</div>
             <div class="team-stat-card__value" id="teamStatRank">—</div>
           </div>
-
         </div>
 
         <!-- Columns -->
@@ -153,6 +152,7 @@
               </div>
               <div class="team-chart-card__body">
                 <canvas id="teamWinChart"></canvas>
+                <div class="team-chart-note" id="teamWinChartNote">Win history is unavailable — the chart library didn't load.</div>
               </div>
             </div>
           </div>
