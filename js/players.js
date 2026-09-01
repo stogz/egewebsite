@@ -2776,17 +2776,83 @@
                        setting. The percentages are deliberately not in the
                        group, so turning it off narrows the table without
                        losing shooting efficiency. */
+  /* `tip` is the plain-English name shown on hover, since the headers are
+     abbreviations. */
   var LOG_COLS = [
-    { lbl:'DATE', cls:'log-lbl' },  { lbl:'TEAM', cls:'log-lbl' },
-    { lbl:'OPP',  cls:'log-lbl' },  { lbl:'H/A',  cls:'log-lbl' },
-    { lbl:'RESULT', cls:'log-lbl' },
-    { lbl:'MIN' },   { lbl:'PTS' },   { lbl:'REB' },   { lbl:'AST' },
-    { lbl:'STL' },   { lbl:'BLK' },   { lbl:'TO' },
-    { lbl:'FG',  grp:'fg' }, { lbl:'FGA', grp:'fg' }, { lbl:'FG%' },
-    { lbl:'3P',  grp:'fg' }, { lbl:'3PA', grp:'fg' }, { lbl:'3P%' },
-    { lbl:'FT',  grp:'fg' }, { lbl:'FTA', grp:'fg' }, { lbl:'FT%' },
-    { lbl:'TS%' },   { lbl:'HOOP' },
+    { lbl:'DATE',   cls:'log-lbl', tip:'Date' },
+    { lbl:'TEAM',   cls:'log-lbl', tip:'Team' },
+    { lbl:'OPP',    cls:'log-lbl', tip:'Opponent' },
+    { lbl:'H/A',    cls:'log-lbl', tip:'Home or Away' },
+    { lbl:'RESULT', cls:'log-lbl', tip:'Result and Final Score' },
+    { lbl:'MIN', tip:'Minutes Played' },
+    { lbl:'PTS', tip:'Points' },
+    { lbl:'REB', tip:'Rebounds' },
+    { lbl:'AST', tip:'Assists' },
+    { lbl:'STL', tip:'Steals' },
+    { lbl:'BLK', tip:'Blocks' },
+    { lbl:'TO',  tip:'Turnovers' },
+    { lbl:'FG',  grp:'fg', tip:'Field Goals Made' },
+    { lbl:'FGA', grp:'fg', tip:'Field Goals Attempted' },
+    { lbl:'FG%', tip:'Field Goal Percentage' },
+    { lbl:'3P',  grp:'fg', tip:'Three Pointers Made' },
+    { lbl:'3PA', grp:'fg', tip:'Three Pointers Attempted' },
+    { lbl:'3P%', tip:'Three Point Percentage' },
+    { lbl:'FT',  grp:'fg', tip:'Free Throws Made' },
+    { lbl:'FTA', grp:'fg', tip:'Free Throws Attempted' },
+    { lbl:'FT%', tip:'Free Throw Percentage' },
+    { lbl:'TS%', tip:'True Shooting Percentage' },
+    { lbl:'HOOP', tip:'Hoop Score' },
   ];
+
+  function tipAttr(c) {
+    return c.tip ? ' data-tip="' + c.tip + '"' : '';
+  }
+
+  /* ── HEADER TOOLTIPS ──
+     The log headers are abbreviations, so hovering one names the stat in
+     full. The bubble lives on <body> rather than inside the header: the
+     tables scroll in their own overflow box and the range modal is its own
+     scroll container, either of which would clip a positioned child. Wired
+     by delegation because both theads are re-rendered on every season
+     change, sort and settings toggle. */
+  var logTipEl = null;
+  function logTipShow(th) {
+    var text = th.getAttribute('data-tip');
+    if (!text) return;
+    if (!logTipEl) {
+      logTipEl = document.createElement('div');
+      logTipEl.className = 'log-tip';
+      document.body.appendChild(logTipEl);
+    }
+    logTipEl.textContent = text;
+    logTipEl.style.display = 'block';
+
+    // Centred over the header, above it, and nudged inside the viewport.
+    var r = th.getBoundingClientRect(), t = logTipEl.getBoundingClientRect();
+    var x = r.left + r.width / 2 - t.width / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - t.width - 8));
+    var y = r.top - t.height - 8;
+    if (y < 8) y = r.bottom + 8;   // no room above — sit under the header
+    logTipEl.style.left = x + 'px';
+    logTipEl.style.top  = y + 'px';
+  }
+  function logTipHide() {
+    if (logTipEl) logTipEl.style.display = 'none';
+  }
+  function tipTarget(e) {
+    var n = e.target;
+    if (!n || n.nodeType !== 1 || !n.closest) return null;
+    return n.closest('th[data-tip]');
+  }
+  document.addEventListener('mouseover', function(e){
+    var th = tipTarget(e);
+    if (th) logTipShow(th);
+  });
+  document.addEventListener('mouseout', function(e){
+    if (tipTarget(e)) logTipHide();
+  });
+  // Scrolling moves the header out from under the bubble, so drop it.
+  window.addEventListener('scroll', logTipHide, true);
 
   function colClass(c) {
     return ((c.cls || '') + (c.grp === 'fg' ? ' col-fg' : '')).trim();
@@ -2816,23 +2882,32 @@
   }
 
   /* ── HOOP SCORE HEAT ──
-     Anchors, with a continuous ramp between each pair:
-       <=7  bright red    hsl(0,82,46)
-        17  orange        hsl(30,88,45)
-       >=32 bright green  hsl(140,68,40)
-     Each segment starts on the previous one's end values, so the ramp has no
-     seam at a boundary, and anything above 32 stays flat green. Matches the
-     mock draft's filled-cell heatmap: an HSL background under white text,
-     with every lightness in the 40-46 band so white stays legible throughout. */
+     Two anchors: 7 is red, 30 is green, with a ramp between them.
+       <=7  red         rgb(213, 21, 21)
+        30  green       rgb(33, 171, 79)
+       >=30 stays green
+     The ramp runs through a desaturated slate rather than blending hue
+     directly, because a straight red-to-green hue blend passes through
+     orange and yellow in the middle — the colours this scale is meant to
+     be rid of. Mixing through a neutral keeps the midrange plainly "in
+     between" instead. Every stop stays dark enough for white text. */
+  var HEAT_STOPS = [
+    { at:  7,   rgb: [213,  21,  21] },  // red
+    { at: 18.5, rgb: [104, 106, 124] },  // neutral slate, the midpoint
+    { at: 30,   rgb: [ 33, 171,  79] }   // green
+  ];
   function hoopHeatStyle(gs) {
-    var h, sat, lum;
-    if (gs >= 32)     { h = 140; sat = 68; lum = 40; }                 // bright green
-    else if (gs > 17) { var a = (gs - 17) / 15;                        // orange → green
-                        h = 30 + a * 110; sat = 88 - a * 20; lum = 45 - a * 5; }
-    else if (gs > 7)  { var b = (gs - 7) / 10;                         // red → orange
-                        h = b * 30; sat = 82 + b * 6; lum = 46 - b * 1; }
-    else              { h = 0;   sat = 82; lum = 46; }                 // bright red
-    return 'background:hsl(' + h.toFixed(0) + ',' + sat.toFixed(0) + '%,' + lum.toFixed(0) + '%)!important;color:#fff!important;';
+    var lo = HEAT_STOPS[0], hi = HEAT_STOPS[HEAT_STOPS.length - 1], rgb;
+    if (gs <= lo.at)      rgb = lo.rgb;
+    else if (gs >= hi.at) rgb = hi.rgb;
+    else {
+      var i = 1;
+      while (gs > HEAT_STOPS[i].at) i++;
+      var a = HEAT_STOPS[i - 1], b = HEAT_STOPS[i];
+      var t = (gs - a.at) / (b.at - a.at);
+      rgb = a.rgb.map(function(v, k){ return Math.round(v + (b.rgb[k] - v) * t); });
+    }
+    return 'background:rgb(' + rgb.join(',') + ')!important;color:#fff!important;';
   }
 
   /* Hoop cell, tinted when the Color System setting is on. `perGame` guards
@@ -2998,7 +3073,7 @@
     if (!games.length) return '';
     var thead = '<thead><tr>';
     LOG_COLS.forEach(function(c){
-      thead += '<th' + clsAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
+      thead += '<th' + clsAttr(c) + tipAttr(c) + ' data-col="' + c.lbl + '">' + c.lbl + '<span class="sort-arrow"></span></th>';
     });
     thead += '</tr></thead>';
 
@@ -3124,20 +3199,10 @@
     return rows.slice(lo, hi + 1).map(function(r){ return games[parseInt(r.dataset.gi, 10)]; });
   }
 
-  /* Title reads '{Date} through {Date}' when both ends are dated. Undated
-     games (the 2K25 logs) have no date to name, so those fall back to the
-     span's size and season. */
+  /* The summary covers one season's table, so the season alone names it —
+     the games it spans are already listed in the row beside it. */
   function rangeTitle(span) {
-    // Endpoints run earliest → latest whatever order the table is sorted in,
-    // so a descending sort doesn't title the span 'MAR 17 through MAR 15'.
-    var keys = span.map(function(g){ return dateSortKey(g.date); });
-    if (keys.every(function(k){ return k !== null; })) {
-      var lo = span[keys.indexOf(Math.min.apply(null, keys))];
-      var hi = span[keys.indexOf(Math.max.apply(null, keys))];
-      var a = fmtGameDate(lo.date), b = fmtGameDate(hi.date);
-      return a === b ? a : a + ' through ' + b;
-    }
-    return span.length + ' Games · ' + (span[0].season || '');
+    return span[0] && span[0].season ? String(span[0].season) : '';
   }
 
   function openRangeModal(span) {
@@ -3157,7 +3222,7 @@
     var thead = '<thead><tr><th class="log-lbl"></th>';
     LOG_COLS.forEach(function(c){
       if (c.cls === 'log-lbl') return;
-      thead += '<th' + clsAttr(c) + '>' + c.lbl + '</th>';
+      thead += '<th' + clsAttr(c) + tipAttr(c) + '>' + c.lbl + '</th>';
     });
     thead += '</tr></thead>';
 
@@ -3279,7 +3344,7 @@
     { id:'fgData', label:'Field Goal Data',
       hint:'Show made and attempted counts. Off keeps FG%, 3P%, FT% and TS%.' },
     { id:'colorSystem', label:'Color System',
-      hint:'Shade the Hoop Score by performance — red through orange to green.' },
+      hint:'Shade the Hoop Score by performance — red at 7 up to green at 30.' },
   ];
 
   function logSettingsMenu() {
