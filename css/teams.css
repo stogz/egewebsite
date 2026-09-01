@@ -233,11 +233,12 @@
     }
     .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
     .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(var(--accent-rgb),.25); }
-    /* The playoff line: everything above it made the bracket. Drawn in the
-       conference's own colour so it ties back to the card header, and heavier
-       than the play-in marks either side of it. */
+    /* The playoff line: everything above it made the bracket. Its own gap,
+       wider than the one between rows, keeps it clear of the eighth seed. */
+    .standings-list a:nth-child(8) { margin-bottom: 16px; }
     .standings-list a:nth-child(8)::after {
-      border-bottom: 2px solid rgba(var(--conf-rgb), .75);
+      bottom: calc(-1 * (var(--list-gap) + 16px) / 2);
+      border-bottom: 1.5px dotted var(--border);
     }
 
     .standings-row {
@@ -1000,24 +1001,70 @@
       gap: 0;
     }
 
+    /* A pair of matchups and the elbow that joins them. space-around puts the
+       two centres at exactly 25% and 75% of the pair, so the vertical line
+       spans centre to centre at any height. */
+    .bracket-pair {
+      display: flex; flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      position: relative;
+    }
+    .bracket-pair::before {
+      content: '';
+      position: absolute;
+      right: calc(-1 * var(--bk-gap) / 2);
+      top: 25%; bottom: 25%;
+      width: 1px;
+      background: var(--border);
+    }
+    /* From the middle of that vertical out to the next round */
+    .bracket-pair::after {
+      content: '';
+      position: absolute;
+      right: calc(-1 * var(--bk-gap));
+      top: 50%;
+      width: calc(var(--bk-gap) / 2); height: 1px;
+      background: var(--border);
+    }
+
     /* Matchup card */
     .bracket-matchup {
       position: relative;
       margin: 6px 0;
     }
-    /* Connector stubs reach across the column gap toward the next round —
-       rightward on the west side, leftward on the east, since the east
-       columns run inward toward the finals. Width is tied to the gap so the
-       two can't drift apart. */
+    /* Each card runs a stub half-way across the gap, to meet the pair's
+       vertical line. West runs rightward, east leftward, since the east
+       columns work inward toward the finals. Everything is measured off the
+       column gap, so the pieces meet whatever it is set to. */
     .bracket-matchup::after {
       content: '';
       position: absolute;
-      right: calc(-1 * var(--bk-gap)); top: 50%;
-      width: var(--bk-gap); height: 1px;
+      right: calc(-1 * var(--bk-gap) / 2); top: 50%;
+      width: calc(var(--bk-gap) / 2); height: 1px;
       background: var(--border);
     }
-    .bracket-col--east .bracket-matchup::after {
+    /* A conference final has no sibling to join, so it crosses the whole gap
+       to the finals on its own. */
+    .bracket-col > .bracket-matchup::after {
+      right: calc(-1 * var(--bk-gap));
+      width: var(--bk-gap);
+    }
+    .bracket-col--east .bracket-matchup::after,
+    .bracket-col--east .bracket-pair::before,
+    .bracket-col--east .bracket-pair::after {
       right: auto;
+    }
+    .bracket-col--east .bracket-matchup::after {
+      left: calc(-1 * var(--bk-gap) / 2);
+    }
+    .bracket-col--east > .bracket-matchup::after {
+      left: calc(-1 * var(--bk-gap));
+    }
+    .bracket-col--east .bracket-pair::before {
+      left: calc(-1 * var(--bk-gap) / 2);
+    }
+    .bracket-col--east .bracket-pair::after {
       left: calc(-1 * var(--bk-gap));
     }
 

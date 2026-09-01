@@ -948,13 +948,24 @@
         return idx >= 0 ? idx+1 : '';
       }
 
+      /* Matchups are emitted two to a .bracket-pair. The pair is what the
+         bracket's elbow is drawn on: the vertical line joining a pair spans
+         its two matchup centres, which sit at exactly 25% and 75% of the
+         pair's height however tall it gets. A lone matchup (a conference
+         final) is emitted bare and reaches the finals with one stub. */
       function colHTML(matchups, seeds, conf, isFinals) {
         if (!matchups || !matchups.length) return '';
-        return matchups.map(function(m, i) {
+        var cards = matchups.map(function(m, i) {
           var ts = seeds ? seeds[i*2]   : (m ? getSeed(m.top, conf) : '');
           var bs = seeds ? seeds[i*2+1] : (m ? getSeed(m.bot, conf) : '');
           return buildMatchup(m, ts, bs, i, isFinals, ss, year);
-        }).join('');
+        });
+        if (isFinals || cards.length < 2) return cards.join('');
+        var out = '';
+        for (var i = 0; i < cards.length; i += 2) {
+          out += '<div class="bracket-pair">' + cards[i] + (cards[i+1] || '') + '</div>';
+        }
+        return out;
       }
 
       // Build seed labels for R1
