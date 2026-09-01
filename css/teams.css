@@ -1077,7 +1077,8 @@
     @media (max-width: 768px) {
       .teams-inner { padding: 0 12px; box-sizing: border-box; }
       /* Nav is position:relative on mobile (shared.css), so no top padding needed */
-      .teams-page  { padding: 16px 0 60px; }
+      /* Top padding clears the fixed nav — the team select sat under it. */
+      .teams-page  { padding: calc(var(--nav-h) + 16px) 0 60px; }
 
       /* Controls: row1 = team select full width, row2 = [<][year][>][back] */
       .teams-controls { gap: 8px; flex-wrap: wrap; }

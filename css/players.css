@@ -582,8 +582,10 @@
 
     /* ── MOBILE PLAYER CONTENT PADDING ── */
     @media (max-width:768px) {
-      /* Nav is position:relative on mobile, so no offset needed */
-      #player-profile { padding-top:0; }
+      /* The nav is fixed here too, so the profile reserves its height —
+         without it the Back to Roster button sits under the bar and can't
+         be tapped. */
+      #player-profile { padding-top:var(--nav-h); }
       .player-select { padding:80px 16px 50px; }
       .player-select-grid { gap:10px; }
       .player-banner { padding: 20px 0 30px; }
@@ -1152,7 +1154,10 @@
     /* The summary drops the five identity columns, so it needs less width */
     #range-modal .log-table { min-width: 0; }
     #range-modal .log-table th { padding: 14px 16px; }
-    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; font-size: 1rem; }
+    /* Type is left alone so the numbers read exactly as they do in the log
+       itself — same face, size and weight. Only the box around them is
+       roomier. */
+    #range-modal .log-table td { height: 3.4rem; padding: 0 16px; }
     #range-modal .log-table td.log-lbl {
       font-size: .68rem;
       letter-spacing: .12em;

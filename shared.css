@@ -48,6 +48,9 @@
   --scanline:    rgba(0, 0, 0, 0.03);
   --grid-line:   rgba(35, 26, 165, 0.08);
   --mode-icon:   '☀';
+  /* Height of the fixed nav. Pages reserve space with this rather than a
+     hardcoded number, so the two can never drift apart. */
+  --nav-h:       64px;
   /* Brand colors — same in light and dark mode */
   --orange:      #e75719;
   --dark-orange: #9c380c;
@@ -159,9 +162,9 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  height: 64px;
-  min-height: 64px;
-  max-height: 64px;
+  height: var(--nav-h);
+  min-height: var(--nav-h);
+  max-height: var(--nav-h);
   background: var(--bg-nav);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(var(--accent-rgb), 0.18);
@@ -486,12 +489,13 @@ section { position: relative; z-index: 2; }
    hamburger + dropdown, section headers stack, footer centers. */
 @media (max-width: 768px) {
 
+  /* The nav stays fixed on mobile, so it covers whatever is under it.
+     Pages reserve this height at the top of their own content. */
+  :root { --nav-h: 56px; }
+
   /* Nav bar shrinks and switches to the hamburger menu */
   nav {
     padding: 0 18px;
-    height: 56px;
-    min-height: 56px;
-    max-height: 56px;
     flex-wrap: nowrap;
     position: fixed;
     z-index: 9999;
@@ -532,7 +536,7 @@ section { position: relative; z-index: 2; }
   #nav-mobile-menu {
     display: none;
     position: fixed;
-    top: 56px;
+    top: var(--nav-h);
     left: 0; right: 0;
     background: var(--bg-nav);
     backdrop-filter: blur(14px);
