@@ -210,10 +210,10 @@
       color: rgba(42,33,64,.5);
     }
     .standings-row__name {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(14px,2.2vw,18px);
-      letter-spacing: .02em;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: clamp(12px,1.9vw,15px);
+      letter-spacing: .05em;
       color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
@@ -258,12 +258,20 @@
       50%      { filter: drop-shadow(0 0 10px rgba(255,185,20,1)) drop-shadow(0 0 6px rgba(255,220,60,1)); }
     }
     .standings-row__record {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(14px,2.4vw,18px);
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: clamp(11px,1.7vw,13px);
+      letter-spacing: .08em;
       white-space: nowrap;
       color: #ffffff;
-      transition: color .35s;
+      padding: clamp(5px,.9vw,7px) clamp(9px,1.5vw,13px);
+      border: 1px solid var(--border);
+      background: rgba(var(--accent-rgb),.05);
+      transition: color .35s, border-color .2s, background .35s;
+    }
+    /* Picks up the row's accent on hover, like the row's own border does. */
+    .standings-row:hover .standings-row__record {
+      border-color: rgba(var(--accent-rgb),.45);
     }
     html.light .standings-row__record {
       color: #08052f;
@@ -276,7 +284,7 @@
     /* Team hero banner */
     .team-banner {
       position: relative;
-      border-radius: 8px;
+      border-radius: 0;
       overflow: hidden;
       padding: 36px 40px;
       margin-bottom: 28px;
@@ -330,7 +338,7 @@
     .team-stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       padding: 20px;
       transition: background .35s, transform .2s, border-color .2s, box-shadow .2s;
     }
@@ -379,7 +387,7 @@
     .team-chart-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       transition: background .35s;
       margin-bottom: 24px;
@@ -432,7 +440,7 @@
       margin-top: 20px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       transition: background .35s;
       margin-bottom: 24px;
@@ -500,7 +508,7 @@
     /* ── ROSTER / SPLITS-STYLE TABLE ── */
     .team-roster-card {
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -586,7 +594,7 @@
     .trends-card {
       margin-top: 20px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -637,7 +645,7 @@
     .playoff-result-card {
       margin-top: 20px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -695,7 +703,7 @@
     .champ-card {
       display: none;
       margin-top: 0;
-      border-radius: 8px;
+      border-radius: 0;
       overflow: hidden;
       position: relative;
       background: linear-gradient(135deg, #1a1200 0%, #2a1f00 40%, #1a1200 100%);
@@ -733,7 +741,7 @@
       content: '';
       position: absolute;
       inset: -1px;
-      border-radius: 8px;
+      border-radius: 0;
       border: 1px solid rgba(255,200,40,.6);
       animation: champGlow 2s ease-in-out infinite;
       pointer-events: none;
@@ -957,8 +965,8 @@
       color: var(--text-muted); flex-shrink: 0; min-width: 10px;
     }
     .bracket-team__name {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: .8rem; letter-spacing: .02em;
+      font-family: var(--font-mono); font-weight: 400;
+      font-size: .78rem; letter-spacing: .08em;
       color: var(--heading); flex: 1;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color .35s;
@@ -1110,7 +1118,9 @@
       /* Standings */
       .standings-grid { grid-template-columns: 1fr; gap: 24px; }
       .standings-row__name { display: none; }
-      .standings-row__abbr { display: inline; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px,4vw,17px); letter-spacing: .06em; }
+      /* Mobile shows the abbreviation in place of the full name — same
+         mono face, so the two read as one column at any width. */
+      .standings-row__abbr { display: inline; font-family: var(--font-mono); font-weight: 400; font-size: clamp(12px,3.6vw,15px); letter-spacing: .1em; }
       .standings-row { padding: 10px 12px; min-height: 48px; }
 
       /* Team banner */
@@ -1140,8 +1150,8 @@
 
       /* Roster — exact players.html mobile scroll fix */
       .team-roster-card { overflow: visible; }
-      .team-roster-card__header { border-radius: 6px 6px 0 0; }
-      .roster-scroll { border-radius: 0 0 6px 6px; overflow-x: auto; }
+      .team-roster-card__header { border-radius: 0; }
+      .roster-scroll { border-radius: 0; overflow-x: auto; }
     }
 
     /* ── SUB-400px ── */
