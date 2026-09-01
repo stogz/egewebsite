@@ -875,10 +875,11 @@
             + '</span>';
         }
       }
-      return '<div class="'+cls+'" data-slug="'+slug+'" style="--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';">'
-        +(logo?'<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">':'')
+      return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';">'
+        +(logo
+            ? '<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">'
+            : '<span class="bracket-team__name">'+abbr+'</span>')
         +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
-        +'<span class="bracket-team__name">'+abbr+'</span>'
         +iconsHtml
         +'<span class="bracket-team__wins">'+winsStr+'</span>'
         +'</div>';

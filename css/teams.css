@@ -130,7 +130,6 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 0;
-      overflow: hidden;
       transition: background .35s;
     }
     .standings-card__header {
@@ -148,10 +147,14 @@
     }
     .standings-card--west { --conf-rgb: var(--conf-west-rgb); }
     .standings-card--east { --conf-rgb: var(--conf-east-rgb); }
+    /* The header's own frame, pulled out over the card's border so the top,
+       left and right edges beside it read in the conference colour instead of
+       the site's blue. */
     .standings-card--west .standings-card__header,
     .standings-card--east .standings-card__header {
       background: rgba(var(--conf-rgb), .14);
-      border-bottom-color: rgba(var(--conf-rgb), .35);
+      border: 1px solid rgba(var(--conf-rgb), .45);
+      margin: -1px -1px 0;
     }
     .standings-card--west .team-chart-card__dot,
     .standings-card--east .team-chart-card__dot {
@@ -225,8 +228,7 @@
       position: relative;
     }
 
-    /* Cut lines, drawn centred in the gap below their row */
-    .standings-list a:nth-child(6)::after,
+    /* Cut line, drawn centred in the gap below its row */
     .standings-list a:nth-child(8)::after {
       content: '';
       position: absolute;
@@ -235,13 +237,12 @@
       pointer-events: none;
       z-index: 2;
     }
-    .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
     /* The playoff line: everything above it made the bracket. Its own gap,
        wider than the one between rows, keeps it clear of the eighth seed. */
     .standings-list a:nth-child(8) { margin-bottom: 16px; }
     .standings-list a:nth-child(8)::after {
       bottom: calc(-1 * (var(--list-gap) + 16px) / 2);
-      border-bottom: 1.5px dotted var(--border);
+      border-bottom: 1.5px dotted rgba(var(--accent-rgb), .65);
     }
 
     .standings-row {
@@ -980,7 +981,7 @@
       grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, 180px) repeat(3, minmax(0, 1fr));
       grid-template-rows: auto;
       gap: 0 var(--bk-gap);
-      min-width: 880px;
+      min-width: 760px;
       /* Columns stretch to the row height so each one can space its matchups
          evenly — that is what keeps the rounds aligned. */
       align-items: stretch;
@@ -1129,11 +1130,15 @@
     }
 
     .bracket-team__logo {
-      width: 18px; height: 18px; object-fit: contain; flex-shrink: 0;
+      width: 22px; height: 22px; object-fit: contain; flex-shrink: 0;
     }
+    /* With the abbreviation gone the seed takes the slack, which keeps the
+       crest at one edge and the series score at the other. text-align:start
+       so it follows the east columns' rtl direction. */
     .bracket-team__seed {
       font-family: var(--font-mono); font-size: .52rem;
-      color: var(--text-muted); flex-shrink: 0; min-width: 10px;
+      color: var(--text-muted); flex: 1; min-width: 10px;
+      text-align: start;
     }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
@@ -1236,13 +1241,21 @@
     }
 
     /* ── BRACKET LIGHT MODE ── */
+    /* Set the three neutral edges only. The shorthand used to be border-color,
+       which also overwrote border-left-color and so wiped out the team colour
+       every card carries on its left edge — in light mode no bracket card had
+       any team colour at all. */
     html.light .bracket-team {
       background: rgba(255,255,255,.9);
-      border-color: rgba(35,26,165,.2);
+      border-top-color: rgba(35,26,165,.2);
+      border-right-color: rgba(35,26,165,.2);
+      border-bottom-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
       background: rgba(var(--accent-rgb),.07);
-      border-color: rgba(35,26,165,.2);
+      border-top-color: rgba(35,26,165,.2);
+      border-right-color: rgba(35,26,165,.2);
+      border-bottom-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
     html.light .bracket-team__seed  { color: rgba(42,33,64,.5); }
