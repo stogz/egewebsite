@@ -277,6 +277,18 @@
       var logo = getStandingsLogo(teamName, year);
       var bg = getTeamColor(teamName, year);
       var record = stats.record || 'N/A';
+      /* The record is authored as "50-16"; pct is authored alongside it but
+         is computed here when a season's row omits it. */
+      var rec = String(record).split('-');
+      var wins = rec.length === 2 ? rec[0].trim() : record;
+      var loss = rec.length === 2 ? rec[1].trim() : '';
+      var pct  = stats.pct;
+      if (!pct && rec.length === 2) {
+        var w = parseInt(wins,10), l = parseInt(loss,10);
+        if (!isNaN(w) && !isNaN(l) && (w+l) > 0) {
+          pct = (w/(w+l)).toFixed(3).replace(/^0/,'');
+        }
+      }
       var yy = seasonToSuffix(year);
       var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
       var players = Array.isArray(stats.players) ? stats.players : [];
@@ -300,13 +312,24 @@
         +'</div>'
         +'<div class="standings-row__right">'
           +iconsHtml
-          +'<div class="standings-row__record">'+record+'</div>'
+          +'<div class="standings-row__record">'
+            +'<span class="rec-box rec-w">'+wins+'</span>'
+            +'<span class="rec-box rec-l">'+(loss||'—')+'</span>'
+            +'<span class="rec-box rec-pct">'+(pct||'—')+'</span>'
+          +'</div>'
         +'</div>'
       +'</a>';
     }
     function renderStandings(year) {
       var ss = SEASON_STATS()[year];
-      if (!ss) { eastList.innerHTML = '<div class="roster-empty">No data for this season.</div>'; westList.innerHTML=''; return; }
+      var heads = document.querySelectorAll('.standings-head');
+      if (!ss) {
+        eastList.innerHTML = '<div class="roster-empty">No data for this season.</div>';
+        westList.innerHTML = '';
+        heads.forEach(function(h){ h.style.display = 'none'; });
+        return;
+      }
+      heads.forEach(function(h){ h.style.display = ''; });
       var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
       var sorted = slugs.slice().sort(function(a,b){
         var ra = parseInt(String(ss[a].rank||'').replace(/\D/g,''),10)||9999;

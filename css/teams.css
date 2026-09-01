@@ -141,10 +141,34 @@
     }
     .standings-conf-label { color: var(--orange); }
 
+    /* One set of measurements for the W / L / PCT columns, read by both the
+       headings and the boxes in every row so they stay in line. */
+    .standings-grid {
+      --rec-w:   clamp(34px, 5vw, 44px);
+      --pct-w:   clamp(46px, 6.4vw, 58px);
+      --rec-gap: clamp(4px, .7vw, 6px);
+      --rec-pad-r: clamp(14px, 2vw, 18px);
+    }
+
+    /* Column headings above each conference list */
+    .standings-head {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--rec-gap);
+      padding: 0 var(--rec-pad-r) 6px 0;
+      font-family: var(--font-mono);
+      font-size: .55rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .standings-head__cell { width: var(--rec-w); text-align: center; }
+    .standings-head__cell--pct { width: var(--pct-w); }
+
     .standings-list {
       display: flex;
       flex-direction: column;
-      gap: clamp(5px, .9vw, 7px);
+      gap: clamp(4px, .7vw, 6px);
       position: relative;
     }
 
@@ -166,8 +190,8 @@
       align-items: center;
       justify-content: space-between;
       gap: clamp(8px,1.6vw,14px);
-      padding: clamp(9px,1.4vw,13px) clamp(14px,2vw,18px);
-      min-height: clamp(50px,6vw,62px);
+      padding: clamp(5px,.9vw,8px) var(--rec-pad-r);
+      min-height: clamp(40px,4.6vw,50px);
       border-radius: 0;
       text-decoration: none;
       color: var(--text);
@@ -193,8 +217,8 @@
       min-width: 0; flex: 1;
     }
     .standings-row__logo {
-      width: clamp(28px,4.2vw,40px);
-      height: clamp(28px,4.2vw,40px);
+      width: clamp(24px,3.4vw,32px);
+      height: clamp(24px,3.4vw,32px);
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -234,8 +258,8 @@
       display: flex; align-items: center;
     }
     .standings-row__icon {
-      width: clamp(28px,4vw,36px);
-      height: clamp(28px,4vw,36px);
+      width: clamp(24px,3.4vw,30px);
+      height: clamp(24px,3.4vw,30px);
       object-fit: contain;
       border-radius: 0;
       background: transparent;
@@ -245,7 +269,7 @@
     }
     /* Champion trophy in standings */
     .standings-champ-trophy {
-      width: 28px; height: 28px;
+      width: 24px; height: 24px;
       object-fit: contain;
       flex-shrink: 0;
       margin-left: 6px;
@@ -257,24 +281,42 @@
       0%,100% { filter: drop-shadow(0 0 4px rgba(255,185,20,.6)) drop-shadow(0 0 2px rgba(255,200,40,.8)); }
       50%      { filter: drop-shadow(0 0 10px rgba(255,185,20,1)) drop-shadow(0 0 6px rgba(255,220,60,1)); }
     }
+    /* Wins, losses and win percentage each get their own box, sized from the
+       shared column widths so they sit under the headings. */
     .standings-row__record {
+      display: flex;
+      gap: var(--rec-gap);
+      flex-shrink: 0;
+    }
+    .rec-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--rec-w);
+      padding: clamp(4px,.7vw,6px) 0;
       font-family: var(--font-mono);
       font-weight: 400;
-      font-size: clamp(11px,1.7vw,13px);
-      letter-spacing: .08em;
+      font-size: clamp(11px,1.6vw,13px);
+      letter-spacing: .06em;
       white-space: nowrap;
       color: #ffffff;
-      padding: clamp(5px,.9vw,7px) clamp(9px,1.5vw,13px);
       border: 1px solid var(--border);
       background: rgba(var(--accent-rgb),.05);
       transition: color .35s, border-color .2s, background .35s;
     }
+    .rec-pct {
+      width: var(--pct-w);
+      color: var(--text-muted);
+    }
     /* Picks up the row's accent on hover, like the row's own border does. */
-    .standings-row:hover .standings-row__record {
+    .standings-row:hover .rec-box {
       border-color: rgba(var(--accent-rgb),.45);
     }
-    html.light .standings-row__record {
+    html.light .rec-box {
       color: #08052f;
+    }
+    html.light .rec-pct {
+      color: var(--text-muted);
     }
 
     /* ── TEAM DETAIL VIEW ── */
@@ -1121,7 +1163,9 @@
       /* Mobile shows the abbreviation in place of the full name — same
          mono face, so the two read as one column at any width. */
       .standings-row__abbr { display: inline; font-family: var(--font-mono); font-weight: 400; font-size: clamp(12px,3.6vw,15px); letter-spacing: .1em; }
-      .standings-row { padding: 10px 12px; min-height: 48px; }
+      .standings-row { padding: 6px 10px; min-height: 40px; }
+      /* Rows use a tighter side padding here, so the headings match it. */
+      .standings-head { padding-right: 10px; }
 
       /* Team banner */
       .team-banner { padding: 18px 14px; min-height: auto; }

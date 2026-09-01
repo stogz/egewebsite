@@ -80,10 +80,22 @@
         <div class="standings-grid">
           <div>
             <div class="standings-conf-label">Western Conference</div>
+            <!-- Column headings sit outside .standings-list so they don't shift
+                 the nth-child counts the playoff cut lines are drawn from. -->
+            <div class="standings-head" aria-hidden="true">
+              <span class="standings-head__cell">W</span>
+              <span class="standings-head__cell">L</span>
+              <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+            </div>
             <div class="standings-list" id="standingsWest"></div>
           </div>
           <div>
             <div class="standings-conf-label">Eastern Conference</div>
+            <div class="standings-head" aria-hidden="true">
+              <span class="standings-head__cell">W</span>
+              <span class="standings-head__cell">L</span>
+              <span class="standings-head__cell standings-head__cell--pct">PCT</span>
+            </div>
             <div class="standings-list" id="standingsEast"></div>
           </div>
         </div>
