@@ -338,8 +338,17 @@
       });
       var east=[],west=[];
       sorted.forEach(function(s){ (isEastern(s)?east:west).push(s); });
-      eastList.innerHTML = east.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
-      westList.innerHTML = west.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
+      /* The playoff divider is its own element between the eighth and ninth
+         rows, not a border on the eighth row: as part of that row it inherited
+         the row's hover lift and slid up with it. */
+      function listHTML(slugs) {
+        return slugs.map(function(s, i) {
+          return buildStandingsRow(s, ss[s], i+1, year)
+            + (i === 7 && slugs.length > 8 ? '<div class="standings-cut" aria-hidden="true"></div>' : '');
+        }).join('');
+      }
+      eastList.innerHTML = listHTML(east);
+      westList.innerHTML = listHTML(west);
       // Render bracket
       renderBracket(year);
       // Wire clicks
@@ -875,11 +884,15 @@
             + '</span>';
         }
       }
-      return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';">'
+      /* Seed left, crest centred, series wins right — and the crest again as
+         a washed-out backdrop behind the whole box. */
+      var style = '--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';'
+                + (logo ? '--team-logo:url(\''+logo+'\');' : '');
+      return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="'+style+'">'
+        +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
         +(logo
             ? '<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">'
             : '<span class="bracket-team__name">'+abbr+'</span>')
-        +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
         +iconsHtml
         +'<span class="bracket-team__wins">'+winsStr+'</span>'
         +'</div>';
