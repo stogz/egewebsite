@@ -1142,18 +1142,18 @@
     /* Ordinal seed in a hairline box — the same mono, letterspacing and 1px
        frame the rest of the page uses, in the sim's accent. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .54rem;
-      letter-spacing: .1em;
+      font-family: var(--font-mono); font-size: .46rem;
+      letter-spacing: .06em;
       text-transform: uppercase;
       color: var(--orange);
       border: 1px solid rgba(var(--accent-rgb),.4);
       background: transparent;
       flex: 0 0 auto;
-      min-width: 30px;
-      padding: 2px 5px;
+      min-width: 24px;
+      padding: 1px 3px;
       text-align: center;
     }
-    .bracket-team__seed:empty { border: none; padding: 0; min-width: 16px; }
+    .bracket-team__seed:empty { border: none; padding: 0; min-width: 14px; }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
       font-size: .78rem; letter-spacing: .08em;
@@ -1190,28 +1190,35 @@
     .bracket-team.champion .bracket-team__wins { color: #ffc820; }
 
     /* Finals centre column */
+    /* Three rows, the outer two equal: whatever the wordmark's height, the
+       matchup lands on the column's centre line — which is where the
+       conference finals' connectors arrive. A plain centred stack put the
+       matchup below that line by half the wordmark's height. */
     .bracket-finals-col {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      justify-items: center;
       padding: 0 8px;
       min-width: 0;
     }
-    /* The wordmark's script is black on transparent, which would vanish on the
-       dark ground, so it sits on a white plate — the way the mark is normally
-       presented anyway. */
+    .bracket-finals-trophy { grid-row: 1; align-self: end; }
+    .bracket-finals-col .bracket-matchup { grid-row: 2; align-self: center; }
     .bracket-finals-trophy {
       display: flex; align-items: center; justify-content: center;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       width: 100%;
-      box-sizing: border-box;
     }
+    /* The wordmark's script is black on transparent and would disappear into
+       the dark ground. Four chained 1px drop-shadows trace a white outline
+       around the artwork instead of sitting it on a plate. Light mode has the
+       contrast already, so it goes without. */
     .bracket-finals-trophy img {
-      width: 100%; max-width: 128px; height: auto; display: block;
+      width: 100%; max-width: 118px; height: auto; display: block;
+      filter:
+        drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+        drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
     }
+    html.light .bracket-finals-trophy img { filter: none; }
     .bracket-finals-col .bracket-matchup { width: 100%; }
     .bracket-finals-col .bracket-matchup::after { display: none; }
     /* Finals teams are bigger */
@@ -1222,7 +1229,7 @@
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
-    .bracket-finals-col .bracket-team__seed { font-size: .6rem; min-width: 34px; padding: 3px 6px; }
+    .bracket-finals-col .bracket-team__seed { font-size: .52rem; min-width: 28px; padding: 2px 4px; }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {
