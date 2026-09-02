@@ -872,6 +872,12 @@
     /* ─── PLAYOFF BRACKET ────────────────────────────────────── */
     function BRACKETS() { return window.EGE_BRACKETS || {}; }
 
+    /* "3" → "3rd" for the bracket's seed chip; anything non-numeric passes
+       through, so a missing seed stays blank. */
+    function seedText(seed) {
+      var n = parseInt(seed, 10);
+      return isNaN(n) ? (seed || '') : ordinal(n);
+    }
     function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year, isLoser) {
       if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';
       var ti = TEAM_INFO()[slug]||{};
@@ -903,7 +909,7 @@
                 + (teamRgb ? '--row-accent-rgb:'+teamRgb+';' : '')
                 + (logo ? '--team-logo:url(\''+logo+'\');' : '');
       return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="'+style+'">'
-        +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
+        +'<span class="bracket-team__seed">'+seedText(seedLabel)+'</span>'
         +(logo
             ? '<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">'
             : '<span class="bracket-team__name">'+abbr+'</span>')

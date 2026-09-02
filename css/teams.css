@@ -182,9 +182,8 @@
       --rec-w:   clamp(40px, 5.6vw, 52px);
       --pct-w:   clamp(52px, 7vw, 64px);
       --rec-pad-r: clamp(14px, 2vw, 18px);
-      /* Row geometry the headings copy so the two line up: the accent stripe
-         on the left, the hairline frame, and the gap between crest and seed. */
-      --row-accent-w: 4px;
+      /* Row geometry the headings copy so the two line up: the hairline frame
+         and the gap between crest and seed. */
       --row-frame: 1px;
       --row-gap: clamp(8px,1.6vw,13px);
       --logo-w: clamp(24px,3.4vw,32px);
@@ -199,7 +198,6 @@
       justify-content: space-between;
       gap: var(--row-gap);
       border: var(--row-frame) solid transparent;
-      border-left: var(--row-accent-w) solid transparent;
       padding: 0 var(--rec-pad-r) 8px;
       font-family: var(--font-mono);
       font-size: .55rem;
@@ -256,7 +254,6 @@
       position: relative;
       background: transparent;
       border: 1px solid var(--border-soft);
-      border-left: 4px solid var(--row-accent, var(--border));
       transition: border-color .2s, background .2s, color .35s;
     }
     /* Hover tints the row in the team's own colour. Nothing moves and nothing
@@ -264,7 +261,6 @@
        can be set here. */
     .standings-row:hover {
       border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
-      border-left-color: var(--row-accent, var(--orange));
       background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.14);
     }
 
@@ -1084,7 +1080,6 @@
       padding: 7px 9px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
       transition: border-color .2s, background .35s;
       cursor: pointer;
       position: relative;
@@ -1118,21 +1113,14 @@
       border-radius: 0;
       border-top: none;
     }
-    /* The winner's box washes in its own colour, strongest at the left edge
-       where the accent stripe is, fading out across the box. */
     .bracket-team.winner {
-      border-left-color: var(--row-accent, var(--orange));
-      background: linear-gradient(90deg,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),.55) 0%,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),.16) 55%,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),0) 100%);
+      background: rgba(var(--accent-rgb),.06);
     }
     /* The side that lost the series sits well back. Only a decided series
        marks a loser, so an undecided or TBD box is left at full strength. */
     .bracket-team.loser { opacity: .5; }
     .bracket-team.loser:hover { opacity: 1; }
     .bracket-team.champion {
-      border-left-color: #ffc820;
       background: rgba(255,200,32,.06);
     }
 
@@ -1141,15 +1129,21 @@
       flex: 1 1 auto; min-width: 0;
       object-position: center;
     }
-    /* Plain text, but at full strength rather than the muted grey it used to
-       be, so the seed reads at a glance. */
+    /* Ordinal seed in a chip filled with the sim's accent — orange under
+       2K25, blue under 2K26. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .7rem;
+      font-family: var(--font-mono); font-size: .56rem;
       font-weight: 700;
-      color: var(--heading);
-      flex: 0 0 16px; width: 16px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #ffffff;
+      background: var(--orange);
+      flex: 0 0 auto;
+      min-width: 30px;
+      padding: 3px 5px;
       text-align: center;
     }
+    .bracket-team__seed:empty { background: none; padding: 0; min-width: 16px; }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
       font-size: .78rem; letter-spacing: .08em;
@@ -1195,11 +1189,10 @@
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
-    .bracket-finals-col .bracket-team__seed { font-size: .8rem; flex-basis: 20px; width: 20px; }
+    .bracket-finals-col .bracket-team__seed { font-size: .64rem; min-width: 34px; padding: 4px 6px; }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {
-      border-left-color: #ffc820;
       background: linear-gradient(90deg, rgba(255,200,32,.14) 0%, rgba(255,185,20,.06) 100%);
       position: relative;
       overflow: hidden;
@@ -1230,12 +1223,11 @@
     /* Pulsing gold border */
     .bracket-finals-col .bracket-team.champion {
       border: 1px solid rgba(255,200,40,.5);
-      border-left: 3px solid #ffc820;
       animation: champBorderPulse 2s ease-in-out infinite;
     }
     @keyframes champBorderPulse {
-      0%,100% { box-shadow: 0 0 6px rgba(255,185,20,.2); border-color: rgba(255,200,40,.5); border-left-color: #ffc820; }
-      50%      { box-shadow: 0 0 18px rgba(255,185,20,.55); border-color: rgba(255,220,60,.9); border-left-color: #ffe066; }
+      0%,100% { box-shadow: 0 0 6px rgba(255,185,20,.2); border-color: rgba(255,200,40,.5); }
+      50%      { box-shadow: 0 0 18px rgba(255,185,20,.55); border-color: rgba(255,220,60,.9); }
     }
 
     /* No data state */
@@ -1252,24 +1244,13 @@
     }
 
     /* ── BRACKET LIGHT MODE ── */
-    /* Set the three neutral edges only. The shorthand used to be border-color,
-       which also overwrote border-left-color and so wiped out the team colour
-       every card carries on its left edge — in light mode no bracket card had
-       any team colour at all. */
     html.light .bracket-team {
       background: rgba(255,255,255,.9);
-      border-top-color: rgba(35,26,165,.2);
-      border-right-color: rgba(35,26,165,.2);
-      border-bottom-color: rgba(35,26,165,.2);
+      border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
-      background: linear-gradient(90deg,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),.45) 0%,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),.12) 55%,
-        rgba(var(--row-accent-rgb, var(--accent-rgb)),0) 100%);
-      border-top-color: rgba(35,26,165,.2);
-      border-right-color: rgba(35,26,165,.2);
-      border-bottom-color: rgba(35,26,165,.2);
+      background: rgba(var(--accent-rgb),.08);
+      border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
     html.light .bracket-team__wins  { color: rgba(42,33,64,.6); }
@@ -1278,7 +1259,6 @@
     /* Champion light mode — darker gold so it reads on white */
     html.light .bracket-team.champion {
       background: linear-gradient(90deg, rgba(180,130,0,.12) 0%, rgba(160,112,0,.05) 100%);
-      border-left-color: #a07008;
     }
     html.light .bracket-team.champion .bracket-team__name {
       background: linear-gradient(90deg, #7a5800, #a07008, #c89010);
@@ -1288,7 +1268,6 @@
     html.light .bracket-team.champion .bracket-team__wins { color: #a07008; }
     html.light .bracket-finals-col .bracket-team.champion {
       border-color: rgba(160,112,0,.4);
-      border-left-color: #a07008;
     }
     html.light .bracket-finals-col .bracket-team.champion .bracket-team__wins { color: #a07008; }
 
@@ -1304,7 +1283,6 @@
     html.light .bracket-team.winner:hover,
     html.light .bracket-team.champion:hover {
       border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
-      border-left-color: var(--row-accent, var(--orange));
       background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.2);
       z-index: 3;
     }
