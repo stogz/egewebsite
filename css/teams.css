@@ -1118,13 +1118,18 @@
       border-radius: 0;
       border-top: none;
     }
+    /* The winner's box washes in its own colour, strongest at the left edge
+       where the accent stripe is, fading out across the box. */
     .bracket-team.winner {
       border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.04);
+      background: linear-gradient(90deg,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),.55) 0%,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),.16) 55%,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),0) 100%);
     }
-    /* The side that lost the series sits back a little. Only a decided series
+    /* The side that lost the series sits well back. Only a decided series
        marks a loser, so an undecided or TBD box is left at full strength. */
-    .bracket-team.loser { opacity: .8; }
+    .bracket-team.loser { opacity: .5; }
     .bracket-team.loser:hover { opacity: 1; }
     .bracket-team.champion {
       border-left-color: #ffc820;
@@ -1258,7 +1263,10 @@
       border-bottom-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
-      background: rgba(var(--accent-rgb),.07);
+      background: linear-gradient(90deg,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),.45) 0%,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),.12) 55%,
+        rgba(var(--row-accent-rgb, var(--accent-rgb)),0) 100%);
       border-top-color: rgba(35,26,165,.2);
       border-right-color: rgba(35,26,165,.2);
       border-bottom-color: rgba(35,26,165,.2);
