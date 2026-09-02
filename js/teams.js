@@ -302,7 +302,9 @@
       var champHtml = isChampion
         ? '<img class="standings-champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Champions" title="NBA Champions">'
         : '';
-      return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg+';">'
+      var accentRgb = hexTriplet(bg);
+      return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg
+        + (accentRgb ? ';--row-accent-rgb:'+accentRgb : '') + ';">'
         +'<div class="standings-row__left">'
           +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
           +'<div class="standings-row__seed">'+seed+'.</div>'
@@ -372,6 +374,15 @@
       hex = hex.replace('#','');
       var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
       return 'rgba('+r+','+g+','+b+','+a+')';
+    }
+    /* "r, g, b" for the team colour, so a rule can build its own alpha from it
+       — a hover tint can't be derived from the hex in --row-accent alone. */
+    function hexTriplet(hex){
+      if (!hex || String(hex).charAt(0) !== '#') return '';
+      hex = String(hex).replace('#','');
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      if (hex.length !== 6) return '';
+      return parseInt(hex.slice(0,2),16)+','+parseInt(hex.slice(2,4),16)+','+parseInt(hex.slice(4,6),16);
     }
     function ordinal(n){
       if (!Number.isFinite(n)) return '—';
@@ -886,7 +897,10 @@
       }
       /* Seed left, crest centred, series wins right — and the crest again as
          a washed-out backdrop behind the whole box. */
-      var style = '--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';'
+      var teamHex  = getTeamColor(name, year);
+      var teamRgb  = hexTriplet(teamHex);
+      var style = '--row-accent:'+(teamHex||'var(--orange)')+';'
+                + (teamRgb ? '--row-accent-rgb:'+teamRgb+';' : '')
                 + (logo ? '--team-logo:url(\''+logo+'\');' : '');
       return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="'+style+'">'
         +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'

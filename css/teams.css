@@ -257,16 +257,16 @@
       background: transparent;
       border: 1px solid var(--border-soft);
       border-left: 4px solid var(--row-accent, var(--border));
-      transition: border-color .2s, transform .18s ease, background .35s, color .35s;
-      will-change: transform;
+      transition: border-color .2s, background .2s, color .35s;
     }
+    /* Hover tints the row in the team's own colour. Nothing moves and nothing
+       grows — --row-accent-rgb is the team colour as a triplet so the alpha
+       can be set here. */
     .standings-row:hover {
-      transform: translateY(-2px);
-      border-color: rgba(var(--accent-rgb),.4);
+      border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
       border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.03);
+      background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.14);
     }
-    .standings-row:active { transform: translateY(0); }
 
     .standings-row__left {
       display: flex; align-items: center;
@@ -1122,54 +1122,20 @@
       border-left-color: #ffc820;
       background: rgba(255,200,32,.06);
     }
-    .bracket-team {
-      transform: translateX(0) scale(1);
-      box-shadow: none;
-    }
-    .bracket-team:hover {
-      border-color: var(--row-accent, rgba(var(--accent-rgb),.6));
-      border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.07);
-      transform: translateX(3px) scale(1.012);
-      box-shadow: 0 4px 18px rgba(0,0,0,.22),
-                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.25));
-      z-index: 3;
-    }
-    /* Left-side columns hover goes right, right-side columns hover goes left */
-    .bracket-col--east .bracket-team:hover {
-      transform: translateX(-3px) scale(1.012);
-    }
-    .bracket-finals-col .bracket-team:hover {
-      transform: scale(1.025);
-    }
-    html.light .bracket-team:hover {
-      background: rgba(var(--accent-rgb),.09);
-      box-shadow: 0 4px 14px rgba(0,0,0,.1),
-                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.3));
-    }
 
     .bracket-team__logo {
       width: 26px; height: 26px; object-fit: contain;
       flex: 1 1 auto; min-width: 0;
       object-position: center;
     }
-    /* A filled disc with the seed showing through it. The number is painted
-       in the card's own colour rather than being genuinely cut out — CSS has
-       no way to punch text out of a background — which reads the same, since
-       the crest wash behind is offset to the far side of the box. */
+    /* Plain text, but at full strength rather than the muted grey it used to
+       be, so the seed reads at a glance. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .56rem;
+      font-family: var(--font-mono); font-size: .7rem;
       font-weight: 700;
-      flex: 0 0 18px; width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      background: #ffffff;
-      color: #08052f;
-      letter-spacing: 0;
-    }
-    html.light .bracket-team__seed {
-      background: #08052f;
-      color: #ffffff;
+      color: var(--heading);
+      flex: 0 0 16px; width: 16px;
+      text-align: center;
     }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
@@ -1216,9 +1182,7 @@
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: .85rem; flex-basis: 18px; width: 18px; }
-    .bracket-finals-col .bracket-team__seed {
-      font-size: .66rem; flex-basis: 22px; width: 22px; height: 22px;
-    }
+    .bracket-finals-col .bracket-team__seed { font-size: .8rem; flex-basis: 20px; width: 20px; }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {
@@ -1312,6 +1276,23 @@
     }
     html.light .bracket-finals-col .bracket-team.champion .bracket-team__wins { color: #a07008; }
 
+    /* ── BRACKET HOVER ──
+       Same treatment as a standings row: the team's own colour washes the box,
+       and it neither moves nor grows. Declared after the winner, champion and
+       light-mode backgrounds because those match on specificity — earlier in
+       the file they simply won, and a hovered winner stayed untinted. */
+    .bracket-team:hover,
+    .bracket-team.winner:hover,
+    .bracket-team.champion:hover,
+    html.light .bracket-team:hover,
+    html.light .bracket-team.winner:hover,
+    html.light .bracket-team.champion:hover {
+      border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
+      border-left-color: var(--row-accent, var(--orange));
+      background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.2);
+      z-index: 3;
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .teams-inner { padding: 0 12px; box-sizing: border-box; }
@@ -1389,6 +1370,3 @@
       .gauge-content__val { font-size: .95rem; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .standings-row, .standings-row:hover, .standings-row:active { transition: none; transform: none; }
-    }

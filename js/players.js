@@ -307,9 +307,11 @@
       var r  = card.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width  - 0.5;  // -0.5 .. 0.5
       var py = (e.clientY - r.top)  / r.height - 0.5;
+      // Tilt only — no lift and no scale, so the tile never grows under the
+      // cursor.
       card.style.transform =
         'perspective(900px) rotateX(' + (-py * MAX).toFixed(2) + 'deg)' +
-        ' rotateY(' + (px * MAX).toFixed(2) + 'deg) translateY(-4px) scale(1.015)';
+        ' rotateY(' + (px * MAX).toFixed(2) + 'deg)';
     });
     card.addEventListener('mouseleave', function() {
       card.style.transform = '';
@@ -2626,11 +2628,8 @@
     el.innerHTML = html;
     if (card) card.style.display = html ? '' : 'none';
 
-    // Wire hover lift
     el.querySelectorAll('.bio-jersey').forEach(function(el2) {
-      el2.style.cssText = 'width:60px;height:auto;cursor:pointer;display:block;transition:transform .2s;';
-      el2.addEventListener('mouseenter', function() { el2.style.transform = 'translateY(-5px) scale(1.1)'; });
-      el2.addEventListener('mouseleave', function() { el2.style.transform = ''; });
+      el2.style.cssText = 'width:60px;height:auto;cursor:pointer;display:block;transition:opacity .2s;';
     });
   }
 
