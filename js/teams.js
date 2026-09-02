@@ -1031,7 +1031,13 @@
 
       var finalsHtml = finals
         ? '<div class="bracket-finals-col">'
-            + '<div class="bracket-finals-trophy"><img src="icons/NBA-Finals-Logo.png" alt="NBA Finals"></div>'
+            /* Both marks ship; CSS shows the one that suits the theme, so a live
+               theme toggle needs no JS. The white wordmark would disappear on
+               the light ground and the black one on the dark. */
+            + '<div class="bracket-finals-trophy">'
+                + '<img class="finals-mark finals-mark--dark" src="icons/NBA-Finals-Logo-White.png" alt="NBA Finals">'
+                + '<img class="finals-mark finals-mark--light" src="icons/NBA-Finals-Logo.png" alt="" aria-hidden="true">'
+              + '</div>'
             + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss, year)
           + '</div>'
         : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';

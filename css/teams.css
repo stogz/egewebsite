@@ -1216,17 +1216,17 @@
       margin-bottom: 16px;
       width: 100%;
     }
-    /* The wordmark's script is black on transparent and would disappear into
-       the dark ground. Four chained 1px drop-shadows trace a white outline
-       around the artwork instead of sitting it on a plate. Light mode has the
-       contrast already, so it goes without. */
+    /* One wordmark per theme — white script on the dark ground, black on the
+       light one — so neither needs an outline or a plate behind it. */
     .bracket-finals-trophy img {
-      width: 100%; max-width: 118px; height: auto; display: block;
-      filter:
-        drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
-        drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
+      width: 100%; max-width: 118px; height: auto;
     }
-    html.light .bracket-finals-trophy img { filter: none; }
+    /* The display toggles need to outrank the shared img rule above, so they
+       are scoped to the wrapper rather than left as bare class selectors. */
+    .bracket-finals-trophy .finals-mark--dark  { display: block; }
+    .bracket-finals-trophy .finals-mark--light { display: none; }
+    html.light .bracket-finals-trophy .finals-mark--dark  { display: none; }
+    html.light .bracket-finals-trophy .finals-mark--light { display: block; }
     .bracket-finals-col .bracket-matchup { width: 100%; }
     .bracket-finals-col .bracket-matchup::after { display: none; }
     /* Finals teams are bigger */
