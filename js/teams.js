@@ -913,10 +913,11 @@
                 + (logo ? '--team-logo:url(\''+logo+'\');' : '');
       return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="'+style+'">'
         +'<span class="bracket-team__seed">'+seedText(seedLabel)+'</span>'
+        /* The marker precedes the crest so the crest can overlap it. */
+        +iconsHtml
         +(logo
             ? '<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">'
             : '<span class="bracket-team__name">'+abbr+'</span>')
-        +iconsHtml
         +'<span class="bracket-team__wins">'+winsStr+'</span>'
         +'</div>';
     }

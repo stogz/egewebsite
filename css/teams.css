@@ -1028,9 +1028,11 @@
     .bracket-pair::before {
       content: '';
       position: absolute;
-      right: calc(-1 * var(--bk-gap) / 2);
+      /* 2px wide, so pulled half a pixel further out to stay centred in the
+         gap the stubs meet it in. */
+      right: calc(-1 * var(--bk-gap) / 2 - 1px);
       top: 25%; bottom: 25%;
-      width: 1px;
+      width: 2px;
       background: var(--border);
     }
     /* From the middle of that vertical out to the next round */
@@ -1039,7 +1041,8 @@
       position: absolute;
       right: calc(-1 * var(--bk-gap));
       top: 50%;
-      width: calc(var(--bk-gap) / 2); height: 1px;
+      margin-top: -1px;
+      width: calc(var(--bk-gap) / 2 + 1px); height: 2px;
       background: var(--border);
     }
 
@@ -1056,7 +1059,8 @@
       content: '';
       position: absolute;
       right: calc(-1 * var(--bk-gap) / 2); top: 50%;
-      width: calc(var(--bk-gap) / 2); height: 1px;
+      margin-top: -1px;
+      width: calc(var(--bk-gap) / 2); height: 2px;
       background: var(--border);
     }
     /* A conference final has no sibling to join, so it crosses the whole gap
@@ -1139,6 +1143,7 @@
     .bracket-finals-col     { --conf-rgb: 214, 165, 42; }
     .bracket-team.winner {
       background: rgba(var(--conf-rgb),.10);
+      border-color: rgba(var(--conf-rgb),.55);
     }
     /* The side that lost the series sits well back. Only a decided series
        marks a loser, so an undecided or TBD box is left at full strength. */
@@ -1180,13 +1185,27 @@
       transition: color .35s;
     }
     .bracket-team.winner .bracket-team__name { color: var(--heading); }
-    /* Same marker as the standings, beside the series score. It sits in the
-       flex row rather than pinned to a corner, so it can't sit on top of the
-       crest or spill out of the box. */
+    /* Same marker as the standings, tucked in behind the crest: it sits in the
+       flex row just before the crest and gives back part of its width, so the
+       crest rides over its trailing edge. A negative right margin rather than
+       a left one, so the crest's auto margins still centre it. */
     .bracket-player-icons {
       display: flex; align-items: center;
       flex: 0 0 auto;
-      margin-left: 4px;
+      /* auto on the outside, negative on the inside: the auto margins here and
+         on the crest split the free space so the pair still sits centred,
+         while the -12px is what actually creates the overlap. Left as a plain
+         negative margin it did nothing — the crest's own auto margin simply
+         reabsorbed the space. */
+      margin-left: auto;
+      margin-right: -12px;
+      z-index: 0;
+    }
+    .bracket-player-icons + .bracket-team__logo,
+    .bracket-player-icons + .bracket-team__name {
+      margin-left: 0;
+      margin-right: auto;
+      z-index: 2;
     }
     .bracket-player-icons img {
       width: 26px; height: 26px;
@@ -1204,7 +1223,7 @@
       flex: 0 0 16px; width: 16px;
       text-align: center;
     }
-    .bracket-team.winner .bracket-team__wins { color: var(--orange); }
+    .bracket-team.winner .bracket-team__wins { color: rgb(var(--conf-rgb)); }
     .bracket-team.champion .bracket-team__wins { color: #ffc820; }
 
     /* Finals centre column */
@@ -1310,11 +1329,11 @@
     }
     html.light .bracket-team.winner {
       background: rgba(var(--conf-rgb),.12);
-      border-color: rgba(35,26,165,.2);
+      border-color: rgba(var(--conf-rgb),.55);
     }
     html.light .bracket-team__name  { color: #08052f; }
     html.light .bracket-team__wins  { color: rgba(42,33,64,.6); }
-    html.light .bracket-team.winner .bracket-team__wins { color: var(--orange); }
+    html.light .bracket-team.winner .bracket-team__wins { color: rgb(var(--conf-rgb)); }
     html.light .bracket-col-label   { color: rgba(42,33,64,.55); }
     /* Champion light mode — darker gold so it reads on white */
     html.light .bracket-team.champion {
