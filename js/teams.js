@@ -292,10 +292,11 @@
       var yy = seasonToSuffix(year);
       var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
       var players = Array.isArray(stats.players) ? stats.players : [];
-      var icons = players.map(function(n){ return PLAYER_ICONS()[n]; }).filter(Boolean);
-      var iconsHtml = icons.length
-        ? '<div class="standings-row__icons">'+icons.map(function(u,i){
-            return '<img class="standings-row__icon" src="'+u+'" alt="" loading="lazy" style="z-index:'+(20-i)+';">';
+      var named = players.map(function(n){ return { name:n, src:PLAYER_ICONS()[n] }; })
+                         .filter(function(x){ return !!x.src; });
+      var iconsHtml = named.length
+        ? '<div class="standings-row__icons">'+named.map(function(x,i){
+            return '<img class="standings-row__icon" src="'+x.src+'" alt="'+x.name+'" title="'+x.name+'" loading="lazy" style="z-index:'+(20-i)+';">';
           }).join('')+'</div>'
         : '';
       var isChampion = (stats.playoffs||'').trim() === 'Champions';
@@ -308,7 +309,6 @@
         +'<div class="standings-row__left">'
           +'<div class="standings-row__crest">'
             +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
-            +iconsHtml
           +'</div>'
           +'<div class="standings-row__seed">'+seed+'.</div>'
           +'<div class="standings-row__name">'+teamName+'</div>'
@@ -316,6 +316,7 @@
           +champHtml
         +'</div>'
         +'<div class="standings-row__right">'
+          +iconsHtml
           +'<div class="standings-row__record">'
             +'<span class="rec-box rec-w">'+wins+'</span>'
             +'<span class="rec-box rec-l">'+(loss||'—')+'</span>'
@@ -885,7 +886,6 @@
       var ti = TEAM_INFO()[slug]||{};
       var name = ti.name || slug;
       var abbr = SLUG_ABBR[slug] || slug.slice(0,3).toUpperCase();
-      var teamStats = ss ? (ss[slug] || {}) : {};
       var logo = getStandingsLogo(name, year);
       var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'')+(isLoser?' loser':'');
       var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
@@ -894,11 +894,12 @@
       if (ss) {
         var teamStats = ss[slug] || {};
         var players = Array.isArray(teamStats.players) ? teamStats.players : [];
-        var icons = players.map(function(n){ return PLAYER_ICONS()[n]; }).filter(Boolean);
-        if (icons.length) {
+        var named = players.map(function(n){ return { name:n, src:PLAYER_ICONS()[n] }; })
+                           .filter(function(x){ return !!x.src; });
+        if (named.length) {
           iconsHtml = '<span class="bracket-player-icons">'
-            + icons.map(function(u,i){
-                return '<img src="'+u+'" alt="" style="z-index:'+(20-i)+';">';
+            + named.map(function(x,i){
+                return '<img src="'+x.src+'" alt="'+x.name+'" title="'+x.name+'" style="z-index:'+(20-i)+';">';
               }).join('')
             + '</span>';
         }

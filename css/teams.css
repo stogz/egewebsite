@@ -316,23 +316,25 @@
       gap: clamp(6px,1.2vw,10px);
       flex-shrink: 0;
     }
+    /* League players who suit up for the team, shown beside the record. The
+       ring is the team's own primary colour, and the portrait is framed on the
+       face rather than centred, since the source images are chest-up. */
     .standings-row__icons {
-      position: absolute;
-      right: -6px; bottom: -4px;
       display: flex; align-items: center;
-      pointer-events: none;
+      margin-right: clamp(6px,1vw,10px);
+      flex-shrink: 0;
     }
     .standings-row__icon {
-      width: clamp(16px,2.2vw,20px);
-      height: clamp(16px,2.2vw,20px);
+      width: clamp(28px,3.6vw,34px);
+      height: clamp(28px,3.6vw,34px);
       object-fit: cover;
+      object-position: 50% 20%;
       border-radius: 50%;
-      background: var(--bg);
-      border: 1.5px solid var(--bg);
-      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
+      background: var(--bg-card);
+      border: 2px solid var(--row-accent, var(--orange));
     }
     .standings-row__icon + .standings-row__icon {
-      margin-left: -7px;
+      margin-left: -10px;
     }
     /* Champion trophy in standings */
     .standings-champ-trophy {
@@ -1129,8 +1131,14 @@
       border-top: 1px solid var(--border-soft);
       margin-top: -1px;
     }
+    /* Each side of the bracket carries its conference's colour rather than the
+       sim's accent; the finals are gold for both teams. --conf-rgb is set per
+       column here and read by the winner's wash and the seed chip together. */
+    .bracket-col            { --conf-rgb: var(--conf-west-rgb); }
+    .bracket-col--east      { --conf-rgb: var(--conf-east-rgb); }
+    .bracket-finals-col     { --conf-rgb: 214, 165, 42; }
     .bracket-team.winner {
-      background: rgba(var(--accent-rgb),.06);
+      background: rgba(var(--conf-rgb),.10);
     }
     /* The side that lost the series sits well back. Only a decided series
        marks a loser, so an undecided or TBD box is left at full strength. */
@@ -1140,9 +1148,13 @@
       background: rgba(255,200,32,.06);
     }
 
+    /* A fixed square with contain, so a tall crest can't tower over a wide one
+       and a wide one can't sprawl. Auto margins centre it where the flex-grow
+       used to — that grow was letting the box stretch to 82px. */
     .bracket-team__logo {
       width: 26px; height: 26px; object-fit: contain;
-      flex: 1 1 auto; min-width: 0;
+      flex: 0 0 26px;
+      margin: 0 auto;
       object-position: center;
     }
     /* Ordinal seed in a hairline box — the same mono, letterspacing and 1px
@@ -1151,8 +1163,8 @@
       font-family: var(--font-mono); font-size: .46rem;
       letter-spacing: .06em;
       text-transform: uppercase;
-      color: var(--orange);
-      border: 1px solid rgba(var(--accent-rgb),.4);
+      color: rgb(var(--conf-rgb));
+      border: 1px solid rgba(var(--conf-rgb),.5);
       background: transparent;
       flex: 0 0 auto;
       min-width: 24px;
@@ -1168,23 +1180,23 @@
       transition: color .35s;
     }
     .bracket-team.winner .bracket-team__name { color: var(--heading); }
+    /* Same marker as the standings, beside the series score. It sits in the
+       flex row rather than pinned to a corner, so it can't sit on top of the
+       crest or spill out of the box. */
     .bracket-player-icons {
-      position: absolute;
-      right: 4px; bottom: 2px;
       display: flex; align-items: center;
-      pointer-events: none;
-      z-index: 2;
+      flex: 0 0 auto;
+      margin-left: 4px;
     }
-    .bracket-col--east .bracket-player-icons { right: auto; left: 4px; }
     .bracket-player-icons img {
-      width: 15px; height: 15px;
+      width: 26px; height: 26px;
       object-fit: cover;
+      object-position: 50% 20%;
       border-radius: 50%;
-      background: var(--bg);
-      border: 1.5px solid var(--bg);
-      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
+      background: var(--bg-card);
+      border: 2px solid var(--row-accent, var(--orange));
     }
-    .bracket-player-icons img + img { margin-left: -6px; }
+    .bracket-player-icons img + img { margin-left: -8px; }
 
     .bracket-team__wins {
       font-family: var(--font-mono); font-size: .95rem;
@@ -1234,7 +1246,7 @@
       padding: 10px 12px;
       min-height: 46px;
     }
-    .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
+    .bracket-finals-col .bracket-team__logo { width: 32px; height: 32px; flex-basis: 32px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
     .bracket-finals-col .bracket-team__seed { font-size: .52rem; min-width: 28px; padding: 2px 4px; }
@@ -1297,7 +1309,7 @@
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
-      background: rgba(var(--accent-rgb),.08);
+      background: rgba(var(--conf-rgb),.12);
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
@@ -1362,7 +1374,7 @@
       .teams-inner { --row-h: 40px; }
       .standings-row { padding: 6px 10px; }
       /* The crest sets the box height here, so it comes down with the rows. */
-      .bracket-team__logo { width: 22px; height: 22px; }
+      .bracket-team__logo { width: 22px; height: 22px; flex-basis: 22px; }
       .bracket-team { padding: 5px 8px; }
       /* Rows use a tighter side padding here, so the headings match it. */
       .standings-head { padding-left: 10px; padding-right: 10px; }
