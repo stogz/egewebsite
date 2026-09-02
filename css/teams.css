@@ -174,7 +174,7 @@
     }
     /* The bracket scrolls inside its card rather than under the page edge. */
     #teamsBracketView .standings-card { margin-bottom: 28px; }
-    #teamsBracketView .bracket-scroll { padding: clamp(12px,1.6vw,18px); }
+    #teamsBracketView .bracket-scroll { padding: clamp(10px,1vw,12px); }
 
     /* One set of measurements for the W / L / PCT columns, read by both the
        headings and the boxes in every row so they stay in line. */
@@ -269,6 +269,15 @@
       gap: clamp(8px,1.6vw,13px);
       min-width: 0; flex: 1;
     }
+    /* The crest and, pinned to its corner, the faces of any league players on
+       that team — attached to the team's identity rather than floating loose
+       in front of the record columns. */
+    .standings-row__crest {
+      position: relative;
+      flex-shrink: 0;
+      display: flex; align-items: center;
+      line-height: 0;
+    }
     .standings-row__logo {
       width: clamp(24px,3.4vw,32px);
       height: clamp(24px,3.4vw,32px);
@@ -308,17 +317,22 @@
       flex-shrink: 0;
     }
     .standings-row__icons {
+      position: absolute;
+      right: -6px; bottom: -4px;
       display: flex; align-items: center;
+      pointer-events: none;
     }
     .standings-row__icon {
-      width: clamp(24px,3.4vw,30px);
-      height: clamp(24px,3.4vw,30px);
-      object-fit: contain;
-      border-radius: 0;
-      background: transparent;
+      width: clamp(16px,2.2vw,20px);
+      height: clamp(16px,2.2vw,20px);
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
     }
     .standings-row__icon + .standings-row__icon {
-      margin-left: clamp(-14px,-2vw,-10px);
+      margin-left: -7px;
     }
     /* Champion trophy in standings */
     .standings-champ-trophy {
@@ -967,7 +981,7 @@
 
     /* Full bracket layout — 3 cols per conf + finals in centre */
     .bracket-grid {
-      --bk-gap: 12px;
+      --bk-gap: clamp(12px, 1.6vw, 26px);
       display: grid;
       /* Round columns share what is left over; the finals column is fixed so
          the centre of the bracket doesn't move as the page resizes. */
@@ -975,10 +989,6 @@
       grid-template-rows: auto;
       gap: 0 var(--bk-gap);
       min-width: 760px;
-      /* Capped and centred: the boxes only need room for a seed, a crest and
-         a score, so past this the columns just get emptier. */
-      max-width: 1000px;
-      margin: 0 auto;
       /* Columns stretch to the row height so each one can space its matchups
          evenly — that is what keeps the rounds aligned. */
       align-items: stretch;
@@ -1129,21 +1139,21 @@
       flex: 1 1 auto; min-width: 0;
       object-position: center;
     }
-    /* Ordinal seed in a chip filled with the sim's accent — orange under
-       2K25, blue under 2K26. */
+    /* Ordinal seed in a hairline box — the same mono, letterspacing and 1px
+       frame the rest of the page uses, in the sim's accent. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .56rem;
-      font-weight: 700;
-      letter-spacing: .06em;
+      font-family: var(--font-mono); font-size: .54rem;
+      letter-spacing: .1em;
       text-transform: uppercase;
-      color: #ffffff;
-      background: var(--orange);
+      color: var(--orange);
+      border: 1px solid rgba(var(--accent-rgb),.4);
+      background: transparent;
       flex: 0 0 auto;
       min-width: 30px;
-      padding: 3px 5px;
+      padding: 2px 5px;
       text-align: center;
     }
-    .bracket-team__seed:empty { background: none; padding: 0; min-width: 16px; }
+    .bracket-team__seed:empty { border: none; padding: 0; min-width: 16px; }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
       font-size: .78rem; letter-spacing: .08em;
@@ -1152,6 +1162,24 @@
       transition: color .35s;
     }
     .bracket-team.winner .bracket-team__name { color: var(--heading); }
+    .bracket-player-icons {
+      position: absolute;
+      right: 4px; bottom: 2px;
+      display: flex; align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .bracket-col--east .bracket-player-icons { right: auto; left: 4px; }
+    .bracket-player-icons img {
+      width: 15px; height: 15px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
+    }
+    .bracket-player-icons img + img { margin-left: -6px; }
+
     .bracket-team__wins {
       font-family: var(--font-mono); font-size: .95rem;
       font-weight: 700;
@@ -1169,15 +1197,20 @@
       padding: 0 8px;
       min-width: 0;
     }
-    .bracket-finals-label {
-      font-family: var(--font-mono); font-size: .58rem;
-      letter-spacing: .2em; text-transform: uppercase;
-      color: #c8960a; text-align: center;
-      margin-bottom: 10px;
-    }
-    html.light .bracket-finals-label { color: #a07008; }
+    /* The wordmark's script is black on transparent, which would vanish on the
+       dark ground, so it sits on a white plate — the way the mark is normally
+       presented anyway. */
     .bracket-finals-trophy {
-      text-align: center; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .bracket-finals-trophy img {
+      width: 100%; max-width: 128px; height: auto; display: block;
     }
     .bracket-finals-col .bracket-matchup { width: 100%; }
     .bracket-finals-col .bracket-matchup::after { display: none; }
@@ -1189,7 +1222,7 @@
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
-    .bracket-finals-col .bracket-team__seed { font-size: .64rem; min-width: 34px; padding: 4px 6px; }
+    .bracket-finals-col .bracket-team__seed { font-size: .6rem; min-width: 34px; padding: 3px 6px; }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {

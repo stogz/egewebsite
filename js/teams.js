@@ -306,14 +306,16 @@
       return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg
         + (accentRgb ? ';--row-accent-rgb:'+accentRgb : '') + ';">'
         +'<div class="standings-row__left">'
-          +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
+          +'<div class="standings-row__crest">'
+            +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
+            +iconsHtml
+          +'</div>'
           +'<div class="standings-row__seed">'+seed+'.</div>'
           +'<div class="standings-row__name">'+teamName+'</div>'
           +'<div class="standings-row__abbr">'+abbr+'</div>'
           +champHtml
         +'</div>'
         +'<div class="standings-row__right">'
-          +iconsHtml
           +'<div class="standings-row__record">'
             +'<span class="rec-box rec-w">'+wins+'</span>'
             +'<span class="rec-box rec-l">'+(loss||'—')+'</span>'
@@ -896,7 +898,7 @@
         if (icons.length) {
           iconsHtml = '<span class="bracket-player-icons">'
             + icons.map(function(u,i){
-                return '<img src="'+u+'" alt="" style="width:18px;height:18px;object-fit:contain;margin-left:'+(i>0?'-4px':'0')+'px;z-index:'+(20-i)+';position:relative;">';
+                return '<img src="'+u+'" alt="" style="z-index:'+(20-i)+';">';
               }).join('')
             + '</span>';
         }
@@ -1029,8 +1031,7 @@
 
       var finalsHtml = finals
         ? '<div class="bracket-finals-col">'
-            + '<div class="bracket-finals-trophy"><img src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Trophy" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(255,185,20,.5));"></div>'
-            + '<div class="bracket-finals-label">NBA Finals</div>'
+            + '<div class="bracket-finals-trophy"><img src="icons/NBA-Finals-Logo.png" alt="NBA Finals"></div>'
             + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss, year)
           + '</div>'
         : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';
