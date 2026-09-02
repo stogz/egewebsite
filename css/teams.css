@@ -144,6 +144,9 @@
     .teams-inner {
       --conf-west-rgb: 214, 45, 45;
       --conf-east-rgb: 40, 110, 214;
+      /* Standings rows and bracket series boxes share this, so the two halves
+         of the page keep the same beat. */
+      --row-h: clamp(40px, 4.6vw, 50px);
     }
     .standings-card--west { --conf-rgb: var(--conf-west-rgb); }
     .standings-card--east { --conf-rgb: var(--conf-east-rgb); }
@@ -245,7 +248,7 @@
       justify-content: space-between;
       gap: clamp(8px,1.6vw,14px);
       padding: clamp(5px,.9vw,8px) var(--rec-pad-r);
-      min-height: clamp(40px,4.6vw,50px);
+      min-height: var(--row-h);
       border-radius: 0;
       text-decoration: none;
       color: var(--text);
@@ -1082,7 +1085,7 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      min-height: 42px;
+      min-height: var(--row-h);
     }
     /* The crest again, washed out behind the box. Its own layer so the seed
        and the score stay at full strength on top of it. */
@@ -1150,11 +1153,23 @@
       flex: 1 1 auto; min-width: 0;
       object-position: center;
     }
+    /* A filled disc with the seed showing through it. The number is painted
+       in the card's own colour rather than being genuinely cut out — CSS has
+       no way to punch text out of a background — which reads the same, since
+       the crest wash behind is offset to the far side of the box. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .58rem;
-      color: var(--text-muted);
-      flex: 0 0 14px; width: 14px;
-      text-align: center;
+      font-family: var(--font-mono); font-size: .56rem;
+      font-weight: 700;
+      flex: 0 0 18px; width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #08052f;
+      letter-spacing: 0;
+    }
+    html.light .bracket-team__seed {
+      background: #08052f;
+      color: #ffffff;
     }
     .bracket-team__name {
       font-family: var(--font-mono); font-weight: 400;
@@ -1201,7 +1216,9 @@
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
     .bracket-finals-col .bracket-team__wins { font-size: .85rem; flex-basis: 18px; width: 18px; }
-    .bracket-finals-col .bracket-team__seed { font-size: .62rem; flex-basis: 18px; width: 18px; }
+    .bracket-finals-col .bracket-team__seed {
+      font-size: .66rem; flex-basis: 22px; width: 22px; height: 22px;
+    }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {
@@ -1275,7 +1292,6 @@
       border-bottom-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
-    html.light .bracket-team__seed  { color: rgba(42,33,64,.5); }
     html.light .bracket-team__wins  { color: rgba(42,33,64,.6); }
     html.light .bracket-team.winner .bracket-team__wins { color: var(--orange); }
     html.light .bracket-col-label   { color: rgba(42,33,64,.55); }
@@ -1320,7 +1336,11 @@
       /* Mobile shows the abbreviation in place of the full name — same
          mono face, so the two read as one column at any width. */
       .standings-row__abbr { display: inline; font-family: var(--font-mono); font-weight: 400; font-size: clamp(12px,3.6vw,15px); letter-spacing: .1em; }
-      .standings-row { padding: 6px 10px; min-height: 40px; }
+      .teams-inner { --row-h: 40px; }
+      .standings-row { padding: 6px 10px; }
+      /* The crest sets the box height here, so it comes down with the rows. */
+      .bracket-team__logo { width: 22px; height: 22px; }
+      .bracket-team { padding: 5px 8px; }
       /* Rows use a tighter side padding here, so the headings match it. */
       .standings-head { padding-left: 10px; padding-right: 10px; }
 
