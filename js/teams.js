@@ -146,6 +146,22 @@
       if (push) { history.pushState(null,'',url); }
       else       { history.replaceState(null,'',url); }
     }
+    /* ─── SETTINGS ────────────────────────────────────────────────
+       One switch for now, in the same gear-and-panel menu the Logs tab uses.
+       Persisted so the choice survives navigation, like the theme and sim. */
+    var TEAMS_SETTINGS_KEY = 'ege-teams-settings-v1';
+    var teamsSettings = (function(){
+      var d = { markers: true };
+      try {
+        var raw = JSON.parse(localStorage.getItem(TEAMS_SETTINGS_KEY) || '{}');
+        if (typeof raw.markers === 'boolean') d.markers = raw.markers;
+      } catch(e) {}
+      return d;
+    })();
+    function saveTeamsSettings() {
+      try { localStorage.setItem(TEAMS_SETTINGS_KEY, JSON.stringify(teamsSettings)); } catch(e) {}
+    }
+
     /* ─── DOM REFS ────────────────────────────────────────────── */
     var teamSel    = document.getElementById('teamSelect');
     var yearSel    = document.getElementById('yearSelect');
@@ -292,8 +308,10 @@
       var yy = seasonToSuffix(year);
       var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
       var players = Array.isArray(stats.players) ? stats.players : [];
-      var named = players.map(function(n){ return { name:n, src:PLAYER_ICONS()[n] }; })
-                         .filter(function(x){ return !!x.src; });
+      var named = teamsSettings.markers
+        ? players.map(function(n){ return { name:n, src:PLAYER_ICONS()[n] }; })
+                 .filter(function(x){ return !!x.src; })
+        : [];
       var iconsHtml = named.length
         ? '<div class="standings-row__icons">'+named.map(function(x,i){
             return '<img class="standings-row__icon" src="'+x.src+'" alt="'+x.name+'" title="'+x.name+'" loading="lazy" style="z-index:'+(20-i)+';">';
@@ -851,6 +869,48 @@
       }
     }
 
+    /* ─── SETTINGS MENU ───────────────────────────────────────────
+       The panel is static markup, so a toggle just re-renders the view under
+       it — no need to rebuild and reopen the menu itself. */
+    (function wireTeamsSettings(){
+      var btn   = document.getElementById('teams-settings-btn');
+      var panel = document.getElementById('teams-settings-panel');
+      if (!btn || !panel) return;
+
+      function syncRows() {
+        panel.querySelectorAll('.log-settings-row').forEach(function(row){
+          var on = !!teamsSettings[row.dataset.setting];
+          row.classList.toggle('is-on', on);
+          row.setAttribute('aria-checked', String(on));
+        });
+      }
+      syncRows();
+
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = panel.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+        btn.classList.toggle('is-active', open);
+      });
+      // Stays open while switches are flipped
+      panel.addEventListener('click', function(e){ e.stopPropagation(); });
+      document.addEventListener('click', function(){
+        panel.classList.remove('open');
+        btn.classList.remove('is-active');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+
+      panel.querySelectorAll('.log-settings-row').forEach(function(row){
+        row.addEventListener('click', function(){
+          var id = row.dataset.setting;
+          teamsSettings[id] = !teamsSettings[id];
+          saveTeamsSettings();
+          syncRows();
+          render();
+        });
+      });
+    })();
+
     /* ─── INIT ────────────────────────────────────────────────── */
     syncDropdownsFromHash();
     render();
@@ -891,7 +951,7 @@
       var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
       // Player icons from standings data
       var iconsHtml = '';
-      if (ss) {
+      if (ss && teamsSettings.markers) {
         var teamStats = ss[slug] || {};
         var players = Array.isArray(teamStats.players) ? teamStats.players : [];
         var named = players.map(function(n){ return { name:n, src:PLAYER_ICONS()[n] }; })
