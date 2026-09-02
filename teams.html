@@ -10,7 +10,7 @@
   <script src="sim-config.js"></script>
   <script src="logos/teaminfo.js"></script>
   <script>if(window.EGE_SIM&&window.EGE_SIM.id==='sim-26'){document.write('<scr'+('ipt src="logos/teaminfo26.js"><\/scr')+('ipt>'));}</script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <link rel="stylesheet" href="css/teams.css" />
 </head>
 <body>
@@ -52,7 +52,7 @@
 
         <!-- Year select -->
         <div class="ege-select-wrap">
-          <select id="yearSelect" class="ege-select" aria-label="Select year" style="min-width:110px;"><!-- populated by JS from EGE_SEASON_STATS --></select>
+          <select id="yearSelect" class="ege-select" aria-label="Select year"><!-- populated by JS from EGE_SEASON_STATS --></select>
           <svg class="ege-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"/></svg>
         </div>
 
@@ -70,21 +70,64 @@
 
       <!-- PLAYOFF BRACKET VIEW -->
       <div id="teamsBracketView" style="display:none;">
-        <div class="bracket-scroll">
-          <div class="bracket-grid" id="bracketGrid"></div>
+        <div class="standings-card">
+          <div class="standings-card__header">
+            <div class="team-chart-card__dot"></div>
+            <span class="team-chart-card__title">Playoffs</span>
+          </div>
+          <div class="bracket-scroll">
+            <div class="bracket-grid" id="bracketGrid"></div>
+          </div>
         </div>
       </div>
 
       <!-- STANDINGS VIEW -->
       <div id="teamsStandingsView">
         <div class="standings-grid">
-          <div>
-            <div class="standings-conf-label">Western Conference</div>
-            <div class="standings-list" id="standingsWest"></div>
+          <div class="standings-card standings-card--west">
+            <div class="standings-card__header">
+              <div class="team-chart-card__dot"></div>
+              <span class="team-chart-card__title">Western Conference</span>
+            </div>
+            <div class="standings-card__body">
+              <!-- Column headings sit outside .standings-list so they don't shift
+                   the nth-child counts the playoff cut lines are drawn from. The
+                   box mirrors a row's padding and borders so the two line up. -->
+              <div class="standings-head" aria-hidden="true">
+                <div class="standings-head__left">
+                  <span class="standings-head__logo"></span>
+                  <span class="standings-head__seed">Seed</span>
+                  <span class="standings-head__name">Name</span>
+                </div>
+                <div class="standings-head__right">
+                  <span class="standings-head__cell">W</span>
+                  <span class="standings-head__cell">L</span>
+                  <span class="standings-head__cell standings-head__cell--pct">Pct</span>
+                </div>
+              </div>
+              <div class="standings-list" id="standingsWest"></div>
+            </div>
           </div>
-          <div>
-            <div class="standings-conf-label">Eastern Conference</div>
-            <div class="standings-list" id="standingsEast"></div>
+          <div class="standings-card standings-card--east">
+            <div class="standings-card__header">
+              <div class="team-chart-card__dot"></div>
+              <span class="team-chart-card__title">Eastern Conference</span>
+            </div>
+            <div class="standings-card__body">
+              <div class="standings-head" aria-hidden="true">
+                <div class="standings-head__left">
+                  <span class="standings-head__logo"></span>
+                  <span class="standings-head__seed">Seed</span>
+                  <span class="standings-head__name">Name</span>
+                </div>
+                <div class="standings-head__right">
+                  <span class="standings-head__cell">W</span>
+                  <span class="standings-head__cell">L</span>
+                  <span class="standings-head__cell standings-head__cell--pct">Pct</span>
+                </div>
+              </div>
+              <div class="standings-list" id="standingsEast"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -114,7 +157,6 @@
             <div class="team-stat-card__label">// Conf Rank</div>
             <div class="team-stat-card__value" id="teamStatRank">—</div>
           </div>
-
         </div>
 
         <!-- Columns -->
@@ -153,6 +195,7 @@
               </div>
               <div class="team-chart-card__body">
                 <canvas id="teamWinChart"></canvas>
+                <div class="team-chart-note" id="teamWinChartNote">Win history is unavailable — the chart library didn't load.</div>
               </div>
             </div>
           </div>

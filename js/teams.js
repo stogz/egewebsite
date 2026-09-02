@@ -277,6 +277,18 @@
       var logo = getStandingsLogo(teamName, year);
       var bg = getTeamColor(teamName, year);
       var record = stats.record || 'N/A';
+      /* The record is authored as "50-16"; pct is authored alongside it but
+         is computed here when a season's row omits it. */
+      var rec = String(record).split('-');
+      var wins = rec.length === 2 ? rec[0].trim() : record;
+      var loss = rec.length === 2 ? rec[1].trim() : '';
+      var pct  = stats.pct;
+      if (!pct && rec.length === 2) {
+        var w = parseInt(wins,10), l = parseInt(loss,10);
+        if (!isNaN(w) && !isNaN(l) && (w+l) > 0) {
+          pct = (w/(w+l)).toFixed(3).replace(/^0/,'');
+        }
+      }
       var yy = seasonToSuffix(year);
       var abbr = ABBR_BY_NAME[teamName] || slug.slice(0,3).toUpperCase();
       var players = Array.isArray(stats.players) ? stats.players : [];
@@ -290,23 +302,38 @@
       var champHtml = isChampion
         ? '<img class="standings-champ-trophy" src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Champions" title="NBA Champions">'
         : '';
-      return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg+';">'
+      var accentRgb = hexTriplet(bg);
+      return '<a class="standings-row" href="#'+slug+yy+'" style="--row-accent:'+bg
+        + (accentRgb ? ';--row-accent-rgb:'+accentRgb : '') + ';">'
         +'<div class="standings-row__left">'
-          +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
+          +'<div class="standings-row__crest">'
+            +(logo?'<img class="standings-row__logo" src="'+logo+'" alt="'+teamName+'" loading="lazy">':'')
+            +iconsHtml
+          +'</div>'
           +'<div class="standings-row__seed">'+seed+'.</div>'
           +'<div class="standings-row__name">'+teamName+'</div>'
           +'<div class="standings-row__abbr">'+abbr+'</div>'
           +champHtml
         +'</div>'
         +'<div class="standings-row__right">'
-          +iconsHtml
-          +'<div class="standings-row__record">'+record+'</div>'
+          +'<div class="standings-row__record">'
+            +'<span class="rec-box rec-w">'+wins+'</span>'
+            +'<span class="rec-box rec-l">'+(loss||'—')+'</span>'
+            +'<span class="rec-box rec-pct">'+(pct||'—')+'</span>'
+          +'</div>'
         +'</div>'
       +'</a>';
     }
     function renderStandings(year) {
       var ss = SEASON_STATS()[year];
-      if (!ss) { eastList.innerHTML = '<div class="roster-empty">No data for this season.</div>'; westList.innerHTML=''; return; }
+      var heads = document.querySelectorAll('.standings-head');
+      if (!ss) {
+        eastList.innerHTML = '<div class="roster-empty">No data for this season.</div>';
+        westList.innerHTML = '';
+        heads.forEach(function(h){ h.style.display = 'none'; });
+        return;
+      }
+      heads.forEach(function(h){ h.style.display = ''; });
       var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
       var sorted = slugs.slice().sort(function(a,b){
         var ra = parseInt(String(ss[a].rank||'').replace(/\D/g,''),10)||9999;
@@ -315,8 +342,17 @@
       });
       var east=[],west=[];
       sorted.forEach(function(s){ (isEastern(s)?east:west).push(s); });
-      eastList.innerHTML = east.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
-      westList.innerHTML = west.map(function(s,i){ return buildStandingsRow(s,ss[s],i+1,year); }).join('');
+      /* The playoff divider is its own element between the eighth and ninth
+         rows, not a border on the eighth row: as part of that row it inherited
+         the row's hover lift and slid up with it. */
+      function listHTML(slugs) {
+        return slugs.map(function(s, i) {
+          return buildStandingsRow(s, ss[s], i+1, year)
+            + (i === 7 && slugs.length > 8 ? '<div class="standings-cut" aria-hidden="true"></div>' : '');
+        }).join('');
+      }
+      eastList.innerHTML = listHTML(east);
+      westList.innerHTML = listHTML(west);
       // Render bracket
       renderBracket(year);
       // Wire clicks
@@ -340,6 +376,15 @@
       hex = hex.replace('#','');
       var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
       return 'rgba('+r+','+g+','+b+','+a+')';
+    }
+    /* "r, g, b" for the team colour, so a rule can build its own alpha from it
+       — a hover tint can't be derived from the hex in --row-accent alone. */
+    function hexTriplet(hex){
+      if (!hex || String(hex).charAt(0) !== '#') return '';
+      hex = String(hex).replace('#','');
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      if (hex.length !== 6) return '';
+      return parseInt(hex.slice(0,2),16)+','+parseInt(hex.slice(2,4),16)+','+parseInt(hex.slice(4,6),16);
     }
     function ordinal(n){
       if (!Number.isFinite(n)) return '—';
@@ -564,7 +609,20 @@
       var isLight    = document.documentElement.classList.contains('light');
       var labelColor = isLight ? 'rgba(42,33,64,.5)'   : 'rgba(208,208,208,.45)';
       var gridColor  = isLight ? 'rgba(35,26,165,.14)'  : 'rgba(35,26,165,.22)';
-      var ctx = document.getElementById('teamWinChart').getContext('2d');
+      /* Chart.js comes off a CDN, so it can simply not be there — blocked,
+         offline, an outage. Without this guard the ReferenceError aborted
+         the rest of this function and took the gauges, the roster and the
+         trends down with it, leaving nothing but the banner. */
+      var canvas = document.getElementById('teamWinChart');
+      var chartNote = document.getElementById('teamWinChartNote');
+      if (typeof Chart === 'undefined') {
+        canvas.style.display = 'none';
+        if (chartNote) chartNote.classList.add('visible');
+        return renderDetailRest();
+      }
+      canvas.style.display = '';
+      if (chartNote) chartNote.classList.remove('visible');
+      var ctx = canvas.getContext('2d');
       _winChart = new Chart(ctx, {
         type:'line',
         data:{ labels:labels, datasets:[{ data:data, tension:.4, borderColor:bg, backgroundColor:hexToRgba(bg,.3), fill:true, borderWidth:3, pointRadius:0, pointHoverRadius:6, hitRadius:18 }] },
@@ -587,6 +645,11 @@
         }
       });
 
+      renderDetailRest();
+
+      /* The parts of the detail view that come after the chart. Declared
+         here so it closes over slug/year/abbr, and called on both paths. */
+      function renderDetailRest() {
       // OFF/DEF gauges
       var ratingsYear = RATINGS()[year];
       var gaugesCard = document.getElementById('teamGaugesCard');
@@ -611,6 +674,7 @@
 
       // Trends
       renderTrends(slug, year, abbr);
+      }
     }
 
     /* ─── ROSTER HELPERS (outside renderDetail) ──────────────── */
@@ -810,14 +874,20 @@
     /* ─── PLAYOFF BRACKET ────────────────────────────────────── */
     function BRACKETS() { return window.EGE_BRACKETS || {}; }
 
-    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year) {
+    /* "3" → "3rd" for the bracket's seed chip; anything non-numeric passes
+       through, so a missing seed stays blank. */
+    function seedText(seed) {
+      var n = parseInt(seed, 10);
+      return isNaN(n) ? (seed || '') : ordinal(n);
+    }
+    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year, isLoser) {
       if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';
       var ti = TEAM_INFO()[slug]||{};
       var name = ti.name || slug;
       var abbr = SLUG_ABBR[slug] || slug.slice(0,3).toUpperCase();
       var teamStats = ss ? (ss[slug] || {}) : {};
       var logo = getStandingsLogo(name, year);
-      var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'');
+      var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'')+(isLoser?' loser':'');
       var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
       // Player icons from standings data
       var iconsHtml = '';
@@ -828,15 +898,23 @@
         if (icons.length) {
           iconsHtml = '<span class="bracket-player-icons">'
             + icons.map(function(u,i){
-                return '<img src="'+u+'" alt="" style="width:18px;height:18px;object-fit:contain;margin-left:'+(i>0?'-4px':'0')+'px;z-index:'+(20-i)+';position:relative;">';
+                return '<img src="'+u+'" alt="" style="z-index:'+(20-i)+';">';
               }).join('')
             + '</span>';
         }
       }
-      return '<div class="'+cls+'" data-slug="'+slug+'" style="--row-accent:'+(getTeamColor(name, year)||'var(--orange)')+';">'
-        +(logo?'<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">':'')
-        +'<span class="bracket-team__seed">'+( seedLabel||'')+'</span>'
-        +'<span class="bracket-team__name">'+abbr+'</span>'
+      /* Seed left, crest centred, series wins right — and the crest again as
+         a washed-out backdrop behind the whole box. */
+      var teamHex  = getTeamColor(name, year);
+      var teamRgb  = hexTriplet(teamHex);
+      var style = '--row-accent:'+(teamHex||'var(--orange)')+';'
+                + (teamRgb ? '--row-accent-rgb:'+teamRgb+';' : '')
+                + (logo ? '--team-logo:url(\''+logo+'\');' : '');
+      return '<div class="'+cls+'" data-slug="'+slug+'" title="'+name+'" style="'+style+'">'
+        +'<span class="bracket-team__seed">'+seedText(seedLabel)+'</span>'
+        +(logo
+            ? '<img class="bracket-team__logo" src="'+logo+'" alt="'+name+'">'
+            : '<span class="bracket-team__name">'+abbr+'</span>')
         +iconsHtml
         +'<span class="bracket-team__wins">'+winsStr+'</span>'
         +'</div>';
@@ -854,8 +932,8 @@
       var topChamp = isChampMatch && topWon;
       var botChamp = isChampMatch && botWon;
       return '<div class="bracket-matchup">'
-        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss, year)
-        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss, year)
+        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss, year, botWon)
+        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss, year, topWon)
         + '</div>';
     }
 
@@ -906,13 +984,24 @@
         return idx >= 0 ? idx+1 : '';
       }
 
+      /* Matchups are emitted two to a .bracket-pair. The pair is what the
+         bracket's elbow is drawn on: the vertical line joining a pair spans
+         its two matchup centres, which sit at exactly 25% and 75% of the
+         pair's height however tall it gets. A lone matchup (a conference
+         final) is emitted bare and reaches the finals with one stub. */
       function colHTML(matchups, seeds, conf, isFinals) {
         if (!matchups || !matchups.length) return '';
-        return matchups.map(function(m, i) {
+        var cards = matchups.map(function(m, i) {
           var ts = seeds ? seeds[i*2]   : (m ? getSeed(m.top, conf) : '');
           var bs = seeds ? seeds[i*2+1] : (m ? getSeed(m.bot, conf) : '');
           return buildMatchup(m, ts, bs, i, isFinals, ss, year);
-        }).join('');
+        });
+        if (isFinals || cards.length < 2) return cards.join('');
+        var out = '';
+        for (var i = 0; i < cards.length; i += 2) {
+          out += '<div class="bracket-pair">' + cards[i] + (cards[i+1] || '') + '</div>';
+        }
+        return out;
       }
 
       // Build seed labels for R1
@@ -924,44 +1013,41 @@
       var westR3 = bData.west && bData.west.r3 || [];
       var finals = bData.finals;
 
-      // Vertical spacer helper — adds spacing to align later rounds
-      function spacers(n) {
-        var s = '';
-        for (var i=0;i<n;i++) s+='<div class="bracket-spacer" style="min-height:52px;"></div>';
-        return s;
-      }
-
-      // Build each column's HTML
+      // Build each column's HTML.
       // R1 order: [1v8, 4v5, 3v6, 2v7]
       // R2: matchup1 = winner of 1v8 vs winner of 4v5
       //     matchup2 = winner of 3v6 vs winner of 2v7
-      // Spacers align each R2 matchup between its two R1 feeder matchups
+      // The columns are all the same height and space their matchups evenly
+      // (justify-content:space-around), which puts 2 matchups exactly at the
+      // midpoints of 4, and 1 at the midpoint of 2 — the alignment a bracket
+      // needs, at any width. It used to be done with fixed-height spacers,
+      // which only held at one size.
       var eR1html = colHTML(eastR1, null, 'east', false);
-      var eR2html = spacers(1) + colHTML([eastR2[0]], null, 'east', false) + spacers(2) + colHTML([eastR2[1]], null, 'east', false) + spacers(1);
-      var eR3html = spacers(3) + colHTML(eastR3, null, 'east', false) + spacers(3);
+      var eR2html = colHTML(eastR2, null, 'east', false);
+      var eR3html = colHTML(eastR3, null, 'east', false);
       var wR1html = colHTML(westR1, null, 'west', false);
-      var wR2html = spacers(1) + colHTML([westR2[0]], null, 'west', false) + spacers(2) + colHTML([westR2[1]], null, 'west', false) + spacers(1);
-      var wR3html = spacers(3) + colHTML(westR3, null, 'west', false) + spacers(3);
+      var wR2html = colHTML(westR2, null, 'west', false);
+      var wR3html = colHTML(westR3, null, 'west', false);
 
       var finalsHtml = finals
         ? '<div class="bracket-finals-col">'
-            + '<div class="bracket-finals-trophy"><img src="https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/nba-champ_orig.png" alt="Trophy" style="width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(255,185,20,.5));"></div>'
-            + '<div class="bracket-finals-label">NBA Finals</div>'
+            /* Both marks ship; CSS shows the one that suits the theme, so a live
+               theme toggle needs no JS. The white wordmark would disappear on
+               the light ground and the black one on the dark. */
+            + '<div class="bracket-finals-trophy">'
+                + '<img class="finals-mark finals-mark--dark" src="icons/NBA-Finals-Logo-White.png" alt="NBA Finals">'
+                + '<img class="finals-mark finals-mark--light" src="icons/NBA-Finals-Logo.png" alt="" aria-hidden="true">'
+              + '</div>'
             + buildMatchup(finals, getSeed(finals.top,'east')||getSeed(finals.top,'west'), getSeed(finals.bot,'east')||getSeed(finals.bot,'west'), 0, true, ss, year)
           + '</div>'
         : '<div class="bracket-finals-col"><div class="bracket-empty">TBD</div></div>';
 
-      // Column header row (7 cols)
-      var westLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">WEST</div>';
-      var eastLabel = '<div class="bracket-col-label" style="color:var(--orange);opacity:1;font-weight:700;">EAST</div>';
-      var headers = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round']
-        .map(function(l){ return '<div class="bracket-col-label">'+l+'</div>'; }).join('');
-      headers = westLabel + headers.slice(headers.indexOf('</div>')+6, headers.lastIndexOf('<div')) + eastLabel;
-      // Rebuild properly
+      // Column header row (7 cols). WEST and EAST carry their conference's
+      // colour, the same two the standings card headers use.
       var roundLabels = ['First Round','Conf. Semis','Conf. Finals','NBA Finals','Conf. Finals','Conf. Semis','First Round'];
-      headers = roundLabels.map(function(l,i){
-        if (i===0) return '<div class="bracket-col-label"><span style="color:var(--orange);font-weight:700;">WEST · </span>'+l+'</div>';
-        if (i===6) return '<div class="bracket-col-label">'+l+' · <span style="color:var(--orange);font-weight:700;">EAST</span></div>';
+      var headers = roundLabels.map(function(l,i){
+        if (i===0) return '<div class="bracket-col-label"><span class="bracket-label-west">WEST · </span>'+l+'</div>';
+        if (i===6) return '<div class="bracket-col-label">'+l+' · <span class="bracket-label-east">EAST</span></div>';
         return '<div class="bracket-col-label">'+l+'</div>';
       }).join('');
 
@@ -970,9 +1056,9 @@
         + '<div class="bracket-col">'+wR2html+'</div>'
         + '<div class="bracket-col">'+wR3html+'</div>'
         + finalsHtml
-        + '<div class="bracket-col" style="direction:rtl;">'+eR3html+'</div>'
-        + '<div class="bracket-col" style="direction:rtl;">'+eR2html+'</div>'
-        + '<div class="bracket-col" style="direction:rtl;">'+eR1html+'</div>';
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR3html+'</div>'
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR2html+'</div>'
+        + '<div class="bracket-col bracket-col--east" style="direction:rtl;">'+eR1html+'</div>';
 
       // Wire click-through to team detail
       grid.querySelectorAll('.bracket-team[data-slug]').forEach(function(el) {

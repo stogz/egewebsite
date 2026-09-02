@@ -63,22 +63,14 @@
     }
 
     /* ── AWARD CARD ── */
-    /* Outer wrapper: ONLY handles hover scale — no animation here */
     .award-card {
       position: relative;
       width: 160px;
       flex-shrink: 0;
       cursor: default;
-      transition: transform .22s cubic-bezier(.22,1,.36,1);
-      transform-origin: bottom center;
-      will-change: transform;
     }
-    .award-card:hover {
-      transform: translateY(-10px) scale(1.1);
-      z-index: 10;
-    }
-    /* Inner wrapper carries the entrance animation so it never
-       conflicts with the hover transform on the outer element */
+    .award-card:hover { z-index: 10; }
+    /* Inner wrapper carries the entrance animation */
     .award-card-inner {
       animation: cardIn .35s cubic-bezier(.22,1,.36,1) both;
     }

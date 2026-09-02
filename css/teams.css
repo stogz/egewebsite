@@ -58,13 +58,14 @@
       color: var(--text);
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 0;
       padding: 11px 38px 11px 14px;
       cursor: pointer;
       outline: none;
       transition: border-color .2s, background .35s, color .35s;
       min-width: 180px;
     }
+    #yearSelect { min-width: 110px; }
     .ege-select:hover  { border-color: rgba(var(--accent-rgb),.5); }
     .ege-select:focus  { border-color: var(--orange); }
     .ege-select option { background: var(--bg-card); color: var(--text); }
@@ -83,7 +84,7 @@
       width: 40px; height: 40px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 0;
       color: var(--text-muted);
       cursor: pointer;
       transition: border-color .2s, color .2s, background .35s;
@@ -103,7 +104,7 @@
       color: var(--text-muted);
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 0;
       padding: 11px 18px;
       cursor: pointer;
       transition: border-color .2s, color .2s, background .35s;
@@ -123,77 +124,163 @@
       gap: clamp(16px, 3vw, 28px);
       align-items: start;
     }
-    .standings-conf-label {
-      font-family: var(--font-mono);
-      font-size: .62rem;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-      color: var(--orange);
-      margin-bottom: 14px;
+    /* Each conference, and the bracket, sits in a card — same shell as the
+       cards on the team detail view, so the whole page reads as one set. */
+    .standings-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      transition: background .35s;
+    }
+    .standings-card__header {
       display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: rgba(35,26,165,.07);
     }
-    .standings-conf-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+    /* Conference colours are fixed — west red, east blue — rather than drawn
+       from --accent-rgb, so they read the same in every sim. Declared once
+       here for both the standings cards and the bracket's WEST/EAST labels. */
+    .teams-inner {
+      --conf-west-rgb: 214, 45, 45;
+      --conf-east-rgb: 40, 110, 214;
+      /* Standings rows and bracket series boxes share this, so the two halves
+         of the page keep the same beat. */
+      --row-h: clamp(40px, 4.6vw, 50px);
     }
-    .standings-conf-label { color: var(--orange); }
+    .standings-card--west { --conf-rgb: var(--conf-west-rgb); }
+    .standings-card--east { --conf-rgb: var(--conf-east-rgb); }
+    /* The header's own frame, pulled out over the card's border so the top,
+       left and right edges beside it read in the conference colour instead of
+       the site's blue. */
+    .standings-card--west .standings-card__header,
+    .standings-card--east .standings-card__header {
+      background: rgba(var(--conf-rgb), .14);
+      border: 1px solid rgba(var(--conf-rgb), .45);
+      margin: -1px -1px 0;
+    }
+    .standings-card--west .team-chart-card__dot,
+    .standings-card--east .team-chart-card__dot {
+      background: rgb(var(--conf-rgb));
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    .standings-card--west .team-chart-card__title,
+    .standings-card--east .team-chart-card__title {
+      color: rgb(var(--conf-rgb));
+    }
+
+    .standings-card__body {
+      padding: clamp(12px,1.6vw,16px) clamp(12px,1.6vw,16px) clamp(14px,1.8vw,18px);
+    }
+    /* The bracket scrolls inside its card rather than under the page edge. */
+    #teamsBracketView .standings-card { margin-bottom: 28px; }
+    #teamsBracketView .bracket-scroll { padding: clamp(10px,1vw,12px); }
+
+    /* One set of measurements for the W / L / PCT columns, read by both the
+       headings and the boxes in every row so they stay in line. */
+    .standings-grid {
+      --rec-w:   clamp(40px, 5.6vw, 52px);
+      --pct-w:   clamp(52px, 7vw, 64px);
+      --rec-pad-r: clamp(14px, 2vw, 18px);
+      /* Row geometry the headings copy so the two line up: the hairline frame
+         and the gap between crest and seed. */
+      --row-frame: 1px;
+      --row-gap: clamp(8px,1.6vw,13px);
+      --logo-w: clamp(24px,3.4vw,32px);
+      --seed-w: clamp(30px, 3.2vw, 40px);
+    }
+
+    /* Column headings above each conference list. Transparent borders match
+       the row's stripe and frame, so every heading sits over its column. */
+    .standings-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--row-gap);
+      border: var(--row-frame) solid transparent;
+      padding: 0 var(--rec-pad-r) 8px;
+      font-family: var(--font-mono);
+      font-size: .55rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .standings-head__left {
+      display: flex; align-items: center;
+      gap: var(--row-gap);
+      min-width: 0; flex: 1;
+    }
+    .standings-head__logo { width: var(--logo-w); flex-shrink: 0; }
+    .standings-head__seed { width: var(--seed-w); flex-shrink: 0; }
+    .standings-head__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .standings-head__right { display: flex; flex-shrink: 0; }
+    .standings-head__cell { width: var(--rec-w); text-align: center; }
+    .standings-head__cell--pct { width: var(--pct-w); }
+    /* Dividers run through the headings and the values as one line */
+    .standings-head__cell + .standings-head__cell {
+      border-left: 1px solid var(--border);
+    }
 
     .standings-list {
+      --list-gap: clamp(4px, .7vw, 6px);
       display: flex;
       flex-direction: column;
-      gap: clamp(5px, .9vw, 7px);
+      gap: var(--list-gap);
       position: relative;
     }
 
-    /* Cut lines */
-    .standings-list a:nth-child(6)::after,
-    .standings-list a:nth-child(10)::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      bottom: calc(-1 * clamp(6px,1.2vw,9px) / 2);
+    /* The playoff line: everything above it made the bracket. It is a row of
+       the list in its own right rather than a border on the eighth seed, so
+       hovering that seed can't carry the line up with it. Its margins are the
+       clearance above and below. */
+    .standings-cut {
+      height: 0;
+      margin: 8px 0;
+      border-bottom: 1.5px dotted rgba(var(--accent-rgb), .65);
       pointer-events: none;
-      z-index: 2;
     }
-    .standings-list a:nth-child(6)::after  { border-bottom: 1.5px dotted rgba(var(--accent-rgb),.3); }
-    .standings-list a:nth-child(10)::after { border-bottom: 1.5px solid rgba(var(--accent-rgb),.25); }
 
     .standings-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: clamp(8px,1.6vw,14px);
-      padding: clamp(9px,1.4vw,13px) clamp(14px,2vw,18px);
-      min-height: clamp(50px,6vw,62px);
-      border-radius: 6px;
+      padding: clamp(5px,.9vw,8px) var(--rec-pad-r);
+      min-height: var(--row-h);
+      border-radius: 0;
       text-decoration: none;
       color: var(--text);
       cursor: pointer;
       position: relative;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--row-accent, var(--border));
-      transition: border-color .2s, transform .18s ease, background .35s, color .35s;
-      will-change: transform;
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      transition: border-color .2s, background .2s, color .35s;
     }
+    /* Hover tints the row in the team's own colour. Nothing moves and nothing
+       grows — --row-accent-rgb is the team colour as a triplet so the alpha
+       can be set here. */
     .standings-row:hover {
-      transform: translateY(-2px);
-      border-color: rgba(var(--accent-rgb),.4);
-      border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.03);
+      border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
+      background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.14);
     }
-    .standings-row:active { transform: translateY(0); }
 
     .standings-row__left {
       display: flex; align-items: center;
       gap: clamp(8px,1.6vw,13px);
       min-width: 0; flex: 1;
     }
+    /* The crest and, pinned to its corner, the faces of any league players on
+       that team — attached to the team's identity rather than floating loose
+       in front of the record columns. */
+    .standings-row__crest {
+      position: relative;
+      flex-shrink: 0;
+      display: flex; align-items: center;
+      line-height: 0;
+    }
     .standings-row__logo {
-      width: clamp(28px,4.2vw,40px);
-      height: clamp(28px,4.2vw,40px);
+      width: clamp(24px,3.4vw,32px);
+      height: clamp(24px,3.4vw,32px);
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -203,16 +290,16 @@
       letter-spacing: .06em;
       color: rgba(255,255,255,.45);
       flex-shrink: 0;
-      min-width: 22px;
+      min-width: var(--seed-w);
     }
     html.light .standings-row__seed {
       color: rgba(42,33,64,.5);
     }
     .standings-row__name {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(14px,2.2vw,18px);
-      letter-spacing: .02em;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: clamp(12px,1.9vw,15px);
+      letter-spacing: .05em;
       color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
@@ -230,21 +317,26 @@
       flex-shrink: 0;
     }
     .standings-row__icons {
+      position: absolute;
+      right: -6px; bottom: -4px;
       display: flex; align-items: center;
+      pointer-events: none;
     }
     .standings-row__icon {
-      width: clamp(28px,4vw,36px);
-      height: clamp(28px,4vw,36px);
-      object-fit: contain;
-      border-radius: 0;
-      background: transparent;
+      width: clamp(16px,2.2vw,20px);
+      height: clamp(16px,2.2vw,20px);
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
     }
     .standings-row__icon + .standings-row__icon {
-      margin-left: clamp(-14px,-2vw,-10px);
+      margin-left: -7px;
     }
     /* Champion trophy in standings */
     .standings-champ-trophy {
-      width: 28px; height: 28px;
+      width: 24px; height: 24px;
       object-fit: contain;
       flex-shrink: 0;
       margin-left: 6px;
@@ -256,16 +348,40 @@
       0%,100% { filter: drop-shadow(0 0 4px rgba(255,185,20,.6)) drop-shadow(0 0 2px rgba(255,200,40,.8)); }
       50%      { filter: drop-shadow(0 0 10px rgba(255,185,20,1)) drop-shadow(0 0 6px rgba(255,220,60,1)); }
     }
+    /* Wins, losses and win percentage each get their own box, sized from the
+       shared column widths so they sit under the headings. */
+    /* Wins, losses and win percentage read as one figure split by dividers
+       rather than three boxes, under the headings they line up with. */
     .standings-row__record {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: clamp(14px,2.4vw,18px);
+      display: flex;
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+    .rec-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--rec-w);
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: clamp(11px,1.6vw,13px);
+      letter-spacing: .06em;
       white-space: nowrap;
       color: #ffffff;
       transition: color .35s;
     }
-    html.light .standings-row__record {
+    .rec-box + .rec-box {
+      border-left: 1px solid var(--border);
+    }
+    .rec-pct {
+      width: var(--pct-w);
+      color: var(--text-muted);
+    }
+    html.light .rec-box {
       color: #08052f;
+    }
+    html.light .rec-pct {
+      color: var(--text-muted);
     }
 
     /* ── TEAM DETAIL VIEW ── */
@@ -275,7 +391,7 @@
     /* Team hero banner */
     .team-banner {
       position: relative;
-      border-radius: 8px;
+      border-radius: 0;
       overflow: hidden;
       padding: 36px 40px;
       margin-bottom: 28px;
@@ -329,7 +445,7 @@
     .team-stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       padding: 20px;
       transition: background .35s, transform .2s, border-color .2s, box-shadow .2s;
     }
@@ -378,7 +494,7 @@
     .team-chart-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       transition: background .35s;
       margin-bottom: 24px;
@@ -410,13 +526,28 @@
       overflow: hidden;
     }
     .team-chart-card__body canvas { max-width: 100%; }
+    /* Stands in for the win chart when Chart.js fails to load. */
+    .team-chart-note {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 20px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .team-chart-note.visible { display: flex; }
 
     /* OFF/DEF gauges */
     .team-gauges {
       margin-top: 20px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       transition: background .35s;
       margin-bottom: 24px;
@@ -484,7 +615,7 @@
     /* ── ROSTER / SPLITS-STYLE TABLE ── */
     .team-roster-card {
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -570,7 +701,7 @@
     .trends-card {
       margin-top: 20px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -621,7 +752,7 @@
     .playoff-result-card {
       margin-top: 20px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       overflow: hidden;
       background: var(--bg-card);
       transition: background .35s;
@@ -679,7 +810,7 @@
     .champ-card {
       display: none;
       margin-top: 0;
-      border-radius: 8px;
+      border-radius: 0;
       overflow: hidden;
       position: relative;
       background: linear-gradient(135deg, #1a1200 0%, #2a1f00 40%, #1a1200 100%);
@@ -717,7 +848,7 @@
       content: '';
       position: absolute;
       inset: -1px;
-      border-radius: 8px;
+      border-radius: 0;
       border: 1px solid rgba(255,200,40,.6);
       animation: champGlow 2s ease-in-out infinite;
       pointer-events: none;
@@ -823,6 +954,13 @@
       letter-spacing: .1em; color: rgba(255,185,20,.3);
     }
 
+    /* Side-by-side conferences need about 1300px before the longest team names
+       start truncating ("Oklahoma City Thunder" is the binding one). Below
+       that they stack, which reads better than a column of ellipses. */
+    @media (max-width: 1299px) {
+      .standings-grid { grid-template-columns: 1fr; }
+    }
+
     /* ══════════════════════════════════════
        PLAYOFF BRACKET
     ══════════════════════════════════════ */
@@ -843,15 +981,22 @@
 
     /* Full bracket layout — 3 cols per conf + finals in centre */
     .bracket-grid {
+      --bk-gap: clamp(12px, 1.6vw, 26px);
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 180px 1fr 1fr 1fr;
+      /* Round columns share what is left over; the finals column is fixed so
+         the centre of the bracket doesn't move as the page resizes. */
+      grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, 180px) repeat(3, minmax(0, 1fr));
       grid-template-rows: auto;
-      gap: 0 12px;
-      min-width: 900px;
-      align-items: center;
+      gap: 0 var(--bk-gap);
+      min-width: 760px;
+      /* Columns stretch to the row height so each one can space its matchups
+         evenly — that is what keeps the rounds aligned. */
+      align-items: stretch;
     }
 
     /* Column header labels */
+    .bracket-label-west { color: rgb(var(--conf-west-rgb)); font-weight: 700; }
+    .bracket-label-east { color: rgb(var(--conf-east-rgb)); font-weight: 700; }
     .bracket-col-label {
       font-family: var(--font-mono); font-size: .55rem;
       letter-spacing: .18em; text-transform: uppercase;
@@ -859,10 +1004,41 @@
       padding: 0 0 10px; opacity: .7;
     }
 
-    /* Each round column */
+    /* Each round column. space-around puts 4 matchups at 1/8, 3/8, 5/8, 7/8
+       of the column, 2 at 1/4 and 3/4, and 1 at 1/2 — so every later round
+       lands exactly on the midpoint of the two matchups that feed it, with
+       no fixed heights involved. */
     .bracket-col {
       display: flex; flex-direction: column;
+      justify-content: space-around;
       gap: 0;
+    }
+
+    /* A pair of matchups and the elbow that joins them. space-around puts the
+       two centres at exactly 25% and 75% of the pair, so the vertical line
+       spans centre to centre at any height. */
+    .bracket-pair {
+      display: flex; flex-direction: column;
+      justify-content: space-around;
+      flex: 1;
+      position: relative;
+    }
+    .bracket-pair::before {
+      content: '';
+      position: absolute;
+      right: calc(-1 * var(--bk-gap) / 2);
+      top: 25%; bottom: 25%;
+      width: 1px;
+      background: var(--border);
+    }
+    /* From the middle of that vertical out to the next round */
+    .bracket-pair::after {
+      content: '';
+      position: absolute;
+      right: calc(-1 * var(--bk-gap));
+      top: 50%;
+      width: calc(var(--bk-gap) / 2); height: 1px;
+      background: var(--border);
     }
 
     /* Matchup card */
@@ -870,112 +1046,187 @@
       position: relative;
       margin: 6px 0;
     }
-    /* Connector lines drawn via pseudo on the right side */
+    /* Each card runs a stub half-way across the gap, to meet the pair's
+       vertical line. West runs rightward, east leftward, since the east
+       columns work inward toward the finals. Everything is measured off the
+       column gap, so the pieces meet whatever it is set to. */
     .bracket-matchup::after {
       content: '';
       position: absolute;
-      right: -12px; top: 50%;
-      width: 12px; height: 1px;
+      right: calc(-1 * var(--bk-gap) / 2); top: 50%;
+      width: calc(var(--bk-gap) / 2); height: 1px;
       background: var(--border);
     }
-    .bracket-col:last-child .bracket-matchup::after { display: none; }
+    /* A conference final has no sibling to join, so it crosses the whole gap
+       to the finals on its own. */
+    .bracket-col > .bracket-matchup::after {
+      right: calc(-1 * var(--bk-gap));
+      width: var(--bk-gap);
+    }
+    .bracket-col--east .bracket-matchup::after,
+    .bracket-col--east .bracket-pair::before,
+    .bracket-col--east .bracket-pair::after {
+      right: auto;
+    }
+    .bracket-col--east .bracket-matchup::after {
+      left: calc(-1 * var(--bk-gap) / 2);
+    }
+    .bracket-col--east > .bracket-matchup::after {
+      left: calc(-1 * var(--bk-gap));
+    }
+    .bracket-col--east .bracket-pair::before {
+      left: calc(-1 * var(--bk-gap) / 2);
+    }
+    .bracket-col--east .bracket-pair::after {
+      left: calc(-1 * var(--bk-gap));
+    }
 
+    /* One team in a series: seed at the left edge, crest in the middle, series
+       wins at the right. Seed and wins have fixed widths, so the crest is
+       centred on the same axis in every box and the seeds line up down the
+       column. */
     .bracket-team {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 10px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 9px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
       transition: border-color .2s, background .35s;
       cursor: pointer;
       position: relative;
-      min-height: 36px;
+      overflow: hidden;
+      min-height: var(--row-h);
     }
+    /* The crest again, washed out behind the box. Its own layer so the seed
+       and the score stay at full strength on top of it. */
+    .bracket-team::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: var(--team-logo, none);
+      background-repeat: no-repeat;
+      /* Offset toward the score, away from the crest in the middle, so the
+         wash reads as a backdrop rather than a halo around the same mark.
+         Mirrored on the east side, where the box's contents are mirrored. */
+      background-position: 82% center;
+      background-size: auto 210%;
+      opacity: .13;
+      pointer-events: none;
+    }
+    .bracket-col--east .bracket-team::before { background-position: 18% center; }
+    html.light .bracket-team::before { opacity: .16; }
+    .bracket-team > * { position: relative; z-index: 1; }
+    /* Each box carries a full frame and the lower one is pulled up a pixel, so
+       the line between them is two borders on top of each other. Whichever box
+       is hovered raises its z-index, and its coloured border is the one seen —
+       the divider used to belong to the top box alone, so hovering the bottom
+       box left that line untouched. */
     .bracket-team:first-child {
-      border-radius: 5px 5px 0 0;
+      border-radius: 0;
       border-bottom: 1px solid var(--border-soft);
     }
     .bracket-team:last-child {
-      border-radius: 0 0 5px 5px;
-      border-top: none;
+      border-radius: 0;
+      border-top: 1px solid var(--border-soft);
+      margin-top: -1px;
     }
     .bracket-team.winner {
-      border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.04);
+      background: rgba(var(--accent-rgb),.06);
     }
+    /* The side that lost the series sits well back. Only a decided series
+       marks a loser, so an undecided or TBD box is left at full strength. */
+    .bracket-team.loser { opacity: .5; }
+    .bracket-team.loser:hover { opacity: 1; }
     .bracket-team.champion {
-      border-left-color: #ffc820;
       background: rgba(255,200,32,.06);
-    }
-    .bracket-team {
-      transform: translateX(0) scale(1);
-      box-shadow: none;
-    }
-    .bracket-team:hover {
-      border-color: var(--row-accent, rgba(var(--accent-rgb),.6));
-      border-left-color: var(--row-accent, var(--orange));
-      background: rgba(var(--accent-rgb),.07);
-      transform: translateX(3px) scale(1.012);
-      box-shadow: 0 4px 18px rgba(0,0,0,.22),
-                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.25));
-      z-index: 3;
-    }
-    /* Left-side columns hover goes right, right-side columns hover goes left */
-    .bracket-col[style*="direction:rtl"] .bracket-team:hover {
-      transform: translateX(-3px) scale(1.012);
-    }
-    .bracket-finals-col .bracket-team:hover {
-      transform: scale(1.025);
-    }
-    html.light .bracket-team:hover {
-      background: rgba(var(--accent-rgb),.09);
-      box-shadow: 0 4px 14px rgba(0,0,0,.1),
-                  0 0 0 1px var(--row-accent, rgba(var(--accent-rgb),.3));
     }
 
     .bracket-team__logo {
-      width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+      width: 26px; height: 26px; object-fit: contain;
+      flex: 1 1 auto; min-width: 0;
+      object-position: center;
     }
+    /* Ordinal seed in a hairline box — the same mono, letterspacing and 1px
+       frame the rest of the page uses, in the sim's accent. */
     .bracket-team__seed {
-      font-family: var(--font-mono); font-size: .52rem;
-      color: var(--text-muted); flex-shrink: 0; min-width: 10px;
+      font-family: var(--font-mono); font-size: .46rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--orange);
+      border: 1px solid rgba(var(--accent-rgb),.4);
+      background: transparent;
+      flex: 0 0 auto;
+      min-width: 24px;
+      padding: 1px 3px;
+      text-align: center;
     }
+    .bracket-team__seed:empty { border: none; padding: 0; min-width: 14px; }
     .bracket-team__name {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: .8rem; letter-spacing: .02em;
+      font-family: var(--font-mono); font-weight: 400;
+      font-size: .78rem; letter-spacing: .08em;
       color: var(--heading); flex: 1;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color .35s;
     }
     .bracket-team.winner .bracket-team__name { color: var(--heading); }
+    .bracket-player-icons {
+      position: absolute;
+      right: 4px; bottom: 2px;
+      display: flex; align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .bracket-col--east .bracket-player-icons { right: auto; left: 4px; }
+    .bracket-player-icons img {
+      width: 15px; height: 15px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(var(--accent-rgb),.35);
+    }
+    .bracket-player-icons img + img { margin-left: -6px; }
+
     .bracket-team__wins {
-      font-family: var(--font-mono); font-size: .65rem;
-      font-weight: 700; flex-shrink: 0;
-      min-width: 14px; text-align: right;
+      font-family: var(--font-mono); font-size: .95rem;
+      font-weight: 700;
+      flex: 0 0 16px; width: 16px;
+      text-align: center;
     }
     .bracket-team.winner .bracket-team__wins { color: var(--orange); }
     .bracket-team.champion .bracket-team__wins { color: #ffc820; }
 
-    /* Spacers between matchups for R2/R3 vertical alignment */
-    .bracket-spacer { flex: 1; }
-
     /* Finals centre column */
+    /* Three rows, the outer two equal: whatever the wordmark's height, the
+       matchup lands on the column's centre line — which is where the
+       conference finals' connectors arrive. A plain centred stack put the
+       matchup below that line by half the wordmark's height. */
     .bracket-finals-col {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0;
-      padding: 0 8px;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      justify-items: center;
+      /* No side padding: it would inset the matchup from the column edges and
+         leave the conference finals' connectors stopping short of it. */
+      min-width: 0;
     }
-    .bracket-finals-label {
-      font-family: var(--font-mono); font-size: .58rem;
-      letter-spacing: .2em; text-transform: uppercase;
-      color: #c8960a; text-align: center;
-      margin-bottom: 10px;
-    }
-    html.light .bracket-finals-label { color: #a07008; }
+    .bracket-finals-col .bracket-matchup { width: 100%; }
+    .bracket-finals-trophy { grid-row: 1; align-self: end; }
+    .bracket-finals-col .bracket-matchup { grid-row: 2; align-self: center; }
     .bracket-finals-trophy {
-      text-align: center; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      width: 100%;
     }
+    /* One wordmark per theme — white script on the dark ground, black on the
+       light one — so neither needs an outline or a plate behind it. */
+    .bracket-finals-trophy img {
+      width: 100%; max-width: 118px; height: auto;
+    }
+    /* The display toggles need to outrank the shared img rule above, so they
+       are scoped to the wrapper rather than left as bare class selectors. */
+    .bracket-finals-trophy .finals-mark--dark  { display: block; }
+    .bracket-finals-trophy .finals-mark--light { display: none; }
+    html.light .bracket-finals-trophy .finals-mark--dark  { display: none; }
+    html.light .bracket-finals-trophy .finals-mark--light { display: block; }
     .bracket-finals-col .bracket-matchup { width: 100%; }
     .bracket-finals-col .bracket-matchup::after { display: none; }
     /* Finals teams are bigger */
@@ -983,14 +1234,13 @@
       padding: 10px 12px;
       min-height: 46px;
     }
-    .bracket-finals-col .bracket-team__logo { width: 26px; height: 26px; }
+    .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
-    .bracket-finals-col .bracket-team__wins { font-size: .75rem; }
-    .bracket-finals-col .bracket-team__seed { font-size: .56rem; }
+    .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
+    .bracket-finals-col .bracket-team__seed { font-size: .52rem; min-width: 28px; padding: 2px 4px; }
 
     /* Champion row — gold shimmer */
     .bracket-team.champion {
-      border-left-color: #ffc820;
       background: linear-gradient(90deg, rgba(255,200,32,.14) 0%, rgba(255,185,20,.06) 100%);
       position: relative;
       overflow: hidden;
@@ -1021,12 +1271,11 @@
     /* Pulsing gold border */
     .bracket-finals-col .bracket-team.champion {
       border: 1px solid rgba(255,200,40,.5);
-      border-left: 3px solid #ffc820;
       animation: champBorderPulse 2s ease-in-out infinite;
     }
     @keyframes champBorderPulse {
-      0%,100% { box-shadow: 0 0 6px rgba(255,185,20,.2); border-color: rgba(255,200,40,.5); border-left-color: #ffc820; }
-      50%      { box-shadow: 0 0 18px rgba(255,185,20,.55); border-color: rgba(255,220,60,.9); border-left-color: #ffe066; }
+      0%,100% { box-shadow: 0 0 6px rgba(255,185,20,.2); border-color: rgba(255,200,40,.5); }
+      50%      { box-shadow: 0 0 18px rgba(255,185,20,.55); border-color: rgba(255,220,60,.9); }
     }
 
     /* No data state */
@@ -1048,18 +1297,16 @@
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team.winner {
-      background: rgba(var(--accent-rgb),.07);
+      background: rgba(var(--accent-rgb),.08);
       border-color: rgba(35,26,165,.2);
     }
     html.light .bracket-team__name  { color: #08052f; }
-    html.light .bracket-team__seed  { color: rgba(42,33,64,.5); }
     html.light .bracket-team__wins  { color: rgba(42,33,64,.6); }
     html.light .bracket-team.winner .bracket-team__wins { color: var(--orange); }
     html.light .bracket-col-label   { color: rgba(42,33,64,.55); }
     /* Champion light mode — darker gold so it reads on white */
     html.light .bracket-team.champion {
       background: linear-gradient(90deg, rgba(180,130,0,.12) 0%, rgba(160,112,0,.05) 100%);
-      border-left-color: #a07008;
     }
     html.light .bracket-team.champion .bracket-team__name {
       background: linear-gradient(90deg, #7a5800, #a07008, #c89010);
@@ -1069,9 +1316,24 @@
     html.light .bracket-team.champion .bracket-team__wins { color: #a07008; }
     html.light .bracket-finals-col .bracket-team.champion {
       border-color: rgba(160,112,0,.4);
-      border-left-color: #a07008;
     }
     html.light .bracket-finals-col .bracket-team.champion .bracket-team__wins { color: #a07008; }
+
+    /* ── BRACKET HOVER ──
+       Same treatment as a standings row: the team's own colour washes the box,
+       and it neither moves nor grows. Declared after the winner, champion and
+       light-mode backgrounds because those match on specificity — earlier in
+       the file they simply won, and a hovered winner stayed untinted. */
+    .bracket-team:hover,
+    .bracket-team.winner:hover,
+    .bracket-team.champion:hover,
+    html.light .bracket-team:hover,
+    html.light .bracket-team.winner:hover,
+    html.light .bracket-team.champion:hover {
+      border-color: rgba(var(--row-accent-rgb, var(--accent-rgb)),.5);
+      background: rgba(var(--row-accent-rgb, var(--accent-rgb)),.2);
+      z-index: 3;
+    }
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
@@ -1094,8 +1356,16 @@
       /* Standings */
       .standings-grid { grid-template-columns: 1fr; gap: 24px; }
       .standings-row__name { display: none; }
-      .standings-row__abbr { display: inline; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px,4vw,17px); letter-spacing: .06em; }
-      .standings-row { padding: 10px 12px; min-height: 48px; }
+      /* Mobile shows the abbreviation in place of the full name — same
+         mono face, so the two read as one column at any width. */
+      .standings-row__abbr { display: inline; font-family: var(--font-mono); font-weight: 400; font-size: clamp(12px,3.6vw,15px); letter-spacing: .1em; }
+      .teams-inner { --row-h: 40px; }
+      .standings-row { padding: 6px 10px; }
+      /* The crest sets the box height here, so it comes down with the rows. */
+      .bracket-team__logo { width: 22px; height: 22px; }
+      .bracket-team { padding: 5px 8px; }
+      /* Rows use a tighter side padding here, so the headings match it. */
+      .standings-head { padding-left: 10px; padding-right: 10px; }
 
       /* Team banner */
       .team-banner { padding: 18px 14px; min-height: auto; }
@@ -1124,8 +1394,8 @@
 
       /* Roster — exact players.html mobile scroll fix */
       .team-roster-card { overflow: visible; }
-      .team-roster-card__header { border-radius: 6px 6px 0 0; }
-      .roster-scroll { border-radius: 0 0 6px 6px; overflow-x: auto; }
+      .team-roster-card__header { border-radius: 0; }
+      .roster-scroll { border-radius: 0; overflow-x: auto; }
     }
 
     /* ── SUB-400px ── */
@@ -1142,6 +1412,3 @@
       .gauge-content__val { font-size: .95rem; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .standings-row, .standings-row:hover, .standings-row:active { transition: none; transform: none; }
-    }
