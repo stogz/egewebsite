@@ -872,14 +872,14 @@
     /* ─── PLAYOFF BRACKET ────────────────────────────────────── */
     function BRACKETS() { return window.EGE_BRACKETS || {}; }
 
-    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year) {
+    function buildBracketTeam(slug, wins, isWinner, isChamp, seedLabel, ss, year, isLoser) {
       if (!slug) return '<div class="bracket-team"><span class="bracket-team__name" style="color:var(--text-muted);">TBD</span></div>';
       var ti = TEAM_INFO()[slug]||{};
       var name = ti.name || slug;
       var abbr = SLUG_ABBR[slug] || slug.slice(0,3).toUpperCase();
       var teamStats = ss ? (ss[slug] || {}) : {};
       var logo = getStandingsLogo(name, year);
-      var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'');
+      var cls = 'bracket-team'+(isChamp?' champion':isWinner?' winner':'')+(isLoser?' loser':'');
       var winsStr = wins !== null && wins !== undefined ? String(wins) : '';
       // Player icons from standings data
       var iconsHtml = '';
@@ -924,8 +924,8 @@
       var topChamp = isChampMatch && topWon;
       var botChamp = isChampMatch && botWon;
       return '<div class="bracket-matchup">'
-        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss, year)
-        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss, year)
+        + buildBracketTeam(m.top, m.topW, topWon, topChamp, topSeed||'', ss, year, botWon)
+        + buildBracketTeam(m.bot, m.botW, botWon, botChamp, botSeed||'', ss, year, topWon)
         + '</div>';
     }
 

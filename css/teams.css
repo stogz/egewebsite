@@ -979,6 +979,10 @@
       grid-template-rows: auto;
       gap: 0 var(--bk-gap);
       min-width: 760px;
+      /* Capped and centred: the boxes only need room for a seed, a crest and
+         a score, so past this the columns just get emptier. */
+      max-width: 1000px;
+      margin: 0 auto;
       /* Columns stretch to the row height so each one can space its matchups
          evenly — that is what keeps the rounds aligned. */
       align-items: stretch;
@@ -1118,6 +1122,10 @@
       border-left-color: var(--row-accent, var(--orange));
       background: rgba(var(--accent-rgb),.04);
     }
+    /* The side that lost the series sits back a little. Only a decided series
+       marks a loser, so an undecided or TBD box is left at full strength. */
+    .bracket-team.loser { opacity: .8; }
+    .bracket-team.loser:hover { opacity: 1; }
     .bracket-team.champion {
       border-left-color: #ffc820;
       background: rgba(255,200,32,.06);
@@ -1146,9 +1154,9 @@
     }
     .bracket-team.winner .bracket-team__name { color: var(--heading); }
     .bracket-team__wins {
-      font-family: var(--font-mono); font-size: .72rem;
+      font-family: var(--font-mono); font-size: .95rem;
       font-weight: 700;
-      flex: 0 0 14px; width: 14px;
+      flex: 0 0 16px; width: 16px;
       text-align: center;
     }
     .bracket-team.winner .bracket-team__wins { color: var(--orange); }
@@ -1181,7 +1189,7 @@
     }
     .bracket-finals-col .bracket-team__logo { width: 34px; height: 34px; }
     .bracket-finals-col .bracket-team__name { font-size: .9rem; }
-    .bracket-finals-col .bracket-team__wins { font-size: .85rem; flex-basis: 18px; width: 18px; }
+    .bracket-finals-col .bracket-team__wins { font-size: 1.15rem; flex-basis: 20px; width: 20px; }
     .bracket-finals-col .bracket-team__seed { font-size: .8rem; flex-basis: 20px; width: 20px; }
 
     /* Champion row — gold shimmer */
