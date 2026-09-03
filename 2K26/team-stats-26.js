@@ -41,11 +41,11 @@ window.EGE_TEAM_INFO = {
 
 /* ── PLAYER ICON URLS ───────────────────────────────────────── */
 window.EGE_PLAYER_ICONS = {
-  "Marcus Vega":     "",
-  "Dante Okafor":    "",
-  "Eli Marchetti":   "",
-  "Cole Pemberton":  "",
-  "Jordan Cross":    "",
+  "Cooper Clark":   "headshots/headshot_clark.png",
+  "Jaykeb Stewart": "headshots/headshot_stewart.png",
+  "Sam Stogsdill":  "headshots/headshot_stogsdill.png",
+  "Paxon Hatch":    "headshots/headshot_hatch.png",
+  "Isaac Vitel":    "headshots/headshot_vitel.png",
 };
 
 /* ══════════════════════════════════════════════════════════════

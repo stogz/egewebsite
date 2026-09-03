@@ -61,6 +61,26 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
 
+        <!-- Settings — same gear and switch panel as the Logs tab -->
+        <div class="log-settings" id="teamsSettings">
+          <button class="log-settings-btn" id="teams-settings-btn" title="Teams settings" aria-label="Teams settings" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.63.71 1.09 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <div class="log-settings-panel" id="teams-settings-panel">
+            <div class="log-settings-title">// teams settings</div>
+            <button class="log-settings-row is-on" data-setting="markers" role="switch" aria-checked="true">
+              <span class="log-settings-switch"><span class="log-settings-knob"></span></span>
+              <span class="log-settings-text">
+                <span class="log-settings-label">Player Markers</span>
+                <span class="log-settings-hint">Show a portrait on the teams a league player suits up for.</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
         <!-- Back to standings -->
         <button class="teams-back-btn" id="teamsBackBtn" aria-label="Back to standings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>

@@ -41,11 +41,11 @@ window.EGE_TEAM_INFO = {
 
 /* ── PLAYER ICON URLS ───────────────────────────────────────── */
 window.EGE_PLAYER_ICONS = {
-  "Cooper Clark":   "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/headshot-clark_orig.png",
-  "Jaykeb Stewart": "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/j-stewart-vancouver-grizzlies_orig.png",
-  "Sam Stogsdill":  "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/s-stogsdill-mexico-city-flight_orig.png",
-  "Paxon Hatch":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/p-hatch-los-angeles-lakers_orig.png",
-  "Isaac Vitel":    "https://egesimulation.weebly.com/uploads/1/2/9/6/129667888/i-vitel-st-louis_orig.png",
+  "Cooper Clark":   "headshots/headshot_clark.png",
+  "Jaykeb Stewart": "headshots/headshot_stewart.png",
+  "Sam Stogsdill":  "headshots/headshot_stogsdill.png",
+  "Paxon Hatch":    "headshots/headshot_hatch.png",
+  "Isaac Vitel":    "headshots/headshot_vitel.png",
 };
 
 /* ══════════════════════════════════════════════════════════════
