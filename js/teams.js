@@ -75,7 +75,6 @@
     }
 
     function getStandingsLogo(teamName, season)  { return _logoForTeam(teamName, season, false); }
-    function getDetailLogo(teamName, season)     { return _logoForTeam(teamName, season, true);  }
 
     // Build TEAM_COLORS from teamInfo primaryColor (used as fallback / 2K25)
     var TEAM_COLORS = {};
@@ -571,17 +570,25 @@
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
       var ss = (SEASON_STATS()[year]||{})[slug] || null;
-      var logo = getDetailLogo(teamName, year) || '';
+      var logo = getStandingsLogo(teamName, year) || '';
       var bg = getTeamColor(teamName, year);
       var abbr = SLUG_ABBR[slug] || '';
 
-      // Banner
-      var banner = document.getElementById('teamBanner');
-      banner.style.background = bg; // fallback solid color
+      // Header
       document.getElementById('teamBannerLogo').src = logo;
       document.getElementById('teamBannerLogo').alt = teamName;
       document.getElementById('teamBannerName').textContent = teamName;
-      document.getElementById('teamBannerSeason').textContent = year;
+
+      /* Page wash in the team's primary colour — the same two radial gradients
+         the player profile uses, so the two pages read as one family. */
+      var grad = document.getElementById('teamsDetailGradient');
+      if (grad) {
+        var rgb = hexTriplet(bg);
+        grad.style.background = rgb
+          ? 'radial-gradient(ellipse at 80% 0%, rgba('+rgb+',.22) 0%, transparent 65%),'
+          + 'radial-gradient(ellipse at 20% 100%, rgba('+rgb+',.14) 0%, transparent 55%)'
+          : '';
+      }
 
       // Quick stats
       document.getElementById('teamStatRecord').textContent = ss ? ss.record : '—';

@@ -388,54 +388,47 @@
 
     /* ── TEAM DETAIL VIEW ── */
     #teamsDetailView { display: none; animation: fadeSlideUp .4s ease both; }
-    #teamsDetailView.visible { display: block; }
+    #teamsDetailView.visible { display: block; position: relative; }
+    /* Everything but the wash sits above it */
+    #teamsDetailView > *:not(#teamsDetailGradient) { position: relative; z-index: 1; }
 
     /* Team hero banner */
-    .team-banner {
-      position: relative;
-      border-radius: 0;
-      overflow: hidden;
-      padding: 36px 40px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: flex-end;
-      gap: 28px;
-      min-height: 180px;
-      transition: background .5s ease;
-    }
-    .team-banner::before {
-      content: '';
-      position: absolute;
+    /* Team-colour wash behind the whole page. Fixed, so it stays put as the
+       page scrolls, and inert to the pointer. It lives inside the detail view,
+       which is display:none on the standings, so it clears itself. */
+    #teamsDetailGradient {
+      position: fixed;
       inset: 0;
-      background: linear-gradient(135deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 60%, transparent 100%);
       pointer-events: none;
+      z-index: 0;
+      transition: background .6s ease;
     }
-    .team-banner__logo {
-      position: relative; z-index: 1;
-      width: 90px; height: 90px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 20px rgba(0,0,0,.5));
-      flex-shrink: 0;
+
+    /* Header — the team's name, then its crest. */
+    .team-header {
+      position: relative; z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 2vw, 26px);
+      margin-bottom: 32px;
     }
-    .team-banner__info { position: relative; z-index: 1; }
-    .team-banner__name {
+    .team-header__name {
       font-family: var(--font-display);
       font-weight: 900;
-      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-size: clamp(2.1rem, 5vw, 4.4rem);
       text-transform: uppercase;
-      letter-spacing: -.01em;
-      color: #fff;
-      line-height: .92;
+      letter-spacing: -.015em;
+      line-height: .9;
+      color: var(--heading);
+      margin: 0;
+      transition: color .35s;
     }
-    .team-banner__season {
-      font-family: var(--font-mono);
-      font-size: .68rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.7);
-      margin-top: 8px;
+    .team-header__logo {
+      width: clamp(46px, 6vw, 88px);
+      height: clamp(46px, 6vw, 88px);
+      object-fit: contain;
+      flex-shrink: 0;
     }
-    .team-banner__season span { color: #fff; font-weight: 700; }
 
     /* Stats grid below banner */
     .team-stats-grid {
@@ -1402,9 +1395,9 @@
       .standings-head { padding-left: 10px; padding-right: 10px; }
 
       /* Team banner */
-      .team-banner { padding: 18px 14px; min-height: auto; }
-      .team-banner__logo { width: 48px; height: 48px; }
-      .team-banner__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+      .team-header { gap: 12px; margin-bottom: 22px; }
+      .team-header__logo { width: 46px; height: 46px; }
+      .team-header__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
 
       /* Stat cards — 2 col */
       .team-stats-grid { grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
@@ -1438,8 +1431,8 @@
       .team-stats-grid { gap: 6px; }
       .team-stat-card { padding: 10px 8px; }
       .team-stat-card__value { font-size: 1.1rem; }
-      .team-banner__name { font-size: clamp(1.2rem, 6vw, 1.8rem); }
-      .team-banner__logo { width: 40px; height: 40px; }
+      .team-header__name { font-size: clamp(1.2rem, 6vw, 1.8rem); }
+      .team-header__logo { width: 40px; height: 40px; }
       .team-chart-card__body { height: 130px; padding: 8px; }
       .gauge-wrap { width: 86px; height: 86px; }
       .gauge-inner { width: 64px; height: 64px; }
