@@ -471,10 +471,15 @@
       color: var(--text-muted);
       margin-bottom: 8px;
     }
+    /* Mono, like every other figure on this page — the heavy condensed face
+       these used was the odd one out against their own mono labels. Share
+       Tech Mono has a single weight, so the size carries the emphasis the
+       900 weight used to. */
     .team-stat-card__value {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 1.8rem;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 1.5rem;
+      letter-spacing: .02em;
       line-height: 1;
       color: var(--heading);
       transition: color .35s;
@@ -1436,7 +1441,7 @@
       /* Stat cards — 2 col */
       .team-stats-grid { grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
       .team-stat-card { padding: 12px 10px; }
-      .team-stat-card__value { font-size: 1.3rem; }
+      .team-stat-card__value { font-size: 1.25rem; }
 
       /* Single column detail layout */
       .team-detail-cols { grid-template-columns: 1fr; gap: 14px; }
@@ -1464,7 +1469,7 @@
       .teams-inner { padding: 0 8px; }
       .team-stats-grid { gap: 6px; }
       .team-stat-card { padding: 10px 8px; }
-      .team-stat-card__value { font-size: 1.1rem; }
+      .team-stat-card__value { font-size: 1.05rem; }
       .team-header__name { font-size: clamp(1.45rem, 7vw, 2.1rem); }
       .team-header__logo { width: 44px; height: 44px; }
       .team-chart-card__body { height: 130px; padding: 8px; }
