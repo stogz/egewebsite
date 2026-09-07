@@ -145,6 +145,34 @@
       if (push) { history.pushState(null,'',url); }
       else       { history.replaceState(null,'',url); }
     }
+    /* ─── PLAYOFF SEEDS ───────────────────────────────────────────
+       Seeding order for one conference in one season: conference rank, with
+       the bracket's playoff_seeds overrides applied at 7 and 8 for play-in
+       winners. Both the bracket and the postseason series card read seeds
+       from here, so the two can't disagree. */
+    function playoffSeedOrder(conf, year) {
+      var ss    = SEASON_STATS()[year] || {};
+      var bData = BRACKETS()[year] || {};
+      var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
+      var order = slugs.slice().sort(function(a,b){
+        var ra = parseInt(String(ss[a] && ss[a].rank || '99').replace(/\D/g,''),10) || 9999;
+        var rb = parseInt(String(ss[b] && ss[b].rank || '99').replace(/\D/g,''),10) || 9999;
+        return ra - rb;
+      }).filter(function(s){
+        return conf === 'east' ? isEastern(s) : !isEastern(s);
+      });
+      var overrides = (bData[conf] && bData[conf].playoff_seeds) || {};
+      [7,8].forEach(function(seed) {
+        if (overrides[seed]) order[seed-1] = overrides[seed];
+      });
+      return order;
+    }
+    function playoffSeed(slug, year) {
+      var conf = isEastern(slug) ? 'east' : 'west';
+      var idx = playoffSeedOrder(conf, year).indexOf(slug);
+      return idx >= 0 ? idx + 1 : null;
+    }
+
     /* ─── SETTINGS ────────────────────────────────────────────────
        One switch for now, in the same gear-and-panel menu the Logs tab uses.
        Persisted so the choice survives navigation, like the theme and sim. */
@@ -495,9 +523,11 @@
 
       var playoffs = ss ? (ss.playoffs||'').trim() : '';
 
-      // No bracket data or did not qualify
+      /* No bracket data, or the team missed the playoffs. The card stays and
+         says so — vanishing left a hole where the roster expected a card. */
       if (!bData || playoffs === 'Did not qualify') {
-        card.style.display = 'none';
+        list.innerHTML = '<div class="ps-no-data">Didn\'t make playoffs</div>';
+        card.style.display = 'block';
         return;
       }
 
@@ -528,7 +558,7 @@
 
       // Not in bracket at all — check play-in
       if (!series.length) {
-        list.innerHTML = '<div class="ps-no-data">Did not make playoffs</div>';
+        list.innerHTML = '<div class="ps-no-data">Didn\'t make playoffs</div>';
         card.style.display = 'block';
         return;
       }
@@ -539,21 +569,21 @@
         var isChampSeries = s.isFinals && won;
         var scoreStr = s.myW + '–' + s.opW;
         var scoreCls = isChampSeries ? 'champ' : won ? 'won' : 'lost';
-        var resultWord = won ? 'Won' : 'Lost';
 
         // Opponent info
         var opTi   = TEAM_INFO()[s.opSlug] || {};
         var opName = opTi.name || s.opSlug;
-        var opAbbr = SLUG_ABBR[s.opSlug] || (s.opSlug||'').slice(0,3).toUpperCase();
-        var opSs   = (SEASON_STATS()[year]||{})[s.opSlug] || null;
         var opLogo = getStandingsLogo(opName, year);
         var opLink = '#' + s.opSlug + yy;
+        // The opponent's seed, from the same order the bracket is built on
+        var opSeed = playoffSeed(s.opSlug, year);
+        var roundLine = s.label + (opSeed ? ' · ' + ordinal(opSeed) + ' seed' : '');
 
-        return '<a class="ps-series-row" href="' + opLink + '">'
+        return '<a class="ps-series-row ps-' + scoreCls + '" href="' + opLink + '">'
           + (opLogo ? '<img class="ps-series-logo" src="' + opLogo + '" alt="' + opName + '">' : '')
           + '<div class="ps-series-info">'
-            + '<div class="ps-series-round">' + s.label + '</div>'
-            + '<div class="ps-series-matchup">' + resultWord + ' vs. ' + opAbbr + '</div>'
+            + '<div class="ps-series-round">' + roundLine + '</div>'
+            + '<div class="ps-series-matchup">' + opName + '</div>'
           + '</div>'
           + '<div class="ps-series-score ' + scoreCls + '">' + scoreStr + '</div>'
         + '</a>';
@@ -1047,26 +1077,8 @@
       // bData.east.playoff_seeds / bData.west.playoff_seeds can override
       // positions 7 and 8 (0-indexed: 6 and 7) for play-in winners.
       // Format: { 7: "slug", 8: "slug" }  (1-based seed numbers)
-      function buildSeedOrder(conf) {
-        var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
-        var sorted = slugs.slice().sort(function(a,b){
-          var ra=parseInt(String(ss[a]&&ss[a].rank||'99').replace(/\D/g,''),10)||9999;
-          var rb=parseInt(String(ss[b]&&ss[b].rank||'99').replace(/\D/g,''),10)||9999;
-          return ra-rb;
-        });
-        var order = sorted.filter(function(s){
-          return conf==='east' ? isEastern(s) : !isEastern(s);
-        });
-        // Apply playoff_seeds overrides for 7 and 8
-        var overrides = bData[conf] && bData[conf].playoff_seeds || {};
-        [7,8].forEach(function(seed) {
-          if (overrides[seed]) order[seed-1] = overrides[seed];
-        });
-        return order;
-      }
-
-      var eastOrder = buildSeedOrder('east');
-      var westOrder = buildSeedOrder('west');
+      var eastOrder = playoffSeedOrder('east', year);
+      var westOrder = playoffSeedOrder('west', year);
 
       function getSeed(slug, conf) {
         var order = conf==='east' ? eastOrder : westOrder;

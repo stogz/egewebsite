@@ -503,6 +503,15 @@
        works inside them. Without this, the cell's min-size = content size (table min-width)
        and the grid never shrinks, causing page overflow instead of table scroll. */
     .team-detail-cols > div { min-width: 0; }
+    /* The side column stacks with a gap rather than each card carrying its own
+       top margin. A hidden card is not a flex item, so whichever card is first
+       on screen starts flush with the roster — with margins, the champions card
+       was the only one that did, and the rest sat 20px low without it. */
+    .team-detail-side {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
     /* Win chart */
     .team-chart-card {
@@ -558,13 +567,11 @@
 
     /* OFF/DEF gauges */
     .team-gauges {
-      margin-top: 20px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
       transition: background .35s;
-      margin-bottom: 24px;
       max-width: 100%;
     }
     .team-gauges__header {
@@ -713,7 +720,6 @@
 
     /* ── TRENDS CARD ── */
     .trends-card {
-      margin-top: 20px;
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
@@ -764,7 +770,6 @@
 
     /* ── POSTSEASON SERIES CARD ── */
     .playoff-result-card {
-      margin-top: 20px;
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
@@ -809,9 +814,16 @@
       font-family: var(--font-mono); font-weight: 700;
       font-size: .9rem; flex-shrink: 0; text-align: right;
     }
-    .ps-series-score.won  { color: var(--orange); }
-    .ps-series-score.lost { color: var(--text-muted); }
+    /* Green for a series won, red for one lost, gold for the title. The row
+       carries a matching edge so the outcome reads before the score does. */
+    .ps-series-score.won   { color: #21a14a; }
+    .ps-series-score.lost  { color: #d62d2d; }
     .ps-series-score.champ { color: #ffc820; }
+    .ps-series-row.ps-won   { box-shadow: inset 3px 0 0 #21a14a; }
+    .ps-series-row.ps-lost  { box-shadow: inset 3px 0 0 #d62d2d; }
+    .ps-series-row.ps-champ { box-shadow: inset 3px 0 0 #ffc820; }
+    html.light .ps-series-score.won  { color: #1a8a3e; }
+    html.light .ps-series-score.lost { color: #c02626; }
     /* No postseason row */
     .ps-no-data {
       padding: 18px 16px;
