@@ -156,10 +156,13 @@
       <div id="teamsDetailView">
         <!-- Team-colour wash behind the page, like the player profile -->
         <div id="teamsDetailGradient"></div>
-        <!-- Header: the team's name, then its crest -->
+        <!-- Header: the team's name and crest, with the season below -->
         <div class="team-header">
-          <h1 class="team-header__name" id="teamBannerName">—</h1>
-          <img class="team-header__logo" id="teamBannerLogo" src="" alt="">
+          <div class="team-header__row">
+            <h1 class="team-header__name" id="teamBannerName">—</h1>
+            <img class="team-header__logo" id="teamBannerLogo" src="" alt="">
+          </div>
+          <div class="team-header__season" id="teamHeaderSeason"></div>
         </div>
 
         <!-- Quick stats -->

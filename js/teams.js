@@ -395,6 +395,16 @@
       var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
       return 'rgba('+r+','+g+','+b+','+a+')';
     }
+    /* Perceived brightness of an "r, g, b" triplet, for deciding whether text
+       over that colour should be white or the site's navy. */
+    function relLuminance(rgb) {
+      var p = String(rgb).split(',').map(function(v){
+        var c = parseInt(v, 10) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      if (p.length !== 3 || p.some(isNaN)) return 0;
+      return 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2];
+    }
     /* "r, g, b" for the team colour, so a rule can build its own alpha from it
        — a hover tint can't be derived from the hex in --row-accent alone. */
     function hexTriplet(hex){
@@ -578,6 +588,17 @@
       document.getElementById('teamBannerLogo').src = logo;
       document.getElementById('teamBannerLogo').alt = teamName;
       document.getElementById('teamBannerName').textContent = teamName;
+
+      /* Season badge, filled with the team's colour. White text unless that
+         colour is bright enough to wash it out, where the site's navy reads
+         better — the same contrast test the player profile's badges use. */
+      var seasonEl = document.getElementById('teamHeaderSeason');
+      if (seasonEl) {
+        var badgeRgb = hexTriplet(bg);
+        seasonEl.textContent = year || '';
+        seasonEl.style.background = bg || 'var(--orange)';
+        seasonEl.style.color = (badgeRgb && relLuminance(badgeRgb) > 0.6) ? 'var(--navy)' : '#ffffff';
+      }
 
       /* Page wash in the team's primary colour — the same two radial gradients
          the player profile uses, so the two pages read as one family. */

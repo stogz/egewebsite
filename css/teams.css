@@ -404,18 +404,27 @@
       transition: background .6s ease;
     }
 
-    /* Header — the team's name, then its crest. */
+    /* Header — the team's name and crest centred on the page, with the season
+       on a badge beneath them. */
     .team-header {
       position: relative; z-index: 2;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: clamp(14px, 2vw, 26px);
-      margin-bottom: 32px;
+      gap: 16px;
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .team-header__row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 2.2vw, 30px);
     }
     .team-header__name {
       font-family: var(--font-display);
       font-weight: 900;
-      font-size: clamp(2.1rem, 5vw, 4.4rem);
+      font-size: clamp(2.6rem, 6.5vw, 6rem);
       text-transform: uppercase;
       letter-spacing: -.015em;
       line-height: .9;
@@ -424,10 +433,20 @@
       transition: color .35s;
     }
     .team-header__logo {
-      width: clamp(46px, 6vw, 88px);
-      height: clamp(46px, 6vw, 88px);
+      width: clamp(56px, 7.5vw, 108px);
+      height: clamp(56px, 7.5vw, 108px);
       object-fit: contain;
       flex-shrink: 0;
+    }
+    /* Filled with the team's colour from JS, like the player profile's badges */
+    .team-header__season {
+      display: inline-block;
+      padding: 7px 18px;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      transition: color .4s, background .4s;
     }
 
     /* Stats grid below banner */
@@ -1395,9 +1414,11 @@
       .standings-head { padding-left: 10px; padding-right: 10px; }
 
       /* Team banner */
-      .team-header { gap: 12px; margin-bottom: 22px; }
-      .team-header__logo { width: 46px; height: 46px; }
-      .team-header__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+      .team-header { gap: 12px; margin-bottom: 24px; }
+      .team-header__row { gap: 12px; }
+      .team-header__logo { width: 52px; height: 52px; }
+      .team-header__name { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+      .team-header__season { font-size: .6rem; letter-spacing: .18em; padding: 5px 13px; }
 
       /* Stat cards — 2 col */
       .team-stats-grid { grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
@@ -1431,8 +1452,8 @@
       .team-stats-grid { gap: 6px; }
       .team-stat-card { padding: 10px 8px; }
       .team-stat-card__value { font-size: 1.1rem; }
-      .team-header__name { font-size: clamp(1.2rem, 6vw, 1.8rem); }
-      .team-header__logo { width: 40px; height: 40px; }
+      .team-header__name { font-size: clamp(1.45rem, 7vw, 2.1rem); }
+      .team-header__logo { width: 44px; height: 44px; }
       .team-chart-card__body { height: 130px; padding: 8px; }
       .gauge-wrap { width: 86px; height: 86px; }
       .gauge-inner { width: 64px; height: 64px; }
