@@ -154,13 +154,15 @@
 
       <!-- TEAM DETAIL VIEW -->
       <div id="teamsDetailView">
-        <!-- Banner -->
-        <div class="team-banner" id="teamBanner">
-          <img class="team-banner__logo" id="teamBannerLogo" src="" alt="">
-          <div class="team-banner__info">
-            <div class="team-banner__name" id="teamBannerName">—</div>
-            <div class="team-banner__season">Season <span id="teamBannerSeason">—</span></div>
+        <!-- Team-colour wash behind the page, like the player profile -->
+        <div id="teamsDetailGradient"></div>
+        <!-- Header: the team's name and crest, with the season below -->
+        <div class="team-header">
+          <div class="team-header__row">
+            <h1 class="team-header__name" id="teamBannerName">—</h1>
+            <img class="team-header__logo" id="teamBannerLogo" src="" alt="">
           </div>
+          <div class="team-header__season" id="teamHeaderSeason"></div>
         </div>
 
         <!-- Quick stats -->
@@ -220,7 +222,7 @@
             </div>
           </div>
 
-          <div>
+          <div class="team-detail-side">
             <!-- NBA Champions card -->
             <div class="champ-card" id="champCard">
               <div class="champ-header">
@@ -232,7 +234,7 @@
                 <div class="champ-year" id="champYear">—</div>
                 <div class="champ-label">NBA Champions</div>
                 <div class="champ-mvp-wrap">
-                  <div class="champ-mvp-label">🏆 Finals MVP</div>
+                  <div class="champ-mvp-label">Finals MVP</div>
                   <div class="champ-mvp-name" id="champMvp"></div>
                 </div>
               </div>

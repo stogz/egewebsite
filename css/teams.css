@@ -388,54 +388,66 @@
 
     /* ── TEAM DETAIL VIEW ── */
     #teamsDetailView { display: none; animation: fadeSlideUp .4s ease both; }
-    #teamsDetailView.visible { display: block; }
+    #teamsDetailView.visible { display: block; position: relative; }
+    /* Everything but the wash sits above it */
+    #teamsDetailView > *:not(#teamsDetailGradient) { position: relative; z-index: 1; }
 
     /* Team hero banner */
-    .team-banner {
-      position: relative;
-      border-radius: 0;
-      overflow: hidden;
-      padding: 36px 40px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: flex-end;
-      gap: 28px;
-      min-height: 180px;
-      transition: background .5s ease;
-    }
-    .team-banner::before {
-      content: '';
-      position: absolute;
+    /* Team-colour wash behind the whole page. Fixed, so it stays put as the
+       page scrolls, and inert to the pointer. It lives inside the detail view,
+       which is display:none on the standings, so it clears itself. */
+    #teamsDetailGradient {
+      position: fixed;
       inset: 0;
-      background: linear-gradient(135deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 60%, transparent 100%);
       pointer-events: none;
+      z-index: 0;
+      transition: background .6s ease;
     }
-    .team-banner__logo {
-      position: relative; z-index: 1;
-      width: 90px; height: 90px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 20px rgba(0,0,0,.5));
-      flex-shrink: 0;
+
+    /* Header — the team's name and crest centred on the page, with the season
+       on a badge beneath them. */
+    .team-header {
+      position: relative; z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+      text-align: center;
     }
-    .team-banner__info { position: relative; z-index: 1; }
-    .team-banner__name {
+    .team-header__row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 2.2vw, 30px);
+    }
+    .team-header__name {
       font-family: var(--font-display);
       font-weight: 900;
-      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-size: clamp(2.6rem, 6.5vw, 6rem);
       text-transform: uppercase;
-      letter-spacing: -.01em;
-      color: #fff;
-      line-height: .92;
+      letter-spacing: -.015em;
+      line-height: .9;
+      color: var(--heading);
+      margin: 0;
+      transition: color .35s;
     }
-    .team-banner__season {
+    .team-header__logo {
+      width: clamp(56px, 7.5vw, 108px);
+      height: clamp(56px, 7.5vw, 108px);
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    /* Filled with the team's colour from JS, like the player profile's badges */
+    .team-header__season {
+      display: inline-block;
+      padding: 7px 18px;
       font-family: var(--font-mono);
-      font-size: .68rem;
-      letter-spacing: .2em;
+      font-size: .72rem;
+      letter-spacing: .24em;
       text-transform: uppercase;
-      color: rgba(255,255,255,.7);
-      margin-top: 8px;
+      transition: color .4s, background .4s;
     }
-    .team-banner__season span { color: #fff; font-weight: 700; }
 
     /* Stats grid below banner */
     .team-stats-grid {
@@ -459,10 +471,15 @@
       color: var(--text-muted);
       margin-bottom: 8px;
     }
+    /* Mono, like every other figure on this page — the heavy condensed face
+       these used was the odd one out against their own mono labels. Share
+       Tech Mono has a single weight, so the size carries the emphasis the
+       900 weight used to. */
     .team-stat-card__value {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 1.8rem;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 1.5rem;
+      letter-spacing: .02em;
       line-height: 1;
       color: var(--heading);
       transition: color .35s;
@@ -491,6 +508,15 @@
        works inside them. Without this, the cell's min-size = content size (table min-width)
        and the grid never shrinks, causing page overflow instead of table scroll. */
     .team-detail-cols > div { min-width: 0; }
+    /* The side column stacks with a gap rather than each card carrying its own
+       top margin. A hidden card is not a flex item, so whichever card is first
+       on screen starts flush with the roster — with margins, the champions card
+       was the only one that did, and the rest sat 20px low without it. */
+    .team-detail-side {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
     /* Win chart */
     .team-chart-card {
@@ -546,13 +572,11 @@
 
     /* OFF/DEF gauges */
     .team-gauges {
-      margin-top: 20px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
       transition: background .35s;
-      margin-bottom: 24px;
       max-width: 100%;
     }
     .team-gauges__header {
@@ -701,7 +725,6 @@
 
     /* ── TRENDS CARD ── */
     .trends-card {
-      margin-top: 20px;
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
@@ -752,7 +775,6 @@
 
     /* ── POSTSEASON SERIES CARD ── */
     .playoff-result-card {
-      margin-top: 20px;
       border: 1px solid var(--border);
       border-radius: 0;
       overflow: hidden;
@@ -787,9 +809,12 @@
       letter-spacing: .16em; text-transform: uppercase;
       color: var(--text-muted); margin-bottom: 3px;
     }
+    /* Team names read in the mono face, upper-case, the same treatment the
+       team line under a player's name uses on players.html. */
     .ps-series-matchup {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: .95rem; color: var(--heading);
+      font-family: var(--font-mono); font-weight: 500;
+      font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--heading);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color .35s;
     }
@@ -797,9 +822,14 @@
       font-family: var(--font-mono); font-weight: 700;
       font-size: .9rem; flex-shrink: 0; text-align: right;
     }
-    .ps-series-score.won  { color: var(--orange); }
-    .ps-series-score.lost { color: var(--text-muted); }
+    /* Green for a series won, red for one lost, gold for the title. The score
+       alone carries the outcome — the darker greens and reds keep contrast on
+       the light theme's paper background. */
+    .ps-series-score.won   { color: #21a14a; }
+    .ps-series-score.lost  { color: #d62d2d; }
     .ps-series-score.champ { color: #ffc820; }
+    html.light .ps-series-score.won  { color: #1a8a3e; }
+    html.light .ps-series-score.lost { color: #c02626; }
     /* No postseason row */
     .ps-no-data {
       padding: 18px 16px;
@@ -1402,14 +1432,16 @@
       .standings-head { padding-left: 10px; padding-right: 10px; }
 
       /* Team banner */
-      .team-banner { padding: 18px 14px; min-height: auto; }
-      .team-banner__logo { width: 48px; height: 48px; }
-      .team-banner__name { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+      .team-header { gap: 12px; margin-bottom: 24px; }
+      .team-header__row { gap: 12px; }
+      .team-header__logo { width: 52px; height: 52px; }
+      .team-header__name { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+      .team-header__season { font-size: .6rem; letter-spacing: .18em; padding: 5px 13px; }
 
       /* Stat cards — 2 col */
       .team-stats-grid { grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
       .team-stat-card { padding: 12px 10px; }
-      .team-stat-card__value { font-size: 1.3rem; }
+      .team-stat-card__value { font-size: 1.25rem; }
 
       /* Single column detail layout */
       .team-detail-cols { grid-template-columns: 1fr; gap: 14px; }
@@ -1437,9 +1469,9 @@
       .teams-inner { padding: 0 8px; }
       .team-stats-grid { gap: 6px; }
       .team-stat-card { padding: 10px 8px; }
-      .team-stat-card__value { font-size: 1.1rem; }
-      .team-banner__name { font-size: clamp(1.2rem, 6vw, 1.8rem); }
-      .team-banner__logo { width: 40px; height: 40px; }
+      .team-stat-card__value { font-size: 1.05rem; }
+      .team-header__name { font-size: clamp(1.45rem, 7vw, 2.1rem); }
+      .team-header__logo { width: 44px; height: 44px; }
       .team-chart-card__body { height: 130px; padding: 8px; }
       .gauge-wrap { width: 86px; height: 86px; }
       .gauge-inner { width: 64px; height: 64px; }

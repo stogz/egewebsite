@@ -75,7 +75,6 @@
     }
 
     function getStandingsLogo(teamName, season)  { return _logoForTeam(teamName, season, false); }
-    function getDetailLogo(teamName, season)     { return _logoForTeam(teamName, season, true);  }
 
     // Build TEAM_COLORS from teamInfo primaryColor (used as fallback / 2K25)
     var TEAM_COLORS = {};
@@ -146,6 +145,34 @@
       if (push) { history.pushState(null,'',url); }
       else       { history.replaceState(null,'',url); }
     }
+    /* ─── PLAYOFF SEEDS ───────────────────────────────────────────
+       Seeding order for one conference in one season: conference rank, with
+       the bracket's playoff_seeds overrides applied at 7 and 8 for play-in
+       winners. Both the bracket and the postseason series card read seeds
+       from here, so the two can't disagree. */
+    function playoffSeedOrder(conf, year) {
+      var ss    = SEASON_STATS()[year] || {};
+      var bData = BRACKETS()[year] || {};
+      var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
+      var order = slugs.slice().sort(function(a,b){
+        var ra = parseInt(String(ss[a] && ss[a].rank || '99').replace(/\D/g,''),10) || 9999;
+        var rb = parseInt(String(ss[b] && ss[b].rank || '99').replace(/\D/g,''),10) || 9999;
+        return ra - rb;
+      }).filter(function(s){
+        return conf === 'east' ? isEastern(s) : !isEastern(s);
+      });
+      var overrides = (bData[conf] && bData[conf].playoff_seeds) || {};
+      [7,8].forEach(function(seed) {
+        if (overrides[seed]) order[seed-1] = overrides[seed];
+      });
+      return order;
+    }
+    function playoffSeed(slug, year) {
+      var conf = isEastern(slug) ? 'east' : 'west';
+      var idx = playoffSeedOrder(conf, year).indexOf(slug);
+      return idx >= 0 ? idx + 1 : null;
+    }
+
     /* ─── SETTINGS ────────────────────────────────────────────────
        One switch for now, in the same gear-and-panel menu the Logs tab uses.
        Persisted so the choice survives navigation, like the theme and sim. */
@@ -390,11 +417,24 @@
 
     /* ─── TEAM DETAIL RENDERING ───────────────────────────────── */
     var _winChart = null;
+    /* The floating chart tooltip, defined in shared.js so this page and the
+       Players charts show the same thing. */
+    var Tooltip = window.EGETooltip;
 
     function hexToRgba(hex,a){
       hex = hex.replace('#','');
       var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
       return 'rgba('+r+','+g+','+b+','+a+')';
+    }
+    /* Perceived brightness of an "r, g, b" triplet, for deciding whether text
+       over that colour should be white or the site's navy. */
+    function relLuminance(rgb) {
+      var p = String(rgb).split(',').map(function(v){
+        var c = parseInt(v, 10) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      if (p.length !== 3 || p.some(isNaN)) return 0;
+      return 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2];
     }
     /* "r, g, b" for the team colour, so a rule can build its own alpha from it
        — a hover tint can't be derived from the hex in --row-accent alone. */
@@ -486,9 +526,11 @@
 
       var playoffs = ss ? (ss.playoffs||'').trim() : '';
 
-      // No bracket data or did not qualify
+      /* No bracket data, or the team missed the playoffs. The card stays and
+         says so — vanishing left a hole where the roster expected a card. */
       if (!bData || playoffs === 'Did not qualify') {
-        card.style.display = 'none';
+        list.innerHTML = '<div class="ps-no-data">Didn\'t make playoffs</div>';
+        card.style.display = 'block';
         return;
       }
 
@@ -519,7 +561,7 @@
 
       // Not in bracket at all — check play-in
       if (!series.length) {
-        list.innerHTML = '<div class="ps-no-data">Did not make playoffs</div>';
+        list.innerHTML = '<div class="ps-no-data">Didn\'t make playoffs</div>';
         card.style.display = 'block';
         return;
       }
@@ -530,21 +572,21 @@
         var isChampSeries = s.isFinals && won;
         var scoreStr = s.myW + '–' + s.opW;
         var scoreCls = isChampSeries ? 'champ' : won ? 'won' : 'lost';
-        var resultWord = won ? 'Won' : 'Lost';
 
         // Opponent info
         var opTi   = TEAM_INFO()[s.opSlug] || {};
         var opName = opTi.name || s.opSlug;
-        var opAbbr = SLUG_ABBR[s.opSlug] || (s.opSlug||'').slice(0,3).toUpperCase();
-        var opSs   = (SEASON_STATS()[year]||{})[s.opSlug] || null;
         var opLogo = getStandingsLogo(opName, year);
         var opLink = '#' + s.opSlug + yy;
+        // The opponent's seed, from the same order the bracket is built on
+        var opSeed = playoffSeed(s.opSlug, year);
+        var roundLine = s.label + (opSeed ? ' · ' + ordinal(opSeed) + ' seed' : '');
 
         return '<a class="ps-series-row" href="' + opLink + '">'
           + (opLogo ? '<img class="ps-series-logo" src="' + opLogo + '" alt="' + opName + '">' : '')
           + '<div class="ps-series-info">'
-            + '<div class="ps-series-round">' + s.label + '</div>'
-            + '<div class="ps-series-matchup">' + resultWord + ' vs. ' + opAbbr + '</div>'
+            + '<div class="ps-series-round">' + roundLine + '</div>'
+            + '<div class="ps-series-matchup">' + opName + '</div>'
           + '</div>'
           + '<div class="ps-series-score ' + scoreCls + '">' + scoreStr + '</div>'
         + '</a>';
@@ -571,17 +613,36 @@
       var ti = TEAM_INFO()[slug] || {};
       var teamName = ti.name || slug;
       var ss = (SEASON_STATS()[year]||{})[slug] || null;
-      var logo = getDetailLogo(teamName, year) || '';
+      var logo = getStandingsLogo(teamName, year) || '';
       var bg = getTeamColor(teamName, year);
       var abbr = SLUG_ABBR[slug] || '';
 
-      // Banner
-      var banner = document.getElementById('teamBanner');
-      banner.style.background = bg; // fallback solid color
+      // Header
       document.getElementById('teamBannerLogo').src = logo;
       document.getElementById('teamBannerLogo').alt = teamName;
       document.getElementById('teamBannerName').textContent = teamName;
-      document.getElementById('teamBannerSeason').textContent = year;
+
+      /* Season badge, filled with the team's colour. White text unless that
+         colour is bright enough to wash it out, where the site's navy reads
+         better — the same contrast test the player profile's badges use. */
+      var seasonEl = document.getElementById('teamHeaderSeason');
+      if (seasonEl) {
+        var badgeRgb = hexTriplet(bg);
+        seasonEl.textContent = year || '';
+        seasonEl.style.background = bg || 'var(--orange)';
+        seasonEl.style.color = (badgeRgb && relLuminance(badgeRgb) > 0.6) ? 'var(--navy)' : '#ffffff';
+      }
+
+      /* Page wash in the team's primary colour — the same two radial gradients
+         the player profile uses, so the two pages read as one family. */
+      var grad = document.getElementById('teamsDetailGradient');
+      if (grad) {
+        var rgb = hexTriplet(bg);
+        grad.style.background = rgb
+          ? 'radial-gradient(ellipse at 80% 0%, rgba('+rgb+',.22) 0%, transparent 65%),'
+          + 'radial-gradient(ellipse at 20% 100%, rgba('+rgb+',.14) 0%, transparent 55%)'
+          : '';
+      }
 
       // Quick stats
       document.getElementById('teamStatRecord').textContent = ss ? ss.record : '—';
@@ -623,7 +684,7 @@
           if (m) { labels.push(s); data.push(parseInt(m[1],10)); }
         }
       });
-      if (_winChart) { _winChart.destroy(); _winChart=null; }
+      if (_winChart) { _winChart.destroy(); _winChart=null; Tooltip.hide(); }
       // Read actual computed colors from the site's CSS variables at render time
       var isLight    = document.documentElement.classList.contains('light');
       var labelColor = isLight ? 'rgba(42,33,64,.5)'   : 'rgba(208,208,208,.45)';
@@ -642,18 +703,46 @@
       canvas.style.display = '';
       if (chartNote) chartNote.classList.remove('visible');
       var ctx = canvas.getContext('2d');
+
+      /* The same floating tooltip the Players charts use (shared.js), instead
+         of Chart.js's built-in one — that one drew its own box in its own
+         type and ignored the site's tokens, so the two pages didn't match.
+         Chart.js reports the caret in canvas space and the tooltip is
+         position:fixed, so the canvas rect has to be added back in. */
+      function winTooltip(context) {
+        var tt = context.tooltip;
+        if (tt.opacity === 0) { Tooltip.hide(); return; }
+        var dp = tt.dataPoints && tt.dataPoints[0];
+        if (!dp) { Tooltip.hide(); return; }
+        var seasonLabel = dp.label;
+        var row = (SEASON_STATS()[seasonLabel] || {})[slug] || {};
+        var po  = (row.playoffs || '').trim();
+        Tooltip.show(Tooltip.body({
+          logo:  getStandingsLogo(teamName, seasonLabel) || '',
+          title: seasonLabel,
+          // The postseason finish says more than repeating the record, which
+          // is already half in the value; the record covers seasons with none.
+          sub:   (po && po !== 'N/A') ? po : (row.record || ''),
+          value: dp.parsed.y,
+          unit:  'W'
+        }), rect().left + tt.caretX, rect().top + tt.caretY);
+      }
+      function rect() { return canvas.getBoundingClientRect(); }
+      canvas.onmouseleave = function(){ Tooltip.hide(); };
+
       _winChart = new Chart(ctx, {
         type:'line',
         data:{ labels:labels, datasets:[{ data:data, tension:.4, borderColor:bg, backgroundColor:hexToRgba(bg,.3), fill:true, borderWidth:3, pointRadius:0, pointHoverRadius:6, hitRadius:18 }] },
         options:{
           responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:function(i){ return i[0].label; }, label:function(c){ return 'Wins: '+c.parsed.y; } } } },
+          plugins:{ legend:{display:false}, tooltip:{ enabled:false, external:winTooltip } },
           scales:{
             x:{ ticks:{ color:labelColor, font:{size:10} }, grid:{color:gridColor} },
             y:{ min:5, max:75, ticks:{ stepSize:10, color:labelColor, font:{size:10} }, grid:{color:gridColor} }
           },
           onClick:function(evt){
             if (!_winChart) return;
+            Tooltip.hide();   // the chart is about to be rebuilt under it
             var pts = _winChart.getElementsAtEventForMode(evt,'nearest',{intersect:false},true);
             if (!pts||!pts.length) return;
             var clickedYear = _winChart.data.labels[pts[0].index];
@@ -1019,26 +1108,8 @@
       // bData.east.playoff_seeds / bData.west.playoff_seeds can override
       // positions 7 and 8 (0-indexed: 6 and 7) for play-in winners.
       // Format: { 7: "slug", 8: "slug" }  (1-based seed numbers)
-      function buildSeedOrder(conf) {
-        var slugs = Object.keys(TEAM_INFO()).filter(function(s){ return !!ss[s]; });
-        var sorted = slugs.slice().sort(function(a,b){
-          var ra=parseInt(String(ss[a]&&ss[a].rank||'99').replace(/\D/g,''),10)||9999;
-          var rb=parseInt(String(ss[b]&&ss[b].rank||'99').replace(/\D/g,''),10)||9999;
-          return ra-rb;
-        });
-        var order = sorted.filter(function(s){
-          return conf==='east' ? isEastern(s) : !isEastern(s);
-        });
-        // Apply playoff_seeds overrides for 7 and 8
-        var overrides = bData[conf] && bData[conf].playoff_seeds || {};
-        [7,8].forEach(function(seed) {
-          if (overrides[seed]) order[seed-1] = overrides[seed];
-        });
-        return order;
-      }
-
-      var eastOrder = buildSeedOrder('east');
-      var westOrder = buildSeedOrder('west');
+      var eastOrder = playoffSeedOrder('east', year);
+      var westOrder = playoffSeedOrder('west', year);
 
       function getSeed(slug, conf) {
         var order = conf==='east' ? eastOrder : westOrder;
