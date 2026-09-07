@@ -417,6 +417,9 @@
 
     /* ─── TEAM DETAIL RENDERING ───────────────────────────────── */
     var _winChart = null;
+    /* The floating chart tooltip, defined in shared.js so this page and the
+       Players charts show the same thing. */
+    var Tooltip = window.EGETooltip;
 
     function hexToRgba(hex,a){
       hex = hex.replace('#','');
@@ -579,7 +582,7 @@
         var opSeed = playoffSeed(s.opSlug, year);
         var roundLine = s.label + (opSeed ? ' · ' + ordinal(opSeed) + ' seed' : '');
 
-        return '<a class="ps-series-row ps-' + scoreCls + '" href="' + opLink + '">'
+        return '<a class="ps-series-row" href="' + opLink + '">'
           + (opLogo ? '<img class="ps-series-logo" src="' + opLogo + '" alt="' + opName + '">' : '')
           + '<div class="ps-series-info">'
             + '<div class="ps-series-round">' + roundLine + '</div>'
@@ -681,7 +684,7 @@
           if (m) { labels.push(s); data.push(parseInt(m[1],10)); }
         }
       });
-      if (_winChart) { _winChart.destroy(); _winChart=null; }
+      if (_winChart) { _winChart.destroy(); _winChart=null; Tooltip.hide(); }
       // Read actual computed colors from the site's CSS variables at render time
       var isLight    = document.documentElement.classList.contains('light');
       var labelColor = isLight ? 'rgba(42,33,64,.5)'   : 'rgba(208,208,208,.45)';
@@ -700,18 +703,46 @@
       canvas.style.display = '';
       if (chartNote) chartNote.classList.remove('visible');
       var ctx = canvas.getContext('2d');
+
+      /* The same floating tooltip the Players charts use (shared.js), instead
+         of Chart.js's built-in one — that one drew its own box in its own
+         type and ignored the site's tokens, so the two pages didn't match.
+         Chart.js reports the caret in canvas space and the tooltip is
+         position:fixed, so the canvas rect has to be added back in. */
+      function winTooltip(context) {
+        var tt = context.tooltip;
+        if (tt.opacity === 0) { Tooltip.hide(); return; }
+        var dp = tt.dataPoints && tt.dataPoints[0];
+        if (!dp) { Tooltip.hide(); return; }
+        var seasonLabel = dp.label;
+        var row = (SEASON_STATS()[seasonLabel] || {})[slug] || {};
+        var po  = (row.playoffs || '').trim();
+        Tooltip.show(Tooltip.body({
+          logo:  getStandingsLogo(teamName, seasonLabel) || '',
+          title: seasonLabel,
+          // The postseason finish says more than repeating the record, which
+          // is already half in the value; the record covers seasons with none.
+          sub:   (po && po !== 'N/A') ? po : (row.record || ''),
+          value: dp.parsed.y,
+          unit:  'W'
+        }), rect().left + tt.caretX, rect().top + tt.caretY);
+      }
+      function rect() { return canvas.getBoundingClientRect(); }
+      canvas.onmouseleave = function(){ Tooltip.hide(); };
+
       _winChart = new Chart(ctx, {
         type:'line',
         data:{ labels:labels, datasets:[{ data:data, tension:.4, borderColor:bg, backgroundColor:hexToRgba(bg,.3), fill:true, borderWidth:3, pointRadius:0, pointHoverRadius:6, hitRadius:18 }] },
         options:{
           responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title:function(i){ return i[0].label; }, label:function(c){ return 'Wins: '+c.parsed.y; } } } },
+          plugins:{ legend:{display:false}, tooltip:{ enabled:false, external:winTooltip } },
           scales:{
             x:{ ticks:{ color:labelColor, font:{size:10} }, grid:{color:gridColor} },
             y:{ min:5, max:75, ticks:{ stepSize:10, color:labelColor, font:{size:10} }, grid:{color:gridColor} }
           },
           onClick:function(evt){
             if (!_winChart) return;
+            Tooltip.hide();   // the chart is about to be rebuilt under it
             var pts = _winChart.getElementsAtEventForMode(evt,'nearest',{intersect:false},true);
             if (!pts||!pts.length) return;
             var clickedYear = _winChart.data.labels[pts[0].index];

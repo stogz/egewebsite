@@ -589,6 +589,61 @@ section { position: relative; z-index: 2; }
       line-height: 1.35;
     }
 
+/* ── CHART TOOLTIP ──
+   One floating element serves every chart that wants a tooltip: the
+   progression chart, the position pie and the scouting rows on Players,
+   and the win-history chart on Teams. Shared so the pages cannot drift
+   apart. Colours come from the same tokens the cards use: --bg for the
+   surface and --border for the edge, matching every chart border.
+   Opaque on purpose — a chart showing through a tooltip is what made
+   the old ones hard to read. */
+    .ege-tooltip {
+      position: fixed;
+      z-index: 9999;
+      display: none;
+      pointer-events: none;
+      padding: 9px 13px;
+      min-width: 132px;
+      max-width: min(280px, calc(100vw - 24px));
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: 0 6px 22px rgba(0,0,0,.4);
+      color: var(--text);
+      /* Follows the cursor by transform, which the compositor can handle
+         without re-laying out the page on every mouse move. */
+      left: 0;
+      top: 0;
+      will-change: transform;
+    }
+    .ege-tooltip.is-open { display: block; }
+    .ege-tt-row   { display:flex; align-items:center; gap:8px; }
+    .ege-tt-main  { flex:1; min-width:0; }
+    .ege-tt-title { font-family:var(--font-mono); font-size:.55rem; letter-spacing:.14em; text-transform:uppercase; color:var(--heading); }
+    .ege-tt-sub   { font-family:var(--font-mono); font-size:.52rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ege-tt-value { font-family:var(--font-display); font-weight:400; font-size:1.3rem; line-height:1; flex-shrink:0; padding-left:8px; color:var(--heading); }
+    .ege-tt-value .ege-tt-unit { font-size:.6rem; font-family:var(--font-mono); color:var(--text-muted); margin-left:2px; }
+    .ege-tt-logo  { width:24px; height:24px; object-fit:contain; flex-shrink:0; }
+
+    /* Touch: no cursor to follow, so it docks to the bottom of the screen
+       rather than hiding under the finger or running off the edge. */
+    @media (hover: none), (pointer: coarse) {
+      .ege-tooltip {
+        transform: none !important;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        top: auto !important;
+        width: auto;
+        max-width: none;
+        padding: 12px 14px;
+      }
+      .ege-tt-title { font-size: .62rem; }
+      .ege-tt-sub   { font-size: .58rem; }
+      .ege-tt-value { font-size: 1.5rem; }
+    }
+
+
 /* ── 8. MOBILE RESPONSIVE (≤768px) ──
    One breakpoint covers every shared element: nav collapses to a
    hamburger + dropdown, section headers stack, footer centers. */

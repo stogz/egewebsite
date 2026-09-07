@@ -804,9 +804,12 @@
       letter-spacing: .16em; text-transform: uppercase;
       color: var(--text-muted); margin-bottom: 3px;
     }
+    /* Team names read in the mono face, upper-case, the same treatment the
+       team line under a player's name uses on players.html. */
     .ps-series-matchup {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: .95rem; color: var(--heading);
+      font-family: var(--font-mono); font-weight: 500;
+      font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--heading);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color .35s;
     }
@@ -814,14 +817,12 @@
       font-family: var(--font-mono); font-weight: 700;
       font-size: .9rem; flex-shrink: 0; text-align: right;
     }
-    /* Green for a series won, red for one lost, gold for the title. The row
-       carries a matching edge so the outcome reads before the score does. */
+    /* Green for a series won, red for one lost, gold for the title. The score
+       alone carries the outcome — the darker greens and reds keep contrast on
+       the light theme's paper background. */
     .ps-series-score.won   { color: #21a14a; }
     .ps-series-score.lost  { color: #d62d2d; }
     .ps-series-score.champ { color: #ffc820; }
-    .ps-series-row.ps-won   { box-shadow: inset 3px 0 0 #21a14a; }
-    .ps-series-row.ps-lost  { box-shadow: inset 3px 0 0 #d62d2d; }
-    .ps-series-row.ps-champ { box-shadow: inset 3px 0 0 #ffc820; }
     html.light .ps-series-score.won  { color: #1a8a3e; }
     html.light .ps-series-score.lost { color: #c02626; }
     /* No postseason row */

@@ -307,3 +307,118 @@
   document.querySelectorAll('.players-grid').forEach(g => barObs.observe(g));
 
 })();
+
+  /* ══════════════════════════════════════════════════════════════
+     TOOLTIP
+
+     One element, one set of styles, shared by the progression chart, the
+     position pie and the scouting rows on Players, and the win-history
+     chart on Teams. Each of those used to build its own div with its own
+     inline colours, padding and shadow, which is why they never quite
+     matched. It lives here rather than on either page so a change to the
+     shape of a tooltip lands on both at once.
+
+     Behaviour worth knowing:
+     · Positioned with transform, so following the cursor does not force a
+       layout on every mouse move.
+     · Kept inside the viewport, flipping to the other side of the cursor
+       when it would overflow rather than being cut off at the edge.
+     · Hidden on scroll, wheel and resize. It is position:fixed, so without
+       that it hangs in place while the page moves underneath.
+     · On touch, CSS docks it to the bottom of the screen — there is no
+       cursor to follow and anything at the finger sits under the finger.
+     ══════════════════════════════════════════════════════════════ */
+  window.EGETooltip = (function () {
+    var el = null;
+    var OFFSET_X = 16, OFFSET_Y = 18, EDGE = 10;
+
+    function isCoarse() {
+      return window.matchMedia
+        && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    }
+
+    /* Built once up front rather than on first hover: place() measures the
+       element straight after setting its content, and a div appended in the
+       same tick can still report a width of zero. */
+    function node() {
+      if (el && el.isConnected) return el;
+      el = document.getElementById('ege-tooltip');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'ege-tooltip';
+        el.className = 'ege-tooltip';
+        el.setAttribute('role', 'tooltip');
+        el.setAttribute('aria-hidden', 'true');
+      }
+      if (!el.isConnected && document.body) document.body.appendChild(el);
+      return el;
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', node);
+    } else {
+      node();
+    }
+
+    /* Place near (x, y) in viewport coordinates, staying on screen. */
+    function place(x, y) {
+      var t = node();
+      if (isCoarse()) return;            // CSS docks it; nothing to position
+      var w = t.offsetWidth, h = t.offsetHeight;
+      var left = x + OFFSET_X;
+      var top  = y - OFFSET_Y;
+      if (left + w > window.innerWidth - EDGE) left = x - w - OFFSET_X;
+      if (left < EDGE) left = EDGE;
+      if (top + h > window.innerHeight - EDGE) top = y - h - OFFSET_Y;
+      if (top < EDGE) top = EDGE;
+      t.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(top) + 'px)';
+    }
+
+    function show(html, x, y) {
+      var t = node();
+      t.innerHTML = html;
+      t.classList.add('is-open');
+      t.setAttribute('aria-hidden', 'false');
+      place(x, y);                        // after paint, so offsetWidth is real
+    }
+
+    function move(x, y) {
+      if (el && el.classList.contains('is-open')) place(x, y);
+    }
+
+    function hide() {
+      if (!el) return;
+      el.classList.remove('is-open');
+      el.setAttribute('aria-hidden', 'true');
+    }
+
+    /* A fixed-position tooltip does not move with the page, so anything that
+       scrolls or resizes the viewport has to dismiss it. Capture phase picks
+       up scrolling inside the tables and chart panes too, not just the page. */
+    ['scroll', 'wheel'].forEach(function (evt) {
+      window.addEventListener(evt, hide, { passive: true, capture: true });
+    });
+    window.addEventListener('resize', hide, { passive: true });
+    window.addEventListener('orientationchange', hide, { passive: true });
+    // A tap anywhere outside the thing that opened it closes it on touch.
+    document.addEventListener('touchstart', function (e) {
+      if (!el || !el.classList.contains('is-open')) return;
+      if (e.target && e.target.closest && e.target.closest('[data-tt-source]')) return;
+      hide();
+    }, { passive: true });
+
+    /* ── Shared markup builders, so every caller looks the same ── */
+    function body(opts) {
+      return '<div class="ege-tt-row">'
+        + (opts.logo ? '<img class="ege-tt-logo" src="' + opts.logo + '" alt="">' : '')
+        + '<div class="ege-tt-main">'
+        + '<div class="ege-tt-title">' + opts.title + '</div>'
+        + (opts.sub ? '<div class="ege-tt-sub">' + opts.sub + '</div>' : '')
+        + '</div>'
+        + '<div class="ege-tt-value"' + (opts.valueColor ? ' style="color:' + opts.valueColor + ';"' : '') + '>'
+        + opts.value
+        + (opts.unit ? '<span class="ege-tt-unit">' + opts.unit + '</span>' : '')
+        + '</div></div>';
+    }
+
+    return { show: show, move: move, hide: hide, body: body, isCoarse: isCoarse };
+  })();
