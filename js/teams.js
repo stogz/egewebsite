@@ -111,7 +111,7 @@
       detroitpistons:"DET",goldenstatewarriors:"GSW",houstonrockets:"HOU",indianapacers:"IND",
       losangelesclippers:"LAC",losangeleslakers:"LAL",memphisgrizzlies:"MEM",miamiheat:"MIA",
       milwaukeebucks:"MIL",minnesotatimberwolves:"MIN",neworleanspelicans:"NOP",
-      neworleanshornets:"NOH",newyorkknicks:"NYK",
+      neworleanshornets:"NOH",newjerseynets:"NJN",newyorkknicks:"NYK",
       oklahomacitythunder:"OKC",orlandomagic:"ORL",philadelphia76ers:"PHI",phoenixsuns:"PHX",
       portlandtrailblazers:"POR",sacramentokings:"SAC",sanantoniospurs:"SAS",torontoraptors:"TOR",
       utahjazz:"UTA",vancouvergrizzlies:"VAN",washingtonwizards:"WAS",
