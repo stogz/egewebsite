@@ -34,6 +34,7 @@
     function SEASON_STATS() { return window.EGE_SEASON_STATS || {}; }
     function RATINGS()      { return window.EGE_RATINGS      || {}; }
     function ROSTERS()      { return window.EGE_ROSTERS      || {}; }
+    function TOP_PLAYERS()  { return window.EGE_TOP_PLAYERS  || {}; }
     function PLAYER_ICONS() { return window.EGE_PLAYER_ICONS || {}; }
 
     /* ─── CONSTANTS — built from teaminfo.js ──────────────────── */
@@ -813,22 +814,161 @@
       return name;
     }
 
+    /* ─── NBA HEADSHOT IDS ────────────────────────────────────────
+       NBA_All_Player_IDs.csv maps a player's name to the id the NBA CDN
+       keys headshots by. It is ~100KB, so it is fetched the first time a
+       top-three card actually needs it rather than on every page load, and
+       the parse is kept. Names are compared with accents and punctuation
+       stripped, so "Dario Saric" finds "Dario Šarić". */
+    var _nbaIds = null, _nbaIdsPending = null;
+
+    /* Names go into attributes as well as text, so they get escaped. The data
+       is ours, but an unescaped apostrophe in a name like "Amar'e Stoudemire"
+       would still break out of the attribute it sits in. */
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function normName(s) {
+      s = String(s || '');
+      // Split accented characters apart, then drop the accent marks.
+      if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function loadNbaIds() {
+      if (_nbaIds)        return Promise.resolve(_nbaIds);
+      if (_nbaIdsPending) return _nbaIdsPending;
+      _nbaIdsPending = fetch('NBA_All_Player_IDs.csv')
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .then(function(txt){
+          var map = {};
+          // slice(1) drops the header row, and with it the file's BOM.
+          txt.split(/\r?\n/).slice(1).forEach(function(line){
+            if (!line) return;
+            var comma = line.lastIndexOf(',');      // no name in the file has one
+            if (comma < 0) return;
+            var id = line.slice(comma + 1).trim();
+            if (!/^\d+$/.test(id)) return;
+            var key = normName(line.slice(0, comma));
+            // First id wins: 38 names are shared, and an entry that cares
+            // says which one it means with nbaId.
+            if (key && !map[key]) map[key] = id;
+          });
+          _nbaIds = map;
+          return map;
+        })
+        .catch(function(){
+          // Offline, blocked, or opened from file://. The cards still render;
+          // they just keep their initials. Cached so we ask only once.
+          _nbaIds = {};
+          return _nbaIds;
+        });
+      return _nbaIdsPending;
+    }
+
+    function headshotUrl(id) {
+      return 'https://cdn.nba.com/headshots/nba/latest/1040x760/' + id + '.png';
+    }
+
+    function initialsOf(name) {
+      var parts = String(name || '').trim().split(/\s+/);
+      if (!parts[0]) return '?';
+      var first = parts[0].charAt(0);
+      var last  = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+      return (first + last).toUpperCase();
+    }
+
+    /* 1-5, halves allowed. A half lands as a full star at reduced opacity
+       rather than a "½" glyph, which no mono face renders consistently. */
+    function starsMarkup(n) {
+      var v = Math.max(0, Math.min(5, parseFloat(n) || 0));
+      var out = '';
+      for (var i = 1; i <= 5; i++) {
+        if (v >= i)          out += '<span>\u2605</span>';
+        else if (v >= i - .5) out += '<span style="opacity:.45">\u2605</span>';
+        else                  out += '<span class="is-empty">\u2605</span>';
+      }
+      return out;
+    }
+
+    function renderTopThree(list, ring) {
+      var host = document.getElementById('topThree');
+      if (!host) return;
+      var players = list.slice(0, 3);
+
+      host.style.setProperty('--tt-ring', ring || 'var(--orange)');
+      host.innerHTML = players.map(function(p){
+        return '<div class="top-three__player">'
+          + '<div class="top-three__shot" data-name="' + esc(p.name) + '"'
+          + (p.nbaId ? ' data-id="' + esc(String(p.nbaId)) + '"' : '') + '>'
+            + '<div class="top-three__initials">' + esc(initialsOf(p.name)) + '</div>'
+          + '</div>'
+          + '<div class="top-three__name">' + esc(p.name) + '</div>'
+          + '<div class="top-three__stars">' + starsMarkup(p.stars) + '</div>'
+        + '</div>';
+      }).join('');
+      host.style.display = 'flex';
+
+      /* The card is complete without the photos, so they are filled in when
+         the id table arrives instead of holding the render on a fetch. */
+      var shots = Array.prototype.slice.call(host.querySelectorAll('.top-three__shot'));
+      loadNbaIds().then(function(ids){
+        // A different team may have been picked while the fetch was in flight.
+        if (!host.isConnected || host.style.display === 'none') return;
+        shots.forEach(function(box){
+          if (!box.isConnected) return;
+          var id = box.getAttribute('data-id') || ids[normName(box.getAttribute('data-name'))];
+          if (!id) return;
+          var img = new Image();
+          img.alt = box.getAttribute('data-name');
+          // Only swap the initials out once the photo has actually decoded,
+          // so a 404 from the CDN leaves the initials rather than a blank ring.
+          img.onload = function(){ if (box.isConnected) box.insertBefore(img, box.firstChild); };
+          img.src = headshotUrl(id);
+        });
+      });
+    }
+
     function renderRoster(slug, year, scope) {
       var abbr2 = SLUG_ABBR[slug] || '';
       var rostYear = ROSTERS()[year];
       var rostData = rostYear && abbr2 && rostYear[abbr2] ? rostYear[abbr2] : null;
+      var topYear  = TOP_PLAYERS()[year];
+      var topData  = topYear && abbr2 && topYear[abbr2] ? topYear[abbr2] : null;
 
       var labelEl = document.getElementById('rosterTableLabel');
-      if (labelEl) labelEl.textContent = 'Roster';
 
       var table   = document.getElementById('rosterTable');
       var tbody   = document.getElementById('rosterTbody');
       var emptyEl = document.getElementById('rosterEmpty');
+      var scroll  = document.querySelector('.roster-scroll');
+      var topEl   = document.getElementById('topThree');
 
+      /* Three ways this slot can be filled: a full roster table, a top-three
+         card, or the note saying there is neither. A roster wins when a
+         season somehow has both. */
       if (!rostData || !rostData.length) {
-        tbody.innerHTML = ''; emptyEl.style.display = 'block';
+        tbody.innerHTML = '';
+        if (topData && topData.length) {
+          if (labelEl) labelEl.textContent = 'Top Players';
+          if (scroll) scroll.style.display = 'none';
+          emptyEl.style.display = 'none';
+          renderTopThree(topData, getTeamColor(
+            (TEAM_INFO()[slug] || {}).name || slug, year));
+          return;
+        }
+        if (labelEl) labelEl.textContent = 'Roster';
+        if (scroll) scroll.style.display = '';
+        if (topEl)  { topEl.style.display = 'none'; topEl.innerHTML = ''; }
+        emptyEl.style.display = 'block';
         return;
       }
+      if (labelEl) labelEl.textContent = 'Roster';
+      if (scroll) scroll.style.display = '';
+      if (topEl)  { topEl.style.display = 'none'; topEl.innerHTML = ''; }
       emptyEl.style.display = 'none';
 
       var rows = '';

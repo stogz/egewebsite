@@ -198,3 +198,178 @@ window.EGE_BRACKETS = {
     finals: { top: "miamiheat", topW: 4, bot: "oklahomacitythunder", botW: 1 },
   },
 }
+
+/* ══════════════════════════════════════════════════════════════
+   TOP PLAYERS
+   The third thing that can fill the roster slot on teams.html. A season
+   here can have a full roster (EGE_ROSTERS), this — a team's best three,
+   as headshot, name and a star rating — or neither, which leaves the
+   "no roster data" note. teams.html prefers a roster when both exist.
+
+   Format:  "SEASON": { ABBR: [ { name, stars }, ... up to three ] }
+
+   `name` is looked up in NBA_All_Player_IDs.csv to build the headshot URL,
+   so it has to match the spelling there (accents and case are ignored).
+   38 names in that file belong to more than one player — for those, add
+   `nbaId` to say which one, as CHO's Gerald Henderson does below.
+   `stars` runs 1-5 and may end in .5.
+   ══════════════════════════════════════════════════════════════ */
+window.EGE_TOP_PLAYERS = {
+
+  /* ── 2011-12 ──────────────────────────────────────────────── */
+  "2011-12": {
+    /* EAST */
+    CHI: [
+      { name: "Derrick Rose", stars: 5 },
+      { name: "Luol Deng", stars: 4 },
+      { name: "Joakim Noah", stars: 4 },
+    ],
+    MIA: [
+      { name: "LeBron James", stars: 5 },
+      { name: "Dwyane Wade", stars: 5 },
+      { name: "Chris Bosh", stars: 4 },
+    ],
+    IND: [
+      { name: "Danny Granger", stars: 4 },
+      { name: "Roy Hibbert", stars: 4 },
+      { name: "David West", stars: 3.5 },
+    ],
+    BOS: [
+      { name: "Rajon Rondo", stars: 4 },
+      { name: "Paul Pierce", stars: 4 },
+      { name: "Kevin Garnett", stars: 4 },
+    ],
+    ATL: [
+      { name: "Josh Smith", stars: 4 },
+      { name: "Joe Johnson", stars: 3.5 },
+      { name: "Al Horford", stars: 3.5 },
+    ],
+    ORL: [
+      { name: "Dwight Howard", stars: 5 },
+      { name: "Ryan Anderson", stars: 3.5 },
+      { name: "Jameer Nelson", stars: 3 },
+    ],
+    NYK: [
+      { name: "Carmelo Anthony", stars: 4.5 },
+      { name: "Tyson Chandler", stars: 4 },
+      { name: "Amar'e Stoudemire", stars: 3.5 },
+    ],
+    PHI: [
+      { name: "Andre Iguodala", stars: 3.5 },
+      { name: "Lou Williams", stars: 3 },
+      { name: "Jrue Holiday", stars: 3 },
+    ],
+    MIL: [
+      { name: "Brandon Jennings", stars: 3.5 },
+      { name: "Monta Ellis", stars: 3.5 },
+      { name: "Ersan Ilyasova", stars: 3 },
+    ],
+    DET: [
+      { name: "Greg Monroe", stars: 3.5 },
+      { name: "Rodney Stuckey", stars: 2.5 },
+      { name: "Brandon Knight", stars: 2.5 },
+    ],
+    TOR: [
+      { name: "DeMar DeRozan", stars: 3 },
+      { name: "Andrea Bargnani", stars: 3 },
+      { name: "Jose Calderon", stars: 2.5 },
+    ],
+    BKN: [
+      { name: "Deron Williams", stars: 4 },
+      { name: "Brook Lopez", stars: 3 },
+      { name: "MarShon Brooks", stars: 2.5 },
+    ],
+    CLE: [
+      { name: "Kyrie Irving", stars: 4 },
+      { name: "Antawn Jamison", stars: 3 },
+      { name: "Anderson Varejao", stars: 3 },
+    ],
+    WAS: [
+      { name: "John Wall", stars: 3.5 },
+      { name: "Nene", stars: 3 },
+      { name: "Jordan Crawford", stars: 2.5 },
+    ],
+    CHO: [
+      { name: "Gerald Henderson", stars: 2.5, nbaId: 201945 },
+      { name: "Kemba Walker", stars: 2.5 },
+      { name: "Byron Mullens", stars: 2 },
+    ],
+    /* WEST */
+    SAS: [
+      { name: "Tony Parker", stars: 4.5 },
+      { name: "Tim Duncan", stars: 4 },
+      { name: "Manu Ginobili", stars: 4 },
+    ],
+    OKC: [
+      { name: "Kevin Durant", stars: 5 },
+      { name: "Russell Westbrook", stars: 4.5 },
+      { name: "James Harden", stars: 4 },
+    ],
+    LAL: [
+      { name: "Kobe Bryant", stars: 5 },
+      { name: "Andrew Bynum", stars: 4 },
+      { name: "Pau Gasol", stars: 4 },
+    ],
+    MEM: [
+      { name: "Marc Gasol", stars: 4 },
+      { name: "Rudy Gay", stars: 3.5 },
+      { name: "Zach Randolph", stars: 3.5 },
+    ],
+    LAC: [
+      { name: "Chris Paul", stars: 5 },
+      { name: "Blake Griffin", stars: 4.5 },
+      { name: "DeAndre Jordan", stars: 3.5 },
+    ],
+    DEN: [
+      { name: "Ty Lawson", stars: 3.5 },
+      { name: "Danilo Gallinari", stars: 3.5 },
+      { name: "Al Harrington", stars: 3 },
+    ],
+    DAL: [
+      { name: "Dirk Nowitzki", stars: 4.5 },
+      { name: "Jason Terry", stars: 3 },
+      { name: "Shawn Marion", stars: 3 },
+    ],
+    UTA: [
+      { name: "Al Jefferson", stars: 3.5 },
+      { name: "Paul Millsap", stars: 3.5 },
+      { name: "Gordon Hayward", stars: 3 },
+    ],
+    HOU: [
+      { name: "Luis Scola", stars: 3.5 },
+      { name: "Kevin Martin", stars: 3 },
+      { name: "Goran Dragic", stars: 3 },
+    ],
+    PHX: [
+      { name: "Steve Nash", stars: 4 },
+      { name: "Marcin Gortat", stars: 3.5 },
+      { name: "Jared Dudley", stars: 3 },
+    ],
+    POR: [
+      { name: "LaMarcus Aldridge", stars: 4.5 },
+      { name: "Nicolas Batum", stars: 3.5 },
+      { name: "Wesley Matthews", stars: 3 },
+    ],
+    MIN: [
+      { name: "Kevin Love", stars: 4.5 },
+      { name: "Nikola Pekovic", stars: 3.5 },
+      { name: "Ricky Rubio", stars: 3.5 },
+    ],
+    GSW: [
+      { name: "David Lee", stars: 4 },
+      { name: "Stephen Curry", stars: 3.5 },
+      { name: "Klay Thompson", stars: 3 },
+    ],
+    SAC: [
+      { name: "DeMarcus Cousins", stars: 4 },
+      { name: "Tyreke Evans", stars: 3 },
+      { name: "Marcus Thornton", stars: 3 },
+    ],
+    NOH: [
+      { name: "Eric Gordon", stars: 3 },
+      { name: "Jarrett Jack", stars: 2.5 },
+      { name: "Chris Kaman", stars: 2.5 },
+    ],
+  },
+
+};
