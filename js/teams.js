@@ -34,6 +34,7 @@
     function SEASON_STATS() { return window.EGE_SEASON_STATS || {}; }
     function RATINGS()      { return window.EGE_RATINGS      || {}; }
     function ROSTERS()      { return window.EGE_ROSTERS      || {}; }
+    function TOP_PLAYERS()  { return window.EGE_TOP_PLAYERS  || {}; }
     function PLAYER_ICONS() { return window.EGE_PLAYER_ICONS || {}; }
 
     /* ─── CONSTANTS — built from teaminfo.js ──────────────────── */
@@ -110,7 +111,7 @@
       detroitpistons:"DET",goldenstatewarriors:"GSW",houstonrockets:"HOU",indianapacers:"IND",
       losangelesclippers:"LAC",losangeleslakers:"LAL",memphisgrizzlies:"MEM",miamiheat:"MIA",
       milwaukeebucks:"MIL",minnesotatimberwolves:"MIN",neworleanspelicans:"NOP",
-      neworleanshornets:"NOH",newyorkknicks:"NYK",
+      neworleanshornets:"NOH",newjerseynets:"NJN",newyorkknicks:"NYK",
       oklahomacitythunder:"OKC",orlandomagic:"ORL",philadelphia76ers:"PHI",phoenixsuns:"PHX",
       portlandtrailblazers:"POR",sacramentokings:"SAC",sanantoniospurs:"SAS",torontoraptors:"TOR",
       utahjazz:"UTA",vancouvergrizzlies:"VAN",washingtonwizards:"WAS",
@@ -438,6 +439,71 @@
     }
     /* "r, g, b" for the team colour, so a rule can build its own alpha from it
        — a hover tint can't be derived from the hex in --row-accent alone. */
+    /* ─── READABLE TEAM COLOURS ───────────────────────────────────
+       A club's own colour is not always legible on the surface it lands on.
+       Brooklyn's black sits at 1.07:1 against the dark theme — invisible —
+       and San Antonio's silver at 1.54:1 against the light one; 16 of the 33
+       clubs fail one theme or the other at the 3:1 WCAG asks of a graphic.
+
+       Rather than give up team colour, hue and saturation are kept and only
+       lightness is walked away from the background until the colour clears
+       the threshold. A colour that already passes comes back untouched, so
+       most teams render exactly as authored. Both theme variants are handed
+       to CSS at once, so switching theme needs no re-render. */
+    var CONTRAST_MIN = 3.5;
+    var BG_DARK  = '#08052f';   // --bg on the dark theme
+    var BG_LIGHT = '#fbfaf9';   // --bg-card over --bg on the light theme
+
+    function contrastRatio(rgbA, rgbB) {
+      var la = relLuminance(rgbA), lb = relLuminance(rgbB);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    }
+    function rgbToHsl(rgb) {
+      var p = String(rgb).split(',').map(function(v){ return parseInt(v, 10) / 255; });
+      if (p.length !== 3 || p.some(isNaN)) return [0, 0, 0];
+      var r = p[0], g = p[1], b = p[2];
+      var mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx - mn;
+      var h = 0, sat = 0, l = (mx + mn) / 2;
+      if (d) {
+        sat = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+        if (mx === r)      h = (g - b) / d + (g < b ? 6 : 0);
+        else if (mx === g) h = (b - r) / d + 2;
+        else               h = (r - g) / d + 4;
+        h *= 60;
+      }
+      return [h, sat * 100, l * 100];
+    }
+    function hslToRgb(h, sat, l) {
+      h = ((h % 360) + 360) % 360;
+      sat = Math.max(0, Math.min(100, sat)) / 100;
+      l   = Math.max(0, Math.min(100, l))   / 100;
+      var c = (1 - Math.abs(2 * l - 1)) * sat;
+      var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      var m = l - c / 2;
+      var t = h < 60  ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x]
+            : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+      return [Math.round((t[0]+m)*255), Math.round((t[1]+m)*255), Math.round((t[2]+m)*255)].join(',');
+    }
+    function readableOn(hex, bgHex) {
+      var rgb = hexTriplet(hex), bg = hexTriplet(bgHex);
+      if (!rgb || !bg) return hex;
+      if (contrastRatio(rgb, bg) >= CONTRAST_MIN) return hex;
+      var hsl  = rgbToHsl(rgb);
+      // Lighten on a dark background, darken on a light one.
+      var step = relLuminance(bg) > 0.4 ? -2 : 2;
+      for (var i = 0; i < 60; i++) {
+        hsl[2] = Math.max(0, Math.min(100, hsl[2] + step));
+        var cand = hslToRgb(hsl[0], hsl[1], hsl[2]);
+        if (contrastRatio(cand, bg) >= CONTRAST_MIN) return 'rgb(' + cand + ')';
+        if (hsl[2] <= 0 || hsl[2] >= 100) break;   // nothing further to give
+      }
+      return 'rgb(' + hslToRgb(hsl[0], hsl[1], hsl[2]) + ')';
+    }
+    /* Both theme variants at once, for handing straight to CSS. */
+    function readablePair(hex) {
+      return { dark: readableOn(hex, BG_DARK), light: readableOn(hex, BG_LIGHT) };
+    }
+
     function hexTriplet(hex){
       if (!hex || String(hex).charAt(0) !== '#') return '';
       hex = String(hex).replace('#','');
@@ -813,22 +879,165 @@
       return name;
     }
 
+    /* ─── NBA HEADSHOT IDS ────────────────────────────────────────
+       NBA_All_Player_IDs.csv maps a player's name to the id the NBA CDN
+       keys headshots by. It is ~100KB, so it is fetched the first time a
+       top-three card actually needs it rather than on every page load, and
+       the parse is kept. Names are compared with accents and punctuation
+       stripped, so "Dario Saric" finds "Dario Šarić". */
+    var _nbaIds = null, _nbaIdsPending = null;
+
+    /* Names go into attributes as well as text, so they get escaped. The data
+       is ours, but an unescaped apostrophe in a name like "Amar'e Stoudemire"
+       would still break out of the attribute it sits in. */
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function normName(s) {
+      s = String(s || '');
+      // Split accented characters apart, then drop the accent marks.
+      if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function loadNbaIds() {
+      if (_nbaIds)        return Promise.resolve(_nbaIds);
+      if (_nbaIdsPending) return _nbaIdsPending;
+      _nbaIdsPending = fetch('NBA_All_Player_IDs.csv')
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .then(function(txt){
+          var map = {};
+          // slice(1) drops the header row, and with it the file's BOM.
+          txt.split(/\r?\n/).slice(1).forEach(function(line){
+            if (!line) return;
+            var comma = line.lastIndexOf(',');      // no name in the file has one
+            if (comma < 0) return;
+            var id = line.slice(comma + 1).trim();
+            if (!/^\d+$/.test(id)) return;
+            var key = normName(line.slice(0, comma));
+            // First id wins: 38 names are shared, and an entry that cares
+            // says which one it means with nbaId.
+            if (key && !map[key]) map[key] = id;
+          });
+          _nbaIds = map;
+          return map;
+        })
+        .catch(function(){
+          // Offline, blocked, or opened from file://. The cards still render;
+          // they just keep their initials. Cached so we ask only once.
+          _nbaIds = {};
+          return _nbaIds;
+        });
+      return _nbaIdsPending;
+    }
+
+    function headshotUrl(id) {
+      return 'https://cdn.nba.com/headshots/nba/latest/1040x760/' + id + '.png';
+    }
+
+    function initialsOf(name) {
+      var parts = String(name || '').trim().split(/\s+/);
+      if (!parts[0]) return '?';
+      var first = parts[0].charAt(0);
+      var last  = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+      return (first + last).toUpperCase();
+    }
+
+    /* 1-5, halves allowed. A half lands as a full star at reduced opacity
+       rather than a "½" glyph, which no mono face renders consistently. */
+    function starsMarkup(n) {
+      var v = Math.max(0, Math.min(5, parseFloat(n) || 0));
+      var out = '';
+      for (var i = 1; i <= 5; i++) {
+        if (v >= i)          out += '<span>\u2605</span>';
+        else if (v >= i - .5) out += '<span style="opacity:.45">\u2605</span>';
+        else                  out += '<span class="is-empty">\u2605</span>';
+      }
+      return out;
+    }
+
+    function renderTopThree(list, ring) {
+      var host = document.getElementById('topThree');
+      if (!host) return;
+      var players = list.slice(0, 3);
+
+      /* Both variants go on the element; CSS picks by theme, so a theme
+         toggle re-colours the card without it having to be rebuilt. */
+      var safe = readablePair(ring || '');
+      host.style.setProperty('--tt-ring-dark',  safe.dark  || 'var(--orange)');
+      host.style.setProperty('--tt-ring-light', safe.light || 'var(--orange)');
+      host.innerHTML = players.map(function(p){
+        return '<div class="top-three__player">'
+          + '<div class="top-three__shot" data-name="' + esc(p.name) + '"'
+          + (p.nbaId ? ' data-id="' + esc(String(p.nbaId)) + '"' : '') + '>'
+            + '<div class="top-three__initials">' + esc(initialsOf(p.name)) + '</div>'
+          + '</div>'
+          + '<div class="top-three__name">' + esc(p.name) + '</div>'
+          + '<div class="top-three__stars">' + starsMarkup(p.stars) + '</div>'
+        + '</div>';
+      }).join('');
+      host.style.display = 'flex';
+
+      /* The card is complete without the photos, so they are filled in when
+         the id table arrives instead of holding the render on a fetch. */
+      var shots = Array.prototype.slice.call(host.querySelectorAll('.top-three__shot'));
+      loadNbaIds().then(function(ids){
+        // A different team may have been picked while the fetch was in flight.
+        if (!host.isConnected || host.style.display === 'none') return;
+        shots.forEach(function(box){
+          if (!box.isConnected) return;
+          var id = box.getAttribute('data-id') || ids[normName(box.getAttribute('data-name'))];
+          if (!id) return;
+          var img = new Image();
+          img.alt = box.getAttribute('data-name');
+          // Only swap the initials out once the photo has actually decoded,
+          // so a 404 from the CDN leaves the initials rather than a blank ring.
+          img.onload = function(){ if (box.isConnected) box.insertBefore(img, box.firstChild); };
+          img.src = headshotUrl(id);
+        });
+      });
+    }
+
     function renderRoster(slug, year, scope) {
       var abbr2 = SLUG_ABBR[slug] || '';
       var rostYear = ROSTERS()[year];
       var rostData = rostYear && abbr2 && rostYear[abbr2] ? rostYear[abbr2] : null;
+      var topYear  = TOP_PLAYERS()[year];
+      var topData  = topYear && abbr2 && topYear[abbr2] ? topYear[abbr2] : null;
 
       var labelEl = document.getElementById('rosterTableLabel');
-      if (labelEl) labelEl.textContent = 'Roster';
 
       var table   = document.getElementById('rosterTable');
       var tbody   = document.getElementById('rosterTbody');
       var emptyEl = document.getElementById('rosterEmpty');
+      var scroll  = document.querySelector('.roster-scroll');
+      var topEl   = document.getElementById('topThree');
 
+      /* Three ways this slot can be filled: a full roster table, a top-three
+         card, or the note saying there is neither. A roster wins when a
+         season somehow has both. */
       if (!rostData || !rostData.length) {
-        tbody.innerHTML = ''; emptyEl.style.display = 'block';
+        tbody.innerHTML = '';
+        if (topData && topData.length) {
+          if (labelEl) labelEl.textContent = 'Top Players';
+          if (scroll) scroll.style.display = 'none';
+          emptyEl.style.display = 'none';
+          renderTopThree(topData, getTeamColor(
+            (TEAM_INFO()[slug] || {}).name || slug, year));
+          return;
+        }
+        if (labelEl) labelEl.textContent = 'Roster';
+        if (scroll) scroll.style.display = '';
+        if (topEl)  { topEl.style.display = 'none'; topEl.innerHTML = ''; }
+        emptyEl.style.display = 'block';
         return;
       }
+      if (labelEl) labelEl.textContent = 'Roster';
+      if (scroll) scroll.style.display = '';
+      if (topEl)  { topEl.style.display = 'none'; topEl.innerHTML = ''; }
       emptyEl.style.display = 'none';
 
       var rows = '';

@@ -723,6 +723,93 @@
       text-transform: uppercase; color: var(--text-muted);
     }
 
+    /* ── TOP THREE ──
+       The alternative to the roster table in the same card: three players
+       side by side, each a round headshot ringed in the team's colour, the
+       name, and a 1-5 star rating. --tt-ring is set inline per team. */
+    .top-three {
+      display: flex;
+      align-items: flex-start;
+      padding: 26px 16px 30px;
+      gap: 8px;
+      /* Both readable variants of the team colour are set on this element by
+         JS; the theme picks one here, so toggling theme recolours the card
+         without re-rendering it. */
+      --tt-ring: var(--tt-ring-dark, var(--orange));
+    }
+    html.light .top-three { --tt-ring: var(--tt-ring-light, var(--orange)); }
+    .top-three__player {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+    /* A fixed box the image fills, so a missing or still-loading headshot
+       leaves the ring and the row's height exactly where they were. */
+    .top-three__shot {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      border: 3px solid var(--tt-ring, var(--orange));
+      background: var(--bg);
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+    }
+    /* The NBA CDN's headshots are 1040x760 with the player high in a lot of
+       empty frame, so `cover` on a square box shows nearly the whole image
+       and leaves the head small near the top. The portrait is scaled up and
+       pulled up instead, to crop to head and shoulders. At 125% the visible
+       slice is about the middle four-fifths of the frame, which keeps
+       headroom above the hair and the shoulders in shot. Width follows the
+       aspect ratio and the image is centred by transform, so no horizontal
+       bias creeps in. */
+    .top-three__shot img {
+      position: absolute;
+      top: -6%;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 125%;
+      width: auto;
+      max-width: none;
+      display: block;
+    }
+    /* Initials, shown until (or instead of) the headshot. */
+    .top-three__initials {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 1.4rem;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+    }
+    .top-three__shot img + .top-three__initials { display: none; }
+    .top-three__name {
+      font-family: var(--font-mono);
+      font-size: .68rem; letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--heading);
+      line-height: 1.45;
+      transition: color .35s;
+    }
+    .top-three__stars {
+      font-size: .82rem;
+      letter-spacing: .12em;
+      color: var(--tt-ring, var(--orange));
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .top-three__stars .is-empty { color: var(--border); }
+
+    @media (max-width: 560px) {
+      .top-three { padding: 20px 10px 24px; gap: 4px; }
+      .top-three__shot { width: 72px; height: 72px; border-width: 2px; }
+      .top-three__initials { font-size: 1.05rem; }
+      .top-three__name { font-size: .6rem; letter-spacing: .06em; }
+      .top-three__stars { font-size: .7rem; letter-spacing: .06em; }
+    }
+
     /* ── TRENDS CARD ── */
     .trends-card {
       border: 1px solid var(--border);
