@@ -439,6 +439,71 @@
     }
     /* "r, g, b" for the team colour, so a rule can build its own alpha from it
        — a hover tint can't be derived from the hex in --row-accent alone. */
+    /* ─── READABLE TEAM COLOURS ───────────────────────────────────
+       A club's own colour is not always legible on the surface it lands on.
+       Brooklyn's black sits at 1.07:1 against the dark theme — invisible —
+       and San Antonio's silver at 1.54:1 against the light one; 16 of the 33
+       clubs fail one theme or the other at the 3:1 WCAG asks of a graphic.
+
+       Rather than give up team colour, hue and saturation are kept and only
+       lightness is walked away from the background until the colour clears
+       the threshold. A colour that already passes comes back untouched, so
+       most teams render exactly as authored. Both theme variants are handed
+       to CSS at once, so switching theme needs no re-render. */
+    var CONTRAST_MIN = 3.5;
+    var BG_DARK  = '#08052f';   // --bg on the dark theme
+    var BG_LIGHT = '#fbfaf9';   // --bg-card over --bg on the light theme
+
+    function contrastRatio(rgbA, rgbB) {
+      var la = relLuminance(rgbA), lb = relLuminance(rgbB);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    }
+    function rgbToHsl(rgb) {
+      var p = String(rgb).split(',').map(function(v){ return parseInt(v, 10) / 255; });
+      if (p.length !== 3 || p.some(isNaN)) return [0, 0, 0];
+      var r = p[0], g = p[1], b = p[2];
+      var mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx - mn;
+      var h = 0, sat = 0, l = (mx + mn) / 2;
+      if (d) {
+        sat = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+        if (mx === r)      h = (g - b) / d + (g < b ? 6 : 0);
+        else if (mx === g) h = (b - r) / d + 2;
+        else               h = (r - g) / d + 4;
+        h *= 60;
+      }
+      return [h, sat * 100, l * 100];
+    }
+    function hslToRgb(h, sat, l) {
+      h = ((h % 360) + 360) % 360;
+      sat = Math.max(0, Math.min(100, sat)) / 100;
+      l   = Math.max(0, Math.min(100, l))   / 100;
+      var c = (1 - Math.abs(2 * l - 1)) * sat;
+      var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      var m = l - c / 2;
+      var t = h < 60  ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x]
+            : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+      return [Math.round((t[0]+m)*255), Math.round((t[1]+m)*255), Math.round((t[2]+m)*255)].join(',');
+    }
+    function readableOn(hex, bgHex) {
+      var rgb = hexTriplet(hex), bg = hexTriplet(bgHex);
+      if (!rgb || !bg) return hex;
+      if (contrastRatio(rgb, bg) >= CONTRAST_MIN) return hex;
+      var hsl  = rgbToHsl(rgb);
+      // Lighten on a dark background, darken on a light one.
+      var step = relLuminance(bg) > 0.4 ? -2 : 2;
+      for (var i = 0; i < 60; i++) {
+        hsl[2] = Math.max(0, Math.min(100, hsl[2] + step));
+        var cand = hslToRgb(hsl[0], hsl[1], hsl[2]);
+        if (contrastRatio(cand, bg) >= CONTRAST_MIN) return 'rgb(' + cand + ')';
+        if (hsl[2] <= 0 || hsl[2] >= 100) break;   // nothing further to give
+      }
+      return 'rgb(' + hslToRgb(hsl[0], hsl[1], hsl[2]) + ')';
+    }
+    /* Both theme variants at once, for handing straight to CSS. */
+    function readablePair(hex) {
+      return { dark: readableOn(hex, BG_DARK), light: readableOn(hex, BG_LIGHT) };
+    }
+
     function hexTriplet(hex){
       if (!hex || String(hex).charAt(0) !== '#') return '';
       hex = String(hex).replace('#','');
@@ -899,7 +964,11 @@
       if (!host) return;
       var players = list.slice(0, 3);
 
-      host.style.setProperty('--tt-ring', ring || 'var(--orange)');
+      /* Both variants go on the element; CSS picks by theme, so a theme
+         toggle re-colours the card without it having to be rebuilt. */
+      var safe = readablePair(ring || '');
+      host.style.setProperty('--tt-ring-dark',  safe.dark  || 'var(--orange)');
+      host.style.setProperty('--tt-ring-light', safe.light || 'var(--orange)');
       host.innerHTML = players.map(function(p){
         return '<div class="top-three__player">'
           + '<div class="top-three__shot" data-name="' + esc(p.name) + '"'

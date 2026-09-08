@@ -732,7 +732,12 @@
       align-items: flex-start;
       padding: 26px 16px 30px;
       gap: 8px;
+      /* Both readable variants of the team colour are set on this element by
+         JS; the theme picks one here, so toggling theme recolours the card
+         without re-rendering it. */
+      --tt-ring: var(--tt-ring-dark, var(--orange));
     }
+    html.light .top-three { --tt-ring: var(--tt-ring-light, var(--orange)); }
     .top-three__player {
       flex: 1 1 0;
       min-width: 0;
@@ -753,19 +758,20 @@
       flex-shrink: 0;
       position: relative;
     }
-    /* The NBA CDN's headshots are 1040x760 with the player small and high in
-       a lot of empty frame, so `cover` on a square box shows almost the whole
-       image and leaves the head tiny near the top. Instead the portrait is
-       scaled to 150% of the circle and pulled up, which crops to roughly the
-       head and shoulders — the head then fills about 60% of the circle and
-       sits just above centre. Width is left to follow the aspect ratio and
-       the image is centred by transform, so no horizontal bias creeps in. */
+    /* The NBA CDN's headshots are 1040x760 with the player high in a lot of
+       empty frame, so `cover` on a square box shows nearly the whole image
+       and leaves the head small near the top. The portrait is scaled up and
+       pulled up instead, to crop to head and shoulders. At 125% the visible
+       slice is about the middle four-fifths of the frame, which keeps
+       headroom above the hair and the shoulders in shot. Width follows the
+       aspect ratio and the image is centred by transform, so no horizontal
+       bias creeps in. */
     .top-three__shot img {
       position: absolute;
-      top: -14%;
+      top: -6%;
       left: 50%;
       transform: translateX(-50%);
-      height: 150%;
+      height: 125%;
       width: auto;
       max-width: none;
       display: block;
