@@ -4,11 +4,25 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="EGE_Logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Build a shareable tweet card styled after Twitter, using EGE NBA Simulation accounts, and save it as an image." />
   <title>Tweet Generator · EGE NBA Simulation</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    /* Stamp the saved theme before the body paints. Without this the document
+       renders in the dark palette and shared.js — which sits at the end of
+       <body> — switches it afterwards, so anyone on the light theme sees a
+       dark flash whenever the network is slow. shared.js still owns the
+       toggle and the button; this only sets the starting state.
+       Wrapped because localStorage throws outright when site data is blocked. */
+    try { if (localStorage.getItem('ege-mode') === 'light') {
+      document.documentElement.classList.add('light');
+    } } catch (e) {}
+  </script>
+  <!-- defer: html2canvas is only called when the user presses Generate, so
+       blocking the first paint on a third-party CDN buys nothing. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <link rel="stylesheet" href="css/tweet-gen.css" />
 </head>
@@ -64,7 +78,7 @@
               <div class="tg-field">
                 <div class="tg-label">Profile Picture</div>
                 <div class="pfp-upload-wrap">
-                  <img src="" alt="pfp" class="pfp-preview" id="pfp-preview" />
+                  <img alt="Profile picture preview" class="pfp-preview" id="pfp-preview" />
                   <label class="pfp-upload-btn" for="pfp-file">↑ Upload image</label>
                   <input type="file" id="pfp-file" accept="image/*" />
                 </div>
@@ -72,13 +86,13 @@
 
               <!-- NAME -->
               <div class="tg-field">
-                <div class="tg-label">Display Name</div>
+                <label class="tg-label" for="inp-name">Display Name</label>
                 <input type="text" id="inp-name" class="tg-input" value="" maxlength="50" placeholder="Display name" />
               </div>
 
               <!-- USERNAME -->
               <div class="tg-field">
-                <div class="tg-label">Username</div>
+                <label class="tg-label" for="inp-handle">Username</label>
                 <input type="text" id="inp-handle" class="tg-input" value="" maxlength="16" placeholder="@username" />
               </div>
 
@@ -98,7 +112,7 @@
 
               <!-- TWEET TEXT -->
               <div class="tg-field" style="flex:1;">
-                <div class="tg-label">Tweet Text</div>
+                <label class="tg-label" for="inp-tweet">Tweet Text</label>
                 <textarea id="inp-tweet" class="tg-textarea" placeholder="What's happening?" style="flex:1;min-height:120px;"></textarea>
               </div>
 
@@ -138,7 +152,7 @@
               <!-- Header: pfp + name/handle + more-icon -->
               <div class="headerContainer css-1dbjc4n">
                 <div class="pfpContainer css-1dbjc4n">
-                  <img class="pfp editable-border" src="" width="48" height="48" id="pfp" />
+                  <img class="pfp editable-border" width="48" height="48" id="pfp" alt="Profile picture" />
                 </div>
                 <div class="headerRight css-1dbjc4n">
                   <div class="userinfo css-1dbjc4n">
@@ -165,7 +179,7 @@
 
               <!-- Tweet image -->
               <div class="imgContainer" id="imgContainer" style="display:none;">
-                <img class="tweetImg" id="tweetImg" src="" alt="" />
+                <img class="tweetImg" id="tweetImg" alt="" />
               </div>
 
               <!-- Action buttons row -->
@@ -236,7 +250,7 @@
       </div>
       <div class="tg-modal-body">
         <p class="tg-modal-hint">Right-click (or hold on mobile) → Save image as...</p>
-        <img class="tg-modal-img" id="modal-img" src="" alt="generated tweet" />
+        <img class="tg-modal-img" id="modal-img" alt="Generated tweet image" />
       </div>
       <div class="tg-modal-foot">
         <button class="tg-modal-done" id="modal-done">Done</button>
@@ -255,8 +269,8 @@
     </ul>
   </footer>
 
-  <script src="shared.js"></script>
+  <script defer src="shared.js"></script>
 
-  <script src="js/tweet-gen.js"></script>
+  <script defer src="js/tweet-gen.js"></script>
 </body>
 </html>

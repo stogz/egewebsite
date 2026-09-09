@@ -97,6 +97,20 @@ html.light {
 
 /* ── 3. BASE RESETS ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Available to assistive tech, painted nowhere. For headings a page needs
+   for its document outline but does not show — history.html opens straight
+   into its controls with no visible title. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 html {
   scroll-behavior: smooth;
   /* Always reserve scrollbar gutter space — prevents layout shift when
