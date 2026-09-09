@@ -1101,10 +1101,17 @@
     /* Full bracket layout — 3 cols per conf + finals in centre */
     .bracket-grid {
       --bk-gap: clamp(12px, 1.6vw, 26px);
+      /* Floor for a round column. Zero on desktop, where the columns are
+         roomy already; the phone breakpoint raises it so a team box can
+         always hold its full contents (see the mobile block). */
+      --bk-col-min: 0px;
+      /* The finals box carries larger type than a round box, so it gets its
+         own floor rather than sharing --bk-col-min. */
+      --bk-finals-min: 150px;
       display: grid;
       /* Round columns share what is left over; the finals column is fixed so
          the centre of the bracket doesn't move as the page resizes. */
-      grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, 180px) repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(var(--bk-col-min), 1fr)) minmax(var(--bk-finals-min), 180px) repeat(3, minmax(var(--bk-col-min), 1fr));
       grid-template-rows: auto;
       gap: 0 var(--bk-gap);
       min-width: 760px;
@@ -1515,6 +1522,16 @@
       /* The crest sets the box height here, so it comes down with the rows. */
       .bracket-team__logo { width: 22px; height: 22px; flex-basis: 22px; }
       .bracket-team { padding: 5px 8px; }
+      /* A round column wide enough for a team box holding everything at once:
+         16px of padding, the 22px crest, two 26px markers overlapped by 8px,
+         the seed chip and the win count, plus the 6px gaps between them.
+         That measures 140px, and the floor is set for every box rather than
+         only the ones that currently have two markers — otherwise a box would
+         change width the moment a second marker appeared in it. The bracket
+         already lives in a horizontally scrollable wrapper, so the wider grid
+         scrolls here instead of squeezing the boxes; before this they were
+         84.7px and clipped their own contents even with no markers at all. */
+      .bracket-grid { --bk-col-min: 140px; --bk-finals-min: 166px; }
       /* Rows use a tighter side padding here, so the headings match it. */
       .standings-head { padding-left: 10px; padding-right: 10px; }
 

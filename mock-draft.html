@@ -10,6 +10,15 @@
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
   <script>
+    /* The board is built from the 2K26 draft class and loads that sim's
+       team info directly, so it has nothing to show on another sim. Sent
+       back to Other before anything renders, rather than drawing a page of
+       mismatched data. */
+    if (!window.EGE_SIM || window.EGE_SIM.id !== 'sim-26') {
+      window.location.replace('other.html');
+    }
+  </script>
+  <script>
     /* Stamp the saved theme before the body paints. Without this the document
        renders in the dark palette and shared.js — which sits at the end of
        <body> — switches it afterwards, so anyone on the light theme sees a

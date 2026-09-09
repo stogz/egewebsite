@@ -19,10 +19,9 @@
     var logo = EGE_SIM.logoFile;
     if (!logo || logo === 'EGE_Logo.png') return;
 
-    // Swap nav logo img
-    document.querySelectorAll('img.logo-img').forEach(function(img) {
-      img.src = logo;
-    });
+    // The nav logo itself is handled by sim-config.js, which writes a CSS
+    // rule from <head> so the right mark is painted in the first frame
+    // instead of being swapped in after load.
 
     // Swap favicon
     var favicon = document.querySelector('link[rel="icon"]');

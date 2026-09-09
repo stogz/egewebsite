@@ -78,6 +78,21 @@
   /* Apply sim theme to <html> immediately — before any paint */
   document.documentElement.setAttribute('data-sim', activeSim);
 
+  /* Paint the right nav logo in the very first frame. Every page hard-codes
+     EGE_Logo.png in its markup, and shared.js used to rewrite the src after
+     load — so on any sim with its own logo (2K26 is the default) the wrong
+     mark was painted and then visibly swapped a few hundred ms later, on
+     every single page. Writing the rule from here, still inside <head> and
+     before the body is parsed, means there is nothing to swap. The file name
+     is read from the registry, so a future sim needs no change here. */
+  (function () {
+    var logo = window.EGE_SIM && window.EGE_SIM.logoFile;
+    if (!logo || logo === 'EGE_Logo.png' || !document.head) return;
+    var style = document.createElement('style');
+    style.textContent = 'img.logo-img{content:url("' + logo + '")}';
+    document.head.appendChild(style);
+  })();
+
   /* Helper — call this to switch sims and reload */
   window.EGE_switchSim = function (id) {
     if (SIM_REGISTRY[id]) {

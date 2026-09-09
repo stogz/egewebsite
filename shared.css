@@ -220,13 +220,19 @@ nav {
   overflow: visible;
 }
 .nav-links a {
+  /* inline-flex at a fixed 36px so the five page links stand exactly as tall
+     as #sim-toggle and #mode-toggle beside them — as plain inline anchors
+     they came out 28px and the row read as two different sizes. */
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
   font-family: var(--font-mono);
   font-size: .72rem;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--text);
   text-decoration: none;
-  padding: 6px 14px;
+  padding: 0 14px;
   border: 1px solid transparent;
   border-radius: 3px;
   transition: color .2s, border-color .2s, background .2s;
@@ -278,6 +284,13 @@ nav {
 #nav-mobile-menu { display: none; }
 #nav-menu-mode-toggle { display: none; }
 
+/* ── SIM-SCOPED CONTENT ──
+   Some pages only exist for one simulation. Keying off the data-sim
+   attribute, which sim-config.js stamps on <html> before the body is
+   parsed, means the entry is simply never painted on the other sims
+   rather than appearing and then being removed by script. */
+html:not([data-sim="sim-26"]) .feature-card--sim26 { display: none; }
+
 /* ── SIM SWITCHER (nav dropdown for choosing between simulations) ── */
 #sim-toggle {
   display: inline-flex;
@@ -318,7 +331,11 @@ nav {
 #sim-toggle-li {
   display: inline-flex;
   align-items: center;
-  min-width: 72px; /* matches the rendered #sim-toggle width */
+  /* Must match the rendered #sim-toggle exactly: a 4-character label at
+     .68rem/.14em plus the chevron, its 6px gap, 14px of padding each side
+     and 1px borders measures 78.3px. At the old 72px the nav still shifted
+     6px sideways the moment the button was inserted. */
+  min-width: 79px;
   height: 36px;
   flex-shrink: 0;
 }
