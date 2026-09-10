@@ -9,26 +9,37 @@
 
     /* ─────────────────────────────────────────────
        TWITTER CHIRP FONTS  (same as tweetgen)
+
+       These four files are not in the repository — there is no fonts/
+       directory — so every one of them 404s. font-display:swap means the
+       browser paints the fallback immediately instead of holding the tweet
+       card's text invisible for its block period while it waits to find
+       out. The rules are kept rather than deleted so that dropping the
+       .woff files into fonts/ is all it takes to get Chirp back.
     ───────────────────────────────────────────── */
     @font-face {
       font-family: "Twitter Chirp";
       src: url("../fonts/chirp-regular-web.woff");
       font-weight: normal;
+      font-display: swap;
     }
     @font-face {
       font-family: "Twitter Chirp";
       src: url("../fonts/chirp-medium-web.woff");
       font-weight: 500;
+      font-display: swap;
     }
     @font-face {
       font-family: "Twitter Chirp";
       src: url("../fonts/chirp-bold-web.woff");
       font-weight: bold;
+      font-display: swap;
     }
     @font-face {
       font-family: "Twitter Chirp";
       src: url("../fonts/chirp-heavy-web.woff");
       font-weight: 900;
+      font-display: swap;
     }
 
     /* ─────────────────────────────────────────────

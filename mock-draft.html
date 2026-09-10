@@ -4,10 +4,31 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="EGE_Logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="The EGE NBA Simulation mock draft board: prospect rankings, team needs and projected picks for the upcoming draft class." />
   <title>Mock Draft · EGE NBA Simulation</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <script src="sim-config.js"></script>
+  <script>
+    /* The board is built from the 2K26 draft class and loads that sim's
+       team info directly, so it has nothing to show on another sim. Sent
+       back to Other before anything renders, rather than drawing a page of
+       mismatched data. */
+    if (!window.EGE_SIM || window.EGE_SIM.id !== 'sim-26') {
+      window.location.replace('other.html');
+    }
+  </script>
+  <script>
+    /* Stamp the saved theme before the body paints. Without this the document
+       renders in the dark palette and shared.js — which sits at the end of
+       <body> — switches it afterwards, so anyone on the light theme sees a
+       dark flash whenever the network is slow. shared.js still owns the
+       toggle and the button; this only sets the starting state.
+       Wrapped because localStorage throws outright when site data is blocked. */
+    try { if (localStorage.getItem('ege-mode') === 'light') {
+      document.documentElement.classList.add('light');
+    } } catch (e) {}
+  </script>
   <script src="logos/teaminfo26.js"></script>
   <link rel="stylesheet" href="css/mock-draft.css" />
 </head>

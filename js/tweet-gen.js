@@ -92,8 +92,9 @@
       usernameEl.textContent = ensureAt(inpHandle.value) || '@Username';
     }
 
-    // pfp
-    pfpEl.src = currentPfp || '';
+    // pfp — an empty src resolves against the document, which points the
+    // element at the page itself; removing the attribute requests nothing.
+    if (currentPfp) pfpEl.src = currentPfp; else pfpEl.removeAttribute('src');
 
     // tweet body
     tweetRaw = inpTweet.value;
@@ -136,7 +137,7 @@
   imgClear.addEventListener('click', clearImg);
   function clearImg() {
     imgFile.value = '';
-    tweetImgEl.src = '';
+    tweetImgEl.removeAttribute('src');   // not src='', which reloads the page as an image
     imgContainerEl.style.display = 'none';
     imgClear.style.display = 'none';
   }
